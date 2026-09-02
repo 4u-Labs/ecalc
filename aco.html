@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Calculadora de Aço | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    
+    :root {
+      --primary: #06b6d4;
+      --secondary: #8b5cf6;
+      --dark: #0f172a;
+      --darker: #020617;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1e1b4b 100%);
+      min-height: 100vh;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glow {
+      box-shadow: 0 0 40px rgba(6, 182, 212, 0.15);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .tipo-btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .tipo-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .tipo-btn.active {
+      background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+      transform: scale(1.02);
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+    }
+    
+    .result-card {
+      animation: slideUp 0.5s ease-out forwards;
+      opacity: 0;
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .result-card:nth-child(1) { animation-delay: 0.1s; }
+    .result-card:nth-child(2) { animation-delay: 0.2s; }
+    .result-card:nth-child(3) { animation-delay: 0.3s; }
+    
+    .stat-value {
+      background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .progress-bar {
+      transition: width 0.8s ease-out;
+    }
+    
+    /* Steel bar visualization */
+    .steel-bar {
+      background: linear-gradient(90deg, #64748b 0%, #94a3b8 50%, #64748b 100%);
+      border-radius: 50px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .steel-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+      border-radius: 50px 50px 0 0;
+    }
+    
+    .steel-bar-ribs {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .rib {
+      width: 3px;
+      height: 60%;
+      background: rgba(0,0,0,0.3);
+      border-radius: 2px;
+    }
+    
+    /* Dropdown fixes */
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2306b6d4' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+    
+    select option {
+      background-color: #1e293b;
+      color: #f1f5f9;
+      padding: 12px;
+    }
+    
+    select option:hover,
+    select option:focus,
+    select option:checked {
+      background-color: #0f172a;
+      color: #06b6d4;
+    }
+    
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      z-index: 50;
+    }
+    
+    @media print {
+      body { background: white !important; }
+      .no-print { display: none !important; }
+      .glass { background: white; border: 1px solid #ddd; }
+      .gradient-text, .stat-value { color: #06b6d4; -webkit-text-fill-color: #06b6d4; }
+    }
+    
+    /* Table styles */
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th {
+      background: rgba(6, 182, 212, 0.1);
+      color: #06b6d4;
+      font-weight: 600;
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 2px solid rgba(6, 182, 212, 0.3);
+    }
+    
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .data-table tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    
+    .data-table tr.highlight {
+      background: rgba(6, 182, 212, 0.1);
+    }
+  </style>
+</head>
+<body class="text-gray-100">
+  <!-- Header -->
+  <header class="no-print sticky top-0 z-50 glass border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-xl">
+          🔩
+        </div>
+        <div>
+          <h1 class="text-lg font-bold gradient-text">Calculadora de Aço</h1>
+          <p class="text-xs text-gray-500">Ferramentas de Engenharia</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="window.print()" class="p-2 rounded-lg hover:bg-white/10 transition tooltip" data-tip="Imprimir">
+          🖨️
+        </button>
+        <button onclick="compartilhar()" class="p-2 rounded-lg hover:bg-white/10 transition tooltip" data-tip="Compartilhar">
+          📤
+        </button>
+        <a href="index.html" class="p-2 rounded-lg hover:bg-white/10 transition tooltip" data-tip="Voltar">
+          🏠
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Quick Stats -->
+    <div id="quickStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="glass rounded-2xl p-4 glow">
+        <div class="text-sm text-gray-400 mb-1">Bitola</div>
+        <div class="text-2xl font-bold stat-value" id="statBitola">Ø 10mm</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-sm text-gray-400 mb-1">Peso Total</div>
+        <div class="text-2xl font-bold stat-value" id="statPeso">0 kg</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-sm text-gray-400 mb-1">Comprimento</div>
+        <div class="text-2xl font-bold stat-value" id="statComprimento">0 m</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-sm text-gray-400 mb-1">Custo Total</div>
+        <div class="text-2xl font-bold stat-value" id="statCusto">R$ 0</div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="no-print flex flex-wrap gap-3 justify-center mb-8">
+      <button id="btnCalcular" class="px-8 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 font-semibold hover:opacity-90 transition transform hover:scale-105 flex items-center gap-2">
+        <span>⚡</span> Calcular
+      </button>
+      <button id="btnConfigurarPrecos" class="px-6 py-3 rounded-xl glass border border-cyan-500/30 hover:bg-cyan-500/10 transition flex items-center gap-2">
+        <span>⚙️</span> Configurar Preços
+      </button>
+      <button id="btnComparar" class="px-6 py-3 rounded-xl glass border border-violet-500/30 hover:bg-violet-500/10 transition flex items-center gap-2">
+        <span>📊</span> Comparar Bitolas
+      </button>
+      <button id="btnReset" class="px-6 py-3 rounded-xl glass border border-white/20 hover:bg-white/5 transition flex items-center gap-2">
+        <span>🔄</span> Limpar
+      </button>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Left Column - Main Content -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Calculation Type Selection -->
+        <section class="glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">🔧</span> Tipo de Cálculo
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="tiposCalculo">
+            <button class="tipo-btn active p-4 rounded-xl glass border-2 border-cyan-500/30 text-left" data-tipo="peso-comprimento">
+              <div class="text-2xl mb-2">📏</div>
+              <div class="font-medium">Peso por Comprimento</div>
+              <div class="text-xs text-gray-400">Calcular peso total</div>
+            </button>
+            <button class="tipo-btn p-4 rounded-xl glass border-2 border-white/10 text-left" data-tipo="comprimento-peso">
+              <div class="text-2xl mb-2">⚖️</div>
+              <div class="font-medium">Comprimento por Peso</div>
+              <div class="text-xs text-gray-400">Quantas barras comprar</div>
+            </button>
+            <button class="tipo-btn p-4 rounded-xl glass border-2 border-white/10 text-left" data-tipo="tabela-bitolas">
+              <div class="text-2xl mb-2">📊</div>
+              <div class="font-medium">Tabela de Bitolas</div>
+              <div class="text-xs text-gray-400">Referência técnica</div>
+            </button>
+          </div>
+        </section>
+
+        <!-- Form: Peso por Comprimento -->
+        <section class="glass rounded-2xl p-6" id="form-peso-comprimento">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📏</span> Calcular Peso por Comprimento
+          </h2>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Bitola (mm)</label>
+              <select id="bitola-peso" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-lg">
+                <option value="5.0">Ø 5.0 mm (CA-60)</option>
+                <option value="6.3">Ø 6.3 mm</option>
+                <option value="8.0">Ø 8.0 mm</option>
+                <option value="10.0" selected>Ø 10.0 mm</option>
+                <option value="12.5">Ø 12.5 mm</option>
+                <option value="16.0">Ø 16.0 mm</option>
+                <option value="20.0">Ø 20.0 mm</option>
+                <option value="25.0">Ø 25.0 mm</option>
+                <option value="32.0">Ø 32.0 mm</option>
+                <option value="40.0">Ø 40.0 mm</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Comprimento (m)</label>
+              <input type="number" id="comprimento-peso" value="12.00" step="0.01"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-lg font-medium">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Quantidade de barras</label>
+              <input type="number" id="quantidade-peso" value="1" min="1"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-lg font-medium">
+            </div>
+          </div>
+          
+          <div class="mt-4 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-start gap-3">
+            <span class="text-cyan-400 text-xl">💡</span>
+            <p class="text-sm text-cyan-300">
+              <strong>Dica:</strong> Barras comerciais padrão têm 12 metros de comprimento.
+            </p>
+          </div>
+        </section>
+
+        <!-- Form: Comprimento por Peso -->
+        <section class="glass rounded-2xl p-6 hidden" id="form-comprimento-peso">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">⚖️</span> Calcular Comprimento por Peso
+          </h2>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Bitola (mm)</label>
+              <select id="bitola-comprimento" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-lg">
+                <option value="5.0">Ø 5.0 mm (CA-60)</option>
+                <option value="6.3">Ø 6.3 mm</option>
+                <option value="8.0">Ø 8.0 mm</option>
+                <option value="10.0" selected>Ø 10.0 mm</option>
+                <option value="12.5">Ø 12.5 mm</option>
+                <option value="16.0">Ø 16.0 mm</option>
+                <option value="20.0">Ø 20.0 mm</option>
+                <option value="25.0">Ø 25.0 mm</option>
+                <option value="32.0">Ø 32.0 mm</option>
+                <option value="40.0">Ø 40.0 mm</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Peso total desejado (kg)</label>
+              <input type="number" id="peso-comprimento" value="100.00" step="0.01"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-lg font-medium">
+            </div>
+            <div class="tooltip" data-tip="Comprimento padrão de cada barra">
+              <label class="block text-sm text-gray-400 mb-2">Comprimento da barra (m) ℹ️</label>
+              <input type="number" id="tamanho-barra" value="12.00" step="0.01"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-lg font-medium">
+            </div>
+          </div>
+        </section>
+
+        <!-- Form: Tabela de Bitolas -->
+        <section class="glass rounded-2xl p-6 hidden" id="form-tabela">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📊</span> Tabela de Bitolas CA-50 e CA-60
+          </h2>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Bitola</th>
+                  <th>Tipo</th>
+                  <th>Área (cm²)</th>
+                  <th>Peso (kg/m)</th>
+                  <th>Peso Barra 12m</th>
+                  <th>Barras/Ton</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-bitolas-body">
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 p-4 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-start gap-3">
+            <span class="text-violet-400 text-xl">📐</span>
+            <p class="text-sm text-violet-300">
+              <strong>Fórmula:</strong> Peso (kg/m) = (Ø² / 162.2) ou Área × 7.85
+            </p>
+          </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultados" class="space-y-6">
+          <!-- Results will be injected here -->
+        </section>
+      </div>
+
+      <!-- Right Column - Visualization & Info -->
+      <div class="space-y-6">
+        <!-- Steel Bar Visualization -->
+        <section class="glass rounded-2xl p-6">
+          <h3 class="text-sm font-medium text-gray-400 mb-4">Visualização da Barra</h3>
+          <div class="flex flex-col items-center gap-4">
+            <div id="barraVisual" class="w-full">
+              <div class="steel-bar h-8 w-full relative">
+                <div class="steel-bar-ribs">
+                  <div class="rib"></div>
+                  <div class="rib"></div>
+                  <div class="rib"></div>
+                  <div class="rib"></div>
+                  <div class="rib"></div>
+                  <div class="rib"></div>
+                  <div class="rib"></div>
+                  <div class="rib"></div>
+                </div>
+              </div>
+              <div class="flex justify-between mt-2 text-xs text-gray-400">
+                <span>0m</span>
+                <span id="barraComprimento">12m</span>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-2 text-sm">
+              <div class="w-4 h-4 rounded-full bg-gradient-to-r from-cyan-500 to-violet-500" id="bitolaCircle" style="width: 20px; height: 20px;"></div>
+              <span id="bitolaLabel">Ø 10.0 mm</span>
+            </div>
+          </div>
+          
+          <div class="mt-6 space-y-3" id="barraSpecs">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-400">Peso Linear</span>
+              <span class="font-medium text-cyan-400" id="specPesoLinear">0.617 kg/m</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-400">Área da Seção</span>
+              <span class="font-medium" id="specArea">0.785 cm²</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-400">Tipo</span>
+              <span class="font-medium" id="specTipo">CA-50</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-400">Peso Barra 12m</span>
+              <span class="font-medium" id="specPeso12m">7.40 kg</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cost Summary -->
+        <section class="glass rounded-2xl p-6">
+          <h3 class="text-sm font-medium text-gray-400 mb-4">Resumo de Custos</h3>
+          <div id="costSummary" class="space-y-4">
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span>Material</span>
+                <span id="custoMaterial">R$ 0,00</span>
+              </div>
+              <div class="h-3 bg-white/10 rounded-full overflow-hidden">
+                <div id="barMaterial" class="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 progress-bar" style="width: 100%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-white/10 flex justify-between">
+            <span class="font-medium">Total</span>
+            <span class="font-bold text-lg gradient-text" id="custoTotal">R$ 0,00</span>
+          </div>
+          <div class="mt-2 text-xs text-gray-500">
+            Preço base: R$ <span id="precoBase">6.50</span>/kg
+          </div>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="glass rounded-2xl p-6">
+          <h3 class="text-sm font-medium text-gray-400 mb-4">Referência Rápida</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between p-2 rounded-lg bg-white/5">
+              <span>Densidade do aço</span>
+              <span class="text-cyan-400">7.850 kg/m³</span>
+            </div>
+            <div class="flex justify-between p-2 rounded-lg bg-white/5">
+              <span>Barra padrão</span>
+              <span class="text-cyan-400">12 metros</span>
+            </div>
+            <div class="flex justify-between p-2 rounded-lg bg-white/5">
+              <span>CA-50 (fy)</span>
+              <span class="text-cyan-400">500 MPa</span>
+            </div>
+            <div class="flex justify-between p-2 rounded-lg bg-white/5">
+              <span>CA-60 (fy)</span>
+              <span class="text-cyan-400">600 MPa</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div id="modalComparar" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+      <div class="glass rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-auto p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold gradient-text">📊 Comparativo de Bitolas</h2>
+          <button onclick="fecharModal('modalComparar')" class="p-2 hover:bg-white/10 rounded-lg">✕</button>
+        </div>
+        <div id="comparativoConteudo" class="overflow-x-auto">
+          <!-- Comparison table will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Price Configuration Modal -->
+    <div id="modalPrecos" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+      <div class="glass rounded-2xl max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold gradient-text">⚙️ Configurar Preços</h2>
+          <button onclick="fecharModal('modalPrecos')" class="p-2 hover:bg-white/10 rounded-lg">✕</button>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+            <label class="block text-sm text-gray-400 mb-2">Preço do Aço (R$/kg)</label>
+            <input type="number" id="preco-aco-kg" value="6.50" step="0.01" min="0"
+              class="w-full px-4 py-3 rounded-xl bg-white/5 border border-cyan-500/30 text-cyan-400 text-xl font-bold text-center">
+            <p class="text-xs text-gray-500 mt-2">Valor médio de mercado para CA-50</p>
+          </div>
+          
+          <div class="p-4 rounded-xl bg-violet-500/10 border border-violet-500/20">
+            <div class="flex items-center gap-2 text-violet-300 text-sm">
+              <span>💡</span>
+              <span>O preço pode variar de R$ 5,00 a R$ 10,00/kg dependendo da região e quantidade.</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex gap-3 mt-6">
+          <button onclick="restaurarPrecos()" class="flex-1 py-3 rounded-xl glass border border-white/20 hover:bg-white/5 transition">
+            Restaurar Padrão
+          </button>
+          <button onclick="salvarPrecos()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 font-semibold hover:opacity-90 transition">
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- References -->
+    <section class="glass rounded-2xl p-6 mt-8">
+      <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <span class="text-cyan-400">📚</span> Referências Normativas
+      </h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-white/5">
+          <div class="font-medium text-cyan-400">NBR 7480:2007</div>
+          <div class="text-sm text-gray-400">Aço para Armaduras de Concreto</div>
+        </div>
+        <div class="p-4 rounded-xl bg-white/5">
+          <div class="font-medium text-cyan-400">NBR 6118:2014</div>
+          <div class="text-sm text-gray-400">Projeto de Estruturas de Concreto</div>
+        </div>
+        <div class="p-4 rounded-xl bg-white/5">
+          <div class="font-medium text-cyan-400">NBR 7481:1990</div>
+          <div class="text-sm text-gray-400">Tela de Aço Soldada</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="no-print text-center py-8 text-gray-500 text-sm">
+    &copy; <span id="ano"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia
+  </footer>
+
+  <script>
+    // ===== DATA =====
+    const DENSIDADE_ACO = 7850;
+    
+    const bitolas = {
+      5.0: { diametro: 5.0, area: 0.196, peso: 0.154, tipo: 'CA-60' },
+      6.3: { diametro: 6.3, area: 0.312, peso: 0.245, tipo: 'CA-50' },
+      8.0: { diametro: 8.0, area: 0.503, peso: 0.395, tipo: 'CA-50' },
+      10.0: { diametro: 10.0, area: 0.785, peso: 0.617, tipo: 'CA-50' },
+      12.5: { diametro: 12.5, area: 1.227, peso: 0.963, tipo: 'CA-50' },
+      16.0: { diametro: 16.0, area: 2.011, peso: 1.578, tipo: 'CA-50' },
+      20.0: { diametro: 20.0, area: 3.142, peso: 2.466, tipo: 'CA-50' },
+      25.0: { diametro: 25.0, area: 4.909, peso: 3.853, tipo: 'CA-50' },
+      32.0: { diametro: 32.0, area: 8.042, peso: 6.313, tipo: 'CA-50' },
+      40.0: { diametro: 40.0, area: 12.566, peso: 9.864, tipo: 'CA-50' }
+    };
+
+    const precoPadrao = { custoKg: 9.80 };
+    let precos = JSON.parse(localStorage.getItem('precosAco')) || { ...precoPadrao };
+    let tipoCalculoAtual = 'peso-comprimento';
+    let ultimoResultado = null;
+
+    // ===== INITIALIZATION =====
+    document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('ano')) document.getElementById('ano').textContent = new Date().getFullYear();
+      document.getElementById('precoBase').textContent = precos.custoKg.toFixed(2);
+      carregarDados();
+      setupEventListeners();
+      calcular();
+      gerarTabelaBitolas();
+    });
+
+    function setupEventListeners() {
+      // Calculation type selection
+      document.querySelectorAll('.tipo-btn').forEach(btn => {
+        btn.addEventListener('click', () => selecionarTipo(btn.dataset.tipo));
+      });
+
+      // Action buttons
+      document.getElementById('btnCalcular').addEventListener('click', calcular);
+      document.getElementById('btnReset').addEventListener('click', resetar);
+      document.getElementById('btnConfigurarPrecos').addEventListener('click', () => abrirModal('modalPrecos'));
+      document.getElementById('btnComparar').addEventListener('click', abrirComparativo);
+
+      // Auto-calculate on input change
+      const inputsPeso = ['bitola-peso', 'comprimento-peso', 'quantidade-peso'];
+      const inputsComprimento = ['bitola-comprimento', 'peso-comprimento', 'tamanho-barra'];
+      
+      inputsPeso.forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', debounce(calcular, 300));
+        el.addEventListener('change', calcular);
+      });
+      
+      inputsComprimento.forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', debounce(calcular, 300));
+        el.addEventListener('change', calcular);
+      });
+
+      // Modal close on backdrop click
+      ['modalComparar', 'modalPrecos'].forEach(id => {
+        document.getElementById(id).addEventListener('click', (e) => {
+          if (e.target.id === id) fecharModal(id);
+        });
+      });
+    }
+
+    // ===== UTILITY FUNCTIONS =====
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    }
+
+    function salvarDados() {
+      const dados = {
+        tipoCalculoAtual,
+        bitolaPeso: document.getElementById('bitola-peso').value,
+        comprimentoPeso: document.getElementById('comprimento-peso').value,
+        quantidadePeso: document.getElementById('quantidade-peso').value,
+        bitolaComprimento: document.getElementById('bitola-comprimento').value,
+        pesoComprimento: document.getElementById('peso-comprimento').value,
+        tamanhoBarra: document.getElementById('tamanho-barra').value
+      };
+      localStorage.setItem('aco-calc', JSON.stringify(dados));
+    }
+
+    function carregarDados() {
+      const dados = JSON.parse(localStorage.getItem('aco-calc'));
+      if (!dados) return;
+
+      if (dados.tipoCalculoAtual) selecionarTipo(dados.tipoCalculoAtual, false);
+      if (dados.bitolaPeso) document.getElementById('bitola-peso').value = dados.bitolaPeso;
+      if (dados.comprimentoPeso) document.getElementById('comprimento-peso').value = dados.comprimentoPeso;
+      if (dados.quantidadePeso) document.getElementById('quantidade-peso').value = dados.quantidadePeso;
+      if (dados.bitolaComprimento) document.getElementById('bitola-comprimento').value = dados.bitolaComprimento;
+      if (dados.pesoComprimento) document.getElementById('peso-comprimento').value = dados.pesoComprimento;
+      if (dados.tamanhoBarra) document.getElementById('tamanho-barra').value = dados.tamanhoBarra;
+    }
+
+    // ===== TYPE SELECTION =====
+    function selecionarTipo(tipo, calcular_auto = true) {
+      tipoCalculoAtual = tipo;
+      
+      document.querySelectorAll('.tipo-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.classList.remove('border-cyan-500/30');
+        btn.classList.add('border-white/10');
+      });
+      
+      const activeBtn = document.querySelector(`.tipo-btn[data-tipo="${tipo}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.classList.remove('border-white/10');
+        activeBtn.classList.add('border-cyan-500/30');
+      }
+
+      // Show/hide forms
+      document.getElementById('form-peso-comprimento').classList.add('hidden');
+      document.getElementById('form-comprimento-peso').classList.add('hidden');
+      document.getElementById('form-tabela').classList.add('hidden');
+      document.getElementById('resultados').innerHTML = '';
+
+      if (tipo === 'peso-comprimento') {
+        document.getElementById('form-peso-comprimento').classList.remove('hidden');
+      } else if (tipo === 'comprimento-peso') {
+        document.getElementById('form-comprimento-peso').classList.remove('hidden');
+      } else if (tipo === 'tabela-bitolas') {
+        document.getElementById('form-tabela').classList.remove('hidden');
+        gerarTabelaBitolas();
+      }
+      
+      if (calcular_auto) calcular();
+    }
+
+    // ===== VISUALIZATION =====
+    function atualizarVisualizacao(bitola, comprimento) {
+      const info = bitolas[bitola];
+      
+      // Update bar size based on bitola
+      const barHeight = Math.max(8, Math.min(40, bitola * 1.2));
+      const steelBar = document.querySelector('.steel-bar');
+      steelBar.style.height = barHeight + 'px';
+      
+      // Update circle size
+      const circleSize = Math.max(12, Math.min(40, bitola * 1.5));
+      document.getElementById('bitolaCircle').style.width = circleSize + 'px';
+      document.getElementById('bitolaCircle').style.height = circleSize + 'px';
+      
+      // Update labels
+      document.getElementById('barraComprimento').textContent = comprimento + 'm';
+      document.getElementById('bitolaLabel').textContent = `Ø ${bitola} mm`;
+      
+      // Update specs
+      document.getElementById('specPesoLinear').textContent = info.peso.toFixed(3) + ' kg/m';
+      document.getElementById('specArea').textContent = info.area.toFixed(3) + ' cm²';
+      document.getElementById('specTipo').textContent = info.tipo;
+      document.getElementById('specPeso12m').textContent = (info.peso * 12).toFixed(2) + ' kg';
+    }
+
+    // ===== CALCULATIONS =====
+    function calcular() {
+      if (tipoCalculoAtual === 'peso-comprimento') {
+        calcularPesoPorComprimento();
+      } else if (tipoCalculoAtual === 'comprimento-peso') {
+        calcularComprimentoPorPeso();
+      }
+      salvarDados();
+    }
+
+    function calcularPesoPorComprimento() {
+      const bitola = parseFloat(document.getElementById('bitola-peso').value);
+      const comprimento = parseFloat(document.getElementById('comprimento-peso').value);
+      const quantidade = parseInt(document.getElementById('quantidade-peso').value);
+
+      if (!bitola || !comprimento || !quantidade) return;
+
+      const info = bitolas[bitola];
+      const pesoUnitario = info.peso;
+      const pesoTotal = pesoUnitario * comprimento * quantidade;
+      const comprimentoTotal = comprimento * quantidade;
+      const custoTotal = pesoTotal * precos.custoKg;
+      const barrasComerciais = Math.ceil(comprimentoTotal / 12);
+
+      ultimoResultado = {
+        bitola, comprimento, quantidade, info, pesoUnitario,
+        pesoTotal, comprimentoTotal, custoTotal, barrasComerciais
+      };
+
+      // Update Quick Stats
+      document.getElementById('statBitola').textContent = `Ø ${bitola}mm`;
+      document.getElementById('statPeso').textContent = pesoTotal.toFixed(2) + ' kg';
+      document.getElementById('statComprimento').textContent = comprimentoTotal.toFixed(1) + ' m';
+      document.getElementById('statCusto').textContent = formatCurrency(custoTotal);
+
+      // Update visualization
+      atualizarVisualizacao(bitola, comprimento);
+
+      // Update cost summary
+      document.getElementById('custoMaterial').textContent = formatCurrency(custoTotal);
+      document.getElementById('custoTotal').textContent = formatCurrency(custoTotal);
+      document.getElementById('precoBase').textContent = precos.custoKg.toFixed(2);
+
+      // Generate detailed results
+      gerarResultadoPeso(ultimoResultado);
+    }
+
+    function gerarResultadoPeso(dados) {
+      const { bitola, comprimento, quantidade, info, pesoUnitario,
+              pesoTotal, comprimentoTotal, custoTotal, barrasComerciais } = dados;
+
+      const html = `
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="result-card glass rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">📦</span>
+              Especificação da Barra
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Material</span>
+                <span class="font-medium">Aço ${info.tipo}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Bitola</span>
+                <span class="font-medium text-cyan-400">Ø ${bitola} mm</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Área da Seção</span>
+                <span>${info.area.toFixed(3)} cm²</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Peso Linear</span>
+                <span>${pesoUnitario.toFixed(3)} kg/m</span>
+              </div>
+              <div class="flex justify-between py-2">
+                <span class="text-gray-400">Resistência (fy)</span>
+                <span>${info.tipo === 'CA-60' ? '600' : '500'} MPa</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-card glass rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">⚖️</span>
+              Quantitativo
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Quantidade</span>
+                <span>${quantidade} barra(s)</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Comprimento Unitário</span>
+                <span>${comprimento.toFixed(2)} m</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Comprimento Total</span>
+                <span class="text-cyan-400">${comprimentoTotal.toFixed(2)} m</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Peso por Barra</span>
+                <span>${(pesoUnitario * comprimento).toFixed(2)} kg</span>
+              </div>
+              <div class="flex justify-between py-2 bg-cyan-500/10 rounded-lg px-3 -mx-3">
+                <span class="font-medium">Peso Total</span>
+                <span class="font-bold text-cyan-400">${pesoTotal.toFixed(2)} kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">💰</span>
+            Análise de Custos
+          </h3>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl bg-white/5 text-center">
+              <div class="text-sm text-gray-400 mb-1">Preço/kg</div>
+              <div class="text-xl font-bold text-green-400">${formatCurrency(precos.custoKg)}</div>
+            </div>
+            <div class="p-4 rounded-xl bg-white/5 text-center">
+              <div class="text-sm text-gray-400 mb-1">Peso Total</div>
+              <div class="text-xl font-bold">${pesoTotal.toFixed(2)} kg</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-500/10 text-center">
+              <div class="text-sm text-gray-400 mb-1">Custo Total</div>
+              <div class="text-xl font-bold text-green-400">${formatCurrency(custoTotal)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">📋</span>
+            Resumo do Pedido
+          </h3>
+          <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <p class="text-amber-200">
+              Para <strong>${comprimentoTotal.toFixed(2)}m</strong> de Ø${bitola}mm, 
+              são necessárias aproximadamente <strong>${barrasComerciais} barras comerciais</strong> de 12m.
+            </p>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4 mt-4">
+            <ul class="space-y-2 text-sm">
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> ${quantidade}× barras de ${comprimento}m</li>
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> Peso unitário: ${(pesoUnitario * comprimento).toFixed(2)} kg/barra</li>
+            </ul>
+            <ul class="space-y-2 text-sm">
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> Peso total: ${pesoTotal.toFixed(2)} kg</li>
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> Custo: ${formatCurrency(custoTotal)}</li>
+            </ul>
+          </div>
+        </div>
+      `;
+
+      html += `
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📝</span> Memorial de Cálculo
+          </h3>
+          <pre class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE AÇO
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS GERAIS
+Material: Aço ${info.tipo} (fy = ${info.tipo === 'CA-60' ? '600' : '500'} MPa)
+Densidade do Aço: 7.850 kg/m³
+Bitola Solicitada: Ø ${bitola} mm
+Área da Seção Transversal: ${info.area.toFixed(3)} cm²
+
+2. CÁLCULO DE PESO LINEAR
+Fórmula: Peso (kg/m) = Área (cm²) × 0.785  [ou Ø² / 162.2]
+Peso Unitário da Bitola = ${pesoUnitario.toFixed(3)} kg/m
+
+3. QUANTITATIVOS
+Comprimento Base: ${comprimento.toFixed(2)} m
+Quantidade: ${quantidade} barra(s)
+Comprimento Total = ${comprimentoTotal.toFixed(2)} m
+
+Peso Total = Comprimento Total × Peso Linear
+Peso Total = ${comprimentoTotal.toFixed(2)} × ${pesoUnitario.toFixed(3)}
+Peso Total = ${pesoTotal.toFixed(2)} kg
+
+4. PREVISÃO DE BARRAS COMERCIAIS
+Barra comercial padrão = 12.00 m
+Barras de 12m necessárias = ${barrasComerciais} un</pre>
+        </div>
+      `;
+
+      document.getElementById('resultados').innerHTML = html;
+    }
+
+    function calcularComprimentoPorPeso() {
+      const bitola = parseFloat(document.getElementById('bitola-comprimento').value);
+      const pesoDesejado = parseFloat(document.getElementById('peso-comprimento').value);
+      const tamanhoBarra = parseFloat(document.getElementById('tamanho-barra').value);
+
+      if (!bitola || !pesoDesejado || !tamanhoBarra) return;
+
+      const info = bitolas[bitola];
+      const pesoUnitario = info.peso;
+      const comprimentoTeorico = pesoDesejado / pesoUnitario;
+      const quantidadeBarras = Math.ceil(comprimentoTeorico / tamanhoBarra);
+      const comprimentoReal = quantidadeBarras * tamanhoBarra;
+      const pesoReal = comprimentoReal * pesoUnitario;
+      const sobra = pesoReal - pesoDesejado;
+      const sobraPercentual = (sobra / pesoDesejado) * 100;
+      const custoTotal = pesoReal * precos.custoKg;
+
+      ultimoResultado = {
+        bitola, pesoDesejado, tamanhoBarra, info, pesoUnitario,
+        comprimentoTeorico, quantidadeBarras, comprimentoReal,
+        pesoReal, sobra, sobraPercentual, custoTotal
+      };
+
+      // Update Quick Stats
+      document.getElementById('statBitola').textContent = `Ø ${bitola}mm`;
+      document.getElementById('statPeso').textContent = pesoReal.toFixed(2) + ' kg';
+      document.getElementById('statComprimento').textContent = comprimentoReal.toFixed(1) + ' m';
+      document.getElementById('statCusto').textContent = formatCurrency(custoTotal);
+
+      // Update visualization
+      atualizarVisualizacao(bitola, tamanhoBarra);
+
+      // Update cost summary
+      document.getElementById('custoMaterial').textContent = formatCurrency(custoTotal);
+      document.getElementById('custoTotal').textContent = formatCurrency(custoTotal);
+
+      // Generate detailed results
+      gerarResultadoComprimento(ultimoResultado);
+    }
+
+    function gerarResultadoComprimento(dados) {
+      const { bitola, pesoDesejado, tamanhoBarra, info, pesoUnitario,
+              comprimentoTeorico, quantidadeBarras, comprimentoReal,
+              pesoReal, sobra, sobraPercentual, custoTotal } = dados;
+
+      const html = `
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="result-card glass rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">📐</span>
+              Cálculo de Comprimento
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Bitola</span>
+                <span class="font-medium text-cyan-400">Ø ${bitola} mm</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Peso Solicitado</span>
+                <span>${pesoDesejado.toFixed(2)} kg</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Comprimento Teórico</span>
+                <span>${comprimentoTeorico.toFixed(2)} m</span>
+              </div>
+              <div class="flex justify-between py-2 bg-cyan-500/10 rounded-lg px-3 -mx-3">
+                <span class="font-medium">Barras Necessárias</span>
+                <span class="font-bold text-cyan-400">${quantidadeBarras} un</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-card glass rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">📦</span>
+              Quantidades Reais
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Comprimento Barra</span>
+                <span>${tamanhoBarra.toFixed(2)} m</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Comprimento Real</span>
+                <span>${comprimentoReal.toFixed(2)} m</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Peso Real</span>
+                <span class="text-cyan-400">${pesoReal.toFixed(2)} kg</span>
+              </div>
+              <div class="flex justify-between py-2 ${sobra > 0 ? 'bg-amber-500/10' : 'bg-green-500/10'} rounded-lg px-3 -mx-3">
+                <span class="font-medium">Sobra</span>
+                <span class="font-bold ${sobra > 0 ? 'text-amber-400' : 'text-green-400'}">
+                  ${sobra.toFixed(2)} kg (${sobraPercentual.toFixed(1)}%)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">💰</span>
+            Custo do Pedido
+          </h3>
+          <div class="grid md:grid-cols-4 gap-4">
+            <div class="p-4 rounded-xl bg-white/5 text-center">
+              <div class="text-sm text-gray-400 mb-1">Barras</div>
+              <div class="text-xl font-bold">${quantidadeBarras}</div>
+            </div>
+            <div class="p-4 rounded-xl bg-white/5 text-center">
+              <div class="text-sm text-gray-400 mb-1">Peso Real</div>
+              <div class="text-xl font-bold">${pesoReal.toFixed(1)} kg</div>
+            </div>
+            <div class="p-4 rounded-xl bg-white/5 text-center">
+              <div class="text-sm text-gray-400 mb-1">Preço/kg</div>
+              <div class="text-xl font-bold">${formatCurrency(precos.custoKg)}</div>
+            </div>
+            <div class="p-4 rounded-xl bg-green-500/10 text-center">
+              <div class="text-sm text-gray-400 mb-1">Total</div>
+              <div class="text-xl font-bold text-green-400">${formatCurrency(custoTotal)}</div>
+            </div>
+          </div>
+        </div>
+
+        ${sobra > 0 ? `
+        <div class="result-card p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 mt-6 flex items-start gap-3">
+          <span class="text-amber-400 text-xl">⚠️</span>
+          <p class="text-amber-200">
+            <strong>Atenção:</strong> Como as barras são vendidas em tamanhos padrão (${tamanhoBarra}m), 
+            há uma sobra de <strong>${sobra.toFixed(2)} kg</strong> (${sobraPercentual.toFixed(1)}%).
+            Considere utilizar a sobra em outros elementos da obra.
+          </p>
+        </div>
+        ` : ''}
+      `;
+
+      html += `
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📝</span> Memorial de Cálculo
+          </h3>
+          <pre class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE AÇO
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS GERAIS
+Material: Aço ${info.tipo} (fy = ${info.tipo === 'CA-60' ? '600' : '500'} MPa)
+Bitola Solicitada: Ø ${bitola} mm
+Peso Linear: ${pesoUnitario.toFixed(3)} kg/m
+
+2. CÁLCULO DE COMPRIMENTO
+Peso Solicitado = ${pesoDesejado.toFixed(2)} kg
+Comprimento Teórico = Peso Solicitado ÷ Peso Linear
+Comprimento Teórico = ${pesoDesejado.toFixed(2)} ÷ ${pesoUnitario.toFixed(3)} = ${comprimentoTeorico.toFixed(2)} m
+
+3. AJUSTE PARA BARRAS COMERCIAIS
+Tamanho de Corte/Barra adotado = ${tamanhoBarra.toFixed(2)} m
+Quantidade de Barras = Math.ceil(Comprimento Teórico ÷ Tamanho da Barra)
+Quantidade de Barras = ${quantidadeBarras} un
+
+4. COMPRIMENTO E PESO REAL
+Comprimento Real = ${quantidadeBarras} × ${tamanhoBarra.toFixed(2)} = ${comprimentoReal.toFixed(2)} m
+Peso Real = Comprimento Real × Peso Linear = ${pesoReal.toFixed(2)} kg
+Sobra = ${sobra.toFixed(2)} kg (${sobraPercentual.toFixed(1)}%)</pre>
+        </div>
+      `;
+
+      document.getElementById('resultados').innerHTML = html;
+    }
+
+    // ===== TABLE =====
+    function gerarTabelaBitolas() {
+      let html = '';
+      Object.entries(bitolas).forEach(([key, info]) => {
+        const peso12m = info.peso * 12;
+        const barrasPorTon = Math.floor(1000 / peso12m);
+        
+        html += `
+          <tr class="${key === '10.0' ? 'highlight' : ''}">
+            <td class="font-bold text-cyan-400">Ø ${info.diametro} mm</td>
+            <td><span class="px-2 py-1 rounded text-xs ${info.tipo === 'CA-60' ? 'bg-violet-500/20 text-violet-400' : 'bg-cyan-500/20 text-cyan-400'}">${info.tipo}</span></td>
+            <td>${info.area.toFixed(3)}</td>
+            <td>${info.peso.toFixed(3)}</td>
+            <td>${peso12m.toFixed(2)} kg</td>
+            <td>${barrasPorTon} barras</td>
+          </tr>
+        `;
+      });
+      document.getElementById('tabela-bitolas-body').innerHTML = html;
+    }
+
+    // ===== COMPARISON =====
+    function abrirComparativo() {
+      const comprimento = parseFloat(document.getElementById('comprimento-peso')?.value || 
+                                     document.getElementById('tamanho-barra')?.value || 12);
+      
+      let html = `
+        <p class="text-sm text-gray-400 mb-4">Comparativo para ${comprimento}m de barra</p>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Bitola</th>
+              <th>Tipo</th>
+              <th>Peso (${comprimento}m)</th>
+              <th>Custo (${comprimento}m)</th>
+              <th>Barras/Ton</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      Object.entries(bitolas).forEach(([key, info]) => {
+        const peso = info.peso * comprimento;
+        const custo = peso * precos.custoKg;
+        const barrasPorTon = Math.floor(1000 / peso);
+        
+        html += `
+          <tr>
+            <td class="font-bold text-cyan-400">Ø ${info.diametro} mm</td>
+            <td>${info.tipo}</td>
+            <td>${peso.toFixed(2)} kg</td>
+            <td class="text-green-400">${formatCurrency(custo)}</td>
+            <td>${barrasPorTon}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+
+      document.getElementById('comparativoConteudo').innerHTML = html;
+      abrirModal('modalComparar');
+    }
+
+    // ===== MODALS =====
+    function abrirModal(id) {
+      if (id === 'modalPrecos') {
+        document.getElementById('preco-aco-kg').value = precos.custoKg.toFixed(2);
+      }
+      document.getElementById(id).classList.remove('hidden');
+      document.getElementById(id).classList.add('flex');
+    }
+
+    function fecharModal(id) {
+      document.getElementById(id).classList.add('hidden');
+      document.getElementById(id).classList.remove('flex');
+    }
+
+    // ===== PRICES =====
+    function salvarPrecos() {
+      const custoKg = parseFloat(document.getElementById('preco-aco-kg').value);
+      
+      if (isNaN(custoKg) || custoKg < 0) {
+        alert('Por favor, insira um valor válido!');
+        return;
+      }
+
+      precos.custoKg = custoKg;
+      localStorage.setItem('precosAco', JSON.stringify(precos));
+      document.getElementById('precoBase').textContent = custoKg.toFixed(2);
+      
+      calcular();
+      fecharModal('modalPrecos');
+      
+      // Show confirmation
+      const btn = document.getElementById('btnConfigurarPrecos');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span>✓</span> Salvo!';
+      btn.classList.add('border-green-500/50');
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.remove('border-green-500/50');
+      }, 2000);
+    }
+
+    function restaurarPrecos() {
+      if (confirm('Restaurar preços padrão?')) {
+        precos = { ...precoPadrao };
+        localStorage.setItem('precosAco', JSON.stringify(precos));
+        document.getElementById('preco-aco-kg').value = precos.custoKg.toFixed(2);
+        document.getElementById('precoBase').textContent = precos.custoKg.toFixed(2);
+        calcular();
+      }
+    }
+
+    // ===== RESET =====
+    function resetar() {
+      if (tipoCalculoAtual === 'peso-comprimento') {
+        document.getElementById('bitola-peso').value = '10.0';
+        document.getElementById('comprimento-peso').value = '12.00';
+        document.getElementById('quantidade-peso').value = '1';
+      } else if (tipoCalculoAtual === 'comprimento-peso') {
+        document.getElementById('bitola-comprimento').value = '10.0';
+        document.getElementById('peso-comprimento').value = '100.00';
+        document.getElementById('tamanho-barra').value = '12.00';
+      }
+      
+      document.getElementById('resultados').innerHTML = '';
+      localStorage.removeItem('aco-calc');
+      calcular();
+    }
+
+    // ===== SHARE =====
+    function compartilhar() {
+      if (ultimoResultado && navigator.share) {
+        navigator.share({
+          title: 'Cálculo de Aço',
+          text: `Ø${ultimoResultado.bitola}mm - Peso: ${ultimoResultado.pesoTotal?.toFixed(2) || ultimoResultado.pesoReal?.toFixed(2)} kg - Custo: ${formatCurrency(ultimoResultado.custoTotal)}`,
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        window.print();
+      }
+    }
+  </script>
+</body>
+</html>
