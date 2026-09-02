@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Instalações Elétricas Residenciais | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+      min-height: 100vh;
+    }
+    
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,193,7,0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,193,7,0.5); }
+    
+    /* Animações */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,193,7,0.2); }
+      50% { box-shadow: 0 0 40px rgba(255,193,7,0.4); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+    .animate-slide-in { animation: slideIn 0.3s ease-out; }
+    .animate-pulse-glow { animation: pulse-glow 2s infinite; }
+    
+    /* Glassmorphism */
+    .glass {
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .glass-gold {
+      background: rgba(255,193,7,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,193,7,0.2);
+    }
+    
+    /* Botões de ambiente */
+    .tipo-btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .tipo-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,193,7,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .tipo-btn:hover::before {
+      left: 100%;
+    }
+    
+    .tipo-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(255,193,7,0.2);
+    }
+    
+    .tipo-btn.active {
+      background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+      color: #000;
+      transform: scale(1.02);
+    }
+    
+    /* Cards de ambiente */
+    .ambiente-card {
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .ambiente-card:hover {
+      border-color: rgba(255,193,7,0.5);
+      transform: translateY(-2px);
+    }
+    
+    .ambiente-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ffc107, #ff9800);
+      border-radius: 10px 10px 0 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .ambiente-card:hover::after {
+      opacity: 1;
+    }
+    
+    /* Tabs */
+    .tab-btn {
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .tab-btn::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #ffc107;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    
+    .tab-btn.active::after {
+      transform: scaleX(1);
+    }
+    
+    .tab-btn.active {
+      color: #ffc107;
+    }
+    
+    /* Quadro elétrico visual */
+    .quadro-container {
+      perspective: 1000px;
+    }
+    
+    .quadro-visual {
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+    
+    .quadro-container:hover .quadro-visual {
+      transform: rotateY(5deg) rotateX(2deg);
+    }
+    
+    .disjuntor-linha {
+      transition: all 0.3s ease;
+    }
+    
+    .disjuntor-linha:hover {
+      background: rgba(255,193,7,0.15);
+      transform: translateX(5px);
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ffc107, #ff9800);
+      border-radius: 4px;
+      transition: width 1s ease-out;
+    }
+    
+    /* Tooltips */
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-5px);
+      background: rgba(0,0,0,0.9);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .tooltip:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-10px);
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    /* Tabela de materiais */
+    .tabela-materiais {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .tabela-materiais th,
+    .tabela-materiais td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .tabela-materiais th {
+      background: rgba(255,193,7,0.1);
+      color: #ffc107;
+      font-weight: 600;
+    }
+    
+    .tabela-materiais tr:hover {
+      background: rgba(255,255,255,0.03);
+    }
+    
+    .tabela-materiais tfoot td {
+      background: rgba(255,193,7,0.1);
+      font-weight: 700;
+      color: #ffc107;
+    }
+    
+    /* Status indicators */
+    .status-ok { color: #28a745; }
+    .status-warning { color: #ffc107; }
+    .status-danger { color: #dc3545; }
+    
+    /* Chart container */
+    .chart-container {
+      position: relative;
+      height: 200px;
+    }
+    
+    /* Print styles */
+    @media print {
+      body { background: white !important; color: black !important; }
+      .no-print { display: none !important; }
+      .glass, .glass-gold { background: white !important; border: 1px solid #ccc !important; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .specs-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .modal-content { padding: 20px !important; }
+    }
+  </style>
+</head>
+<body class="text-gray-200">
+  <!-- Header -->
+  <header class="glass border-b border-amber-500/20 sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+            <i class="fas fa-bolt text-black text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-amber-400">Instalações Elétricas</h1>
+            <p class="text-xs text-gray-400">Dimensionamento NBR 5410</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="exportarPDF()" class="tooltip px-3 py-2 glass rounded-lg hover:bg-white/10 transition-all" data-tooltip="Exportar PDF">
+            <i class="fas fa-file-pdf text-amber-400"></i>
+          </button>
+          <button onclick="salvarProjeto()" class="tooltip px-3 py-2 glass rounded-lg hover:bg-white/10 transition-all" data-tooltip="Salvar Projeto">
+            <i class="fas fa-save text-amber-400"></i>
+          </button>
+          <button onclick="carregarProjeto()" class="tooltip px-3 py-2 glass rounded-lg hover:bg-white/10 transition-all" data-tooltip="Carregar Projeto">
+            <i class="fas fa-folder-open text-amber-400"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-4 justify-center mb-8 no-print">
+      <button id="btnCalcular" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all transform hover:scale-105">
+        <i class="fas fa-calculator mr-2"></i> Calcular
+      </button>
+      <button id="btnConfigurarPrecos" class="px-6 py-3 glass-gold rounded-xl text-amber-400 hover:bg-amber-500/20 transition-all">
+        <i class="fas fa-cog mr-2"></i> Configurar Preços
+      </button>
+      <button id="btnBalanceamento" class="px-6 py-3 glass-gold rounded-xl text-amber-400 hover:bg-amber-500/20 transition-all">
+        <i class="fas fa-balance-scale mr-2"></i> Balanceamento
+      </button>
+      <button id="btnReset" class="px-6 py-3 glass rounded-xl text-gray-400 hover:text-red-400 hover:border-red-500/50 transition-all">
+        <i class="fas fa-trash mr-2"></i> Limpar
+      </button>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="glass-gold rounded-xl p-4 mb-8 no-print">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm text-gray-400">Progresso do Dimensionamento</span>
+        <span id="progressText" class="text-sm text-amber-400 font-semibold">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+      </div>
+      <div class="flex justify-between mt-3 text-xs text-gray-500">
+        <span id="step1" class="flex items-center gap-1"><i class="fas fa-circle text-gray-600"></i> Dados Gerais</span>
+        <span id="step2" class="flex items-center gap-1"><i class="fas fa-circle text-gray-600"></i> Ambientes</span>
+        <span id="step3" class="flex items-center gap-1"><i class="fas fa-circle text-gray-600"></i> Cálculo</span>
+        <span id="step4" class="flex items-center gap-1"><i class="fas fa-circle text-gray-600"></i> Resultado</span>
+      </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="flex gap-1 mb-6 glass rounded-xl p-1 no-print overflow-x-auto">
+      <button class="tab-btn active flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all" data-tab="dados">
+        <i class="fas fa-sliders-h mr-2"></i> Dados Gerais
+      </button>
+      <button class="tab-btn flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all" data-tab="ambientes">
+        <i class="fas fa-home mr-2"></i> Ambientes
+      </button>
+      <button class="tab-btn flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all" data-tab="resultados">
+        <i class="fas fa-chart-bar mr-2"></i> Resultados
+      </button>
+      <button class="tab-btn flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all" data-tab="materiais">
+        <i class="fas fa-list mr-2"></i> Lista de Materiais
+      </button>
+    </div>
+
+    <!-- Tab: Dados Gerais -->
+    <section id="tab-dados" class="tab-content glass-gold rounded-2xl p-6 mb-6 animate-fade-in">
+      <h2 class="text-xl font-bold text-amber-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-sliders-h"></i> Dados Gerais da Instalação
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-building mr-1"></i> Tipo de Instalação
+          </label>
+          <select id="tipo-instalacao" class="w-full px-4 py-3 bg-black/30 border border-amber-500/30 rounded-xl text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+            <option value="residencial" selected>🏠 Residencial</option>
+            <option value="comercial">🏢 Comercial</option>
+            <option value="industrial">🏭 Industrial</option>
+            <option value="misto">🔀 Misto</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-ruler-combined mr-1"></i> Área Construída (m²)
+          </label>
+          <input type="number" id="area-construida" value="100" min="20" class="w-full px-4 py-3 bg-black/30 border border-amber-500/30 rounded-xl text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-bolt mr-1"></i> Tensão de Alimentação
+          </label>
+          <select id="tensao" class="w-full px-4 py-3 bg-black/30 border border-amber-500/30 rounded-xl text-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+            <option value="127">127V (Monofásico)</option>
+            <option value="220" selected>220V (Bifásico)</option>
+            <option value="380">380V (Trifásico)</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-percentage mr-1"></i> Fator de Demanda
+          </label>
+          <div class="relative">
+            <input type="range" id="fator-demanda-range" min="50" max="100" value="70" class="w-full h-2 bg-black/30 rounded-lg appearance-none cursor-pointer accent-amber-500">
+            <div class="flex justify-between mt-2">
+              <span class="text-xs text-gray-500">50%</span>
+              <span id="fator-demanda-value" class="text-sm text-amber-400 font-bold">70%</span>
+              <span class="text-xs text-gray-500">100%</span>
+            </div>
+          </div>
+          <input type="hidden" id="fator-demanda" value="70">
+        </div>
+      </div>
+      
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-amber-400" id="stat-ambientes">0</div>
+          <div class="text-xs text-gray-400">Ambientes</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-green-400" id="stat-circuitos">0</div>
+          <div class="text-xs text-gray-400">Circuitos</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-blue-400" id="stat-potencia">0</div>
+          <div class="text-xs text-gray-400">kW Total</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-purple-400" id="stat-custo">0</div>
+          <div class="text-xs text-gray-400">Custo Est.</div>
+        </div>
+      </div>
+      
+      <div class="mt-6 p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl flex items-start gap-3">
+        <i class="fas fa-lightbulb text-cyan-400 text-xl mt-0.5"></i>
+        <div>
+          <p class="text-cyan-400 font-semibold">NBR 5410 - Fator de Demanda</p>
+          <p class="text-gray-400 text-sm mt-1">
+            Residencial: 70-80% | Comercial: 80-90% | Industrial: 90-100%
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab: Ambientes -->
+    <section id="tab-ambientes" class="tab-content glass-gold rounded-2xl p-6 mb-6 hidden">
+      <h2 class="text-xl font-bold text-amber-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-home"></i> Ambientes e Cargas
+      </h2>
+      
+      <!-- Ambiente Buttons -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
+        <button class="tipo-btn glass p-4 rounded-xl text-center border-2 border-amber-500/20 hover:border-amber-500" onclick="adicionarAmbientePredefinido('sala')">
+          <div class="text-3xl mb-2">🛋️</div>
+          <div class="text-sm font-medium">Sala</div>
+        </button>
+        <button class="tipo-btn glass p-4 rounded-xl text-center border-2 border-amber-500/20 hover:border-amber-500" onclick="adicionarAmbientePredefinido('quarto')">
+          <div class="text-3xl mb-2">🛏️</div>
+          <div class="text-sm font-medium">Quarto</div>
+        </button>
+        <button class="tipo-btn glass p-4 rounded-xl text-center border-2 border-amber-500/20 hover:border-amber-500" onclick="adicionarAmbientePredefinido('cozinha')">
+          <div class="text-3xl mb-2">🍳</div>
+          <div class="text-sm font-medium">Cozinha</div>
+        </button>
+        <button class="tipo-btn glass p-4 rounded-xl text-center border-2 border-amber-500/20 hover:border-amber-500" onclick="adicionarAmbientePredefinido('banheiro')">
+          <div class="text-3xl mb-2">🚿</div>
+          <div class="text-sm font-medium">Banheiro</div>
+        </button>
+        <button class="tipo-btn glass p-4 rounded-xl text-center border-2 border-amber-500/20 hover:border-amber-500" onclick="adicionarAmbientePredefinido('area-servico')">
+          <div class="text-3xl mb-2">🧺</div>
+          <div class="text-sm font-medium">Área Serviço</div>
+        </button>
+        <button class="tipo-btn glass p-4 rounded-xl text-center border-2 border-amber-500/20 hover:border-amber-500" onclick="adicionarAmbientePredefinido('garagem')">
+          <div class="text-3xl mb-2">🚗</div>
+          <div class="text-sm font-medium">Garagem</div>
+        </button>
+        <button class="tipo-btn glass p-4 rounded-xl text-center border-2 border-amber-500/20 hover:border-amber-500" onclick="adicionarAmbientePredefinido('escritorio')">
+          <div class="text-3xl mb-2">💼</div>
+          <div class="text-sm font-medium">Escritório</div>
+        </button>
+        <button class="tipo-btn glass p-4 rounded-xl text-center border-2 border-amber-500/20 hover:border-amber-500" onclick="adicionarAmbientePredefinido('varanda')">
+          <div class="text-3xl mb-2">🌿</div>
+          <div class="text-sm font-medium">Varanda</div>
+        </button>
+        <button class="tipo-btn glass p-4 rounded-xl text-center border-2 border-green-500/30 hover:border-green-500 hover:bg-green-500/10" onclick="adicionarAmbientePersonalizado()">
+          <div class="text-3xl mb-2">➕</div>
+          <div class="text-sm font-medium text-green-400">Personalizado</div>
+        </button>
+      </div>
+      
+      <!-- Lista de Ambientes -->
+      <div id="lista-ambientes" class="space-y-4">
+        <div class="text-center py-12 text-gray-500">
+          <i class="fas fa-home text-5xl mb-4 opacity-30"></i>
+          <p>Adicione ambientes usando os botões acima</p>
+        </div>
+      </div>
+      
+      <!-- Normas -->
+      <div class="mt-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+        <p class="text-amber-400 font-semibold flex items-center gap-2">
+          <i class="fas fa-exclamation-triangle"></i> Pontos Mínimos NBR 5410
+        </p>
+        <ul class="text-gray-400 text-sm mt-2 space-y-1">
+          <li>• <strong>Sala/Quarto:</strong> 1 tomada a cada 5m de perímetro (mín. 100VA por ponto)</li>
+          <li>• <strong>Cozinha:</strong> 1 tomada a cada 3,5m de perímetro (mín. 600VA por ponto)</li>
+          <li>• <strong>Banheiro:</strong> 1 tomada junto ao lavatório (mín. 600VA)</li>
+          <li>• <strong>Iluminação:</strong> Mínimo 100VA para área ≤ 6m², +60VA a cada 4m² excedentes</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Tab: Resultados -->
+    <section id="tab-resultados" class="tab-content glass-gold rounded-2xl p-6 mb-6 hidden">
+      <h2 class="text-xl font-bold text-amber-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-chart-bar"></i> Dimensionamento Elétrico
+      </h2>
+      <div id="resultado">
+        <div class="text-center py-12 text-gray-500">
+          <i class="fas fa-calculator text-5xl mb-4 opacity-30"></i>
+          <p>Clique em "Calcular" para gerar os resultados</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab: Lista de Materiais -->
+    <section id="tab-materiais" class="tab-content glass-gold rounded-2xl p-6 mb-6 hidden">
+      <h2 class="text-xl font-bold text-amber-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-list"></i> Lista de Materiais
+      </h2>
+      <div id="lista-materiais">
+        <div class="text-center py-12 text-gray-500">
+          <i class="fas fa-boxes text-5xl mb-4 opacity-30"></i>
+          <p>Execute o cálculo para gerar a lista de materiais</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Referências NBR -->
+    <section class="glass rounded-2xl p-6 mb-6">
+      <h2 class="text-xl font-bold text-amber-400 mb-4 flex items-center gap-3">
+        <i class="fas fa-book"></i> Referências Normativas
+      </h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="glass p-4 rounded-xl">
+          <h3 class="font-semibold text-white mb-2">NBR 5410:2004</h3>
+          <ul class="text-sm text-gray-400 space-y-1">
+            <li>• Item 4.2 - Características gerais</li>
+            <li>• Item 6.2 - Circuitos de distribuição</li>
+            <li>• Item 6.5 - Seção dos condutores</li>
+            <li>• Item 9.5 - Proteção contra sobrecorrentes</li>
+          </ul>
+        </div>
+        <div class="glass p-4 rounded-xl">
+          <h3 class="font-semibold text-white mb-2">Outras Normas</h3>
+          <ul class="text-sm text-gray-400 space-y-1">
+            <li>• NR-10 - Segurança em eletricidade</li>
+            <li>• NBR 5419 - Proteção contra descargas</li>
+            <li>• NBR 14039 - Instalações de média tensão</li>
+            <li>• NBR IEC 60898 - Disjuntores</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  
+
+  <!-- Modal Container -->
+  <div id="modal-container"></div>
+
+  <script>
+    // =============================================
+    // CONFIGURAÇÕES E DADOS
+    // =============================================
+    
+    let ambientes = [];
+    let ultimoCalculo = null;
+    
+    // Preços configuráveis
+    let precosConfig = {
+      cabo_1_5: 3.20,
+      cabo_2_5: 5.10,
+      cabo_4: 7.50,
+      cabo_6: 11.20,
+      cabo_10: 18.50,
+      cabo_16: 29.00,
+      cabo_25: 46.00,
+      cabo_35: 64.00,
+      cabo_50: 88.00,
+      disjuntor_10a: 22,
+      disjuntor_16a: 22,
+      disjuntor_20a: 24,
+      disjuntor_25a: 24,
+      disjuntor_32a: 28,
+      disjuntor_40a: 42,
+      disjuntor_50a: 54,
+      disjuntor_63a: 72,
+      disjuntor_geral: 210,
+      dr_30ma: 185,
+      dps: 98,
+      quadro_base: 280,
+      quadro_por_circuito: 22,
+      eletroduto_20mm: 4.80,
+      eletroduto_25mm: 6.20,
+      eletroduto_32mm: 8.50,
+      caixa_4x2: 4.50,
+      caixa_4x4: 6.00,
+      tomada_10a: 18.00,
+      tomada_20a: 22.00,
+      interruptor: 16.00,
+      mao_obra_percentual: 50
+    };
+    
+    const precosConfigPadrao = { ...precosConfig };
+    
+    // Aparelhos padrão com mais detalhes
+    const aparelhosPadrao = {
+      'lampada-led': { nome: 'Lâmpada LED', potencia: 12, tipo: 'iluminacao', icone: '💡' },
+      'lampada-led-20w': { nome: 'Lâmpada LED 20W', potencia: 20, tipo: 'iluminacao', icone: '💡' },
+      'plafon-led': { nome: 'Plafon LED', potencia: 24, tipo: 'iluminacao', icone: '🔆' },
+      'spot-led': { nome: 'Spot LED', potencia: 7, tipo: 'iluminacao', icone: '🔦' },
+      'fita-led-metro': { nome: 'Fita LED (por metro)', potencia: 15, tipo: 'iluminacao', icone: '🌈' },
+      'tomada-uso-geral': { nome: 'Tomada Uso Geral', potencia: 100, tipo: 'tomada', icone: '🔌' },
+      'tomada-tug': { nome: 'TUG (600VA)', potencia: 600, tipo: 'tomada', icone: '🔌' },
+      'geladeira': { nome: 'Geladeira', potencia: 150, tipo: 'tue', icone: '🧊' },
+      'geladeira-duplex': { nome: 'Geladeira Duplex', potencia: 200, tipo: 'tue', icone: '🧊' },
+      'freezer': { nome: 'Freezer', potencia: 250, tipo: 'tue', icone: '❄️' },
+      'microondas': { nome: 'Micro-ondas', potencia: 1500, tipo: 'tue', icone: '📦' },
+      'forno-eletrico': { nome: 'Forno Elétrico', potencia: 2000, tipo: 'tue', icone: '🔥' },
+      'cooktop-4': { nome: 'Cooktop 4 bocas', potencia: 6000, tipo: 'tue', icone: '🍳' },
+      'cooktop-5': { nome: 'Cooktop 5 bocas', potencia: 8500, tipo: 'tue', icone: '🍳' },
+      'lava-louca': { nome: 'Lava-louça', potencia: 1800, tipo: 'tue', icone: '🍽️' },
+      'lava-roupa': { nome: 'Máq. Lavar Roupa', potencia: 1200, tipo: 'tue', icone: '👕' },
+      'lava-seca': { nome: 'Lava e Seca', potencia: 2100, tipo: 'tue', icone: '👔' },
+      'secadora': { nome: 'Secadora', potencia: 4000, tipo: 'tue', icone: '🌀' },
+      'ferro-passar': { nome: 'Ferro de Passar', potencia: 1200, tipo: 'tue', icone: '👔' },
+      'ar-7500': { nome: 'Ar Cond. 7500 BTU', potencia: 900, tipo: 'tue', icone: '❄️' },
+      'ar-9000': { nome: 'Ar Cond. 9000 BTU', potencia: 1100, tipo: 'tue', icone: '❄️' },
+      'ar-12000': { nome: 'Ar Cond. 12000 BTU', potencia: 1450, tipo: 'tue', icone: '❄️' },
+      'ar-18000': { nome: 'Ar Cond. 18000 BTU', potencia: 2100, tipo: 'tue', icone: '❄️' },
+      'ar-24000': { nome: 'Ar Cond. 24000 BTU', potencia: 2800, tipo: 'tue', icone: '❄️' },
+      'ventilador': { nome: 'Ventilador', potencia: 80, tipo: 'tomada', icone: '🌀' },
+      'ventilador-teto': { nome: 'Ventilador de Teto', potencia: 150, tipo: 'tomada', icone: '🌀' },
+      'chuveiro-4500': { nome: 'Chuveiro 4500W', potencia: 4500, tipo: 'tue', icone: '🚿' },
+      'chuveiro-5500': { nome: 'Chuveiro 5500W', potencia: 5500, tipo: 'tue', icone: '🚿' },
+      'chuveiro-7500': { nome: 'Chuveiro 7500W', potencia: 7500, tipo: 'tue', icone: '🚿' },
+      'chuveiro-8200': { nome: 'Chuveiro 8200W', potencia: 8200, tipo: 'tue', icone: '🚿' },
+      'torneira-eletrica': { nome: 'Torneira Elétrica', potencia: 5500, tipo: 'tue', icone: '🚰' },
+      'aquecedor-passagem': { nome: 'Aquecedor Passagem', potencia: 8000, tipo: 'tue', icone: '🔥' },
+      'tv-32': { nome: 'TV 32"', potencia: 60, tipo: 'tomada', icone: '📺' },
+      'tv-50': { nome: 'TV 50"', potencia: 120, tipo: 'tomada', icone: '📺' },
+      'tv-65': { nome: 'TV 65"', potencia: 180, tipo: 'tomada', icone: '📺' },
+      'computador': { nome: 'Computador Desktop', potencia: 300, tipo: 'tomada', icone: '💻' },
+      'computador-gamer': { nome: 'PC Gamer', potencia: 600, tipo: 'tomada', icone: '🎮' },
+      'notebook': { nome: 'Notebook', potencia: 65, tipo: 'tomada', icone: '💻' },
+      'impressora': { nome: 'Impressora', potencia: 100, tipo: 'tomada', icone: '🖨️' },
+      'roteador': { nome: 'Roteador WiFi', potencia: 15, tipo: 'tomada', icone: '📡' },
+      'bomba-agua-1-2': { nome: 'Bomba 1/2 CV', potencia: 500, tipo: 'tue', icone: '💧' },
+      'bomba-agua-1': { nome: 'Bomba 1 CV', potencia: 1000, tipo: 'tue', icone: '💧' },
+      'portao-eletrico': { nome: 'Portão Eletrônico', potencia: 400, tipo: 'tue', icone: '🚪' },
+      'camera-seguranca': { nome: 'Câmera Segurança', potencia: 15, tipo: 'tomada', icone: '📷' },
+      'alarme': { nome: 'Central Alarme', potencia: 30, tipo: 'tomada', icone: '🚨' },
+      'aspirador-po': { nome: 'Aspirador de Pó', potencia: 1400, tipo: 'tomada', icone: '🧹' },
+      'cafeteira': { nome: 'Cafeteira', potencia: 800, tipo: 'tomada', icone: '☕' },
+      'liquidificador': { nome: 'Liquidificador', potencia: 600, tipo: 'tomada', icone: '🥤' },
+      'batedeira': { nome: 'Batedeira', potencia: 400, tipo: 'tomada', icone: '🍰' },
+      'airfryer': { nome: 'Air Fryer', potencia: 1500, tipo: 'tue', icone: '🍟' },
+      'hidromassagem': { nome: 'Banheira Hidro', potencia: 7500, tipo: 'tue', icone: '🛁' },
+      'sauna': { nome: 'Sauna Elétrica', potencia: 8000, tipo: 'tue', icone: '🧖' }
+    };
+    
+    // Ambientes predefinidos
+    const ambientesPredefinidos = {
+      'sala': {
+        nome: 'Sala de Estar',
+        icon: '🛋️',
+        area: 20,
+        aparelhos: ['plafon-led', 'spot-led', 'spot-led', 'tomada-uso-geral', 'tomada-uso-geral', 'tomada-uso-geral', 'tomada-uso-geral', 'tv-50', 'ar-12000', 'roteador']
+      },
+      'quarto': {
+        nome: 'Quarto',
+        icon: '🛏️',
+        area: 12,
+        aparelhos: ['plafon-led', 'tomada-uso-geral', 'tomada-uso-geral', 'tomada-uso-geral', 'tv-32', 'ar-9000', 'ventilador-teto']
+      },
+      'cozinha': {
+        nome: 'Cozinha',
+        icon: '🍳',
+        area: 10,
+        aparelhos: ['plafon-led', 'spot-led', 'spot-led', 'tomada-tug', 'tomada-tug', 'tomada-tug', 'tomada-tug', 'geladeira-duplex', 'microondas', 'forno-eletrico', 'lava-louca']
+      },
+      'banheiro': {
+        nome: 'Banheiro',
+        icon: '🚿',
+        area: 5,
+        aparelhos: ['plafon-led', 'spot-led', 'tomada-uso-geral', 'chuveiro-5500']
+      },
+      'area-servico': {
+        nome: 'Área de Serviço',
+        icon: '🧺',
+        area: 8,
+        aparelhos: ['plafon-led', 'tomada-tug', 'tomada-tug', 'lava-roupa', 'ferro-passar']
+      },
+      'garagem': {
+        nome: 'Garagem',
+        icon: '🚗',
+        area: 20,
+        aparelhos: ['lampada-led-20w', 'lampada-led-20w', 'tomada-uso-geral', 'tomada-uso-geral', 'portao-eletrico', 'camera-seguranca']
+      },
+      'escritorio': {
+        nome: 'Escritório',
+        icon: '💼',
+        area: 10,
+        aparelhos: ['plafon-led', 'spot-led', 'tomada-uso-geral', 'tomada-uso-geral', 'tomada-uso-geral', 'computador', 'impressora', 'ar-9000']
+      },
+      'varanda': {
+        nome: 'Varanda',
+        icon: '🌿',
+        area: 12,
+        aparelhos: ['lampada-led', 'lampada-led', 'tomada-uso-geral', 'tomada-uso-geral', 'ventilador-teto']
+      }
+    };
+    
+    // Tabelas técnicas
+    const secoesCabos = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120];
+    const capacidadeCorrente = {
+      1.5: 15.5, 2.5: 21, 4: 28, 6: 36, 10: 50, 16: 68,
+      25: 89, 35: 111, 50: 134, 70: 171, 95: 207, 120: 239
+    };
+    
+    // =============================================
+    // FUNÇÕES DE UI
+    // =============================================
+    
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      carregarPrecosConfig();
+      carregarProjetoLocal();
+      setupEventListeners();
+      atualizarProgress();
+      
+      // Adicionar ambientes demo se vazio
+      if (ambientes.length === 0) {
+        adicionarAmbientePredefinido('sala');
+        adicionarAmbientePredefinido('quarto');
+        adicionarAmbientePredefinido('cozinha');
+        adicionarAmbientePredefinido('banheiro');
+      }
+    });
+    
+    function setupEventListeners() {
+      // Tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+      
+      // Botões principais
+      document.getElementById('btnCalcular').addEventListener('click', calcular);
+      document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+      document.getElementById('btnBalanceamento').addEventListener('click', mostrarBalanceamento);
+      document.getElementById('btnReset').addEventListener('click', resetarProjeto);
+      
+      // Fator de demanda slider
+      const slider = document.getElementById('fator-demanda-range');
+      slider.addEventListener('input', (e) => {
+        document.getElementById('fator-demanda-value').textContent = e.target.value + '%';
+        document.getElementById('fator-demanda').value = e.target.value;
+      });
+      
+      // Auto-save
+      setInterval(salvarProjetoLocal, 30000);
+    }
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    }
+    
+    function atualizarProgress() {
+      let progress = 25;
+      const steps = ['step1', 'step2', 'step3', 'step4'];
+      
+      // Step 1: Dados gerais
+      document.getElementById('step1').innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Dados Gerais';
+      
+      // Step 2: Ambientes
+      if (ambientes.length > 0) {
+        progress = 50;
+        document.getElementById('step2').innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Ambientes';
+      }
+      
+      // Step 3 e 4: Cálculo
+      if (ultimoCalculo) {
+        progress = 100;
+        document.getElementById('step3').innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Cálculo';
+        document.getElementById('step4').innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Resultado';
+      }
+      
+      document.getElementById('progressFill').style.width = progress + '%';
+      document.getElementById('progressText').textContent = progress + '%';
+      
+      // Atualizar stats
+      atualizarStats();
+    }
+    
+    function atualizarStats() {
+      document.getElementById('stat-ambientes').textContent = ambientes.length;
+      
+      let totalAparelhos = 0;
+      let potenciaTotal = 0;
+      
+      ambientes.forEach(amb => {
+        totalAparelhos += amb.aparelhos.length;
+        amb.aparelhos.forEach(ap => {
+          const info = aparelhosPadrao[ap.tipo];
+          if (info) potenciaTotal += info.potencia;
+        });
+      });
+      
+      document.getElementById('stat-circuitos').textContent = totalAparelhos > 0 ? Math.ceil(totalAparelhos / 3) : 0;
+      document.getElementById('stat-potencia').textContent = (potenciaTotal / 1000).toFixed(1);
+      document.getElementById('stat-custo').textContent = ultimoCalculo ? 
+        'R$' + (ultimoCalculo.custo.total / 1000).toFixed(1) + 'k' : '---';
+    }
+    
+    // =============================================
+    // GERENCIAMENTO DE AMBIENTES
+    // =============================================
+    
+    function adicionarAmbientePredefinido(tipo) {
+      const config = ambientesPredefinidos[tipo];
+      if (!config) return;
+      
+      const ambiente = {
+        id: Date.now(),
+        tipo: tipo,
+        nome: config.nome,
+        icon: config.icon,
+        area: config.area,
+        aparelhos: config.aparelhos.map((ap, idx) => ({
+          id: Date.now() + idx + 1,
+          tipo: ap,
+          quantidade: 1
+        }))
+      };
+      
+      ambientes.push(ambiente);
+      renderizarAmbientes();
+      atualizarProgress();
+      
+      // Mostrar notificação
+      mostrarNotificacao(`${config.icon} ${config.nome} adicionado!`, 'success');
+    }
+    
+    function adicionarAmbientePersonalizado() {
+      const modal = criarModal('Novo Ambiente Personalizado', `
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Nome do Ambiente</label>
+            <input type="text" id="nome-ambiente" placeholder="Ex: Sala de Jogos" 
+              class="w-full px-4 py-3 bg-black/30 border border-amber-500/30 rounded-xl text-white">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Ícone (emoji)</label>
+            <input type="text" id="icone-ambiente" value="🏠" maxlength="2"
+              class="w-full px-4 py-3 bg-black/30 border border-amber-500/30 rounded-xl text-white text-center text-2xl">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Área (m²)</label>
+            <input type="number" id="area-ambiente" value="15" min="1"
+              class="w-full px-4 py-3 bg-black/30 border border-amber-500/30 rounded-xl text-white">
+          </div>
+        </div>
+      `, [
+        { text: 'Cancelar', class: 'btn-outline', action: 'fecharModal()' },
+        { text: 'Adicionar', class: 'btn-primary', action: 'confirmarAmbientePersonalizado()' }
+      ]);
+    }
+    
+    function confirmarAmbientePersonalizado() {
+      const nome = document.getElementById('nome-ambiente').value.trim();
+      const icone = document.getElementById('icone-ambiente').value || '🏠';
+      const area = parseFloat(document.getElementById('area-ambiente').value) || 15;
+      
+      if (!nome) {
+        alert('Digite um nome para o ambiente');
+        return;
+      }
+      
+      const ambiente = {
+        id: Date.now(),
+        tipo: 'personalizado',
+        nome: nome,
+        icon: icone,
+        area: area,
+        aparelhos: [
+          { id: Date.now() + 1, tipo: 'lampada-led', quantidade: 1 },
+          { id: Date.now() + 2, tipo: 'tomada-uso-geral', quantidade: 1 }
+        ]
+      };
+      
+      ambientes.push(ambiente);
+      fecharModal();
+      renderizarAmbientes();
+      atualizarProgress();
+      mostrarNotificacao(`${icone} ${nome} adicionado!`, 'success');
+    }
+    
+    function removerAmbiente(id) {
+      const ambiente = ambientes.find(a => a.id === id);
+      if (ambiente && confirm(`Remover ${ambiente.nome}?`)) {
+        ambientes = ambientes.filter(a => a.id !== id);
+        renderizarAmbientes();
+        atualizarProgress();
+        mostrarNotificacao('Ambiente removido', 'info');
+      }
+    }
+    
+    function duplicarAmbiente(id) {
+      const original = ambientes.find(a => a.id === id);
+      if (original) {
+        const copia = {
+          ...original,
+          id: Date.now(),
+          nome: original.nome + ' (cópia)',
+          aparelhos: original.aparelhos.map((ap, idx) => ({
+            ...ap,
+            id: Date.now() + idx + 1
+          }))
+        };
+        ambientes.push(copia);
+        renderizarAmbientes();
+        atualizarProgress();
+        mostrarNotificacao(`${copia.icon} ${copia.nome} duplicado!`, 'success');
+      }
+    }
+    
+    function renderizarAmbientes() {
+      const container = document.getElementById('lista-ambientes');
+      
+      if (ambientes.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-gray-500">
+            <i class="fas fa-home text-5xl mb-4 opacity-30"></i>
+            <p>Adicione ambientes usando os botões acima</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      ambientes.forEach((ambiente, index) => {
+        const potenciaAmbiente = ambiente.aparelhos.reduce((sum, ap) => {
+          const info = aparelhosPadrao[ap.tipo];
+          return sum + (info ? info.potencia : 0);
+        }, 0);
+        
+        html += `
+          <div class="ambiente-card glass rounded-xl p-5 animate-slide-in" style="animation-delay: ${index * 0.1}s">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex items-center gap-3">
+                <span class="text-4xl">${ambiente.icon}</span>
+                <div>
+                  <h3 class="text-lg font-bold text-amber-400">${ambiente.nome}</h3>
+                  <p class="text-sm text-gray-500">${ambiente.aparelhos.length} aparelhos • ${potenciaAmbiente}W</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="duplicarAmbiente(${ambiente.id})" 
+                  class="p-2 glass rounded-lg hover:bg-white/10 transition-all tooltip" data-tooltip="Duplicar">
+                  <i class="fas fa-copy text-gray-400"></i>
+                </button>
+                <button onclick="removerAmbiente(${ambiente.id})" 
+                  class="p-2 glass rounded-lg hover:bg-red-500/20 transition-all tooltip" data-tooltip="Remover">
+                  <i class="fas fa-trash text-red-400"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Área (m²)</label>
+                <input type="number" value="${ambiente.area}" min="1" 
+                  onchange="atualizarAreaAmbiente(${ambiente.id}, this.value)"
+                  class="w-full px-3 py-2 bg-black/30 border border-amber-500/20 rounded-lg text-white text-sm">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Potência Total</label>
+                <div class="px-3 py-2 bg-black/30 border border-amber-500/20 rounded-lg text-amber-400 text-sm font-bold">
+                  ${potenciaAmbiente}W
+                </div>
+              </div>
+            </div>
+            
+            <div class="space-y-2 mb-4 max-h-48 overflow-y-auto pr-2">
+              ${ambiente.aparelhos.map(ap => {
+                const info = aparelhosPadrao[ap.tipo];
+                if (!info) return '';
+                return `
+                  <div class="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2 group">
+                    <div class="flex items-center gap-2">
+                      <span class="text-lg">${info.icone}</span>
+                      <span class="text-sm text-gray-300">${info.nome}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span class="text-sm text-amber-400 font-semibold">${info.potencia}W</span>
+                      <button onclick="removerAparelho(${ambiente.id}, ${ap.id})" 
+                        class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-all">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+            
+            <button onclick="mostrarModalAparelho(${ambiente.id})" 
+              class="w-full py-3 border-2 border-dashed border-amber-500/30 rounded-lg text-amber-400 hover:border-amber-500 hover:bg-amber-500/10 transition-all">
+              <i class="fas fa-plus mr-2"></i> Adicionar Aparelho
+            </button>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    function atualizarAreaAmbiente(id, novaArea) {
+      const ambiente = ambientes.find(a => a.id === id);
+      if (ambiente) {
+        ambiente.area = parseFloat(novaArea) || 1;
+      }
+    }
+    
+    function mostrarModalAparelho(ambienteId) {
+      const categorias = {
+        'Iluminação': Object.entries(aparelhosPadrao).filter(([k, v]) => v.tipo === 'iluminacao'),
+        'Tomadas': Object.entries(aparelhosPadrao).filter(([k, v]) => v.tipo === 'tomada'),
+        'Equipamentos Específicos': Object.entries(aparelhosPadrao).filter(([k, v]) => v.tipo === 'tue')
+      };
+      
+      let opcoesHtml = '';
+      for (const [categoria, aparelhos] of Object.entries(categorias)) {
+        opcoesHtml += `<optgroup label="${categoria}">`;
+        aparelhos.forEach(([key, info]) => {
+          opcoesHtml += `<option value="${key}">${info.icone} ${info.nome} (${info.potencia}W)</option>`;
+        });
+        opcoesHtml += '</optgroup>';
+      }
+      
+      criarModal('Adicionar Aparelho', `
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Selecione o Aparelho</label>
+            <select id="select-aparelho" 
+              class="w-full px-4 py-3 bg-black/30 border border-amber-500/30 rounded-xl text-white">
+              ${opcoesHtml}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Quantidade</label>
+            <input type="number" id="quantidade-aparelho" value="1" min="1" max="20"
+              class="w-full px-4 py-3 bg-black/30 border border-amber-500/30 rounded-xl text-white">
+          </div>
+        </div>
+      `, [
+        { text: 'Cancelar', class: 'btn-outline', action: 'fecharModal()' },
+        { text: 'Adicionar', class: 'btn-primary', action: `confirmarAparelho(${ambienteId})` }
+      ]);
+    }
+    
+    function confirmarAparelho(ambienteId) {
+      const tipo = document.getElementById('select-aparelho').value;
+      const quantidade = parseInt(document.getElementById('quantidade-aparelho').value) || 1;
+      
+      const ambiente = ambientes.find(a => a.id === ambienteId);
+      if (ambiente) {
+        for (let i = 0; i < quantidade; i++) {
+          ambiente.aparelhos.push({
+            id: Date.now() + i,
+            tipo: tipo,
+            quantidade: 1
+          });
+        }
+        fecharModal();
+        renderizarAmbientes();
+        atualizarProgress();
+        
+        const info = aparelhosPadrao[tipo];
+        mostrarNotificacao(`${info.icone} ${quantidade}x ${info.nome} adicionado!`, 'success');
+      }
+    }
+    
+    function removerAparelho(ambienteId, aparelhoId) {
+      const ambiente = ambientes.find(a => a.id === ambienteId);
+      if (ambiente) {
+        ambiente.aparelhos = ambiente.aparelhos.filter(ap => ap.id !== aparelhoId);
+        renderizarAmbientes();
+        atualizarProgress();
+      }
+    }
+    
+    // =============================================
+    // CÁLCULOS ELÉTRICOS
+    // =============================================
+    
+    function calcular() {
+      if (ambientes.length === 0) {
+        mostrarNotificacao('Adicione pelo menos um ambiente!', 'error');
+        return;
+      }
+      
+      const tipoInstalacao = document.getElementById('tipo-instalacao').value;
+      const areaTotal = parseFloat(document.getElementById('area-construida').value) || 100;
+      const tensao = parseInt(document.getElementById('tensao').value);
+      const fatorDemanda = parseFloat(document.getElementById('fator-demanda').value) / 100;
+      
+      let potenciaTotal = 0;
+      let potenciaIluminacao = 0;
+      let potenciaTomadas = 0;
+      let potenciaTUE = 0;
+      
+      const circuitos = [];
+      
+      // Processar cada ambiente
+      ambientes.forEach((ambiente, idx) => {
+        let potIlum = 0, potTom = 0, potTue = 0;
+        
+        ambiente.aparelhos.forEach(ap => {
+          const info = aparelhosPadrao[ap.tipo];
+          if (!info) return;
+          
+          const pot = info.potencia * ap.quantidade;
+          
+          if (info.tipo === 'iluminacao') potIlum += pot;
+          else if (info.tipo === 'tomada') potTom += pot;
+          else if (info.tipo === 'tue') potTue += pot;
+        });
+        
+        potenciaIluminacao += potIlum;
+        potenciaTomadas += potTom;
+        potenciaTUE += potTue;
+        potenciaTotal += potIlum + potTom + potTue;
+        
+        // Criar circuitos
+        if (potIlum > 0) {
+          circuitos.push({
+            nome: `Iluminação - ${ambiente.nome}`,
+            tipo: 'iluminacao',
+            potencia: potIlum,
+            ambiente: ambiente.nome,
+            fase: null
+          });
+        }
+        
+        if (potTom > 0) {
+          circuitos.push({
+            nome: `Tomadas - ${ambiente.nome}`,
+            tipo: 'tomadas',
+            potencia: potTom,
+            ambiente: ambiente.nome,
+            fase: null
+          });
+        }
+        
+        // TUEs como circuitos individuais
+        ambiente.aparelhos.forEach(ap => {
+          const info = aparelhosPadrao[ap.tipo];
+          if (info && info.tipo === 'tue') {
+            circuitos.push({
+              nome: `${info.nome} - ${ambiente.nome}`,
+              tipo: 'tue',
+              potencia: info.potencia,
+              ambiente: ambiente.nome,
+              fase: null
+            });
+          }
+        });
+      });
+      
+      // Calcular demanda
+      const demandaTotal = potenciaTotal * fatorDemanda;
+      const correnteTotal = demandaTotal / tensao;
+      
+      // Dimensionar entrada
+      const secaoEntrada = dimensionarCabo(correnteTotal * 1.25, 1.0, 30);
+      const disjuntorGeral = dimensionarDisjuntor(correnteTotal * 1.25);
+      
+      // Dimensionar cada circuito
+      const circuitosDimensionados = circuitos.map((circ, idx) => {
+        const tensaoCircuito = circ.tipo === 'tue' && circ.potencia > 2000 ? 220 : tensao;
+        const corrente = circ.potencia / tensaoCircuito;
+        const secao = dimensionarCabo(corrente, 1.0, circ.tipo === 'iluminacao' ? 15 : 20);
+        const disjuntor = dimensionarDisjuntor(corrente);
+        const eletroduto = dimensionarEletroduto(secao);
+        const quedaTensao = calcularQuedaTensao(corrente, secao, 20, tensaoCircuito);
+        
+        return {
+          ...circ,
+          numero: idx + 1,
+          corrente: corrente,
+          secao: secao,
+          disjuntor: disjuntor,
+          eletroduto: eletroduto,
+          quedaTensao: quedaTensao,
+          tensao: tensaoCircuito
+        };
+      });
+      
+      // Balancear fases (se trifásico)
+      if (tensao === 380) {
+        balancearFases(circuitosDimensionados);
+      }
+      
+      // Calcular custos
+      const custo = calcularCusto(circuitosDimensionados, secaoEntrada, areaTotal);
+      
+      // Gerar lista de materiais
+      const materiais = gerarListaMateriais(circuitosDimensionados, secaoEntrada, areaTotal);
+      
+      // Salvar resultado
+      ultimoCalculo = {
+        ambientes,
+        potenciaTotal,
+        potenciaIluminacao,
+        potenciaTomadas,
+        potenciaTUE,
+        demandaTotal,
+        correnteTotal,
+        tensao,
+        fatorDemanda,
+        secaoEntrada,
+        disjuntorGeral,
+        circuitos: circuitosDimensionados,
+        custo,
+        materiais
+      };
+      
+      // Renderizar resultados
+      gerarResultado(ultimoCalculo);
+      gerarListaMateriaisHTML(materiais, custo);
+      atualizarProgress();
+      
+      // Mudar para aba de resultados
+      switchTab('resultados');
+      
+      mostrarNotificacao('Cálculo concluído com sucesso!', 'success');
+    }
+    
+    function dimensionarCabo(corrente, fatorCorrecao = 1.0, comprimento = 20) {
+      const correnteCorrigida = corrente / fatorCorrecao;
+      
+      for (let secao of secoesCabos) {
+        if (capacidadeCorrente[secao] >= correnteCorrigida) {
+          // Verificar seção mínima por tipo
+          if (secao < 1.5) return 1.5;
+          return secao;
+        }
+      }
+      return 120;
+    }
+    
+    function dimensionarDisjuntor(corrente) {
+      const disjuntores = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125];
+      
+      for (let disj of disjuntores) {
+        if (disj >= corrente) return disj;
+      }
+      return 125;
+    }
+    
+    function dimensionarEletroduto(secaoCabo) {
+      if (secaoCabo <= 2.5) return 20;
+      if (secaoCabo <= 6) return 25;
+      if (secaoCabo <= 16) return 32;
+      if (secaoCabo <= 35) return 40;
+      return 50;
+    }
+    
+    function calcularQuedaTensao(corrente, secao, comprimento, tensao) {
+      const resistividade = 0.0178; // Cobre a 70°C
+      const quedaVolts = (2 * resistividade * comprimento * corrente) / secao;
+      return (quedaVolts / tensao) * 100;
+    }
+    
+    function balancearFases(circuitos) {
+      const fases = { A: 0, B: 0, C: 0 };
+      
+      // Ordenar por potência decrescente
+      circuitos.sort((a, b) => b.potencia - a.potencia);
+      
+      // Distribuir entre fases
+      circuitos.forEach(circ => {
+        const menorFase = Object.entries(fases).reduce((min, [fase, pot]) => 
+          pot < min[1] ? [fase, pot] : min, ['A', Infinity])[0];
+        
+        circ.fase = menorFase;
+        fases[menorFase] += circ.potencia;
+      });
+      
+      return fases;
+    }
+    
+    function calcularCusto(circuitos, secaoEntrada, area) {
+      const precoCabo = {
+        1.5: precosConfig.cabo_1_5,
+        2.5: precosConfig.cabo_2_5,
+        4: precosConfig.cabo_4,
+        6: precosConfig.cabo_6,
+        10: precosConfig.cabo_10,
+        16: precosConfig.cabo_16,
+        25: precosConfig.cabo_25,
+        35: precosConfig.cabo_35,
+        50: precosConfig.cabo_50
+      };
+      
+      const comprimentoMedio = Math.max(15, Math.sqrt(area) * 2);
+      
+      // Cabos internos
+      let custoCabos = 0;
+      circuitos.forEach(circ => {
+        const preco = precoCabo[circ.secao] || 25;
+        custoCabos += preco * comprimentoMedio * 3; // 3 condutores
+      });
+      
+      // Entrada
+      const custoEntrada = (precoCabo[secaoEntrada] || 40) * 15 * 3;
+      
+      // Disjuntores
+      let custoDisjuntores = precosConfig.disjuntor_geral;
+      circuitos.forEach(circ => {
+        const chave = `disjuntor_${circ.disjuntor}a`;
+        custoDisjuntores += precosConfig[chave] || precosConfig.disjuntor_25a;
+      });
+      
+      // DR e DPS
+      const custoProtecao = precosConfig.dr_30ma + precosConfig.dps;
+      
+      // Quadro
+      const custoQuadro = precosConfig.quadro_base + (circuitos.length * precosConfig.quadro_por_circuito);
+      
+      // Infraestrutura
+      const custoEletrodutos = area * 12;
+      const custoCaixas = (circuitos.length * 2) * precosConfig.caixa_4x2;
+      
+      // Acabamento
+      const custoTomadas = circuitos.filter(c => c.tipo !== 'iluminacao').length * 2 * precosConfig.tomada_10a;
+      const custoInterruptores = circuitos.filter(c => c.tipo === 'iluminacao').length * precosConfig.interruptor;
+      
+      // Total material
+      const custoMaterial = custoCabos + custoEntrada + custoDisjuntores + custoProtecao + 
+                           custoQuadro + custoEletrodutos + custoCaixas + custoTomadas + custoInterruptores;
+      
+      // Mão de obra
+      const custoMaoObra = custoMaterial * (precosConfig.mao_obra_percentual / 100);
+      
+      return {
+        cabos: custoCabos,
+        entrada: custoEntrada,
+        disjuntores: custoDisjuntores,
+        protecao: custoProtecao,
+        quadro: custoQuadro,
+        eletrodutos: custoEletrodutos,
+        caixas: custoCaixas,
+        tomadas: custoTomadas,
+        interruptores: custoInterruptores,
+        material: custoMaterial,
+        maoObra: custoMaoObra,
+        total: custoMaterial + custoMaoObra
+      };
+    }
+    
+    function gerarListaMateriais(circuitos, secaoEntrada, area) {
+      const materiais = [];
+      const comprimentoMedio = Math.max(15, Math.sqrt(area) * 2);
+      
+      // Agrupar cabos por seção
+      const cabos = {};
+      circuitos.forEach(circ => {
+        if (!cabos[circ.secao]) cabos[circ.secao] = 0;
+        cabos[circ.secao] += comprimentoMedio * 3;
+      });
+      
+      // Adicionar cabo de entrada
+      if (!cabos[secaoEntrada]) cabos[secaoEntrada] = 0;
+      cabos[secaoEntrada] += 15 * 3;
+      
+      // Materiais - Cabos
+      for (const [secao, metros] of Object.entries(cabos)) {
+        materiais.push({
+          categoria: 'Cabos',
+          descricao: `Cabo flexível ${secao}mm² - 750V`,
+          unidade: 'm',
+          quantidade: Math.ceil(metros * 1.15), // 15% de margem
+          preco: precosConfig[`cabo_${secao}`.replace('.', '_')] || 10
+        });
+      }
+      
+      // Disjuntores
+      const disjuntores = {};
+      circuitos.forEach(circ => {
+        if (!disjuntores[circ.disjuntor]) disjuntores[circ.disjuntor] = 0;
+        disjuntores[circ.disjuntor]++;
+      });
+      
+      for (const [amperagem, qtd] of Object.entries(disjuntores)) {
+        materiais.push({
+          categoria: 'Proteção',
+          descricao: `Disjuntor monopolar ${amperagem}A`,
+          unidade: 'un',
+          quantidade: qtd,
+          preco: precosConfig[`disjuntor_${amperagem}a`] || 25
+        });
+      }
+      
+      // Disjuntor geral
+      materiais.push({
+        categoria: 'Proteção',
+        descricao: 'Disjuntor geral bipolar/tripolar',
+        unidade: 'un',
+        quantidade: 1,
+        preco: precosConfig.disjuntor_geral
+      });
+      
+      // DR
+      materiais.push({
+        categoria: 'Proteção',
+        descricao: 'Dispositivo DR 30mA',
+        unidade: 'un',
+        quantidade: 1,
+        preco: precosConfig.dr_30ma
+      });
+      
+      // DPS
+      materiais.push({
+        categoria: 'Proteção',
+        descricao: 'DPS Classe II',
+        unidade: 'un',
+        quantidade: 3,
+        preco: precosConfig.dps
+      });
+      
+      // Quadro
+      materiais.push({
+        categoria: 'Quadro',
+        descricao: `Quadro de distribuição para ${Math.ceil(circuitos.length / 6) * 6 + 6} disjuntores`,
+        unidade: 'un',
+        quantidade: 1,
+        preco: precosConfig.quadro_base + (circuitos.length * precosConfig.quadro_por_circuito)
+      });
+      
+      // Eletrodutos
+      const eletrodutos = {};
+      circuitos.forEach(circ => {
+        if (!eletrodutos[circ.eletroduto]) eletrodutos[circ.eletroduto] = 0;
+        eletrodutos[circ.eletroduto] += comprimentoMedio;
+      });
+      
+      for (const [diametro, metros] of Object.entries(eletrodutos)) {
+        materiais.push({
+          categoria: 'Infraestrutura',
+          descricao: `Eletroduto corrugado Ø${diametro}mm`,
+          unidade: 'm',
+          quantidade: Math.ceil(metros),
+          preco: precosConfig[`eletroduto_${diametro}mm`] || 4
+        });
+      }
+      
+      // Caixas
+      materiais.push({
+        categoria: 'Infraestrutura',
+        descricao: 'Caixa de passagem 4x2"',
+        unidade: 'un',
+        quantidade: circuitos.length * 2,
+        preco: precosConfig.caixa_4x2
+      });
+      
+      materiais.push({
+        categoria: 'Infraestrutura',
+        descricao: 'Caixa de passagem 4x4"',
+        unidade: 'un',
+        quantidade: Math.ceil(circuitos.length / 2),
+        preco: precosConfig.caixa_4x4
+      });
+      
+      // Tomadas e interruptores
+      const qtdTomadas10a = circuitos.filter(c => c.tipo === 'tomadas').length * 3;
+      const qtdTomadas20a = circuitos.filter(c => c.tipo === 'tue').length;
+      const qtdInterruptores = circuitos.filter(c => c.tipo === 'iluminacao').length;
+      
+      if (qtdTomadas10a > 0) {
+        materiais.push({
+          categoria: 'Acabamento',
+          descricao: 'Tomada 2P+T 10A',
+          unidade: 'un',
+          quantidade: qtdTomadas10a,
+          preco: precosConfig.tomada_10a
+        });
+      }
+      
+      if (qtdTomadas20a > 0) {
+        materiais.push({
+          categoria: 'Acabamento',
+          descricao: 'Tomada 2P+T 20A',
+          unidade: 'un',
+          quantidade: qtdTomadas20a,
+          preco: precosConfig.tomada_20a
+        });
+      }
+      
+      if (qtdInterruptores > 0) {
+        materiais.push({
+          categoria: 'Acabamento',
+          descricao: 'Interruptor simples',
+          unidade: 'un',
+          quantidade: qtdInterruptores,
+          preco: precosConfig.interruptor
+        });
+      }
+      
+      return materiais;
+    }
+    
+    // =============================================
+    // RENDERIZAÇÃO DE RESULTADOS
+    // =============================================
+    
+    function gerarResultado(dados) {
+      const html = `
+        <!-- Resumo Principal -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="glass rounded-xl p-4 text-center animate-fade-in">
+            <i class="fas fa-bolt text-amber-400 text-2xl mb-2"></i>
+            <div class="text-2xl font-bold text-white">${(dados.potenciaTotal / 1000).toFixed(2)}</div>
+            <div class="text-xs text-gray-400">kW Instalado</div>
+          </div>
+          <div class="glass rounded-xl p-4 text-center animate-fade-in" style="animation-delay: 0.1s">
+            <i class="fas fa-tachometer-alt text-green-400 text-2xl mb-2"></i>
+            <div class="text-2xl font-bold text-white">${(dados.demandaTotal / 1000).toFixed(2)}</div>
+            <div class="text-xs text-gray-400">kW Demanda</div>
+          </div>
+          <div class="glass rounded-xl p-4 text-center animate-fade-in" style="animation-delay: 0.2s">
+            <i class="fas fa-wave-square text-blue-400 text-2xl mb-2"></i>
+            <div class="text-2xl font-bold text-white">${dados.correnteTotal.toFixed(1)}</div>
+            <div class="text-xs text-gray-400">A Corrente</div>
+          </div>
+          <div class="glass rounded-xl p-4 text-center animate-fade-in" style="animation-delay: 0.3s">
+            <i class="fas fa-money-bill-wave text-emerald-400 text-2xl mb-2"></i>
+            <div class="text-2xl font-bold text-white">R$ ${(dados.custo.total / 1000).toFixed(1)}k</div>
+            <div class="text-xs text-gray-400">Custo Total</div>
+          </div>
+        </div>
+        
+        <!-- Entrada de Energia -->
+        <div class="glass rounded-xl p-5 mb-6">
+          <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
+            <i class="fas fa-plug"></i> Entrada de Energia
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-black/30 rounded-lg p-3">
+              <div class="text-xs text-gray-500 mb-1">Tensão</div>
+              <div class="text-xl font-bold text-white">${dados.tensao}V</div>
+              <div class="text-xs text-gray-400">${dados.tensao === 127 ? 'Monofásico' : dados.tensao === 220 ? 'Bifásico' : 'Trifásico'}</div>
+            </div>
+            <div class="bg-black/30 rounded-lg p-3">
+              <div class="text-xs text-gray-500 mb-1">Disjuntor Geral</div>
+              <div class="text-xl font-bold text-amber-400">${dados.disjuntorGeral}A</div>
+              <div class="text-xs text-gray-400">Curva C</div>
+            </div>
+            <div class="bg-black/30 rounded-lg p-3">
+              <div class="text-xs text-gray-500 mb-1">Cabo Entrada</div>
+              <div class="text-xl font-bold text-blue-400">${dados.secaoEntrada}mm²</div>
+              <div class="text-xs text-gray-400">Cobre flexível</div>
+            </div>
+            <div class="bg-black/30 rounded-lg p-3">
+              <div class="text-xs text-gray-500 mb-1">Fator Demanda</div>
+              <div class="text-xl font-bold text-green-400">${(dados.fatorDemanda * 100).toFixed(0)}%</div>
+              <div class="text-xs text-gray-400">Aplicado</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Diagrama do Quadro -->
+        <div class="glass rounded-xl p-5 mb-6">
+          <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
+            <i class="fas fa-th"></i> Quadro de Distribuição
+          </h3>
+          <div class="quadro-container flex justify-center">
+            <div class="quadro-visual bg-gradient-to-b from-gray-800 to-gray-900 border-2 border-amber-500/40 rounded-xl p-6 shadow-2xl">
+              <div class="text-center text-amber-400 font-bold mb-4 pb-3 border-b border-amber-500/30">
+                QUADRO GERAL - ${dados.circuitos.length + 3} POSIÇÕES
+              </div>
+              
+              <!-- Disjuntor Geral -->
+              <div class="disjuntor-linha flex items-center gap-4 p-3 bg-amber-500/20 border border-amber-500 rounded-lg mb-3">
+                <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-black px-4 py-2 rounded font-bold min-w-16 text-center">
+                  ${dados.disjuntorGeral}A
+                </div>
+                <div>
+                  <div class="font-semibold text-white">DISJUNTOR GERAL</div>
+                  <div class="text-xs text-gray-400">Cabo ${dados.secaoEntrada}mm²</div>
+                </div>
+              </div>
+              
+              <!-- DR -->
+              <div class="disjuntor-linha flex items-center gap-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg mb-3">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded font-bold min-w-16 text-center">
+                  DR
+                </div>
+                <div>
+                  <div class="font-semibold text-white">DISPOSITIVO DR</div>
+                  <div class="text-xs text-gray-400">30mA - Proteção contra choque</div>
+                </div>
+              </div>
+              
+              <!-- Circuitos -->
+              <div class="space-y-2 max-h-80 overflow-y-auto">
+                ${dados.circuitos.map((circ, idx) => `
+                  <div class="disjuntor-linha flex items-center gap-4 p-2 bg-black/30 rounded-lg border border-white/5">
+                    <div class="bg-gradient-to-r from-gray-600 to-gray-700 text-white px-3 py-1.5 rounded font-bold min-w-14 text-center text-sm">
+                      ${circ.disjuntor}A
+                    </div>
+                    <div class="flex-1">
+                      <div class="font-medium text-white text-sm">C${circ.numero} - ${circ.nome}</div>
+                      <div class="text-xs text-gray-400">
+                        ${circ.secao}mm² | ${circ.potencia.toFixed(0)}W | ${circ.corrente.toFixed(1)}A
+                        ${circ.fase ? `| Fase ${circ.fase}` : ''}
+                      </div>
+                    </div>
+                    <div class="text-xs ${circ.quedaTensao > 4 ? 'text-red-400' : circ.quedaTensao > 3 ? 'text-amber-400' : 'text-green-400'}">
+                      ${circ.quedaTensao.toFixed(1)}%
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Detalhamento dos Circuitos -->
+        <div class="glass rounded-xl p-5 mb-6">
+          <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
+            <i class="fas fa-list-alt"></i> Detalhamento dos Circuitos
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="tabela-materiais">
+              <thead>
+                <tr>
+                  <th>Circuito</th>
+                  <th>Tipo</th>
+                  <th>Potência</th>
+                  <th>Corrente</th>
+                  <th>Cabo</th>
+                  <th>Disjuntor</th>
+                  <th>Eletroduto</th>
+                  <th>ΔV%</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${dados.circuitos.map(circ => `
+                  <tr>
+                    <td class="font-medium">C${circ.numero}</td>
+                    <td>
+                      <span class="px-2 py-1 rounded text-xs ${
+                        circ.tipo === 'iluminacao' ? 'bg-yellow-500/20 text-yellow-400' :
+                        circ.tipo === 'tomadas' ? 'bg-blue-500/20 text-blue-400' :
+                        'bg-red-500/20 text-red-400'
+                      }">
+                        ${circ.tipo === 'iluminacao' ? '💡 Ilum.' : circ.tipo === 'tomadas' ? '🔌 Tom.' : '⚡ TUE'}
+                      </span>
+                    </td>
+                    <td>${circ.potencia.toFixed(0)}W</td>
+                    <td>${circ.corrente.toFixed(1)}A</td>
+                    <td class="text-amber-400">${circ.secao}mm²</td>
+                    <td>${circ.disjuntor}A</td>
+                    <td>Ø${circ.eletroduto}mm</td>
+                    <td class="${circ.quedaTensao > 4 ? 'text-red-400' : circ.quedaTensao > 3 ? 'text-amber-400' : 'text-green-400'}">
+                      ${circ.quedaTensao.toFixed(2)}%
+                    </td>
+                    <td>
+                      ${circ.quedaTensao > 4 ? 
+                        '<span class="text-red-400"><i class="fas fa-exclamation-triangle"></i></span>' : 
+                        '<span class="text-green-400"><i class="fas fa-check-circle"></i></span>'
+                      }
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Distribuição de Cargas -->
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <div class="glass rounded-xl p-5">
+            <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
+              <i class="fas fa-chart-pie"></i> Distribuição de Cargas
+            </h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm text-gray-400">💡 Iluminação</span>
+                  <span class="text-sm text-amber-400">${((dados.potenciaIluminacao / dados.potenciaTotal) * 100).toFixed(1)}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-gradient-to-r from-yellow-400 to-yellow-500" style="width: ${(dados.potenciaIluminacao / dados.potenciaTotal) * 100}%"></div>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">${(dados.potenciaIluminacao / 1000).toFixed(2)} kW</div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm text-gray-400">🔌 Tomadas</span>
+                  <span class="text-sm text-blue-400">${((dados.potenciaTomadas / dados.potenciaTotal) * 100).toFixed(1)}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-gradient-to-r from-blue-400 to-blue-500" style="width: ${(dados.potenciaTomadas / dados.potenciaTotal) * 100}%"></div>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">${(dados.potenciaTomadas / 1000).toFixed(2)} kW</div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm text-gray-400">⚡ Uso Específico</span>
+                  <span class="text-sm text-red-400">${((dados.potenciaTUE / dados.potenciaTotal) * 100).toFixed(1)}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-gradient-to-r from-red-400 to-red-500" style="width: ${(dados.potenciaTUE / dados.potenciaTotal) * 100}%"></div>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">${(dados.potenciaTUE / 1000).toFixed(2)} kW</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="glass rounded-xl p-5">
+            <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
+              <i class="fas fa-money-bill-wave"></i> Resumo de Custos
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-white/10">
+                <span class="text-gray-400">Cabos</span>
+                <span class="text-white">R$ ${dados.custo.cabos.toFixed(2)}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/10">
+                <span class="text-gray-400">Proteção</span>
+                <span class="text-white">R$ ${(dados.custo.disjuntores + dados.custo.protecao).toFixed(2)}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/10">
+                <span class="text-gray-400">Quadro</span>
+                <span class="text-white">R$ ${dados.custo.quadro.toFixed(2)}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/10">
+                <span class="text-gray-400">Infraestrutura</span>
+                <span class="text-white">R$ ${(dados.custo.eletrodutos + dados.custo.caixas).toFixed(2)}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/10">
+                <span class="text-gray-400">Mão de Obra (${precosConfig.mao_obra_percentual}%)</span>
+                <span class="text-white">R$ ${dados.custo.maoObra.toFixed(2)}</span>
+              </div>
+              <div class="flex justify-between py-3 bg-amber-500/20 rounded-lg px-3 -mx-3">
+                <span class="font-bold text-amber-400">TOTAL</span>
+                <span class="font-bold text-amber-400">R$ ${dados.custo.total.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recomendações -->
+        <div class="glass rounded-xl p-5">
+          <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
+            <i class="fas fa-exclamation-circle"></i> Recomendações Importantes
+          </h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <ul class="space-y-2 text-sm text-gray-400">
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-green-400 mt-1"></i>
+                <span>Instalação por profissional habilitado (NR-10)</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-green-400 mt-1"></i>
+                <span>Aterramento obrigatório conforme NBR 5410</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-green-400 mt-1"></i>
+                <span>DR 30mA para circuitos de tomadas</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-green-400 mt-1"></i>
+                <span>DPS na entrada para proteção contra surtos</span>
+              </li>
+            </ul>
+            <ul class="space-y-2 text-sm text-gray-400">
+              <li class="flex items-start gap-2">
+                <i class="fas fa-palette text-blue-400 mt-1"></i>
+                <span><strong>Cores:</strong> Fase (preto/vermelho), Neutro (azul), Terra (verde/amarelo)</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-file-signature text-amber-400 mt-1"></i>
+                <span>ART obrigatória para projeto e execução</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-calendar-alt text-purple-400 mt-1"></i>
+                <span>Revisão periódica a cada 5 anos</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-clipboard-check text-cyan-400 mt-1"></i>
+                <span>Queda de tensão máxima: 4%</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('resultado').innerHTML = html;
+    }
+    
+    function gerarListaMateriaisHTML(materiais, custo) {
+      const categorias = [...new Set(materiais.map(m => m.categoria))];
+      
+      let html = `
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <p class="text-gray-400">Total de ${materiais.length} itens</p>
+          </div>
+          <button onclick="copiarListaMateriais()" class="px-4 py-2 glass rounded-lg hover:bg-white/10 transition-all">
+            <i class="fas fa-copy mr-2"></i> Copiar Lista
+          </button>
+        </div>
+      `;
+      
+      categorias.forEach(cat => {
+        const itens = materiais.filter(m => m.categoria === cat);
+        const subtotal = itens.reduce((sum, m) => sum + (m.quantidade * m.preco), 0);
+        
+        html += `
+          <div class="mb-6">
+            <h3 class="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
+              ${cat === 'Cabos' ? '<i class="fas fa-plug"></i>' :
+                cat === 'Proteção' ? '<i class="fas fa-shield-alt"></i>' :
+                cat === 'Quadro' ? '<i class="fas fa-th"></i>' :
+                cat === 'Infraestrutura' ? '<i class="fas fa-cubes"></i>' :
+                '<i class="fas fa-plug"></i>'
+              }
+              ${cat}
+              <span class="text-sm text-gray-500 font-normal">(R$ ${subtotal.toFixed(2)})</span>
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="tabela-materiais">
+                <thead>
+                  <tr>
+                    <th>Descrição</th>
+                    <th class="text-center">Qtd</th>
+                    <th>Unid.</th>
+                    <th class="text-right">Preço Unit.</th>
+                    <th class="text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${itens.map(item => `
+                    <tr>
+                      <td>${item.descricao}</td>
+                      <td class="text-center font-semibold text-amber-400">${item.quantidade}</td>
+                      <td>${item.unidade}</td>
+                      <td class="text-right">R$ ${item.preco.toFixed(2)}</td>
+                      <td class="text-right font-semibold">R$ ${(item.quantidade * item.preco).toFixed(2)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      });
+      
+      // Resumo final
+      html += `
+        <div class="glass-gold rounded-xl p-5 mt-6">
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="text-center">
+              <div class="text-sm text-gray-400 mb-1">Material</div>
+              <div class="text-2xl font-bold text-white">R$ ${custo.material.toFixed(2)}</div>
+            </div>
+            <div class="text-center">
+              <div class="text-sm text-gray-400 mb-1">Mão de Obra (${precosConfig.mao_obra_percentual}%)</div>
+              <div class="text-2xl font-bold text-white">R$ ${custo.maoObra.toFixed(2)}</div>
+            </div>
+            <div class="text-center bg-amber-500/20 rounded-xl py-3">
+              <div class="text-sm text-amber-400 mb-1">TOTAL GERAL</div>
+              <div class="text-3xl font-bold text-amber-400">R$ ${custo.total.toFixed(2)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('lista-materiais').innerHTML = html;
+    }
+    
+    function copiarListaMateriais() {
+      if (!ultimoCalculo) return;
+      
+      let texto = 'LISTA DE MATERIAIS - INSTALAÇÃO ELÉTRICA\n';
+      texto += '='.repeat(50) + '\n\n';
+      
+      ultimoCalculo.materiais.forEach(m => {
+        texto += `${m.quantidade} ${m.unidade} - ${m.descricao}\n`;
+      });
+      
+      texto += '\n' + '='.repeat(50) + '\n';
+      texto += `TOTAL ESTIMADO: R$ ${ultimoCalculo.custo.total.toFixed(2)}\n`;
+      
+      navigator.clipboard.writeText(texto).then(() => {
+        mostrarNotificacao('Lista copiada!', 'success');
+      });
+    }
+    
+    // =============================================
+    // MODAIS E CONFIGURAÇÕES
+    // =============================================
+    
+    function criarModal(titulo, conteudo, botoes = []) {
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
+      modal.id = 'modal-ativo';
+      
+      const botoesHtml = botoes.map(btn => `
+        <button onclick="${btn.action}" class="px-6 py-3 rounded-xl font-semibold transition-all
+          ${btn.class === 'btn-primary' ? 
+            'bg-gradient-to-r from-amber-500 to-orange-500 text-black hover:shadow-lg' : 
+            'glass text-gray-400 hover:text-white'}">
+          ${btn.text}
+        </button>
+      `).join('');
+      
+      modal.innerHTML = `
+        <div class="modal-content glass-gold rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-amber-400">${titulo}</h2>
+            <button onclick="fecharModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+          </div>
+          ${conteudo}
+          <div class="flex gap-3 justify-end mt-6">
+            ${botoesHtml}
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      modal.onclick = (e) => {
+        if (e.target === modal) fecharModal();
+      };
+      
+      return modal;
+    }
+    
+    function fecharModal() {
+      const modal = document.getElementById('modal-ativo');
+      if (modal) modal.remove();
+    }
+    
+    function abrirModalPrecos() {
+      const conteudo = `
+        <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
+          <h3 class="font-semibold text-white">Cabos (R$/metro)</h3>
+          <div class="grid grid-cols-2 gap-3">
+            ${[1.5, 2.5, 4, 6, 10, 16].map(secao => `
+              <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+                <span class="text-gray-400">${secao}mm²</span>
+                <input type="number" id="preco_cabo_${String(secao).replace('.','_')}" 
+                  value="${precosConfig['cabo_' + String(secao).replace('.','_')]?.toFixed(2) || '0.00'}"
+                  step="0.10" class="w-24 px-3 py-1 bg-black/30 border border-amber-500/30 rounded text-amber-400 text-right">
+              </div>
+            `).join('')}
+          </div>
+          
+          <h3 class="font-semibold text-white mt-4">Proteção (R$/unidade)</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400">Disjuntor Geral</span>
+              <input type="number" id="preco_disjuntor_geral" value="${precosConfig.disjuntor_geral.toFixed(2)}"
+                class="w-24 px-3 py-1 bg-black/30 border border-amber-500/30 rounded text-amber-400 text-right">
+            </div>
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400">DR 30mA</span>
+              <input type="number" id="preco_dr_30ma" value="${precosConfig.dr_30ma.toFixed(2)}"
+                class="w-24 px-3 py-1 bg-black/30 border border-amber-500/30 rounded text-amber-400 text-right">
+            </div>
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400">DPS</span>
+              <input type="number" id="preco_dps" value="${precosConfig.dps.toFixed(2)}"
+                class="w-24 px-3 py-1 bg-black/30 border border-amber-500/30 rounded text-amber-400 text-right">
+            </div>
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400">Quadro Base</span>
+              <input type="number" id="preco_quadro_base" value="${precosConfig.quadro_base.toFixed(2)}"
+                class="w-24 px-3 py-1 bg-black/30 border border-amber-500/30 rounded text-amber-400 text-right">
+            </div>
+          </div>
+          
+          <h3 class="font-semibold text-white mt-4">Mão de Obra</h3>
+          <div class="bg-black/20 rounded-lg p-3">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-400">Percentual sobre material</span>
+              <div class="flex items-center gap-2">
+                <input type="range" id="preco_mao_obra_range" min="20" max="80" 
+                  value="${precosConfig.mao_obra_percentual}"
+                  class="w-32 accent-amber-500">
+                <span id="mao_obra_display" class="text-amber-400 font-bold w-12">${precosConfig.mao_obra_percentual}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      criarModal('⚙️ Configurar Preços', conteudo, [
+        { text: 'Restaurar Padrão', class: 'btn-outline', action: 'restaurarPrecosPadrao()' },
+        { text: 'Salvar', class: 'btn-primary', action: 'salvarPrecosModal()' }
+      ]);
+      
+      // Event listener para o slider
+      setTimeout(() => {
+        const slider = document.getElementById('preco_mao_obra_range');
+        const display = document.getElementById('mao_obra_display');
+        if (slider && display) {
+          slider.oninput = () => display.textContent = slider.value + '%';
+        }
+      }, 100);
+    }
+    
+    function salvarPrecosModal() {
+      [1.5, 2.5, 4, 6, 10, 16].forEach(secao => {
+        const key = 'cabo_' + String(secao).replace('.', '_');
+        const input = document.getElementById('preco_' + key);
+        if (input) precosConfig[key] = parseFloat(input.value) || 0;
+      });
+      
+      precosConfig.disjuntor_geral = parseFloat(document.getElementById('preco_disjuntor_geral')?.value) || 180;
+      precosConfig.dr_30ma = parseFloat(document.getElementById('preco_dr_30ma')?.value) || 120;
+      precosConfig.dps = parseFloat(document.getElementById('preco_dps')?.value) || 85;
+      precosConfig.quadro_base = parseFloat(document.getElementById('preco_quadro_base')?.value) || 250;
+      precosConfig.mao_obra_percentual = parseInt(document.getElementById('preco_mao_obra_range')?.value) || 45;
+      
+      salvarPrecosConfig();
+      fecharModal();
+      mostrarNotificacao('Preços salvos com sucesso!', 'success');
+    }
+    
+    function restaurarPrecosPadrao() {
+      if (confirm('Restaurar todos os preços para o padrão?')) {
+        precosConfig = { ...precosConfigPadrao };
+        localStorage.removeItem('eletrica_precos_config');
+        fecharModal();
+        mostrarNotificacao('Preços restaurados!', 'info');
+      }
+    }
+    
+    function mostrarBalanceamento() {
+      if (!ultimoCalculo || ultimoCalculo.tensao !== 380) {
+        mostrarNotificacao('Balanceamento disponível apenas para instalações trifásicas (380V)', 'warning');
+        return;
+      }
+      
+      const fases = { A: 0, B: 0, C: 0 };
+      ultimoCalculo.circuitos.forEach(c => {
+        if (c.fase) fases[c.fase] += c.potencia;
+      });
+      
+      const total = fases.A + fases.B + fases.C;
+      const media = total / 3;
+      const desequilibrio = Math.max(
+        Math.abs(fases.A - media),
+        Math.abs(fases.B - media),
+        Math.abs(fases.C - media)
+      ) / media * 100;
+      
+      const conteudo = `
+        <div class="space-y-4">
+          <div class="grid grid-cols-3 gap-4">
+            <div class="text-center bg-red-500/20 rounded-xl p-4">
+              <div class="text-2xl font-bold text-red-400">${(fases.A/1000).toFixed(2)} kW</div>
+              <div class="text-sm text-gray-400">Fase A</div>
+            </div>
+            <div class="text-center bg-yellow-500/20 rounded-xl p-4">
+              <div class="text-2xl font-bold text-yellow-400">${(fases.B/1000).toFixed(2)} kW</div>
+              <div class="text-sm text-gray-400">Fase B</div>
+            </div>
+            <div class="text-center bg-blue-500/20 rounded-xl p-4">
+              <div class="text-2xl font-bold text-blue-400">${(fases.C/1000).toFixed(2)} kW</div>
+              <div class="text-sm text-gray-400">Fase C</div>
+            </div>
+          </div>
+          
+          <div class="bg-black/20 rounded-xl p-4">
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-400">Desequilíbrio</span>
+              <span class="${desequilibrio < 10 ? 'text-green-400' : desequilibrio < 20 ? 'text-amber-400' : 'text-red-400'} font-bold">
+                ${desequilibrio.toFixed(1)}%
+              </span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill ${desequilibrio < 10 ? 'bg-green-500' : desequilibrio < 20 ? 'bg-amber-500' : 'bg-red-500'}" 
+                style="width: ${Math.min(desequilibrio * 5, 100)}%"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+              ${desequilibrio < 10 ? '✅ Bom balanceamento' : 
+                desequilibrio < 20 ? '⚠️ Balanceamento aceitável' : 
+                '❌ Rebalanceamento recomendado'}
+            </p>
+          </div>
+        </div>
+      `;
+      
+      criarModal('⚖️ Balanceamento de Fases', conteudo, [
+        { text: 'Fechar', class: 'btn-primary', action: 'fecharModal()' }
+      ]);
+    }
+    
+    // =============================================
+    // PERSISTÊNCIA E EXPORTAÇÃO
+    // =============================================
+    
+    function salvarPrecosConfig() {
+      localStorage.setItem('eletrica_precos_config', JSON.stringify(precosConfig));
+    }
+    
+    function carregarPrecosConfig() {
+      const saved = localStorage.getItem('eletrica_precos_config');
+      if (saved) {
+        try {
+          precosConfig = { ...precosConfigPadrao, ...JSON.parse(saved) };
+        } catch (e) {}
+      }
+    }
+    
+    function salvarProjetoLocal() {
+      const projeto = {
+        ambientes,
+        config: {
+          tipo: document.getElementById('tipo-instalacao').value,
+          area: document.getElementById('area-construida').value,
+          tensao: document.getElementById('tensao').value,
+          fatorDemanda: document.getElementById('fator-demanda').value
+        },
+        timestamp: Date.now()
+      };
+      localStorage.setItem('eletrica_projeto', JSON.stringify(projeto));
+    }
+    
+    function carregarProjetoLocal() {
+      const saved = localStorage.getItem('eletrica_projeto');
+      if (saved) {
+        try {
+          const projeto = JSON.parse(saved);
+          ambientes = projeto.ambientes || [];
+          
+          if (projeto.config) {
+            document.getElementById('tipo-instalacao').value = projeto.config.tipo;
+            document.getElementById('area-construida').value = projeto.config.area;
+            document.getElementById('tensao').value = projeto.config.tensao;
+            document.getElementById('fator-demanda').value = projeto.config.fatorDemanda;
+            document.getElementById('fator-demanda-range').value = projeto.config.fatorDemanda;
+            document.getElementById('fator-demanda-value').textContent = projeto.config.fatorDemanda + '%';
+          }
+          
+          renderizarAmbientes();
+        } catch (e) {}
+      }
+    }
+    
+    function salvarProjeto() {
+      const projeto = {
+        nome: prompt('Nome do projeto:', 'Instalação Elétrica'),
+        ambientes,
+        config: {
+          tipo: document.getElementById('tipo-instalacao').value,
+          area: document.getElementById('area-construida').value,
+          tensao: document.getElementById('tensao').value,
+          fatorDemanda: document.getElementById('fator-demanda').value
+        },
+        resultado: ultimoCalculo,
+        timestamp: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(projeto, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${projeto.nome.replace(/\s+/g, '_')}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      mostrarNotificacao('Projeto salvo!', 'success');
+    }
+    
+    function carregarProjeto() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const projeto = JSON.parse(ev.target.result);
+              ambientes = projeto.ambientes || [];
+              
+              if (projeto.config) {
+                document.getElementById('tipo-instalacao').value = projeto.config.tipo;
+                document.getElementById('area-construida').value = projeto.config.area;
+                document.getElementById('tensao').value = projeto.config.tensao;
+                document.getElementById('fator-demanda').value = projeto.config.fatorDemanda;
+                document.getElementById('fator-demanda-range').value = projeto.config.fatorDemanda;
+                document.getElementById('fator-demanda-value').textContent = projeto.config.fatorDemanda + '%';
+              }
+              
+              renderizarAmbientes();
+              atualizarProgress();
+              mostrarNotificacao(`Projeto "${projeto.nome}" carregado!`, 'success');
+            } catch (err) {
+              mostrarNotificacao('Erro ao carregar projeto', 'error');
+            }
+          };
+          reader.readAsText(file);
+        }
+      };
+      input.click();
+    }
+    
+    function exportarPDF() {
+      if (!ultimoCalculo) {
+        mostrarNotificacao('Execute o cálculo primeiro!', 'warning');
+        return;
+      }
+      
+      window.print();
+    }
+    
+    function resetarProjeto() {
+      if (confirm('Limpar todo o projeto?')) {
+        ambientes = [];
+        ultimoCalculo = null;
+        localStorage.removeItem('eletrica_projeto');
+        renderizarAmbientes();
+        document.getElementById('resultado').innerHTML = `
+          <div class="text-center py-12 text-gray-500">
+            <i class="fas fa-calculator text-5xl mb-4 opacity-30"></i>
+            <p>Clique em "Calcular" para gerar os resultados</p>
+          </div>
+        `;
+        document.getElementById('lista-materiais').innerHTML = `
+          <div class="text-center py-12 text-gray-500">
+            <i class="fas fa-boxes text-5xl mb-4 opacity-30"></i>
+            <p>Execute o cálculo para gerar a lista de materiais</p>
+          </div>
+        `;
+        atualizarProgress();
+        mostrarNotificacao('Projeto limpo!', 'info');
+      }
+    }
+    
+    // =============================================
+    // NOTIFICAÇÕES
+    // =============================================
+    
+    function mostrarNotificacao(mensagem, tipo = 'info') {
+      const cores = {
+        success: 'from-green-500 to-green-600',
+        error: 'from-red-500 to-red-600',
+        warning: 'from-amber-500 to-orange-500',
+        info: 'from-blue-500 to-blue-600'
+      };
+      
+      const icones = {
+        success: 'fa-check-circle',
+        error: 'fa-times-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+      
+      const notif = document.createElement('div');
+      notif.className = `fixed bottom-6 right-6 bg-gradient-to-r ${cores[tipo]} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-fade-in z-50`;
+      notif.innerHTML = `
+        <i class="fas ${icones[tipo]}"></i>
+        <span>${mensagem}</span>
+      `;
+      
+      document.body.appendChild(notif);
+      
+      setTimeout(() => {
+        notif.style.opacity = '0';
+        notif.style.transform = 'translateY(20px)';
+        notif.style.transition = 'all 0.3s ease';
+        setTimeout(() => notif.remove(), 300);
+      }, 3000);
+    }
+  </script>
+
+    <!-- Footer -->
+    
+    
+
+    
+
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
