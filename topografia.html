@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Topografia e Áreas | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
+            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', cyan2: '#00e5ff' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00e5ff, #00ff88); border-radius: 4px; }
+    
+    .text-glow { text-shadow: 0 0 20px rgba(0, 229, 255, 0.5); }
+    
+    .gradient-border {
+      position: relative;
+      background: #12121a;
+      border-radius: 16px;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #00e5ff, #00ff88, #00e5ff);
+      background-size: 300% 300%;
+      animation: gradientMove 8s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(0, 229, 255, 0.6); }
+    }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      border-color: #00e5ff;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+      outline: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00e5ff 0%, #00ff88 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.4);
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      border-color: #00e5ff;
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-100">
+  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-cyan2 to-neon-green flex items-center justify-center font-bold text-dark-900 text-xl">
+          📐
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold text-white">Topografia</h1>
+          <p class="text-xs text-gray-500">Área de Polígonos (Shoelace) e Perímetro</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-1 space-y-6">
+        <div class="gradient-border p-6">
+          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+            <span class="text-neon-cyan2">●</span> Coordenadas (X, Y)
+          </h2>
+          <p class="text-sm text-gray-400 mb-4">Insira os vértices do terreno sequencialmente (horário ou anti-horário). Use <b>metros</b>.</p>
+          
+          <div id="verticesContainer" class="space-y-3 mb-4 max-h-80 overflow-y-auto pr-2">
+            <!-- Vértices -->
+            <div class="flex gap-2 items-center vertice-row">
+              <span class="text-xs text-gray-500 w-6">P1</span>
+              <input type="number" placeholder="X (E)" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
+              <input type="number" placeholder="Y (N)" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
+            </div>
+            <div class="flex gap-2 items-center vertice-row">
+              <span class="text-xs text-gray-500 w-6">P2</span>
+              <input type="number" placeholder="X (E)" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
+              <input type="number" placeholder="Y (N)" value="10" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
+            </div>
+            <div class="flex gap-2 items-center vertice-row">
+              <span class="text-xs text-gray-500 w-6">P3</span>
+              <input type="number" placeholder="X (E)" value="15" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
+              <input type="number" placeholder="Y (N)" value="10" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
+            </div>
+            <div class="flex gap-2 items-center vertice-row">
+              <span class="text-xs text-gray-500 w-6">P4</span>
+              <input type="number" placeholder="X (E)" value="20" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
+              <input type="number" placeholder="Y (N)" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
+            </div>
+          </div>
+          
+          <div class="flex gap-2 mb-4">
+            <button id="btnAdd" class="w-full py-2 rounded-lg border border-neon-cyan2/50 text-neon-cyan2 hover:bg-neon-cyan2/10 transition-colors text-sm">
+              + Adicionar Vértice
+            </button>
+            <button id="btnRemove" class="w-full py-2 rounded-lg border border-red-500/50 text-red-500 hover:bg-red-500/10 transition-colors text-sm">
+              - Remover Último
+            </button>
+          </div>
+
+          <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 shadow-lg shadow-cyan-500/30">
+            Calcular Área e Perímetro
+          </button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 space-y-6">
+        <div id="resultadoSection" class="gradient-border p-8 text-center opacity-50 transition-opacity duration-500">
+          <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Área do Polígono Irregular</div>
+          <div id="valArea" class="text-5xl md:text-6xl font-bold text-neon-cyan2 text-glow mb-2">0.0</div>
+          <div class="text-xl mb-4 font-semibold text-gray-300">m²</div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Perímetro Total</div>
+              <div id="valPerimetro" class="text-xl font-semibold text-neon-green">0 m</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Área em Hectares</div>
+              <div id="valHa" class="text-xl font-semibold text-neon-cyan2">0 ha</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Alqueire Paulista</div>
+              <div id="valAlqP" class="text-xl font-semibold text-neon-cyan2">0 alq</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Nº de Vértices</div>
+              <div id="valVertices" class="text-xl font-semibold text-neon-green">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gradient-border p-6">
+          <h3 class="text-lg font-semibold mb-4 text-white">📝 Memorial - Método de Gauss (Shoelace)</h3>
+          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
+    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    let countVertices = 4;
+
+    function getHTMLRow(i) {
+      return `
+        <div class="flex gap-2 items-center vertice-row">
+          <span class="text-xs text-gray-500 w-6">P${i}</span>
+          <input type="number" placeholder="X" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
+          <input type="number" placeholder="Y" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
+        </div>
+      `;
+    }
+
+    $('btnAdd').addEventListener('click', () => {
+      countVertices++;
+      $('verticesContainer').insertAdjacentHTML('beforeend', getHTMLRow(countVertices));
+    });
+
+    $('btnRemove').addEventListener('click', () => {
+      if (countVertices > 3) {
+        const rows = document.querySelectorAll('.vertice-row');
+        rows[rows.length - 1].remove();
+        countVertices--;
+      } else {
+        alert("O polígono precisa ter pelo menos 3 vértices!");
+      }
+    });
+
+    function calcularTopografia() {
+      const xInputs = document.querySelectorAll('.coord-x');
+      const yInputs = document.querySelectorAll('.coord-y');
+      
+      let x = [];
+      let y = [];
+      
+      for(let i=0; i<xInputs.length; i++) {
+        x.push(parseFloat(xInputs[i].value) || 0);
+        y.push(parseFloat(yInputs[i].value) || 0);
+      }
+
+      const n = x.length;
+      if (n < 3) return;
+
+      // Cálculo de Área (Shoelace Formula / Método de Gauss)
+      // Area = 0.5 * | (x1*y2 - y1*x2) + (x2*y3 - y2*x3) + ... + (xn*y1 - yn*x1) |
+      let sum1 = 0;
+      let sum2 = 0;
+      let perimetro = 0;
+
+      let logString = "Ponto | X (E) | Y (N)\n";
+
+      for (let i = 0; i < n; i++) {
+        let j = (i + 1) % n; // O próximo ponto. O último se liga ao primeiro.
+        
+        sum1 += x[i] * y[j];
+        sum2 += y[i] * x[j];
+        
+        // Distância entre P(i) e P(i+1)
+        let dx = x[j] - x[i];
+        let dy = y[j] - y[i];
+        perimetro += Math.sqrt(dx*dx + dy*dy);
+        
+        logString += `P${i+1}    | ${x[i].toFixed(2)} | ${y[i].toFixed(2)}\n`;
+      }
+
+      const area = Math.abs(sum1 - sum2) / 2;
+
+      // Conversões
+      const ha = area / 10000;
+      const alqP = area / 24200;
+
+      // UI
+      $('resultadoSection').classList.remove('opacity-50');
+      $('resultadoSection').classList.add('pulse-glow');
+      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+
+      $('valArea').textContent = area.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      $('valPerimetro').textContent = perimetro.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' m';
+      $('valHa').textContent = ha.toFixed(4) + ' ha';
+      $('valAlqP').textContent = alqP.toFixed(4) + ' alq';
+      $('valVertices').textContent = n;
+
+      $('memorial').textContent = `MEMORIAL DESCRITIVO DE CÁLCULO DE ÁREA (GAUSS)
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. COORDENADAS DOS VÉRTICES (m)
+${logString}
+
+2. CÁLCULO DE ÁREA (Fórmula dos Determinantes / Shoelace)
+Soma (X_i * Y_i+1) = ${sum1.toFixed(2)}
+Soma (Y_i * X_i+1) = ${sum2.toFixed(2)}
+Área = 0.5 * | ${sum1.toFixed(2)} - ${sum2.toFixed(2)} |
+Área Total = ${area.toFixed(2)} m²
+
+3. CÁLCULO DO PERÍMETRO
+Somatório das distâncias euclidianas entre vértices consecutivos.
+Perímetro Total = ${perimetro.toFixed(2)} m
+
+4. CONVERSÕES
+Hectares (1 ha = 10.000 m²) = ${ha.toFixed(4)} ha
+Alqueire Paulista (1 alq = 24.200 m²) = ${alqP.toFixed(4)} alq`;
+    }
+
+    $('btnCalcular').addEventListener('click', calcularTopografia);
+    $('btnReset').addEventListener('click', () => location.reload());
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if ($('year')) $('year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
