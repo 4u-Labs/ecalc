@@ -1,0 +1,2505 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Tubulações Hidrossanitárias | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    /* ===== GLOBAL STYLES ===== */
+    :root {
+      --primary: #00ffff;
+      --primary-dark: #00cccc;
+      --secondary: #8b1bf7;
+      --bg-dark: #0a0a0f;
+      --bg-card: #12121a;
+      --text-primary: #e0e0e0;
+      --text-secondary: #999;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1a25 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ===== LAYOUT ===== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 30px 20px;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color: #000;
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border-color: rgba(0, 255, 255, 0.3);
+    }
+
+    .btn-outline:hover {
+      background: rgba(0, 255, 255, 0.1);
+      border-color: var(--primary);
+    }
+
+    .btn-danger {
+      background: rgba(220, 53, 69, 0.2);
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
+    /* ===== CARDS/SECTIONS ===== */
+    .content-section {
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .content-section h2 {
+      color: var(--primary);
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ===== SYSTEM SELECTOR ===== */
+    .tipo-sistema {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .tipo-btn {
+      padding: 18px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px solid rgba(0, 255, 255, 0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      text-align: center;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tipo-btn:hover {
+      border-color: var(--primary);
+      background: rgba(0, 255, 255, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .tipo-btn.active {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(139, 27, 247, 0.2));
+      color: var(--primary);
+      border-color: var(--primary);
+      font-weight: 600;
+    }
+
+    .tipo-btn .icon {
+      font-size: 1.8rem;
+    }
+
+    /* ===== FORMS ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .form-control,
+    .form-select {
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+
+    .form-select {
+      cursor: pointer;
+    }
+
+    .form-select option {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    /* ===== SPECS GRID ===== */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .spec-item {
+      background: rgba(0, 255, 255, 0.05);
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .spec-item:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+    }
+
+    .spec-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .spec-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* ===== ALERTS ===== */
+    .alert {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin: 18px 0;
+      border-left: 4px solid;
+      line-height: 1.6;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .alert-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .alert-info {
+      background: rgba(0, 255, 255, 0.08);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .alert-warning {
+      background: rgba(255, 193, 7, 0.08);
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+
+    .alert-success {
+      background: rgba(40, 167, 69, 0.08);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .alert-danger {
+      background: rgba(220, 53, 69, 0.08);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* ===== PEÇAS/ITEMS LIST ===== */
+    .pecas-lista {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .peca-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .peca-item:hover {
+      border-color: rgba(0, 255, 255, 0.4);
+      background: rgba(0, 255, 255, 0.03);
+    }
+
+    .peca-icon {
+      font-size: 1.6rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    .peca-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .peca-nome {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .peca-peso {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .peca-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qty-input {
+      width: 60px;
+      padding: 6px 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      color: var(--primary);
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .qty-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .remove-btn {
+      background: rgba(220, 53, 69, 0.15);
+      border: 1px solid rgba(220, 53, 69, 0.4);
+      color: var(--danger);
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .remove-btn:hover {
+      background: rgba(220, 53, 69, 0.3);
+      border-color: var(--danger);
+    }
+
+    .add-peca-btn {
+      background: rgba(0, 255, 255, 0.08);
+      border: 2px dashed rgba(0, 255, 255, 0.3);
+      color: var(--primary);
+      padding: 14px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .add-peca-btn:hover {
+      background: rgba(0, 255, 255, 0.15);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* ===== TABLES ===== */
+    .table-container {
+      overflow-x: auto;
+      margin: 15px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th {
+      background: rgba(0, 255, 255, 0.1);
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tr:hover td {
+      background: rgba(0, 255, 255, 0.03);
+    }
+
+    tfoot tr {
+      background: rgba(0, 255, 255, 0.05);
+    }
+
+    tfoot td {
+      font-weight: 700;
+      color: var(--primary);
+      border-top: 2px solid rgba(0, 255, 255, 0.3);
+    }
+
+    /* ===== HUNTER CALC ===== */
+    .hunter-calc {
+      background: rgba(138, 43, 226, 0.06);
+      border: 1px solid rgba(138, 43, 226, 0.25);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+
+    .hunter-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hunter-item:last-child {
+      border-bottom: none;
+    }
+
+    .hunter-label {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .hunter-value {
+      color: #b19cd9;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    /* ===== INFO LIST ===== */
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0;
+    }
+
+    .info-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .info-list li::before {
+      content: "▸";
+      color: var(--primary);
+      font-size: 0.8rem;
+    }
+
+    .info-list li:last-child {
+      border-bottom: none;
+    }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #0f0f14 0%, #1a1a25 100%);
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      max-width: 900px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 0 50px rgba(0, 255, 255, 0.2);
+      transform: scale(0.9);
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .modal-title {
+      color: var(--primary);
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: rgba(220, 53, 69, 0.2);
+      color: var(--danger);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* ===== PREÇOS GRID ===== */
+    .categoria-header {
+      color: var(--primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 25px 0 15px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .categoria-header:first-child {
+      margin-top: 0;
+    }
+
+    .precos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .preco-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .preco-label {
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .preco-descricao {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 3px;
+    }
+
+    .preco-input {
+      width: 120px;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      color: var(--primary);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .preco-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+
+    /* ===== PECAS SELECTOR MODAL ===== */
+    .pecas-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 5px;
+    }
+
+    .peca-option {
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px solid rgba(0, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+    }
+
+    .peca-option:hover {
+      border-color: var(--primary);
+      background: rgba(0, 255, 255, 0.08);
+      transform: translateY(-3px);
+    }
+
+    .peca-option .icon {
+      font-size: 2rem;
+    }
+
+    .peca-option .name {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .peca-option .details {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* ===== RESULTADO HEADER ===== */
+    .resultado-header {
+      color: var(--primary);
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ===== ACTIONS ===== */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: 40px;
+      border-top: 1px solid rgba(0, 255, 255, 0.1);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* ===== UTILITIES ===== */
+    .mt-1 { margin-top: 10px; }
+    .mt-2 { margin-top: 20px; }
+    .mt-3 { margin-top: 30px; }
+    .mb-2 { margin-bottom: 20px; }
+    .text-center { text-align: center; }
+    .text-muted { color: var(--text-secondary); font-size: 0.85rem; }
+    .hidden { display: none !important; }
+
+    /* ===== LOADING ===== */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      gap: 12px;
+    }
+
+    .loading-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(0, 255, 255, 0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--bg-card);
+      border: 1px solid var(--success);
+      border-radius: 12px;
+      padding: 16px 24px;
+      color: var(--success);
+      font-weight: 500;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s ease;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .content-section {
+        padding: 18px;
+      }
+
+      .tipo-btn {
+        padding: 14px 12px;
+      }
+
+      .tipo-btn .icon {
+        font-size: 1.5rem;
+      }
+
+      .specs-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .pecas-lista {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .modal-content {
+        padding: 20px;
+      }
+
+      .precos-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 255, 0.3);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 255, 255, 0.5);
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      .btn, .actions, .modal-overlay, .add-peca-btn, .remove-btn {
+        display: none !important;
+      }
+
+      .content-section {
+        break-inside: avoid;
+        border: 1px solid #ccc;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <h1>🔧 Tubulações Hidrossanitárias</h1>
+    <p>Dimensionamento conforme normas NBR 5626, 7198, 8160 e 10844</p>
+  </header>
+
+  <main class="container">
+    <!-- ACTIONS -->
+    <div class="actions">
+      <button class="btn btn-primary" id="btnCalcular">
+        <span>📊</span> Calcular
+      </button>
+      <button class="btn btn-outline" id="btnConfigurarPrecos">
+        <span>⚙️</span> Configurar Preços
+      </button>
+      <button class="btn btn-outline" id="btnExportar">
+        <span>📄</span> Exportar PDF
+      </button>
+      <button class="btn btn-outline" id="btnReset">
+        <span>🔄</span> Limpar
+      </button>
+    </div>
+
+    <!-- SISTEMA SELECTOR -->
+    <section class="content-section">
+      <h2>📋 Sistema Hidrossanitário</h2>
+      <div class="tipo-sistema" id="sistemaSeletor">
+        <button class="tipo-btn active" data-sistema="agua-fria">
+          <span class="icon">💧</span>
+          <span>Água Fria</span>
+        </button>
+        <button class="tipo-btn" data-sistema="agua-quente">
+          <span class="icon">🌡️</span>
+          <span>Água Quente</span>
+        </button>
+        <button class="tipo-btn" data-sistema="esgoto">
+          <span class="icon">🚽</span>
+          <span>Esgoto</span>
+        </button>
+        <button class="tipo-btn" data-sistema="pluvial">
+          <span class="icon">🌧️</span>
+          <span>Pluvial</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ÁGUA FRIA -->
+    <section class="content-section" id="secao-agua-fria">
+      <h2>💧 Dimensionamento - Água Fria (NBR 5626)</h2>
+      
+      <div class="alert alert-info">
+        <span class="alert-icon">💡</span>
+        <div>
+          <strong>Método de Cálculo:</strong> Consumo provável baseado em pesos relativos das peças de utilização, conforme NBR 5626:2020.
+        </div>
+      </div>
+
+      <h3 class="resultado-header mt-2">🚿 Peças Sanitárias</h3>
+      <div class="pecas-lista" id="lista-pecas"></div>
+      <button class="add-peca-btn" id="btnAdicionarPeca">
+        <span>➕</span> Adicionar Peça
+      </button>
+
+      <div class="grid mt-2">
+        <div class="form-group">
+          <label class="form-label">Comprimento da tubulação (m)</label>
+          <input class="form-control" id="comprimento-tubo" type="number" min="1" value="15" step="0.5"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Desnível (m)</label>
+          <input class="form-control" id="desnivel" type="number" min="0" value="3" step="0.5"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pressão disponível (mca)</label>
+          <input class="form-control" id="pressao-disponivel" type="number" min="5" value="15"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Material da tubulação</label>
+          <select class="form-select" id="material-tubo">
+            <option value="pvc">PVC Soldável</option>
+            <option value="ppr">PPR (Termofusão)</option>
+            <option value="cobre">Cobre</option>
+            <option value="pex">PEX (Flexível)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÁGUA QUENTE -->
+    <section class="content-section hidden" id="secao-agua-quente">
+      <h2>🌡️ Dimensionamento - Água Quente (NBR 7198)</h2>
+      
+      <div class="alert alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <div>
+          Tubulações de água quente devem ser isoladas termicamente para reduzir perdas de calor.
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="form-group">
+          <label class="form-label">Número de banheiros</label>
+          <input class="form-control" id="num-banheiros" type="number" min="1" value="2"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Número de chuveiros</label>
+          <input class="form-control" id="num-chuveiros" type="number" min="0" value="2"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Temperatura desejada (°C)</label>
+          <input class="form-control" id="temp-desejada" type="number" min="35" max="50" value="40"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comprimento (m)</label>
+          <input class="form-control" id="comprimento-quente" type="number" min="1" value="20"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESGOTO -->
+    <section class="content-section hidden" id="secao-esgoto">
+      <h2>🚽 Dimensionamento - Esgoto Sanitário (NBR 8160)</h2>
+      
+      <div class="alert alert-info">
+        <span class="alert-icon">💡</span>
+        <div>
+          <strong>Método:</strong> Unidades Hunter de Contribuição (UHC) - sistema padronizado para dimensionamento de esgoto.
+        </div>
+      </div>
+
+      <h3 class="resultado-header mt-2">🔧 Aparelhos Sanitários</h3>
+      <div class="pecas-lista" id="lista-esgoto"></div>
+      <button class="add-peca-btn" id="btnAdicionarEsgoto">
+        <span>➕</span> Adicionar Aparelho
+      </button>
+
+      <div class="grid mt-2">
+        <div class="form-group">
+          <label class="form-label">Tipo de ramal</label>
+          <select class="form-select" id="tipo-ramal">
+            <option value="horizontal">Horizontal</option>
+            <option value="vertical">Vertical (Coluna)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comprimento do ramal (m)</label>
+          <input class="form-control" id="comprimento-esgoto" type="number" min="1" value="8"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Declividade (%)</label>
+          <input class="form-control" id="declividade-esgoto" type="number" min="0.5" max="4" step="0.5" value="2"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLUVIAL -->
+    <section class="content-section hidden" id="secao-pluvial">
+      <h2>🌧️ Dimensionamento - Águas Pluviais (NBR 10844)</h2>
+
+      <div class="grid">
+        <div class="form-group">
+          <label class="form-label">Área de contribuição (m²)</label>
+          <input class="form-control" id="area-telhado" type="number" min="1" value="100"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Intensidade pluviométrica (mm/h)</label>
+          <input class="form-control" id="intensidade-chuva" type="number" min="50" value="150"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de cobertura</label>
+          <select class="form-select" id="tipo-cobertura">
+            <option value="1.0">Telha cerâmica/fibrocimento</option>
+            <option value="1.1">Telha metálica</option>
+            <option value="1.2">Laje impermeabilizada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comprimento do condutor (m)</label>
+          <input class="form-control" id="comprimento-pluvial" type="number" min="1" value="6"/>
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-2">
+        <span class="alert-icon">💡</span>
+        <div>
+          <strong>Dados climáticos:</strong> Verifique a intensidade pluviométrica para sua região.<br>
+          Exemplos: São Paulo 150mm/h | Rio de Janeiro 180mm/h | Curitiba 130mm/h | Recife 190mm/h
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTADOS -->
+    <section class="content-section">
+      <h2>📊 Resultados do Dimensionamento</h2>
+      <div id="resultado">
+        <div class="text-center text-muted" style="padding: 40px;">
+          <p style="font-size: 3rem; margin-bottom: 15px;">📋</p>
+          <p>Configure as peças e clique em <strong>Calcular</strong> para ver os resultados.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REFERÊNCIAS -->
+    <section class="content-section">
+      <h2>📚 Referências Normativas</h2>
+      <ul class="info-list">
+        <li><strong>NBR 5626:2020</strong> - Sistemas Prediais de Água Fria e Água Quente - Projeto, execução, operação e manutenção</li>
+        <li><strong>NBR 7198:1993</strong> - Projeto e Execução de Instalações Prediais de Água Quente</li>
+        <li><strong>NBR 8160:1999</strong> - Sistemas Prediais de Esgoto Sanitário - Projeto e execução</li>
+        <li><strong>NBR 10844:1989</strong> - Instalações Prediais de Águas Pluviais - Procedimento</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- MODAL DE PREÇOS -->
+  <div id="modalPrecos" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ Configurar Preços de Tubulações</h3>
+        <button class="modal-close" id="btnFecharModalPrecos">×</button>
+      </div>
+      
+      <div class="categoria-header">💧 Água Fria - PVC (R$/m)</div>
+      <div class="precos-grid">
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">PVC Ø 20mm</div>
+            <div class="preco-descricao">Tubo soldável</div>
+          </div>
+          <input type="number" id="preco-pvc-20" class="preco-input" step="0.5" min="0" value="6.5">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">PVC Ø 25mm</div>
+            <div class="preco-descricao">Tubo soldável</div>
+          </div>
+          <input type="number" id="preco-pvc-25" class="preco-input" step="0.5" min="0" value="9.2">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">PVC Ø 32mm</div>
+            <div class="preco-descricao">Tubo soldável</div>
+          </div>
+          <input type="number" id="preco-pvc-32" class="preco-input" step="0.5" min="0" value="13.5">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">PVC Ø 50mm</div>
+            <div class="preco-descricao">Tubo soldável</div>
+          </div>
+          <input type="number" id="preco-pvc-50" class="preco-input" step="0.5" min="0" value="26.0">
+        </div>
+      </div>
+
+      <div class="categoria-header">🌡️ Água Fria - PPR (R$/m)</div>
+      <div class="precos-grid">
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">PPR Ø 20mm</div>
+            <div class="preco-descricao">Tubo termofusão</div>
+          </div>
+          <input type="number" id="preco-ppr-20" class="preco-input" step="0.5" min="0" value="8">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">PPR Ø 25mm</div>
+            <div class="preco-descricao">Tubo termofusão</div>
+          </div>
+          <input type="number" id="preco-ppr-25" class="preco-input" step="0.5" min="0" value="11">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">PPR Ø 32mm</div>
+            <div class="preco-descricao">Tubo termofusão</div>
+          </div>
+          <input type="number" id="preco-ppr-32" class="preco-input" step="0.5" min="0" value="15">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">PPR Ø 50mm</div>
+            <div class="preco-descricao">Tubo termofusão</div>
+          </div>
+          <input type="number" id="preco-ppr-50" class="preco-input" step="0.5" min="0" value="28">
+        </div>
+      </div>
+
+      <div class="categoria-header">🚽 Esgoto - PVC (R$/m)</div>
+      <div class="precos-grid">
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Esgoto Ø 40mm</div>
+            <div class="preco-descricao">Tubo série normal</div>
+          </div>
+          <input type="number" id="preco-esgoto-40" class="preco-input" step="0.5" min="0" value="8">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Esgoto Ø 50mm</div>
+            <div class="preco-descricao">Tubo série normal</div>
+          </div>
+          <input type="number" id="preco-esgoto-50" class="preco-input" step="0.5" min="0" value="10">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Esgoto Ø 75mm</div>
+            <div class="preco-descricao">Tubo série normal</div>
+          </div>
+          <input type="number" id="preco-esgoto-75" class="preco-input" step="0.5" min="0" value="15">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Esgoto Ø 100mm</div>
+            <div class="preco-descricao">Tubo série normal</div>
+          </div>
+          <input type="number" id="preco-esgoto-100" class="preco-input" step="0.5" min="0" value="22">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Esgoto Ø 150mm</div>
+            <div class="preco-descricao">Tubo série normal</div>
+          </div>
+          <input type="number" id="preco-esgoto-150" class="preco-input" step="0.5" min="0" value="45">
+        </div>
+      </div>
+
+      <div class="categoria-header">🌧️ Pluvial - PVC (R$/m)</div>
+      <div class="precos-grid">
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Pluvial Ø 75mm</div>
+            <div class="preco-descricao">Tubo série normal</div>
+          </div>
+          <input type="number" id="preco-pluvial-75" class="preco-input" step="0.5" min="0" value="12">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Pluvial Ø 100mm</div>
+            <div class="preco-descricao">Tubo série normal</div>
+          </div>
+          <input type="number" id="preco-pluvial-100" class="preco-input" step="0.5" min="0" value="18">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Pluvial Ø 150mm</div>
+            <div class="preco-descricao">Tubo série normal</div>
+          </div>
+          <input type="number" id="preco-pluvial-150" class="preco-input" step="0.5" min="0" value="35">
+        </div>
+      </div>
+
+      <div class="categoria-header">🔧 Serviços e Componentes (R$)</div>
+      <div class="precos-grid">
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Conexões (por peça)</div>
+            <div class="preco-descricao">Média água fria</div>
+          </div>
+          <input type="number" id="preco-conexoes" class="preco-input" step="1" min="0" value="25">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Registros (por peça)</div>
+            <div class="preco-descricao">Registro de gaveta</div>
+          </div>
+          <input type="number" id="preco-registros" class="preco-input" step="1" min="0" value="45">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Sifões (por peça)</div>
+            <div class="preco-descricao">Sifão sanfonado</div>
+          </div>
+          <input type="number" id="preco-sifoes" class="preco-input" step="1" min="0" value="35">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Calha (por m)</div>
+            <div class="preco-descricao">Calha PVC</div>
+          </div>
+          <input type="number" id="preco-calha" class="preco-input" step="1" min="0" value="45">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Ralos pluviais</div>
+            <div class="preco-descricao">Conjunto 2-3 ralos</div>
+          </div>
+          <input type="number" id="preco-ralos" class="preco-input" step="5" min="0" value="150">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Instalação água (%)</div>
+            <div class="preco-descricao">% sobre material</div>
+          </div>
+          <input type="number" id="preco-instalacao-agua" class="preco-input" step="5" min="0" max="100" value="30">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Instalação esgoto (%)</div>
+            <div class="preco-descricao">% sobre material</div>
+          </div>
+          <input type="number" id="preco-instalacao-esgoto" class="preco-input" step="5" min="0" max="100" value="25">
+        </div>
+        <div class="preco-item">
+          <div>
+            <div class="preco-label">Instalação pluvial (%)</div>
+            <div class="preco-descricao">% sobre material</div>
+          </div>
+          <input type="number" id="preco-instalacao-pluvial" class="preco-input" step="5" min="0" max="100" value="20">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btnRestaurarPrecos">🔄 Restaurar Padrão</button>
+        <button class="btn btn-primary" id="btnSalvarPrecos">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ADICIONAR PEÇA -->
+  <div id="modalPeca" class="modal-overlay">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalPecaTitulo">➕ Adicionar Peça</h3>
+        <button class="modal-close" id="btnFecharModalPeca">×</button>
+      </div>
+      <div class="pecas-selector" id="pecasSelector"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span>✓</span>
+    <span id="toastMessage">Ação realizada com sucesso!</span>
+  </div>
+
+  <!-- FOOTER -->
+  
+
+  <script>
+    // ============================================
+    // CONFIGURAÇÕES E CONSTANTES
+    // ============================================
+    
+    const CONFIG = {
+      VELOCIDADE_MIN_AGUA: 0.5,
+      VELOCIDADE_MAX_AGUA: 3.0,
+      VELOCIDADE_MIN_ESGOTO: 0.6,
+      VELOCIDADE_MAX_ESGOTO: 5.0,
+      PRESSAO_MINIMA: 10,
+      PRESSAO_MAXIMA: 400
+    };
+
+    // Dados das peças de água fria (NBR 5626)
+    const PECAS_AGUA_FRIA = {
+      'bacia-caixa': { nome: 'Bacia sanitária c/ caixa', peso: 0.3, vazao: 0.15, icon: '🚽' },
+      'bacia-valvula': { nome: 'Bacia sanitária c/ válvula', peso: 1.7, vazao: 1.70, icon: '🚽' },
+      'banheira': { nome: 'Banheira', peso: 1.0, vazao: 0.30, icon: '🛁' },
+      'bebedouro': { nome: 'Bebedouro', peso: 0.1, vazao: 0.10, icon: '🚰' },
+      'chuveiro': { nome: 'Chuveiro', peso: 0.4, vazao: 0.20, icon: '🚿' },
+      'lavatorio': { nome: 'Lavatório', peso: 0.3, vazao: 0.15, icon: '🚰' },
+      'lava-louca': { nome: 'Máquina lavar louça', peso: 0.7, vazao: 0.30, icon: '🍽️' },
+      'lava-roupa': { nome: 'Máquina lavar roupa', peso: 1.0, vazao: 0.30, icon: '👕' },
+      'pia-cozinha': { nome: 'Pia de cozinha', peso: 0.7, vazao: 0.25, icon: '🍳' },
+      'tanque': { nome: 'Tanque', peso: 0.7, vazao: 0.25, icon: '🧺' },
+      'torneira-jardim': { nome: 'Torneira de jardim', peso: 0.2, vazao: 0.15, icon: '🌱' }
+    };
+
+    // Unidades Hunter para esgoto (NBR 8160)
+    const UNIDADES_HUNTER = {
+      'bacia-caixa': { nome: 'Bacia sanitária c/ caixa', uh: 6, icon: '🚽' },
+      'bacia-valvula': { nome: 'Bacia sanitária c/ válvula', uh: 10, icon: '🚽' },
+      'banheira': { nome: 'Banheira', uh: 2, icon: '🛁' },
+      'chuveiro': { nome: 'Chuveiro', uh: 2, icon: '🚿' },
+      'lavatorio': { nome: 'Lavatório', uh: 1, icon: '🚰' },
+      'lava-louca': { nome: 'Máquina lavar louça', uh: 2, icon: '🍽️' },
+      'lava-roupa': { nome: 'Máquina lavar roupa', uh: 3, icon: '👕' },
+      'pia-cozinha': { nome: 'Pia de cozinha', uh: 3, icon: '🍳' },
+      'tanque': { nome: 'Tanque', uh: 3, icon: '🧺' },
+      'ralo': { nome: 'Ralo sifonado', uh: 1, icon: '⭕' }
+    };
+
+    // Rugosidade dos materiais (mm)
+    const RUGOSIDADE = {
+      'pvc': 0.025,
+      'ppr': 0.025,
+      'cobre': 0.0015,
+      'pex': 0.007
+    };
+
+    // Diâmetros disponíveis
+    const DIAMETROS_AGUA = [15, 20, 25, 32, 40, 50, 60, 75, 100];
+    const DIAMETROS_ESGOTO = [40, 50, 75, 100, 150, 200, 250];
+
+    // Preços padrão
+    const PRECOS_PADRAO = {
+      pvc20: 6.5, pvc25: 9.2, pvc32: 13.5, pvc50: 26.0,
+      ppr20: 10.5, ppr25: 14.8, ppr32: 19.5, ppr50: 36.0,
+      esgoto40: 10.8, esgoto50: 13.5, esgoto75: 20.5, esgoto100: 29.5, esgoto150: 58.0,
+      pluvial75: 16.5, pluvial100: 24.0, pluvial150: 46.0,
+      conexoes: 35, registros: 58, sifoes: 48, calha: 62, ralos: 195,
+      instalacaoAgua: 42, instalacaoEsgoto: 35, instalacaoPluvial: 28
+    };
+
+    // ============================================
+    // ESTADO DA APLICAÇÃO
+    // ============================================
+    
+    let state = {
+      sistemaAtual: 'agua-fria',
+      pecasAgua: [],
+      aparelhosEsgoto: [],
+      precos: JSON.parse(localStorage.getItem('precosTubulacoes')) || { ...PRECOS_PADRAO },
+      modalTipo: null // 'agua' ou 'esgoto'
+    };
+
+    // ============================================
+    // UTILITÁRIOS
+    // ============================================
+    
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => document.querySelectorAll(selector);
+
+    function formatarMoeda(valor) {
+      return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function formatarNumero(valor, decimais = 2) {
+      return valor.toFixed(decimais).replace('.', ',');
+    }
+
+    function gerarId() {
+      return Date.now() + Math.random().toString(36).substr(2, 9);
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = $('#toast');
+      const toastMessage = $('#toastMessage');
+      
+      toast.style.borderColor = type === 'success' ? 'var(--success)' : 'var(--danger)';
+      toast.style.color = type === 'success' ? 'var(--success)' : 'var(--danger)';
+      toastMessage.textContent = message;
+      
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ============================================
+    // GERENCIAMENTO DE SISTEMA
+    // ============================================
+    
+    function selecionarSistema(sistema) {
+      state.sistemaAtual = sistema;
+      
+      // Atualizar botões
+      $$('.tipo-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.sistema === sistema);
+      });
+      
+      // Mostrar/esconder seções
+      const secoes = ['agua-fria', 'agua-quente', 'esgoto', 'pluvial'];
+      secoes.forEach(s => {
+        const secao = $(`#secao-${s}`);
+        if (secao) {
+          secao.classList.toggle('hidden', s !== sistema);
+        }
+      });
+      
+      // Inicializar peças padrão se necessário
+      if (sistema === 'agua-fria' && state.pecasAgua.length === 0) {
+        inicializarPecasPadrao();
+      }
+      
+      if (sistema === 'esgoto' && state.aparelhosEsgoto.length === 0) {
+        inicializarEsgotoPadrao();
+      }
+    }
+
+    function inicializarPecasPadrao() {
+      state.pecasAgua = [
+        { id: gerarId(), tipo: 'chuveiro', quantidade: 2 },
+        { id: gerarId(), tipo: 'lavatorio', quantidade: 2 },
+        { id: gerarId(), tipo: 'bacia-caixa', quantidade: 2 },
+        { id: gerarId(), tipo: 'pia-cozinha', quantidade: 1 }
+      ];
+      renderizarPecas();
+    }
+
+    function inicializarEsgotoPadrao() {
+      state.aparelhosEsgoto = [
+        { id: gerarId(), tipo: 'bacia-caixa', quantidade: 2 },
+        { id: gerarId(), tipo: 'chuveiro', quantidade: 2 },
+        { id: gerarId(), tipo: 'lavatorio', quantidade: 2 },
+        { id: gerarId(), tipo: 'pia-cozinha', quantidade: 1 }
+      ];
+      renderizarAparelhosEsgoto();
+    }
+
+    // ============================================
+    // GERENCIAMENTO DE PEÇAS
+    // ============================================
+    
+    function renderizarPecas() {
+      const container = $('#lista-pecas');
+      if (!container) return;
+      
+      container.innerHTML = state.pecasAgua.map(peca => {
+        const info = PECAS_AGUA_FRIA[peca.tipo];
+        return `
+          <div class="peca-item" data-id="${peca.id}">
+            <div class="peca-icon">${info.icon}</div>
+            <div class="peca-info">
+              <div class="peca-nome">${info.nome}</div>
+              <div class="peca-peso">Peso: ${info.peso} | Vazão: ${info.vazao} L/s</div>
+            </div>
+            <div class="peca-controls">
+              <input type="number" class="qty-input" value="${peca.quantidade}" min="1" 
+                     onchange="atualizarQuantidade('${peca.id}', this.value)">
+              <button class="remove-btn" onclick="removerPeca('${peca.id}')" title="Remover">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderizarAparelhosEsgoto() {
+      const container = $('#lista-esgoto');
+      if (!container) return;
+      
+      container.innerHTML = state.aparelhosEsgoto.map(aparelho => {
+        const info = UNIDADES_HUNTER[aparelho.tipo];
+        return `
+          <div class="peca-item" data-id="${aparelho.id}">
+            <div class="peca-icon">${info.icon}</div>
+            <div class="peca-info">
+              <div class="peca-nome">${info.nome}</div>
+              <div class="peca-peso">Unidades Hunter: ${info.uh}</div>
+            </div>
+            <div class="peca-controls">
+              <input type="number" class="qty-input" value="${aparelho.quantidade}" min="1" 
+                     onchange="atualizarQuantidadeEsgoto('${aparelho.id}', this.value)">
+              <button class="remove-btn" onclick="removerAparelhoEsgoto('${aparelho.id}')" title="Remover">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function abrirModalPeca(tipo) {
+      state.modalTipo = tipo;
+      const modal = $('#modalPeca');
+      const titulo = $('#modalPecaTitulo');
+      const selector = $('#pecasSelector');
+      
+      const dados = tipo === 'agua' ? PECAS_AGUA_FRIA : UNIDADES_HUNTER;
+      const labelExtra = tipo === 'agua' ? 'peso' : 'uh';
+      
+      titulo.textContent = tipo === 'agua' ? '➕ Adicionar Peça Sanitária' : '➕ Adicionar Aparelho';
+      
+      selector.innerHTML = Object.entries(dados).map(([key, info]) => `
+        <div class="peca-option" onclick="adicionarPeca('${key}')">
+          <span class="icon">${info.icon}</span>
+          <span class="name">${info.nome}</span>
+          <span class="details">${tipo === 'agua' ? `Peso: ${info.peso} | Vazão: ${info.vazao} L/s` : `UH: ${info.uh}`}</span>
+        </div>
+      `).join('');
+      
+      modal.classList.add('active');
+    }
+
+    function fecharModalPeca() {
+      $('#modalPeca').classList.remove('active');
+    }
+
+    function adicionarPeca(tipo) {
+      if (state.modalTipo === 'agua') {
+        state.pecasAgua.push({ id: gerarId(), tipo, quantidade: 1 });
+        renderizarPecas();
+      } else {
+        state.aparelhosEsgoto.push({ id: gerarId(), tipo, quantidade: 1 });
+        renderizarAparelhosEsgoto();
+      }
+      fecharModalPeca();
+    }
+
+    function removerPeca(id) {
+      state.pecasAgua = state.pecasAgua.filter(p => p.id !== id);
+      renderizarPecas();
+    }
+
+    function removerAparelhoEsgoto(id) {
+      state.aparelhosEsgoto = state.aparelhosEsgoto.filter(a => a.id !== id);
+      renderizarAparelhosEsgoto();
+    }
+
+    function atualizarQuantidade(id, valor) {
+      const peca = state.pecasAgua.find(p => p.id === id);
+      if (peca) peca.quantidade = Math.max(1, parseInt(valor) || 1);
+    }
+
+    function atualizarQuantidadeEsgoto(id, valor) {
+      const aparelho = state.aparelhosEsgoto.find(a => a.id === id);
+      if (aparelho) aparelho.quantidade = Math.max(1, parseInt(valor) || 1);
+    }
+
+    // ============================================
+    // CÁLCULOS HIDRÁULICOS
+    // ============================================
+    
+    function calcular() {
+      const resultado = $('#resultado');
+      resultado.innerHTML = '<div class="loading"><div class="loading-spinner"></div><span>Calculando...</span></div>';
+      
+      setTimeout(() => {
+        try {
+          switch(state.sistemaAtual) {
+            case 'agua-fria':
+              calcularAguaFria();
+              break;
+            case 'agua-quente':
+              calcularAguaQuente();
+              break;
+            case 'esgoto':
+              calcularEsgoto();
+              break;
+            case 'pluvial':
+              calcularPluvial();
+              break;
+          }
+        } catch (error) {
+          resultado.innerHTML = `
+            <div class="alert alert-danger">
+              <span class="alert-icon">❌</span>
+              <div><strong>Erro no cálculo:</strong> ${error.message}</div>
+            </div>
+          `;
+        }
+      }, 300);
+    }
+
+    function calcularAguaFria() {
+      if (state.pecasAgua.length === 0) {
+        throw new Error('Adicione pelo menos uma peça sanitária para calcular.');
+      }
+
+      // Calcular peso total e vazão
+      let pesoTotal = 0;
+      let vazaoMaxima = 0;
+      
+      state.pecasAgua.forEach(peca => {
+        const info = PECAS_AGUA_FRIA[peca.tipo];
+        pesoTotal += info.peso * peca.quantidade;
+        vazaoMaxima += info.vazao * peca.quantidade;
+      });
+
+      // Vazão provável (NBR 5626)
+      const vazaoProvavel = 0.3 * Math.sqrt(pesoTotal);
+
+      // Parâmetros
+      const comprimento = parseFloat($('#comprimento-tubo').value) || 15;
+      const desnivel = parseFloat($('#desnivel').value) || 0;
+      const pressaoDisponivel = parseFloat($('#pressao-disponivel').value) || 15;
+      const material = $('#material-tubo').value;
+
+      // Dimensionar tubo
+      const dimensionamento = dimensionarTuboAgua(vazaoProvavel, comprimento, desnivel, pressaoDisponivel, material);
+      
+      // Calcular custo
+      const custo = calcularCustoAgua(dimensionamento.diametro, comprimento, material, state.pecasAgua.length);
+
+      // Gerar resultado
+      gerarResultadoAguaFria({
+        pesoTotal,
+        vazaoMaxima,
+        vazaoProvavel,
+        comprimento,
+        desnivel,
+        pressaoDisponivel,
+        material,
+        ...dimensionamento,
+        custo
+      });
+    }
+
+    function dimensionarTuboAgua(vazao, comprimento, desnivel, pressaoDisp, material) {
+      const C = (material === 'pvc' || material === 'ppr') ? 140 : 130;
+
+      for (let dn of DIAMETROS_AGUA) {
+        const d = dn / 1000; // Converter para metros
+        const area = Math.PI * Math.pow(d / 2, 2);
+        const velocidade = (vazao / 1000) / area;
+
+        if (velocidade < 0.5 || velocidade > 3.0) continue;
+
+        // Fórmula de Hazen-Williams
+        const J = (10.643 * Math.pow(vazao / 1000, 1.85)) / (Math.pow(C, 1.85) * Math.pow(d, 4.87));
+        const perdaDistribuida = J * comprimento;
+        const perdaSingular = perdaDistribuida * 0.20;
+        const perdaTotal = perdaDistribuida + perdaSingular - desnivel;
+        const pressaoFinal = pressaoDisp - perdaTotal;
+
+        if (pressaoFinal >= CONFIG.PRESSAO_MINIMA) {
+          let status = 'ok';
+          if (velocidade < 0.7) status = 'baixa';
+          if (velocidade > 2.5) status = 'alta';
+
+          return {
+            diametro: dn,
+            velocidade,
+            perdaCarga: perdaTotal,
+            pressaoFinal,
+            statusVelocidade: status
+          };
+        }
+      }
+
+      return {
+        diametro: 100,
+        velocidade: 0,
+        perdaCarga: 0,
+        pressaoFinal: 0,
+        statusVelocidade: 'erro'
+      };
+    }
+
+    function calcularAguaQuente() {
+      const numChuveiros = parseInt($('#num-chuveiros').value) || 1;
+      const temperatura = parseFloat($('#temp-desejada').value) || 40;
+      const comprimento = parseFloat($('#comprimento-quente').value) || 20;
+
+      const vazaoChuveiro = 6; // L/min
+      const vazaoTotal = numChuveiros * vazaoChuveiro;
+      const vazaoLS = vazaoTotal / 60;
+
+      const dimensionamento = dimensionarTuboAgua(vazaoLS, comprimento, 0, 20, 'ppr');
+
+      // Potência do aquecedor
+      const deltaT = temperatura - 20;
+      const potencia = (vazaoTotal * 4.18 * deltaT) / 60;
+
+      const custo = calcularCustoAgua(dimensionamento.diametro, comprimento, 'ppr', numChuveiros);
+
+      gerarResultadoAguaQuente({
+        numChuveiros,
+        vazaoTotal,
+        vazaoLS,
+        temperatura,
+        potencia,
+        comprimento,
+        ...dimensionamento,
+        custo
+      });
+    }
+
+    function calcularEsgoto() {
+      if (state.aparelhosEsgoto.length === 0) {
+        throw new Error('Adicione pelo menos um aparelho sanitário para calcular.');
+      }
+
+      let uhTotal = 0;
+      state.aparelhosEsgoto.forEach(aparelho => {
+        const info = UNIDADES_HUNTER[aparelho.tipo];
+        uhTotal += info.uh * aparelho.quantidade;
+      });
+
+      const tipoRamal = $('#tipo-ramal').value;
+      const comprimento = parseFloat($('#comprimento-esgoto').value) || 8;
+      const declividade = parseFloat($('#declividade-esgoto').value) || 2;
+
+      const diametro = dimensionarEsgoto(uhTotal, tipoRamal);
+      const vazao = Math.sqrt(uhTotal) * 0.5;
+      const area = Math.PI * Math.pow((diametro / 1000) / 2, 2);
+      const velocidade = vazao / (area * 1000);
+
+      let statusVelocidade = 'ok';
+      if (velocidade < CONFIG.VELOCIDADE_MIN_ESGOTO) statusVelocidade = 'baixa';
+      if (velocidade > CONFIG.VELOCIDADE_MAX_ESGOTO) statusVelocidade = 'alta';
+
+      const custo = calcularCustoEsgoto(diametro, comprimento, state.aparelhosEsgoto.length);
+
+      gerarResultadoEsgoto({
+        uhTotal,
+        vazao,
+        diametro,
+        velocidade,
+        statusVelocidade,
+        tipoRamal,
+        comprimento,
+        declividade,
+        custo
+      });
+    }
+
+    function dimensionarEsgoto(uh, tipo) {
+      if (tipo === 'horizontal') {
+        if (uh <= 3) return 40;
+        if (uh <= 6) return 50;
+        if (uh <= 20) return 75;
+        if (uh <= 160) return 100;
+        if (uh <= 360) return 150;
+        return 200;
+      } else {
+        if (uh <= 10) return 75;
+        if (uh <= 30) return 100;
+        if (uh <= 240) return 150;
+        if (uh <= 540) return 200;
+        return 250;
+      }
+    }
+
+    function calcularPluvial() {
+      const area = parseFloat($('#area-telhado').value) || 100;
+      const intensidade = parseFloat($('#intensidade-chuva').value) || 150;
+      const coefCobertura = parseFloat($('#tipo-cobertura').value);
+      const comprimento = parseFloat($('#comprimento-pluvial').value) || 6;
+
+      const vazao = (intensidade * area * coefCobertura) / 60;
+      const diametroCondutor = dimensionarCondutor(vazao);
+      const larguraCalha = dimensionarCalha(vazao, intensidade);
+
+      const custo = calcularCustoPluvial(diametroCondutor, comprimento, larguraCalha);
+
+      gerarResultadoPluvial({
+        area,
+        intensidade,
+        vazao,
+        diametroCondutor,
+        larguraCalha,
+        comprimento,
+        custo
+      });
+    }
+
+    function dimensionarCondutor(vazao) {
+      if (vazao <= 0.57) return 75;
+      if (vazao <= 1.76) return 100;
+      if (vazao <= 4.3) return 150;
+      if (vazao <= 8.3) return 200;
+      return 250;
+    }
+
+    function dimensionarCalha(vazao, intensidade) {
+      const largura = Math.sqrt(vazao * 100 / intensidade) * 15;
+      return Math.max(10, Math.ceil(largura));
+    }
+
+    // ============================================
+    // CÁLCULOS DE CUSTO
+    // ============================================
+    
+    function calcularCustoAgua(diametro, comprimento, material, numPecas) {
+      const precosPorMetro = {
+        'pvc': { 20: state.precos.pvc20, 25: state.precos.pvc25, 32: state.precos.pvc32, 40: 15, 50: state.precos.pvc50 },
+        'ppr': { 20: state.precos.ppr20, 25: state.precos.ppr25, 32: state.precos.ppr32, 40: 20, 50: state.precos.ppr50 },
+        'cobre': { 15: 35, 22: 50, 28: 70, 35: 95 },
+        'pex': { 16: 12, 20: 15, 25: 22, 32: 30 }
+      };
+
+      const preco = precosPorMetro[material]?.[diametro] || 20;
+      const custoTubo = preco * comprimento;
+      const custoConexoes = numPecas * state.precos.conexoes;
+      const custoRegistros = numPecas * state.precos.registros;
+      const custoInstalacao = (custoTubo + custoConexoes) * (state.precos.instalacaoAgua / 100);
+
+      return {
+        tubo: custoTubo,
+        conexoes: custoConexoes,
+        registros: custoRegistros,
+        instalacao: custoInstalacao,
+        total: custoTubo + custoConexoes + custoRegistros + custoInstalacao
+      };
+    }
+
+    function calcularCustoEsgoto(diametro, comprimento, numAparelhos) {
+      const precosPorMetro = {
+        40: state.precos.esgoto40,
+        50: state.precos.esgoto50,
+        75: state.precos.esgoto75,
+        100: state.precos.esgoto100,
+        150: state.precos.esgoto150,
+        200: 70
+      };
+
+      const preco = precosPorMetro[diametro] || 20;
+      const custoTubo = preco * comprimento;
+      const custoConexoes = numAparelhos * 30;
+      const custoSifoes = numAparelhos * state.precos.sifoes;
+      const custoInstalacao = (custoTubo + custoConexoes) * (state.precos.instalacaoEsgoto / 100);
+
+      return {
+        tubo: custoTubo,
+        conexoes: custoConexoes,
+        sifoes: custoSifoes,
+        instalacao: custoInstalacao,
+        total: custoTubo + custoConexoes + custoSifoes + custoInstalacao
+      };
+    }
+
+    function calcularCustoPluvial(diametro, comprimento, larguraCalha) {
+      const precosPorMetro = {
+        75: state.precos.pluvial75,
+        100: state.precos.pluvial100,
+        150: state.precos.pluvial150,
+        200: 55
+      };
+
+      const preco = precosPorMetro[diametro] || 20;
+      const custoCondutor = preco * comprimento;
+      const custoCalha = larguraCalha * 2 * state.precos.calha;
+      const custoRalos = state.precos.ralos;
+      const custoInstalacao = (custoCondutor + custoCalha) * (state.precos.instalacaoPluvial / 100);
+
+      return {
+        condutor: custoCondutor,
+        calha: custoCalha,
+        ralos: custoRalos,
+        instalacao: custoInstalacao,
+        total: custoCondutor + custoCalha + custoRalos + custoInstalacao
+      };
+    }
+
+    // ============================================
+    // GERAÇÃO DE RESULTADOS
+    // ============================================
+    
+    function getAlertVelocidade(velocidade, status) {
+      const alerts = {
+        'ok': { class: 'success', icon: '✅', msg: `Velocidade adequada (${formatarNumero(velocidade)} m/s) - Entre 0,5 e 3,0 m/s` },
+        'baixa': { class: 'warning', icon: '⚠️', msg: `Velocidade baixa (${formatarNumero(velocidade)} m/s) - Risco de sedimentação` },
+        'alta': { class: 'warning', icon: '⚠️', msg: `Velocidade alta (${formatarNumero(velocidade)} m/s) - Risco de ruído e erosão` },
+        'erro': { class: 'danger', icon: '❌', msg: 'Pressão insuficiente - Aumentar diâmetro ou pressão disponível' }
+      };
+      const a = alerts[status];
+      return `<div class="alert alert-${a.class}"><span class="alert-icon">${a.icon}</span><div>${a.msg}</div></div>`;
+    }
+
+    function getNomeMaterial(material) {
+      const nomes = { 'pvc': 'PVC', 'ppr': 'PPR', 'cobre': 'Cobre', 'pex': 'PEX' };
+      return nomes[material] || material.toUpperCase();
+    }
+
+    function getNomeMaterialCompleto(material) {
+      const nomes = {
+        'pvc': 'PVC (Policloreto de vinila) - Rígido, econômico, fácil instalação',
+        'ppr': 'PPR (Polipropileno) - Termofusão, durável, ideal para água quente',
+        'cobre': 'Cobre - Alta qualidade, bactericida, longa durabilidade',
+        'pex': 'PEX (Polietileno reticulado) - Flexível, rápida instalação'
+      };
+      return nomes[material] || material;
+    }
+
+    function gerarResultadoAguaFria(dados) {
+      const html = `
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">Peso Total</div>
+            <div class="spec-value">${formatarNumero(dados.pesoTotal)}</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Vazão Provável</div>
+            <div class="spec-value">${formatarNumero(dados.vazaoProvavel)} L/s</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Diâmetro</div>
+            <div class="spec-value">DN ${dados.diametro}</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Velocidade</div>
+            <div class="spec-value">${formatarNumero(dados.velocidade)} m/s</div>
+          </div>
+        </div>
+
+        ${getAlertVelocidade(dados.velocidade, dados.statusVelocidade)}
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">📊 Análise Hidráulica</div>
+          <div class="hunter-calc">
+            <div class="hunter-item">
+              <div class="hunter-label">Comprimento da tubulação</div>
+              <div class="hunter-value">${formatarNumero(dados.comprimento, 1)} m</div>
+            </div>
+            <div class="hunter-item">
+              <div class="hunter-label">Desnível</div>
+              <div class="hunter-value">${formatarNumero(dados.desnivel, 1)} m</div>
+            </div>
+            <div class="hunter-item">
+              <div class="hunter-label">Perda de carga total</div>
+              <div class="hunter-value">${formatarNumero(dados.perdaCarga)} mca</div>
+            </div>
+            <div class="hunter-item">
+              <div class="hunter-label">Pressão disponível</div>
+              <div class="hunter-value">${formatarNumero(dados.pressaoDisponivel, 1)} mca</div>
+            </div>
+            <div class="hunter-item">
+              <div class="hunter-label">Pressão final</div>
+              <div class="hunter-value">${formatarNumero(dados.pressaoFinal)} mca</div>
+            </div>
+          </div>
+          
+          <div class="alert ${dados.pressaoFinal >= 10 ? 'alert-success' : 'alert-danger'} mt-2">
+            <span class="alert-icon">${dados.pressaoFinal >= 10 ? '✅' : '❌'}</span>
+            <div>Pressão final ${dados.pressaoFinal >= 10 ? 'ATENDE' : 'NÃO ATENDE'} NBR 5626 (mínimo 10 mca)</div>
+          </div>
+        </div>
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">💰 Custo Estimado</div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Item</th><th style="text-align:right">Custo (R$)</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Tubos ${getNomeMaterial(dados.material)} DN${dados.diametro}</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.tubo)}</td>
+                </tr>
+                <tr>
+                  <td>Conexões e acessórios</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.conexoes)}</td>
+                </tr>
+                <tr>
+                  <td>Registros</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.registros)}</td>
+                </tr>
+                <tr>
+                  <td>Instalação e mão de obra</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.instalacao)}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td><strong>Total Estimado</strong></td>
+                  <td style="text-align:right"><strong>${formatarMoeda(dados.custo.total)}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">📝 Recomendações Técnicas</div>
+          <ul class="info-list">
+            <li><strong>Material:</strong> ${getNomeMaterialCompleto(dados.material)}</li>
+            <li><strong>Pressão estática máxima:</strong> 400 kPa (40 mca)</li>
+            <li><strong>Velocidade recomendada:</strong> 0,5 a 2,5 m/s</li>
+            <li><strong>Isolamento:</strong> Necessário em tubulações aparentes externas</li>
+            <li><strong>Teste de estanqueidade:</strong> 1,5x a pressão de trabalho por 1 hora</li>
+            <li><strong>Ancoragem:</strong> A cada 1,5m (PVC) ou 0,8m (PPR)</li>
+          </ul>
+        </div>
+      `;
+
+      $('#resultado').innerHTML = html;
+    }
+
+    function gerarResultadoAguaQuente(dados) {
+      const html = `
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">Chuveiros</div>
+            <div class="spec-value">${dados.numChuveiros}</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Vazão Total</div>
+            <div class="spec-value">${formatarNumero(dados.vazaoTotal, 1)} L/min</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Diâmetro</div>
+            <div class="spec-value">DN ${dados.diametro}</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Potência Aquecedor</div>
+            <div class="spec-value">${formatarNumero(dados.potencia, 1)} kW</div>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-2">
+          <span class="alert-icon">💡</span>
+          <div>
+            <strong>Sistema de aquecimento recomendado:</strong><br>
+            ${dados.potencia < 10 ? 'Aquecedor a gás tipo passagem (instantâneo)' : 
+              dados.potencia < 25 ? 'Aquecedor a gás ou elétrico com acumulação' : 
+              'Sistema central com boiler e aquecedor de grande porte'}
+          </div>
+        </div>
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">🌡️ Especificações Técnicas</div>
+          <ul class="info-list">
+            <li><strong>Temperatura de projeto:</strong> ${dados.temperatura}°C</li>
+            <li><strong>Material recomendado:</strong> PPR (suporta até 90°C)</li>
+            <li><strong>Isolamento térmico:</strong> Obrigatório (NBR 7198)</li>
+            <li><strong>Espessura isolante:</strong> Mínimo 10mm (lã de vidro ou elastomérico)</li>
+            <li><strong>Dilatação térmica:</strong> Prever juntas de expansão a cada 10m</li>
+            <li><strong>Válvula de segurança:</strong> Instalação obrigatória no aquecedor</li>
+          </ul>
+        </div>
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">💰 Custo Estimado</div>
+          <div class="table-container">
+            <table>
+              <tbody>
+                <tr>
+                  <td>Tubos PPR DN${dados.diametro}</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.tubo)}</td>
+                </tr>
+                <tr>
+                  <td>Conexões e registros</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.conexoes + dados.custo.registros)}</td>
+                </tr>
+                <tr>
+                  <td>Isolamento térmico</td>
+                  <td style="text-align:right">${formatarMoeda(dados.comprimento * 15)}</td>
+                </tr>
+                <tr>
+                  <td>Instalação</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.instalacao)}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td><strong>Total (sem aquecedor)</strong></td>
+                  <td style="text-align:right"><strong>${formatarMoeda(dados.custo.total + dados.comprimento * 15)}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <p class="text-muted mt-1">* Não inclui custo do aquecedor de água</p>
+        </div>
+      `;
+
+      $('#resultado').innerHTML = html;
+    }
+
+    function gerarResultadoEsgoto(dados) {
+      const alertVelocidade = {
+        'ok': { class: 'success', icon: '✅', msg: `Velocidade adequada (${formatarNumero(dados.velocidade)} m/s)` },
+        'baixa': { class: 'warning', icon: '⚠️', msg: `Velocidade baixa - Aumentar declividade` },
+        'alta': { class: 'warning', icon: '⚠️', msg: `Velocidade alta - Reduzir declividade` }
+      };
+
+      const html = `
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">Unidades Hunter</div>
+            <div class="spec-value">${dados.uhTotal}</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Vazão Estimada</div>
+            <div class="spec-value">${formatarNumero(dados.vazao)} L/s</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Diâmetro</div>
+            <div class="spec-value">DN ${dados.diametro}</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Velocidade</div>
+            <div class="spec-value">${formatarNumero(dados.velocidade)} m/s</div>
+          </div>
+        </div>
+
+        <div class="alert alert-${alertVelocidade[dados.statusVelocidade].class}">
+          <span class="alert-icon">${alertVelocidade[dados.statusVelocidade].icon}</span>
+          <div>${alertVelocidade[dados.statusVelocidade].msg}</div>
+        </div>
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">📊 Detalhes do Ramal</div>
+          <div class="hunter-calc">
+            <div class="hunter-item">
+              <div class="hunter-label">Tipo de ramal</div>
+              <div class="hunter-value">${dados.tipoRamal === 'horizontal' ? 'Horizontal' : 'Vertical (Coluna)'}</div>
+            </div>
+            <div class="hunter-item">
+              <div class="hunter-label">Comprimento</div>
+              <div class="hunter-value">${formatarNumero(dados.comprimento, 1)} m</div>
+            </div>
+            <div class="hunter-item">
+              <div class="hunter-label">Declividade</div>
+              <div class="hunter-value">${dados.declividade}%</div>
+            </div>
+            <div class="hunter-item">
+              <div class="hunter-label">Material</div>
+              <div class="hunter-value">PVC Esgoto Série Normal</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">💰 Custo Estimado</div>
+          <div class="table-container">
+            <table>
+              <tbody>
+                <tr>
+                  <td>Tubos PVC Esgoto DN${dados.diametro}</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.tubo)}</td>
+                </tr>
+                <tr>
+                  <td>Conexões</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.conexoes)}</td>
+                </tr>
+                <tr>
+                  <td>Sifões e ralos</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.sifoes)}</td>
+                </tr>
+                <tr>
+                  <td>Instalação</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.instalacao)}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td><strong>Total Estimado</strong></td>
+                  <td style="text-align:right"><strong>${formatarMoeda(dados.custo.total)}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">📝 Recomendações NBR 8160</div>
+          <ul class="info-list">
+            <li><strong>Declividade mínima:</strong> 2% para tubos até DN100</li>
+            <li><strong>Declividade máxima:</strong> 4% para evitar deposições</li>
+            <li><strong>Ventilação:</strong> Obrigatória em colunas e ramais</li>
+            <li><strong>Caixas de inspeção:</strong> A cada 25m ou mudança de direção</li>
+            <li><strong>Dispositivos de limpeza:</strong> TEs de inspeção para manutenção</li>
+            <li><strong>Teste:</strong> Ensaio de estanqueidade com água</li>
+          </ul>
+        </div>
+      `;
+
+      $('#resultado').innerHTML = html;
+    }
+
+    function gerarResultadoPluvial(dados) {
+      const html = `
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">Área Telhado</div>
+            <div class="spec-value">${formatarNumero(dados.area, 1)} m²</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Vazão</div>
+            <div class="spec-value">${formatarNumero(dados.vazao)} L/s</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Condutor</div>
+            <div class="spec-value">DN ${dados.diametroCondutor}</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Calha</div>
+            <div class="spec-value">${dados.larguraCalha} cm</div>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-2">
+          <span class="alert-icon">💡</span>
+          <div>
+            <strong>Intensidade pluviométrica:</strong> ${dados.intensidade} mm/h<br>
+            Para maior precisão, consulte dados climáticos da sua região.
+          </div>
+        </div>
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">💰 Custo Estimado</div>
+          <div class="table-container">
+            <table>
+              <tbody>
+                <tr>
+                  <td>Condutores verticais DN${dados.diametroCondutor}</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.condutor)}</td>
+                </tr>
+                <tr>
+                  <td>Calhas</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.calha)}</td>
+                </tr>
+                <tr>
+                  <td>Ralos e grelhas</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.ralos)}</td>
+                </tr>
+                <tr>
+                  <td>Instalação</td>
+                  <td style="text-align:right">${formatarMoeda(dados.custo.instalacao)}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td><strong>Total Estimado</strong></td>
+                  <td style="text-align:right"><strong>${formatarMoeda(dados.custo.total)}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div class="content-section mt-2">
+          <div class="resultado-header">📝 Recomendações NBR 10844</div>
+          <ul class="info-list">
+            <li><strong>Declividade da calha:</strong> Mínimo 0,5%</li>
+            <li><strong>Espaçamento de condutores:</strong> Máximo 20m</li>
+            <li><strong>Extravasor:</strong> Obrigatório (DN igual ao condutor)</li>
+            <li><strong>Caixas de areia:</strong> Antes do lançamento na rede</li>
+            <li><strong>Manutenção:</strong> Limpeza de calhas e ralos a cada 6 meses</li>
+            <li><strong>Grelhas:</strong> Abertura máxima de 13mm para evitar entupimento</li>
+          </ul>
+        </div>
+      `;
+
+      $('#resultado').innerHTML = html;
+    }
+
+    // ============================================
+    // GERENCIAMENTO DE PREÇOS
+    // ============================================
+    
+    function abrirModalPrecos() {
+      // Preencher valores atuais
+      Object.entries(state.precos).forEach(([key, value]) => {
+        const input = $(`#preco-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
+        if (input) input.value = value;
+      });
+      
+      // Mapeamento manual para IDs com formato diferente
+      $('#preco-pvc-20').value = state.precos.pvc20;
+      $('#preco-pvc-25').value = state.precos.pvc25;
+      $('#preco-pvc-32').value = state.precos.pvc32;
+      $('#preco-pvc-50').value = state.precos.pvc50;
+      $('#preco-ppr-20').value = state.precos.ppr20;
+      $('#preco-ppr-25').value = state.precos.ppr25;
+      $('#preco-ppr-32').value = state.precos.ppr32;
+      $('#preco-ppr-50').value = state.precos.ppr50;
+      $('#preco-esgoto-40').value = state.precos.esgoto40;
+      $('#preco-esgoto-50').value = state.precos.esgoto50;
+      $('#preco-esgoto-75').value = state.precos.esgoto75;
+      $('#preco-esgoto-100').value = state.precos.esgoto100;
+      $('#preco-esgoto-150').value = state.precos.esgoto150;
+      $('#preco-pluvial-75').value = state.precos.pluvial75;
+      $('#preco-pluvial-100').value = state.precos.pluvial100;
+      $('#preco-pluvial-150').value = state.precos.pluvial150;
+      $('#preco-conexoes').value = state.precos.conexoes;
+      $('#preco-registros').value = state.precos.registros;
+      $('#preco-sifoes').value = state.precos.sifoes;
+      $('#preco-calha').value = state.precos.calha;
+      $('#preco-ralos').value = state.precos.ralos;
+      $('#preco-instalacao-agua').value = state.precos.instalacaoAgua;
+      $('#preco-instalacao-esgoto').value = state.precos.instalacaoEsgoto;
+      $('#preco-instalacao-pluvial').value = state.precos.instalacaoPluvial;
+      
+      $('#modalPrecos').classList.add('active');
+    }
+
+    function fecharModalPrecos() {
+      $('#modalPrecos').classList.remove('active');
+    }
+
+    function salvarPrecos() {
+      const novosPrecos = {
+        pvc20: parseFloat($('#preco-pvc-20').value) || 0,
+        pvc25: parseFloat($('#preco-pvc-25').value) || 0,
+        pvc32: parseFloat($('#preco-pvc-32').value) || 0,
+        pvc50: parseFloat($('#preco-pvc-50').value) || 0,
+        ppr20: parseFloat($('#preco-ppr-20').value) || 0,
+        ppr25: parseFloat($('#preco-ppr-25').value) || 0,
+        ppr32: parseFloat($('#preco-ppr-32').value) || 0,
+        ppr50: parseFloat($('#preco-ppr-50').value) || 0,
+        esgoto40: parseFloat($('#preco-esgoto-40').value) || 0,
+        esgoto50: parseFloat($('#preco-esgoto-50').value) || 0,
+        esgoto75: parseFloat($('#preco-esgoto-75').value) || 0,
+        esgoto100: parseFloat($('#preco-esgoto-100').value) || 0,
+        esgoto150: parseFloat($('#preco-esgoto-150').value) || 0,
+        pluvial75: parseFloat($('#preco-pluvial-75').value) || 0,
+        pluvial100: parseFloat($('#preco-pluvial-100').value) || 0,
+        pluvial150: parseFloat($('#preco-pluvial-150').value) || 0,
+        conexoes: parseFloat($('#preco-conexoes').value) || 0,
+        registros: parseFloat($('#preco-registros').value) || 0,
+        sifoes: parseFloat($('#preco-sifoes').value) || 0,
+        calha: parseFloat($('#preco-calha').value) || 0,
+        ralos: parseFloat($('#preco-ralos').value) || 0,
+        instalacaoAgua: parseFloat($('#preco-instalacao-agua').value) || 0,
+        instalacaoEsgoto: parseFloat($('#preco-instalacao-esgoto').value) || 0,
+        instalacaoPluvial: parseFloat($('#preco-instalacao-pluvial').value) || 0
+      };
+
+      state.precos = novosPrecos;
+      localStorage.setItem('precosTubulacoes', JSON.stringify(novosPrecos));
+      
+      fecharModalPrecos();
+      showToast('Preços salvos com sucesso!');
+      
+      // Recalcular se já houver resultado
+      const resultado = $('#resultado').innerHTML;
+      if (resultado && !resultado.includes('Configure as peças')) {
+        calcular();
+      }
+    }
+
+    function restaurarPrecos() {
+      if (confirm('Deseja restaurar todos os preços para os valores padrão?')) {
+        state.precos = { ...PRECOS_PADRAO };
+        localStorage.setItem('precosTubulacoes', JSON.stringify(state.precos));
+        abrirModalPrecos();
+        showToast('Preços restaurados!');
+      }
+    }
+
+    // ============================================
+    // EXPORTAR PDF
+    // ============================================
+    
+    function exportarPDF() {
+      const resultado = $('#resultado').innerHTML;
+      if (resultado.includes('Configure as peças')) {
+        showToast('Calcule primeiro para exportar!', 'error');
+        return;
+      }
+      
+      window.print();
+    }
+
+    // ============================================
+    // RESET
+    // ============================================
+    
+    function resetar() {
+      if (confirm('Deseja limpar todos os dados?')) {
+        state.pecasAgua = [];
+        state.aparelhosEsgoto = [];
+        renderizarPecas();
+        renderizarAparelhosEsgoto();
+        $('#resultado').innerHTML = `
+          <div class="text-center text-muted" style="padding: 40px;">
+            <p style="font-size: 3rem; margin-bottom: 15px;">📋</p>
+            <p>Configure as peças e clique em <strong>Calcular</strong> para ver os resultados.</p>
+          </div>
+        `;
+        showToast('Dados limpos!');
+      }
+    }
+
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+    
+    function initEventListeners() {
+      // Seletor de sistema
+      $$('.tipo-btn').forEach(btn => {
+        btn.addEventListener('click', () => selecionarSistema(btn.dataset.sistema));
+      });
+
+      // Botões principais
+      $('#btnCalcular').addEventListener('click', calcular);
+      $('#btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+      $('#btnExportar').addEventListener('click', exportarPDF);
+      $('#btnReset').addEventListener('click', resetar);
+
+      // Modal de preços
+      $('#btnFecharModalPrecos').addEventListener('click', fecharModalPrecos);
+      $('#btnSalvarPrecos').addEventListener('click', salvarPrecos);
+      $('#btnRestaurarPrecos').addEventListener('click', restaurarPrecos);
+
+      // Modal de peças
+      $('#btnAdicionarPeca').addEventListener('click', () => abrirModalPeca('agua'));
+      $('#btnAdicionarEsgoto').addEventListener('click', () => abrirModalPeca('esgoto'));
+      $('#btnFecharModalPeca').addEventListener('click', fecharModalPeca);
+
+      // Fechar modais clicando fora
+      $$('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.classList.remove('active');
+          }
+        });
+      });
+
+      // Fechar com ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          $$('.modal-overlay.active').forEach(modal => modal.classList.remove('active'));
+        }
+      });
+
+      // Ano no footer
+      if ($('#ano')) $('#ano').textContent = new Date().getFullYear();
+    }
+
+    // ============================================
+    // INICIALIZAÇÃO
+    // ============================================
+    
+    function init() {
+      initEventListeners();
+      selecionarSistema('agua-fria');
+    }
+
+    // Iniciar quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+    
+
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
