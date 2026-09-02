@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Dimensionamento de Reservatórios | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #0f1419 50%, #0a0a0f 100%);
+      min-height: 100vh;
+    }
+    
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00ffff, #8b1bf7); border-radius: 4px; }
+    
+    /* Animações */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,255,255,0.3); }
+      50% { box-shadow: 0 0 40px rgba(0,255,255,0.6); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes water-wave {
+      0% { transform: translateX(0) translateY(0); }
+      50% { transform: translateX(-25%) translateY(2px); }
+      100% { transform: translateX(-50%) translateY(0); }
+    }
+    
+    @keyframes fill-up {
+      0% { height: 0%; }
+      100% { height: var(--fill-height, 70%); }
+    }
+    
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    /* Cards e seções */
+    .glass-card {
+      background: rgba(15, 20, 30, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,255,255,0.15);
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+      border-color: rgba(0,255,255,0.3);
+      transform: translateY(-2px);
+    }
+    
+    /* Botões de tipo */
+    .tipo-btn {
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(0,255,255,0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #e0e0e0;
+      text-align: center;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .tipo-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,255,255,0.1), transparent);
+      transition: left 0.5s;
+    }
+    
+    .tipo-btn:hover::before { left: 100%; }
+    .tipo-btn:hover { border-color: #00ffff; background: rgba(0,255,255,0.05); }
+    
+    .tipo-btn.active {
+      background: linear-gradient(135deg, #00ffff 0%, #8b1bf7 100%);
+      color: #000;
+      border-color: #00ffff;
+      font-weight: 700;
+      box-shadow: 0 0 30px rgba(0,255,255,0.4);
+    }
+    
+    /* Inputs estilizados */
+    .input-modern {
+      background: rgba(0,0,0,0.4);
+      border: 2px solid rgba(0,255,255,0.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    
+    .input-modern:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow: 0 0 20px rgba(0,255,255,0.2);
+      background: rgba(0,255,255,0.05);
+    }
+    
+    .input-modern::placeholder { color: rgba(255,255,255,0.3); }
+    
+    /* Select estilizado */
+    .select-modern {
+      background: rgba(0,0,0,0.4);
+      border: 2px solid rgba(0,255,255,0.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2300ffff' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 24px;
+    }
+    
+    .select-modern:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow: 0 0 20px rgba(0,255,255,0.2);
+    }
+    
+    .select-modern option { background: #1a1a25; color: #fff; }
+    
+    /* Botões principais */
+    .btn-primary {
+      background: linear-gradient(135deg, #00ffff 0%, #00cccc 100%);
+      color: #000;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(0,255,255,0.4);
+    }
+    
+    .btn-primary:active { transform: translateY(0); }
+    
+    .btn-outline {
+      background: transparent;
+      color: #00ffff;
+      font-weight: 600;
+      padding: 14px 32px;
+      border-radius: 12px;
+      border: 2px solid rgba(0,255,255,0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+    
+    .btn-outline:hover {
+      background: rgba(0,255,255,0.1);
+      border-color: #00ffff;
+    }
+    
+    /* Specs cards */
+    .spec-card {
+      background: linear-gradient(135deg, rgba(0,255,255,0.08) 0%, rgba(139,27,247,0.05) 100%);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .spec-card:hover {
+      transform: scale(1.02);
+      border-color: rgba(0,255,255,0.5);
+    }
+    
+    .spec-value {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00ffff, #8b1bf7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Visualização 3D do reservatório */
+    .reservoir-visual {
+      background: rgba(0,0,0,0.3);
+      border-radius: 20px;
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .reservoir-svg {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    .water-fill {
+      fill: url(#waterGradient);
+      animation: fill-up 1.5s ease-out forwards;
+    }
+    
+    .water-surface {
+      animation: water-wave 3s linear infinite;
+    }
+    
+    /* Tabela de comparação */
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    
+    .comparison-table th {
+      background: linear-gradient(135deg, rgba(0,255,255,0.2) 0%, rgba(139,27,247,0.1) 100%);
+      color: #00ffff;
+      padding: 16px;
+      font-weight: 600;
+      text-align: left;
+    }
+    
+    .comparison-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #e0e0e0;
+    }
+    
+    .comparison-table tr:hover td {
+      background: rgba(0,255,255,0.05);
+    }
+    
+    .comparison-table .highlight {
+      background: rgba(0,255,255,0.1);
+      border-left: 3px solid #00ffff;
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #0f0f14 0%, #1a1a25 100%);
+      padding: 30px;
+      border-radius: 24px;
+      border: 2px solid rgba(0,255,255,0.3);
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+    
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+    
+    /* Alert boxes */
+    .alert {
+      padding: 18px 22px;
+      border-radius: 14px;
+      border-left: 4px solid;
+      line-height: 1.6;
+    }
+    
+    .alert-info {
+      background: rgba(0, 255, 255, 0.08);
+      border-color: #00ffff;
+      color: #00ffff;
+    }
+    
+    .alert-warning {
+      background: rgba(255, 165, 0, 0.08);
+      border-color: #ffa500;
+      color: #ffa500;
+    }
+    
+    .alert-success {
+      background: rgba(40, 167, 69, 0.08);
+      border-color: #28a745;
+      color: #28a745;
+    }
+    
+    /* Tooltip */
+    .tooltip-container {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip-text {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.95);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      z-index: 1000;
+      border: 1px solid rgba(0,255,255,0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .tooltip-container:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Progress bar para bomba */
+    .progress-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00ffff, #8b1bf7);
+      border-radius: 4px;
+      transition: width 1s ease;
+    }
+    
+    /* Tabs */
+    .tab-btn {
+      padding: 12px 24px;
+      background: transparent;
+      border: none;
+      color: #888;
+      font-weight: 500;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: transparent;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-btn.active {
+      color: #00ffff;
+    }
+    
+    .tab-btn.active::after {
+      background: linear-gradient(90deg, #00ffff, #8b1bf7);
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .tab-content.active { display: block; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Sugestão de reservatórios comerciais */
+    .produto-card {
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(0,255,255,0.15);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .produto-card:hover {
+      border-color: #00ffff;
+      background: rgba(0,255,255,0.05);
+      transform: translateY(-3px);
+    }
+    
+    .produto-card.recomendado {
+      border-color: #28a745;
+      background: rgba(40, 167, 69, 0.05);
+    }
+    
+    .produto-card.recomendado::before {
+      content: '✓ Recomendado';
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: #28a745;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    /* Print styles */
+    @media print {
+      body { background: #fff !important; }
+      .no-print { display: none !important; }
+      .glass-card { 
+        background: #fff !important; 
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+      }
+      .spec-value { color: #00838f !important; -webkit-text-fill-color: #00838f !important; }
+    }
+  </style>
+</head>
+<body class="text-gray-100 pb-10">
+  
+  <!-- Header -->
+  <header class="no-print py-6 px-4 border-b border-cyan-900/30">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center text-2xl animate-float">
+          💧
+        </div>
+        <div>
+          <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+            Dimensionamento de Reservatórios
+          </h1>
+          <p class="text-sm text-gray-500">Ferramentas de Engenharia</p>
+        </div>
+      </div>
+      <button onclick="history.back()" class="btn-outline text-sm py-2 px-4 no-print">
+        ← Voltar
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    
+    <!-- Botões de ação -->
+    <div class="flex flex-wrap gap-3 justify-center mb-8 no-print">
+      <button class="btn-primary flex items-center gap-2" id="btnCalcular">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        </svg>
+        Calcular
+      </button>
+      <button class="btn-outline flex items-center gap-2" id="btnConfigurarPrecos">
+        ⚙️ Configurar Preços
+      </button>
+      <button class="btn-outline flex items-center gap-2" id="btnExportar">
+        📄 Exportar PDF
+      </button>
+      <button class="btn-outline flex items-center gap-2" id="btnReset">
+        🗑️ Limpar
+      </button>
+    </div>
+
+    <!-- Tipo de Edificação -->
+    <section class="glass-card p-6 mb-6">
+      <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">🏗️</span>
+        Tipo de Edificação
+      </h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" id="tiposContainer">
+        <button class="tipo-btn active" data-tipo="residencial">
+          <div class="text-2xl mb-2">🏠</div>
+          <div>Residencial</div>
+        </button>
+        <button class="tipo-btn" data-tipo="comercial">
+          <div class="text-2xl mb-2">🏢</div>
+          <div>Comercial</div>
+        </button>
+        <button class="tipo-btn" data-tipo="industrial">
+          <div class="text-2xl mb-2">🏭</div>
+          <div>Industrial</div>
+        </button>
+        <button class="tipo-btn" data-tipo="hotel">
+          <div class="text-2xl mb-2">🏨</div>
+          <div>Hotel/Pousada</div>
+        </button>
+        <button class="tipo-btn" data-tipo="hospital">
+          <div class="text-2xl mb-2">🏥</div>
+          <div>Hospital</div>
+        </button>
+        <button class="tipo-btn" data-tipo="escola">
+          <div class="text-2xl mb-2">🏫</div>
+          <div>Escola</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Dados do Projeto -->
+    <section class="glass-card p-6 mb-6">
+      <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">📊</span>
+        Dados do Projeto
+      </h2>
+      
+      <div class="grid md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            População / Usuários
+            <span class="tooltip-container ml-1 cursor-help text-cyan-400">ⓘ
+              <span class="tooltip-text">Número de pessoas que utilizarão o sistema</span>
+            </span>
+          </label>
+          <input type="number" id="populacao" value="4" class="input-modern" min="1">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            Consumo per capita (L/pessoa/dia)
+            <span class="tooltip-container ml-1 cursor-help text-cyan-400">ⓘ
+              <span class="tooltip-text">Consumo médio diário por pessoa</span>
+            </span>
+          </label>
+          <input type="number" id="consumo-per-capita" value="150" class="input-modern" min="1">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            Dias de reserva
+            <span class="tooltip-container ml-1 cursor-help text-cyan-400">ⓘ
+              <span class="tooltip-text">Autonomia em caso de interrupção no abastecimento</span>
+            </span>
+          </label>
+          <input type="number" id="dias-reserva" value="2" class="input-modern" min="1" max="10">
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Tipo de reservatório</label>
+          <select id="tipo-reservatorio" class="select-modern">
+            <option value="inferior">Inferior (Cisterna)</option>
+            <option value="superior">Superior (Caixa d'água)</option>
+            <option value="ambos" selected>Ambos (Sistema completo)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Formato preferido</label>
+          <select id="formato" class="select-modern">
+            <option value="cilindrico">Cilíndrico</option>
+            <option value="retangular">Retangular</option>
+            <option value="quadrado">Quadrado</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Material</label>
+          <select id="material" class="select-modern">
+            <option value="polietileno">Polietileno</option>
+            <option value="fibra">Fibra de vidro</option>
+            <option value="concreto">Concreto armado</option>
+            <option value="aco">Aço inox</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-4">
+        💡 <strong>Dica:</strong> Para residências, recomenda-se 2 dias de reserva. 
+        Para hospitais e indústrias, considere 3-5 dias de autonomia.
+      </div>
+    </section>
+
+    <!-- Resultados -->
+    <section class="glass-card p-6 mb-6" id="resultadoSection">
+      <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">📐</span>
+        Dimensionamento
+      </h2>
+      <div id="resultado">
+        <div class="text-center py-12 text-gray-500">
+          <div class="text-5xl mb-4">🔍</div>
+          <p>Preencha os dados e clique em <strong>Calcular</strong> para ver os resultados</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Referências NBR -->
+    <section class="glass-card p-6 no-print">
+      <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">📚</span>
+        Referências Normativas
+      </h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+          <div class="font-semibold text-cyan-400 mb-1">NBR 5626:2020</div>
+          <div class="text-sm text-gray-400">Sistemas Prediais de Água Fria e Água Quente</div>
+        </div>
+        <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+          <div class="font-semibold text-cyan-400 mb-1">NBR 12217:1994</div>
+          <div class="text-sm text-gray-400">Projeto de Reservatório de Distribuição de Água</div>
+        </div>
+        <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+          <div class="font-semibold text-cyan-400 mb-1">NBR 15527:2019</div>
+          <div class="text-sm text-gray-400">Aproveitamento de Água de Chuva</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-6 text-gray-600 text-sm border-t border-gray-800 mt-10 no-print">
+    &copy; <span id="ano"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia
+  </footer>
+
+  <!-- Modal de Configuração de Preços -->
+  <div id="modalPrecos" class="modal-overlay">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-cyan-900/50">
+        <h3 class="text-xl font-bold text-cyan-400">⚙️ Configurar Preços de Materiais</h3>
+        <button onclick="fecharModalPrecos()" class="text-3xl text-gray-500 hover:text-white transition-colors">&times;</button>
+      </div>
+      
+      <div class="space-y-6">
+        <!-- Reservatório Inferior -->
+        <div>
+          <h4 class="text-cyan-400 font-semibold mb-3 pb-2 border-b border-cyan-900/30">
+            Reservatório Inferior (por m³)
+          </h4>
+          <div class="grid md:grid-cols-2 gap-3">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+              <span class="text-gray-300">Concreto Armado</span>
+              <input type="number" id="preco-concreto-inferior" class="input-modern w-32 text-right" value="1200">
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+              <span class="text-gray-300">Polietileno</span>
+              <input type="number" id="preco-polietileno-inferior" class="input-modern w-32 text-right" value="800">
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+              <span class="text-gray-300">Fibra de Vidro</span>
+              <input type="number" id="preco-fibra-inferior" class="input-modern w-32 text-right" value="1000">
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+              <span class="text-gray-300">Aço Inoxidável</span>
+              <input type="number" id="preco-aco-inferior" class="input-modern w-32 text-right" value="2500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Reservatório Superior -->
+        <div>
+          <h4 class="text-cyan-400 font-semibold mb-3 pb-2 border-b border-cyan-900/30">
+            Reservatório Superior (por m³)
+          </h4>
+          <div class="grid md:grid-cols-2 gap-3">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+              <span class="text-gray-300">Concreto Armado</span>
+              <input type="number" id="preco-concreto-superior" class="input-modern w-32 text-right" value="1500">
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+              <span class="text-gray-300">Polietileno</span>
+              <input type="number" id="preco-polietileno-superior" class="input-modern w-32 text-right" value="600">
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+              <span class="text-gray-300">Fibra de Vidro</span>
+              <input type="number" id="preco-fibra-superior" class="input-modern w-32 text-right" value="900">
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+              <span class="text-gray-300">Aço Inoxidável</span>
+              <input type="number" id="preco-aco-superior" class="input-modern w-32 text-right" value="2200">
+            </div>
+          </div>
+        </div>
+
+        <!-- Serviços -->
+        <div>
+          <h4 class="text-cyan-400 font-semibold mb-3 pb-2 border-b border-cyan-900/30">
+            Serviços
+          </h4>
+          <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+            <span class="text-gray-300">Taxa de Instalação (%)</span>
+            <input type="number" id="preco-instalacao-perc" class="input-modern w-32 text-right" value="20" min="0" max="100">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 justify-end mt-6 pt-4 border-t border-gray-800">
+        <button class="btn-outline" onclick="restaurarPrecosReservatorios()">Restaurar Padrão</button>
+        <button class="btn-primary" onclick="salvarPrecosReservatorios()">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== CONFIGURAÇÕES E ESTADO ==========
+    let tipoUsoAtual = 'residencial';
+    
+    const precosReservatoriosPadrao = {
+      concretoInferior: 1650,
+      polietilenInferior: 1150,
+      fibraInferior: 1450,
+      acoInferior: 3800,
+      concretoSuperior: 1950,
+      polietilenoSuperior: 850,
+      fibraSuperior: 1250,
+      acoSuperior: 3200,
+      instalacaoPerc: 20
+    };
+
+    let precosReservatorios = JSON.parse(localStorage.getItem('precosReservatorios')) || { ...precosReservatoriosPadrao };
+
+    const consumosPadrao = {
+      'residencial': { consumo: 150, populacao: 4, descricao: 'Residência unifamiliar' },
+      'comercial': { consumo: 50, populacao: 50, descricao: 'Escritórios e lojas' },
+      'industrial': { consumo: 70, populacao: 100, descricao: 'Uso industrial geral' },
+      'hotel': { consumo: 200, populacao: 30, descricao: 'Hóspedes + funcionários' },
+      'hospital': { consumo: 350, populacao: 50, descricao: 'Leitos + funcionários' },
+      'escola': { consumo: 80, populacao: 200, descricao: 'Alunos + funcionários' }
+    };
+
+    // Reservatórios comerciais disponíveis (litros)
+    const reservatoriosComerciais = [
+      250, 310, 500, 750, 1000, 1500, 2000, 3000, 5000, 10000, 15000, 20000, 50000
+    ];
+
+    // ========== FUNÇÕES PRINCIPAIS ==========
+    function selecionarTipo(tipo) {
+      tipoUsoAtual = tipo;
+      
+      document.querySelectorAll('.tipo-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tipo === tipo);
+      });
+
+      const config = consumosPadrao[tipo];
+      document.getElementById('consumo-per-capita').value = config.consumo;
+      document.getElementById('populacao').value = config.populacao;
+      
+      calcular();
+    }
+
+    function calcular() {
+      const populacao = parseFloat(document.getElementById('populacao').value) || 0;
+      const consumoPerCapita = parseFloat(document.getElementById('consumo-per-capita').value) || 0;
+      const diasReserva = parseFloat(document.getElementById('dias-reserva').value) || 0;
+      const tipoReservatorio = document.getElementById('tipo-reservatorio').value;
+      const formato = document.getElementById('formato').value;
+      const material = document.getElementById('material').value;
+
+      if (populacao <= 0 || consumoPerCapita <= 0 || diasReserva <= 0) {
+        document.getElementById('resultado').innerHTML = `
+          <div class="alert alert-warning">
+            ⚠️ Por favor, preencha todos os campos com valores válidos maiores que zero.
+          </div>
+        `;
+        return;
+      }
+
+      const volumeDiario = populacao * consumoPerCapita;
+      const volumeReserva = volumeDiario * diasReserva;
+      const volumeM3 = volumeReserva / 1000;
+
+      let volumeInferior = 0, volumeSuperior = 0;
+
+      switch(tipoReservatorio) {
+        case 'inferior':
+          volumeInferior = volumeM3;
+          break;
+        case 'superior':
+          volumeSuperior = volumeM3;
+          break;
+        case 'ambos':
+          volumeInferior = volumeM3 * 0.6;
+          volumeSuperior = volumeM3 * 0.4;
+          break;
+      }
+
+      const dimensoesInferior = calcularDimensoes(volumeInferior, formato);
+      const dimensoesSuperior = calcularDimensoes(volumeSuperior, formato);
+      const custoInferior = calcularCusto(volumeInferior, 'inferior', material);
+      const custoSuperior = calcularCusto(volumeSuperior, 'superior', material);
+      
+      // Sugestões comerciais
+      const sugestaoInferior = encontrarReservatorioComercial(volumeInferior * 1000);
+      const sugestaoSuperior = encontrarReservatorioComercial(volumeSuperior * 1000);
+
+      // Cálculo da bomba (se usar ambos reservatórios)
+      const bomba = tipoReservatorio === 'ambos' ? calcularBomba(volumeSuperior * 1000, populacao) : null;
+
+      gerarResultado({
+        populacao, consumoPerCapita, diasReserva,
+        volumeDiario, volumeReserva, volumeM3,
+        tipoReservatorio, volumeInferior, volumeSuperior,
+        dimensoesInferior, dimensoesSuperior,
+        formato, material,
+        custoInferior, custoSuperior,
+        sugestaoInferior, sugestaoSuperior,
+        bomba
+      });
+    }
+
+    function calcularDimensoes(volume, formato) {
+      if (volume <= 0) return null;
+
+      let dimensoes = { volume: volume };
+
+      switch(formato) {
+        case 'cilindrico':
+          // Proporção ideal: altura = diâmetro
+          const raio = Math.pow(volume / Math.PI, 1/3);
+          dimensoes = {
+            ...dimensoes,
+            tipo: 'Cilíndrico',
+            diametro: raio * 2,
+            altura: raio * 2,
+            raio: raio
+          };
+          break;
+        case 'retangular':
+          // Proporção 2:1:1 (comprimento : largura : altura)
+          const base = Math.pow(volume / 2, 1/3);
+          dimensoes = {
+            ...dimensoes,
+            tipo: 'Retangular',
+            comprimento: base * 2,
+            largura: base,
+            altura: base
+          };
+          break;
+        case 'quadrado':
+          // Cubo
+          const lado = Math.pow(volume, 1/3);
+          dimensoes = {
+            ...dimensoes,
+            tipo: 'Quadrado',
+            lado: lado,
+            altura: lado
+          };
+          break;
+      }
+
+      return dimensoes;
+    }
+
+    function calcularCusto(volume, tipo, material) {
+      if (volume <= 0) return { material: 0, instalacao: 0, total: 0 };
+
+      const custosPorMaterial = {
+        'concreto': { inferior: precosReservatorios.concretoInferior, superior: precosReservatorios.concretoSuperior },
+        'polietileno': { inferior: precosReservatorios.polietilenInferior, superior: precosReservatorios.polietilenoSuperior },
+        'fibra': { inferior: precosReservatorios.fibraInferior, superior: precosReservatorios.fibraSuperior },
+        'aco': { inferior: precosReservatorios.acoInferior, superior: precosReservatorios.acoSuperior }
+      };
+
+      const custoBase = custosPorMaterial[material][tipo];
+      const custoMaterial = volume * custoBase;
+      const custoInstalacao = custoMaterial * (precosReservatorios.instalacaoPerc / 100);
+
+      return {
+        material: custoMaterial,
+        instalacao: custoInstalacao,
+        total: custoMaterial + custoInstalacao
+      };
+    }
+
+    function encontrarReservatorioComercial(volumeLitros) {
+      if (volumeLitros <= 0) return null;
+
+      // Encontrar o menor reservatório que atende
+      const ideal = reservatoriosComerciais.find(v => v >= volumeLitros);
+      
+      // Se não encontrar, sugerir múltiplos
+      if (!ideal) {
+        const maior = reservatoriosComerciais[reservatoriosComerciais.length - 1];
+        const quantidade = Math.ceil(volumeLitros / maior);
+        return {
+          capacidade: maior,
+          quantidade: quantidade,
+          total: maior * quantidade,
+          multiplos: true
+        };
+      }
+
+      return {
+        capacidade: ideal,
+        quantidade: 1,
+        total: ideal,
+        multiplos: false
+      };
+    }
+
+    function calcularBomba(volumeSuperiorLitros, populacao) {
+      // Cálculo simplificado de bomba
+      // Vazão mínima: repor reservatório em 2 horas
+      const vazaoMinima = volumeSuperiorLitros / 120; // L/min
+      
+      // Altura manométrica estimada (considerando 3m por pavimento + perdas)
+      const alturaManometrica = 15; // metros (valor típico residencial)
+      
+      // Potência aproximada: P = (Q * H) / (75 * n)
+      // Q em m³/h, H em m, n = rendimento (0.5 a 0.7)
+      const vazaoM3h = (vazaoMinima * 60) / 1000;
+      const potenciaCV = (vazaoM3h * alturaManometrica) / (75 * 0.5);
+      
+      // Arredondar para valores comerciais
+      const potenciasComerciais = [0.25, 0.33, 0.5, 0.75, 1, 1.5, 2, 3, 5];
+      const potenciaSugerida = potenciasComerciais.find(p => p >= potenciaCV) || potenciasComerciais[potenciasComerciais.length - 1];
+
+      return {
+        vazaoMinima: vazaoMinima.toFixed(1),
+        alturaManometrica,
+        potenciaCalculada: potenciaCV.toFixed(2),
+        potenciaSugerida,
+        tempoRecarga: Math.ceil(volumeSuperiorLitros / (vazaoMinima))
+      };
+    }
+
+    function gerarResultado(dados) {
+      const {
+        populacao, consumoPerCapita, diasReserva,
+        volumeDiario, volumeReserva, volumeM3,
+        tipoReservatorio, volumeInferior, volumeSuperior,
+        dimensoesInferior, dimensoesSuperior,
+        formato, material,
+        custoInferior, custoSuperior,
+        sugestaoInferior, sugestaoSuperior,
+        bomba
+      } = dados;
+
+      const materialNomes = {
+        'concreto': 'Concreto Armado',
+        'polietileno': 'Polietileno',
+        'fibra': 'Fibra de Vidro',
+        'aco': 'Aço Inoxidável'
+      };
+
+      let html = `
+        <!-- Resumo Principal -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="spec-card">
+            <div class="text-gray-400 text-sm mb-1">Consumo Diário</div>
+            <div class="spec-value">${volumeDiario.toLocaleString('pt-BR')}</div>
+            <div class="text-gray-500 text-xs">litros/dia</div>
+          </div>
+          <div class="spec-card">
+            <div class="text-gray-400 text-sm mb-1">Volume Total</div>
+            <div class="spec-value">${volumeM3.toFixed(2)}</div>
+            <div class="text-gray-500 text-xs">m³</div>
+          </div>
+          <div class="spec-card">
+            <div class="text-gray-400 text-sm mb-1">Capacidade</div>
+            <div class="spec-value">${volumeReserva.toLocaleString('pt-BR')}</div>
+            <div class="text-gray-500 text-xs">litros</div>
+          </div>
+          <div class="spec-card">
+            <div class="text-gray-400 text-sm mb-1">Autonomia</div>
+            <div class="spec-value">${diasReserva}</div>
+            <div class="text-gray-500 text-xs">dias</div>
+          </div>
+        </div>
+
+        <!-- Tabs de navegação -->
+        <div class="flex border-b border-gray-800 mb-6 overflow-x-auto">
+          <button class="tab-btn active" onclick="trocarTab('dimensionamento')">📐 Dimensionamento</button>
+          <button class="tab-btn" onclick="trocarTab('comercial')">🛒 Produtos Comerciais</button>
+          <button class="tab-btn" onclick="trocarTab('custos')">💰 Custos</button>
+          ${bomba ? '<button class="tab-btn" onclick="trocarTab(\'bomba\')">⚡ Bomba</button>' : ''}
+          <button class="tab-btn" onclick="trocarTab('recomendacoes')">📋 Recomendações</button>
+        </div>
+
+        <!-- Tab: Dimensionamento -->
+        <div id="tab-dimensionamento" class="tab-content active">
+      `;
+
+      // Reservatório Inferior
+      if (volumeInferior > 0 && dimensoesInferior) {
+        html += gerarSecaoReservatorio('Reservatório Inferior (Cisterna)', '💧', volumeInferior, dimensoesInferior, formato, 'inferior');
+      }
+
+      // Reservatório Superior
+      if (volumeSuperior > 0 && dimensoesSuperior) {
+        html += gerarSecaoReservatorio('Reservatório Superior (Caixa d\'água)', '🚰', volumeSuperior, dimensoesSuperior, formato, 'superior');
+      }
+
+      html += `</div>`;
+
+      // Tab: Produtos Comerciais
+      html += `
+        <div id="tab-comercial" class="tab-content">
+          <h3 class="text-lg font-semibold text-cyan-400 mb-4">Sugestões de Reservatórios Comerciais</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+      `;
+
+      if (sugestaoInferior) {
+        html += gerarCardProduto('Cisterna', sugestaoInferior, volumeInferior * 1000);
+      }
+
+      if (sugestaoSuperior) {
+        html += gerarCardProduto('Caixa d\'água', sugestaoSuperior, volumeSuperior * 1000);
+      }
+
+      html += `
+          </div>
+          <div class="alert alert-info mt-4">
+            💡 <strong>Capacidades comerciais disponíveis:</strong> ${reservatoriosComerciais.map(v => v >= 1000 ? (v/1000) + ' mil L' : v + ' L').join(', ')}
+          </div>
+        </div>
+      `;
+
+      // Tab: Custos
+      const custoTotal = custoInferior.total + custoSuperior.total;
+      html += `
+        <div id="tab-custos" class="tab-content">
+          <h3 class="text-lg font-semibold text-cyan-400 mb-4">Estimativa de Custos - ${materialNomes[material]}</h3>
+          
+          <table class="comparison-table mb-6">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Material</th>
+                <th>Instalação</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${volumeInferior > 0 ? `
+              <tr>
+                <td>Reservatório Inferior</td>
+                <td>R$ ${custoInferior.material.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                <td>R$ ${custoInferior.instalacao.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                <td class="font-semibold text-cyan-400">R$ ${custoInferior.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              </tr>
+              ` : ''}
+              ${volumeSuperior > 0 ? `
+              <tr>
+                <td>Reservatório Superior</td>
+                <td>R$ ${custoSuperior.material.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                <td>R$ ${custoSuperior.instalacao.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                <td class="font-semibold text-cyan-400">R$ ${custoSuperior.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              </tr>
+              ` : ''}
+              <tr class="highlight">
+                <td colspan="3" class="font-bold">INVESTIMENTO TOTAL</td>
+                <td class="font-bold text-xl text-cyan-400">R$ ${custoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          ${gerarComparacaoMateriais(volumeInferior, volumeSuperior, material)}
+          
+          <div class="alert alert-warning mt-4">
+            ⚠️ <strong>Importante:</strong> Valores são estimativas e podem variar conforme região, fornecedor e complexidade da instalação.
+          </div>
+        </div>
+      `;
+
+      // Tab: Bomba
+      if (bomba) {
+        html += `
+          <div id="tab-bomba" class="tab-content">
+            <h3 class="text-lg font-semibold text-cyan-400 mb-4">⚡ Dimensionamento da Bomba</h3>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+                  <div class="text-sm text-gray-400 mb-1">Vazão Mínima</div>
+                  <div class="text-2xl font-bold text-cyan-400">${bomba.vazaoMinima} L/min</div>
+                </div>
+                <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+                  <div class="text-sm text-gray-400 mb-1">Altura Manométrica</div>
+                  <div class="text-2xl font-bold text-cyan-400">${bomba.alturaManometrica} m</div>
+                </div>
+                <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+                  <div class="text-sm text-gray-400 mb-1">Tempo de Recarga</div>
+                  <div class="text-2xl font-bold text-cyan-400">${bomba.tempoRecarga} min</div>
+                </div>
+              </div>
+              
+              <div class="p-6 rounded-xl bg-gradient-to-br from-cyan-900/20 to-purple-900/20 border border-cyan-500/30">
+                <div class="text-center">
+                  <div class="text-5xl mb-3">🔌</div>
+                  <div class="text-sm text-gray-400 mb-2">Potência Sugerida</div>
+                  <div class="text-4xl font-bold text-cyan-400 mb-2">${bomba.potenciaSugerida} CV</div>
+                  <div class="text-xs text-gray-500">(calculado: ${bomba.potenciaCalculada} CV)</div>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-white/10">
+                  <div class="text-sm text-gray-400 mb-2">Eficiência estimada</div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%"></div>
+                  </div>
+                  <div class="text-xs text-gray-500 mt-1">Rendimento: 50-70%</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+              💡 <strong>Recomendações:</strong>
+              <ul class="mt-2 space-y-1 text-sm">
+                <li>• Instale pressostatato para acionamento automático</li>
+                <li>• Considere bomba com protetor térmico</li>
+                <li>• Para maior durabilidade, opte por bombas de marcas reconhecidas</li>
+                <li>• Altura manométrica pode variar - consulte um profissional</li>
+              </ul>
+            </div>
+          </div>
+        `;
+      }
+
+      // Tab: Recomendações
+      html += `
+        <div id="tab-recomendacoes" class="tab-content">
+          <h3 class="text-lg font-semibold text-cyan-400 mb-4">📋 Recomendações Técnicas</h3>
+          
+          ${gerarInfoMaterial(material)}
+          
+          <div class="grid md:grid-cols-2 gap-4 mt-6">
+            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+              <h4 class="font-semibold text-cyan-400 mb-3">🔧 Instalação</h4>
+              <ul class="space-y-2 text-sm text-gray-300">
+                <li>• Tampa obrigatória e vedada (evita contaminação)</li>
+                <li>• Extravasor com diâmetro mínimo 50mm com tela</li>
+                <li>• Registro de gaveta e válvula de retenção</li>
+                <li>• Tubo de ventilação 50mm com tela (evita insetos)</li>
+              </ul>
+            </div>
+            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+              <h4 class="font-semibold text-cyan-400 mb-3">🧹 Manutenção</h4>
+              <ul class="space-y-2 text-sm text-gray-300">
+                <li>• Limpeza semestral obrigatória</li>
+                <li>• Inspeção visual mensal</li>
+                <li>• Verificar vedação da tampa</li>
+                <li>• Prever acesso para manutenção</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('resultado').innerHTML = html;
+    }
+
+    function gerarSecaoReservatorio(titulo, emoji, volume, dimensoes, formato, tipo) {
+      const fillPercent = 70;
+      
+      let dimensoesTexto = '';
+      let svgVisual = '';
+
+      switch(formato) {
+        case 'cilindrico':
+          dimensoesTexto = `Diâmetro: ${dimensoes.diametro.toFixed(2)}m × Altura: ${dimensoes.altura.toFixed(2)}m`;
+          svgVisual = gerarSVGCilindrico(dimensoes, fillPercent, tipo);
+          break;
+        case 'retangular':
+          dimensoesTexto = `${dimensoes.comprimento.toFixed(2)}m × ${dimensoes.largura.toFixed(2)}m × ${dimensoes.altura.toFixed(2)}m`;
+          svgVisual = gerarSVGRetangular(dimensoes, fillPercent, tipo);
+          break;
+        case 'quadrado':
+          dimensoesTexto = `${dimensoes.lado.toFixed(2)}m × ${dimensoes.lado.toFixed(2)}m × ${dimensoes.altura.toFixed(2)}m`;
+          svgVisual = gerarSVGQuadrado(dimensoes, fillPercent, tipo);
+          break;
+      }
+
+      return `
+        <div class="mb-6 p-5 rounded-xl bg-white/5 border border-cyan-900/30">
+          <h3 class="text-lg font-semibold text-cyan-400 mb-4">${emoji} ${titulo}</h3>
+          
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="p-3 rounded-lg bg-black/30">
+                  <div class="text-xs text-gray-500">Volume</div>
+                  <div class="text-xl font-bold text-cyan-400">${volume.toFixed(2)} m³</div>
+                </div>
+                <div class="p-3 rounded-lg bg-black/30">
+                  <div class="text-xs text-gray-500">Capacidade</div>
+                  <div class="text-xl font-bold text-cyan-400">${(volume * 1000).toLocaleString('pt-BR')} L</div>
+                </div>
+              </div>
+              <div class="p-3 rounded-lg bg-black/30">
+                <div class="text-xs text-gray-500 mb-1">Dimensões sugeridas (${dimensoes.tipo})</div>
+                <div class="text-lg font-semibold text-white">${dimensoesTexto}</div>
+              </div>
+            </div>
+            
+            <div class="reservoir-visual flex items-center justify-center">
+              ${svgVisual}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function gerarSVGCilindrico(dimensoes, fillPercent, tipo) {
+      const isInferior = tipo === 'inferior';
+      const color1 = isInferior ? '#0ea5e9' : '#00ffff';
+      const color2 = isInferior ? '#0369a1' : '#06b6d4';
+      
+      return `
+        <svg viewBox="0 0 200 200" class="w-48 h-48">
+          <defs>
+            <linearGradient id="waterGrad${tipo}" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:${color1};stop-opacity:0.8" />
+              <stop offset="100%" style="stop-color:${color2};stop-opacity:0.4" />
+            </linearGradient>
+            <linearGradient id="tankGrad${tipo}" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#374151;stop-opacity:0.8" />
+              <stop offset="50%" style="stop-color:#4b5563;stop-opacity:0.6" />
+              <stop offset="100%" style="stop-color:#374151;stop-opacity:0.8" />
+            </linearGradient>
+          </defs>
+          
+          <!-- Corpo do tanque -->
+          <ellipse cx="100" cy="170" rx="60" ry="15" fill="url(#tankGrad${tipo})" stroke="${color1}" stroke-width="2"/>
+          <rect x="40" y="50" width="120" height="120" fill="url(#tankGrad${tipo})" stroke="${color1}" stroke-width="2"/>
+          <ellipse cx="100" cy="50" rx="60" ry="15" fill="url(#tankGrad${tipo})" stroke="${color1}" stroke-width="2"/>
+          
+          <!-- Água -->
+          <clipPath id="tankClip${tipo}">
+            <rect x="42" y="52" width="116" height="116"/>
+          </clipPath>
+          <g clip-path="url(#tankClip${tipo})">
+            <rect x="42" y="${170 - fillPercent * 1.16}" width="116" height="${fillPercent * 1.16}" fill="url(#waterGrad${tipo})">
+              <animate attributeName="y" values="${170 - fillPercent * 1.16};${168 - fillPercent * 1.16};${170 - fillPercent * 1.16}" dur="2s" repeatCount="indefinite"/>
+            </rect>
+          </g>
+          
+          <!-- Dimensões -->
+          <text x="100" y="25" text-anchor="middle" fill="#999" font-size="10">Ø ${dimensoes.diametro.toFixed(2)}m</text>
+          <text x="175" y="110" text-anchor="start" fill="#999" font-size="10">h=${dimensoes.altura.toFixed(2)}m</text>
+        </svg>
+      `;
+    }
+
+    function gerarSVGRetangular(dimensoes, fillPercent, tipo) {
+      const isInferior = tipo === 'inferior';
+      const color1 = isInferior ? '#0ea5e9' : '#00ffff';
+      const color2 = isInferior ? '#0369a1' : '#06b6d4';
+
+      return `
+        <svg viewBox="0 0 200 200" class="w-48 h-48">
+          <defs>
+            <linearGradient id="waterGradRect${tipo}" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:${color1};stop-opacity:0.8" />
+              <stop offset="100%" style="stop-color:${color2};stop-opacity:0.4" />
+            </linearGradient>
+          </defs>
+          
+          <!-- Corpo 3D do tanque -->
+          <polygon points="30,60 100,30 170,60 170,160 100,190 30,160" fill="#374151" stroke="${color1}" stroke-width="2"/>
+          <polygon points="30,60 100,90 170,60 100,30" fill="#4b5563" stroke="${color1}" stroke-width="2"/>
+          <polygon points="100,90 100,190 170,160 170,60" fill="#3f4a5a" stroke="${color1}" stroke-width="2"/>
+          
+          <!-- Água -->
+          <polygon points="32,${160 - fillPercent} 100,${190 - fillPercent} 168,${160 - fillPercent} 168,160 100,190 32,160" fill="url(#waterGradRect${tipo})">
+            <animate attributeName="points" 
+              values="32,${160 - fillPercent} 100,${190 - fillPercent} 168,${160 - fillPercent} 168,160 100,190 32,160;
+                      32,${158 - fillPercent} 100,${188 - fillPercent} 168,${158 - fillPercent} 168,160 100,190 32,160;
+                      32,${160 - fillPercent} 100,${190 - fillPercent} 168,${160 - fillPercent} 168,160 100,190 32,160" 
+              dur="2s" repeatCount="indefinite"/>
+          </polygon>
+          
+          <!-- Dimensões -->
+          <text x="100" y="20" text-anchor="middle" fill="#999" font-size="9">${dimensoes.comprimento.toFixed(2)}m × ${dimensoes.largura.toFixed(2)}m</text>
+          <text x="180" y="110" text-anchor="start" fill="#999" font-size="9">h=${dimensoes.altura.toFixed(2)}m</text>
+        </svg>
+      `;
+    }
+
+    function gerarSVGQuadrado(dimensoes, fillPercent, tipo) {
+      return gerarSVGRetangular({ ...dimensoes, comprimento: dimensoes.lado, largura: dimensoes.lado }, fillPercent, tipo);
+    }
+
+    function gerarCardProduto(nome, sugestao, volumeNecessario) {
+      const folga = ((sugestao.total - volumeNecessario) / volumeNecessario * 100).toFixed(0);
+      const isRecomendado = folga >= 0 && folga <= 30;
+
+      return `
+        <div class="produto-card relative ${isRecomendado ? 'recomendado' : ''}">
+          <div class="text-lg font-semibold text-white mb-2">${nome}</div>
+          <div class="text-3xl font-bold text-cyan-400 mb-1">
+            ${sugestao.quantidade > 1 ? sugestao.quantidade + '×' : ''} 
+            ${sugestao.capacidade >= 1000 ? (sugestao.capacidade/1000).toLocaleString('pt-BR') + ' mil' : sugestao.capacidade} L
+          </div>
+          <div class="text-sm text-gray-400 mb-3">
+            Capacidade total: ${sugestao.total.toLocaleString('pt-BR')} L
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="text-gray-500">Necessário: ${volumeNecessario.toLocaleString('pt-BR')} L</span>
+            <span class="${folga >= 0 ? 'text-green-400' : 'text-red-400'}">
+              ${folga >= 0 ? '+' : ''}${folga}% ${folga >= 0 ? 'folga' : 'déficit'}
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    function gerarComparacaoMateriais(volumeInferior, volumeSuperior, materialAtual) {
+      const materiais = ['polietileno', 'fibra', 'concreto', 'aco'];
+      const nomes = {
+        polietileno: 'Polietileno',
+        fibra: 'Fibra de Vidro',
+        concreto: 'Concreto',
+        aco: 'Aço Inox'
+      };
+
+      let rows = '';
+      materiais.forEach(mat => {
+        const custoInf = calcularCusto(volumeInferior, 'inferior', mat);
+        const custoSup = calcularCusto(volumeSuperior, 'superior', mat);
+        const total = custoInf.total + custoSup.total;
+        const isAtual = mat === materialAtual;
+
+        rows += `
+          <tr class="${isAtual ? 'highlight' : ''}">
+            <td>${nomes[mat]} ${isAtual ? '<span class="text-cyan-400">(selecionado)</span>' : ''}</td>
+            <td>R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          </tr>
+        `;
+      });
+
+      return `
+        <h4 class="text-md font-semibold text-cyan-400 mb-3">Comparativo de Materiais</h4>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Custo Total Estimado</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function gerarInfoMaterial(material) {
+      const info = {
+        concreto: {
+          vantagens: ['Durabilidade excepcional (50+ anos)', 'Resistência estrutural', 'Isolamento térmico natural', 'Ideal para grandes volumes'],
+          cuidados: ['Necessita impermeabilização', 'Tempo de cura (28 dias)', 'Peso elevado - requer fundação', 'Custo de mão de obra elevado']
+        },
+        polietileno: {
+          vantagens: ['Leve e econômico', 'Não enferruja nem corrói', 'Fácil instalação', 'Atóxico - aprovado pela ANVISA'],
+          cuidados: ['Proteção UV necessária', 'Vida útil 15-20 anos', 'Não é estrutural', 'Pode deformar com calor extremo']
+        },
+        fibra: {
+          vantagens: ['Leve e resistente', 'Não corrói', 'Baixa manutenção', 'Boa durabilidade (25+ anos)'],
+          cuidados: ['Custo médio-alto', 'Sensível a impactos fortes', 'Necessita suporte adequado', 'Pode amarelar com sol']
+        },
+        aco: {
+          vantagens: ['Higiênico e durável', 'Alta resistência mecânica', 'Não altera sabor da água', 'Reciclável'],
+          cuidados: ['Custo elevado', 'Necessita isolamento térmico', 'Requer base perfeitamente nivelada', 'Manutenção periódica']
+        }
+      };
+
+      const nomes = {
+        concreto: 'Concreto Armado',
+        polietileno: 'Polietileno',
+        fibra: 'Fibra de Vidro',
+        aco: 'Aço Inoxidável'
+      };
+
+      const mat = info[material];
+
+      return `
+        <div class="p-5 rounded-xl bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-500/30">
+          <h4 class="text-lg font-semibold text-white mb-4">Material: ${nomes[material]}</h4>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <div class="text-green-400 font-medium mb-2">✅ Vantagens</div>
+              <ul class="space-y-1 text-sm text-gray-300">
+                ${mat.vantagens.map(v => `<li>• ${v}</li>`).join('')}
+              </ul>
+            </div>
+            <div>
+              <div class="text-yellow-400 font-medium mb-2">⚠️ Cuidados</div>
+              <ul class="space-y-1 text-sm text-gray-300">
+                ${mat.cuidados.map(c => `<li>• ${c}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function trocarTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    // ========== MODAL DE PREÇOS ==========
+    function abrirModalPrecos() {
+      document.getElementById('preco-concreto-inferior').value = precosReservatorios.concretoInferior;
+      document.getElementById('preco-polietileno-inferior').value = precosReservatorios.polietilenInferior;
+      document.getElementById('preco-fibra-inferior').value = precosReservatorios.fibraInferior;
+      document.getElementById('preco-aco-inferior').value = precosReservatorios.acoInferior;
+      document.getElementById('preco-concreto-superior').value = precosReservatorios.concretoSuperior;
+      document.getElementById('preco-polietileno-superior').value = precosReservatorios.polietilenoSuperior;
+      document.getElementById('preco-fibra-superior').value = precosReservatorios.fibraSuperior;
+      document.getElementById('preco-aco-superior').value = precosReservatorios.acoSuperior;
+      document.getElementById('preco-instalacao-perc').value = precosReservatorios.instalacaoPerc;
+      
+      document.getElementById('modalPrecos').classList.add('active');
+    }
+
+    function fecharModalPrecos() {
+      document.getElementById('modalPrecos').classList.remove('active');
+    }
+
+    function salvarPrecosReservatorios() {
+      precosReservatorios = {
+        concretoInferior: parseFloat(document.getElementById('preco-concreto-inferior').value) || 0,
+        polietilenInferior: parseFloat(document.getElementById('preco-polietileno-inferior').value) || 0,
+        fibraInferior: parseFloat(document.getElementById('preco-fibra-inferior').value) || 0,
+        acoInferior: parseFloat(document.getElementById('preco-aco-inferior').value) || 0,
+        concretoSuperior: parseFloat(document.getElementById('preco-concreto-superior').value) || 0,
+        polietilenoSuperior: parseFloat(document.getElementById('preco-polietileno-superior').value) || 0,
+        fibraSuperior: parseFloat(document.getElementById('preco-fibra-superior').value) || 0,
+        acoSuperior: parseFloat(document.getElementById('preco-aco-superior').value) || 0,
+        instalacaoPerc: parseFloat(document.getElementById('preco-instalacao-perc').value) || 0
+      };
+
+      localStorage.setItem('precosReservatorios', JSON.stringify(precosReservatorios));
+      calcular();
+      fecharModalPrecos();
+
+      // Feedback visual
+      const btn = document.getElementById('btnConfigurarPrecos');
+      const textoOriginal = btn.innerHTML;
+      btn.innerHTML = '✓ Preços Salvos!';
+      btn.classList.add('!border-green-500', '!text-green-500');
+      setTimeout(() => {
+        btn.innerHTML = textoOriginal;
+        btn.classList.remove('!border-green-500', '!text-green-500');
+      }, 2000);
+    }
+
+    function restaurarPrecosReservatorios() {
+      if (confirm('Restaurar todos os preços para os valores padrão?')) {
+        precosReservatorios = { ...precosReservatoriosPadrao };
+        localStorage.setItem('precosReservatorios', JSON.stringify(precosReservatorios));
+        abrirModalPrecos(); // Recarrega os valores no modal
+        calcular();
+      }
+    }
+
+    // ========== EXPORTAR PDF ==========
+    function exportarPDF() {
+      // Adiciona classe para estilos de impressão
+      document.body.classList.add('printing');
+      window.print();
+      document.body.classList.remove('printing');
+    }
+
+    // ========== RESET ==========
+    function resetar() {
+      document.getElementById('populacao').value = '4';
+      document.getElementById('consumo-per-capita').value = '150';
+      document.getElementById('dias-reserva').value = '2';
+      document.getElementById('tipo-reservatorio').value = 'ambos';
+      document.getElementById('formato').value = 'cilindrico';
+      document.getElementById('material').value = 'polietileno';
+      
+      document.querySelectorAll('.tipo-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector('[data-tipo="residencial"]').classList.add('active');
+      tipoUsoAtual = 'residencial';
+      
+      document.getElementById('resultado').innerHTML = `
+        <div class="text-center py-12 text-gray-500">
+          <div class="text-5xl mb-4">🔍</div>
+          <p>Preencha os dados e clique em <strong>Calcular</strong> para ver os resultados</p>
+        </div>
+      `;
+    }
+
+    // ========== EVENT LISTENERS ==========
+    document.getElementById('btnCalcular').addEventListener('click', calcular);
+    document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+    document.getElementById('btnExportar').addEventListener('click', exportarPDF);
+    document.getElementById('btnReset').addEventListener('click', resetar);
+
+    // Tipos de edificação
+    document.getElementById('tiposContainer').addEventListener('click', (e) => {
+      const btn = e.target.closest('.tipo-btn');
+      if (btn) {
+        selecionarTipo(btn.dataset.tipo);
+      }
+    });
+
+    // Auto-calcular ao mudar inputs
+    ['populacao', 'consumo-per-capita', 'dias-reserva', 'tipo-reservatorio', 'formato', 'material'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', calcular);
+      el.addEventListener('change', calcular);
+    });
+
+    // Fechar modal clicando fora
+    document.getElementById('modalPrecos').addEventListener('click', (e) => {
+      if (e.target.id === 'modalPrecos') fecharModalPrecos();
+    });
+
+    // Tecla ESC fecha modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') fecharModalPrecos();
+    });
+
+    // Ano no footer
+    document.getElementById('ano').textContent = new Date().getFullYear();
+
+    // Calcular ao carregar
+    window.addEventListener('load', calcular);
+  </script>
+</body>
+</html>
