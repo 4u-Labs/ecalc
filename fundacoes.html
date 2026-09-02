@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Calculadora de Fundações | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #0f1419 50%, #0a0a0f 100%);
+      min-height: 100vh;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,255,0.5); }
+    
+    /* Glow effects */
+    .glow-cyan { box-shadow: 0 0 20px rgba(0,255,255,0.15), inset 0 0 20px rgba(0,255,255,0.03); }
+    .glow-purple { box-shadow: 0 0 20px rgba(139,27,247,0.15); }
+    .text-glow { text-shadow: 0 0 20px rgba(0,255,255,0.5); }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,255,255,0.2); }
+      50% { box-shadow: 0 0 35px rgba(0,255,255,0.4); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .animate-fadeIn { animation: fadeIn 0.4s ease-out; }
+    .animate-slideIn { animation: slideIn 0.3s ease-out; }
+    .pulse-animation { animation: pulse-glow 2s infinite; }
+    
+    /* Form controls */
+    .form-control {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0,255,255,0.2);
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      border-color: #00ffff;
+      box-shadow: 0 0 15px rgba(0,255,255,0.3);
+      outline: none;
+    }
+    
+    .form-control:hover:not(:focus) {
+      border-color: rgba(0,255,255,0.4);
+    }
+    
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #00ffff 0%, #00b8b8 100%);
+      color: #000;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 25px rgba(0,255,255,0.4);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 2px solid rgba(0,255,255,0.3);
+      color: #00ffff;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-outline:hover {
+      background: rgba(0,255,255,0.1);
+      border-color: #00ffff;
+      transform: translateY(-2px);
+    }
+    
+    /* Type buttons */
+    .tipo-btn {
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(0,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .tipo-btn:hover {
+      border-color: #00ffff;
+      background: rgba(0,255,255,0.05);
+      transform: translateY(-3px);
+    }
+    
+    .tipo-btn.active {
+      background: linear-gradient(135deg, #00ffff 0%, #8b1bf7 100%);
+      color: #000;
+      border-color: transparent;
+      transform: scale(1.02);
+    }
+    
+    /* Cards */
+    .card {
+      background: rgba(15,15,20,0.8);
+      border: 1px solid rgba(0,255,255,0.15);
+      backdrop-filter: blur(10px);
+    }
+    
+    .card:hover {
+      border-color: rgba(0,255,255,0.3);
+    }
+    
+    /* Spec items */
+    .spec-item {
+      background: linear-gradient(135deg, rgba(0,255,255,0.05) 0%, rgba(139,27,247,0.03) 100%);
+      border: 1px solid rgba(0,255,255,0.15);
+      transition: all 0.3s ease;
+    }
+    
+    .spec-item:hover {
+      border-color: rgba(0,255,255,0.4);
+      transform: translateY(-2px);
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      background: rgba(0,255,255,0.1);
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      background: linear-gradient(90deg, #00ffff 0%, #8b1bf7 100%);
+      transition: width 0.5s ease;
+    }
+    
+    /* Alerts */
+    .alert-warning {
+      background: rgba(255, 165, 0, 0.1);
+      border-left: 4px solid #ffa500;
+    }
+    
+    .alert-info {
+      background: rgba(0, 255, 255, 0.08);
+      border-left: 4px solid #00ffff;
+    }
+    
+    .alert-success {
+      background: rgba(40, 167, 69, 0.1);
+      border-left: 4px solid #28a745;
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      background: rgba(0,0,0,0.9);
+      backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #0f0f14 0%, #1a1a25 100%);
+      border: 2px solid rgba(0,255,255,0.3);
+      box-shadow: 0 0 60px rgba(0,255,255,0.2);
+    }
+    
+    /* Tabs */
+    .tab-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .tab-btn.active {
+      color: #00ffff;
+      border-bottom: 2px solid #00ffff;
+    }
+    
+    /* Diagram */
+    .diagram-container {
+      background: linear-gradient(135deg, rgba(0,20,30,0.5) 0%, rgba(20,0,40,0.3) 100%);
+      border: 1px solid rgba(0,255,255,0.2);
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.9);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    
+    .tooltip:hover::after {
+      opacity: 1;
+      bottom: calc(100% + 8px);
+    }
+    
+    /* Print styles */
+    @media print {
+      body { background: white; color: black; }
+      .no-print { display: none !important; }
+      .card { background: white; border: 1px solid #ccc; }
+      .spec-item { background: #f5f5f5; }
+    }
+  </style>
+</head>
+<body class="text-gray-200">
+  <!-- Header -->
+  <header class="no-print border-b border-cyan-500/20 bg-black/30 backdrop-blur-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center font-bold text-black">
+          F
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-cyan-400 text-glow">Calculadora de Fundações</h1>
+          <p class="text-xs text-gray-500">Ferramentas de Engenharia Civil</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="exportarPDF()" class="btn-outline px-4 py-2 rounded-lg text-sm flex items-center gap-2 tooltip" data-tooltip="Exportar resultados">
+          📄 Exportar
+        </button>
+        <button onclick="toggleDarkMode()" class="btn-outline px-3 py-2 rounded-lg" id="themeToggle">
+          🌙
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap justify-center gap-3 mb-8 no-print">
+      <button class="btn-primary px-8 py-3 rounded-xl text-lg font-semibold flex items-center gap-2" id="btnCalcular">
+        <span>⚡</span> Calcular
+      </button>
+      <button class="btn-outline px-6 py-3 rounded-xl flex items-center gap-2" id="btnConfigurarPrecos">
+        ⚙️ Configurar Preços
+      </button>
+      <button class="btn-outline px-6 py-3 rounded-xl flex items-center gap-2" id="btnComparar">
+        📊 Comparar Tipos
+      </button>
+      <button class="btn-outline px-6 py-3 rounded-xl flex items-center gap-2" id="btnReset">
+        🔄 Limpar
+      </button>
+    </div>
+
+    <!-- Foundation Type Selection -->
+    <section class="card rounded-2xl p-6 mb-6 glow-cyan">
+      <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">🏗️</span>
+        Tipo de Fundação
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <button class="tipo-btn active rounded-xl p-5 text-left" onclick="selecionarTipo('sapata')">
+          <div class="text-2xl mb-2">📐</div>
+          <div class="font-semibold">Sapata Isolada</div>
+          <div class="text-xs text-gray-400 mt-1">Fundação superficial</div>
+        </button>
+        <button class="tipo-btn rounded-xl p-5 text-left" onclick="selecionarTipo('estaca')">
+          <div class="text-2xl mb-2">🔨</div>
+          <div class="font-semibold">Estacas</div>
+          <div class="text-xs text-gray-400 mt-1">Fundação profunda</div>
+        </button>
+        <button class="tipo-btn rounded-xl p-5 text-left" onclick="selecionarTipo('radier')">
+          <div class="text-2xl mb-2">🏢</div>
+          <div class="font-semibold">Radier</div>
+          <div class="text-xs text-gray-400 mt-1">Fundação contínua</div>
+        </button>
+        <button class="tipo-btn rounded-xl p-5 text-left" onclick="selecionarTipo('tubulao')">
+          <div class="text-2xl mb-2">⚒️</div>
+          <div class="font-semibold">Tubulão</div>
+          <div class="text-xs text-gray-400 mt-1">Fundação profunda</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Form Column -->
+      <div class="lg:col-span-2">
+        <!-- Sapata Form -->
+        <section class="card rounded-2xl p-6 animate-fadeIn" id="form-sapata">
+          <h2 class="text-xl font-semibold text-cyan-400 mb-6 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">📐</span>
+            Dados da Sapata Isolada
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Carga Vertical (kN)</label>
+              <input type="number" id="carga-sapata" value="500" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Tensão Admissível do Solo (kN/m²)</label>
+              <input type="number" id="tensao-solo" value="200" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Tipo de Sapata</label>
+              <select id="tipo-sapata" class="form-control w-full px-4 py-3 rounded-xl">
+                <option value="quadrada">Quadrada</option>
+                <option value="retangular">Retangular (2:1)</option>
+                <option value="retangular-3">Retangular (3:1)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Profundidade (m)</label>
+              <input type="number" id="prof-sapata" step="0.1" value="1.5" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Peso Específico Solo (kN/m³)</label>
+              <input type="number" id="peso-solo" value="18" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Altura da Sapata (cm)</label>
+              <input type="number" id="altura-sapata" value="40" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">fck Concreto (MPa)</label>
+              <select id="fck-sapata" class="form-control w-full px-4 py-3 rounded-xl">
+                <option value="20">20 MPa</option>
+                <option value="25" selected>25 MPa</option>
+                <option value="30">30 MPa</option>
+                <option value="35">35 MPa</option>
+                <option value="40">40 MPa</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Pilar (cm x cm)</label>
+              <div class="flex gap-2">
+                <input type="number" id="pilar-a" value="30" placeholder="a" 
+                  class="form-control w-full px-4 py-3 rounded-xl">
+                <input type="number" id="pilar-b" value="30" placeholder="b" 
+                  class="form-control w-full px-4 py-3 rounded-xl">
+              </div>
+            </div>
+          </div>
+          
+          <div id="resultado-sapata" class="mt-6"></div>
+        </section>
+
+        <!-- Estaca Form -->
+        <section class="card rounded-2xl p-6 animate-fadeIn hidden" id="form-estaca">
+          <h2 class="text-xl font-semibold text-cyan-400 mb-6 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">🔨</span>
+            Dados das Estacas
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Carga Total (kN)</label>
+              <input type="number" id="carga-estaca" value="2000" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Tipo de Estaca</label>
+              <select id="tipo-estaca" class="form-control w-full px-4 py-3 rounded-xl">
+                <option value="pre-moldada">Pré-moldada</option>
+                <option value="escavada">Escavada (Strauss)</option>
+                <option value="helice">Hélice Contínua</option>
+                <option value="franki">Franki</option>
+                <option value="raiz">Raiz</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Diâmetro (cm)</label>
+              <input type="number" id="diametro-estaca" value="30" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Capacidade/Estaca (kN)</label>
+              <input type="number" id="capacidade-estaca" value="300" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Comprimento Estimado (m)</label>
+              <input type="number" id="comprimento-estaca" step="0.5" value="12" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Fator de Segurança</label>
+              <input type="number" id="fs-estaca" step="0.1" value="2.0" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+          </div>
+          
+          <div id="resultado-estaca" class="mt-6"></div>
+        </section>
+
+        <!-- Radier Form -->
+        <section class="card rounded-2xl p-6 animate-fadeIn hidden" id="form-radier">
+          <h2 class="text-xl font-semibold text-cyan-400 mb-6 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">🏢</span>
+            Dados do Radier
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Carga Total (kN)</label>
+              <input type="number" id="carga-radier" value="5000" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Tensão Admissível (kN/m²)</label>
+              <input type="number" id="tensao-radier" value="150" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Comprimento (m)</label>
+              <input type="number" id="comprimento-radier" step="0.1" value="12" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Largura (m)</label>
+              <input type="number" id="largura-radier" step="0.1" value="8" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Altura (cm)</label>
+              <input type="number" id="altura-radier" value="30" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Número de Pilares</label>
+              <input type="number" id="pilares-radier" value="6" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+          </div>
+          
+          <div id="resultado-radier" class="mt-6"></div>
+        </section>
+
+        <!-- Tubulão Form -->
+        <section class="card rounded-2xl p-6 animate-fadeIn hidden" id="form-tubulao">
+          <h2 class="text-xl font-semibold text-cyan-400 mb-6 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">⚒️</span>
+            Dados do Tubulão
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Carga (kN)</label>
+              <input type="number" id="carga-tubulao" value="1500" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Tipo de Tubulão</label>
+              <select id="tipo-tubulao" class="form-control w-full px-4 py-3 rounded-xl">
+                <option value="ceu-aberto">Céu Aberto</option>
+                <option value="ar-comprimido">Ar Comprimido</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Diâmetro Fuste (cm)</label>
+              <input type="number" id="diametro-fuste" value="80" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Diâmetro Base (cm)</label>
+              <input type="number" id="diametro-base" value="160" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Profundidade (m)</label>
+              <input type="number" id="prof-tubulao" step="0.5" value="8" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Tensão Admissível (kN/m²)</label>
+              <input type="number" id="tensao-tubulao" value="500" 
+                class="form-control w-full px-4 py-3 rounded-xl">
+            </div>
+          </div>
+          
+          <div id="resultado-tubulao" class="mt-6"></div>
+        </section>
+      </div>
+
+      <!-- Diagram Column -->
+      <div class="lg:col-span-1">
+        <div class="card rounded-2xl p-6 sticky top-24">
+          <h3 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+            📊 Visualização
+          </h3>
+          <div id="diagram-container" class="diagram-container rounded-xl p-4 min-h-[300px] flex items-center justify-center">
+            <svg id="diagram-svg" viewBox="0 0 200 200" class="w-full max-w-[250px]"></svg>
+          </div>
+          
+          <div id="quick-info" class="mt-4 space-y-2">
+            <!-- Quick info items will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- References Section -->
+    <section class="card rounded-2xl p-6 mt-6">
+      <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">📚</span>
+        Referências Normativas
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+          <div class="font-semibold text-cyan-400">NBR 6122:2019</div>
+          <div class="text-sm text-gray-400">Projeto e Execução de Fundações</div>
+        </div>
+        <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+          <div class="font-semibold text-cyan-400">NBR 6118:2014</div>
+          <div class="text-sm text-gray-400">Projeto de Estruturas de Concreto</div>
+        </div>
+        <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+          <div class="font-semibold text-cyan-400">NBR 12131:2006</div>
+          <div class="text-sm text-gray-400">Estacas - Prova de Carga Estática</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Price Configuration Modal -->
+  <div id="modalPrecos" class="modal-overlay fixed inset-0 z-[9999] hidden items-center justify-center p-4">
+    <div class="modal-content rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fadeIn">
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-cyan-500/20">
+        <h3 class="text-xl font-bold text-cyan-400">⚙️ Configurar Preços</h3>
+        <button onclick="fecharModalPrecos()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      
+      <!-- Tabs -->
+      <div class="flex gap-4 mb-6 border-b border-gray-700">
+        <button class="tab-btn active pb-2 px-2" onclick="switchPriceTab('sapatas')">Sapatas</button>
+        <button class="tab-btn pb-2 px-2" onclick="switchPriceTab('estacas')">Estacas</button>
+        <button class="tab-btn pb-2 px-2" onclick="switchPriceTab('outros')">Outros</button>
+      </div>
+      
+      <!-- Sapatas Prices -->
+      <div id="tab-sapatas" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Concreto (R$/m³)</label>
+            <input type="number" id="preco-concreto-sapata" value="450" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Aço CA-50 (R$/kg)</label>
+            <input type="number" id="preco-aco-sapata" value="8" step="0.5"
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Formas (R$/m²)</label>
+            <input type="number" id="preco-forma-sapata" value="50" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Escavação (R$/m³)</label>
+            <input type="number" id="preco-escavacao" value="45" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Estacas Prices -->
+      <div id="tab-estacas" class="space-y-4 hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Pré-moldada (R$/m)</label>
+            <input type="number" id="preco-pre-moldada" value="180" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Escavada Strauss (R$/m)</label>
+            <input type="number" id="preco-escavada" value="150" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Hélice Contínua (R$/m)</label>
+            <input type="number" id="preco-helice" value="200" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Franki (R$/m)</label>
+            <input type="number" id="preco-franki" value="220" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Raiz (R$/m)</label>
+            <input type="number" id="preco-raiz" value="280" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Outros Prices -->
+      <div id="tab-outros" class="space-y-4 hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Mão de Obra (R$/m³)</label>
+            <input type="number" id="preco-mao-obra" value="120" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+            <label class="block text-sm text-gray-400 mb-2">Mobilização (R$)</label>
+            <input type="number" id="preco-mobilizacao" value="2500" 
+              class="form-control w-full px-4 py-2 rounded-lg">
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex gap-3 justify-end mt-6 pt-4 border-t border-gray-700">
+        <button onclick="restaurarPrecos()" class="btn-outline px-5 py-2 rounded-lg">
+          Restaurar Padrão
+        </button>
+        <button onclick="salvarPrecos()" class="btn-primary px-6 py-2 rounded-lg">
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Modal -->
+  <div id="modalComparar" class="modal-overlay fixed inset-0 z-[9999] hidden items-center justify-center p-4">
+    <div class="modal-content rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fadeIn">
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-cyan-500/20">
+        <h3 class="text-xl font-bold text-cyan-400">📊 Comparativo de Fundações</h3>
+        <button onclick="fecharModalComparar()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      
+      <div id="comparativo-content">
+        <!-- Comparison content will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  
+
+  <script>
+    // ==================== STATE MANAGEMENT ====================
+    const state = {
+      tipoAtual: 'sapata',
+      resultados: {},
+      historico: []
+    };
+
+    // Default prices
+    const precosPadrao = {
+      concretoSapata: 480,
+      acoSapata: 9.80,
+      formaSapata: 95,
+      escavacao: 55,
+      preMoldada: 210,
+      escavada: 170,
+      helice: 230,
+      franki: 250,
+      raiz: 320,
+      maoObra: 140,
+      mobilizacao: 3000
+    };
+
+    // Load prices from localStorage or use defaults
+    let precos = JSON.parse(localStorage.getItem('precosFundacoes')) || { ...precosPadrao };
+
+    // ==================== FOUNDATION TYPE SELECTION ====================
+    function selecionarTipo(tipo) {
+      state.tipoAtual = tipo;
+      
+      // Update button states
+      document.querySelectorAll('.tipo-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.closest('.tipo-btn').classList.add('active');
+      
+      // Show/hide forms
+      const forms = ['form-sapata', 'form-estaca', 'form-radier', 'form-tubulao'];
+      forms.forEach(formId => {
+        const form = document.getElementById(formId);
+        if (formId === `form-${tipo}`) {
+          form.classList.remove('hidden');
+          form.classList.add('animate-fadeIn');
+        } else {
+          form.classList.add('hidden');
+        }
+      });
+      
+      // Calculate for new type
+      calcular();
+    }
+
+    // ==================== SAPATA CALCULATIONS ====================
+    function calcularSapata() {
+      const carga = parseFloat(document.getElementById('carga-sapata').value) || 0;
+      const tensaoAdm = parseFloat(document.getElementById('tensao-solo').value) || 0;
+      const tipoSapata = document.getElementById('tipo-sapata').value;
+      const profundidade = parseFloat(document.getElementById('prof-sapata').value) || 0;
+      const pesoSolo = parseFloat(document.getElementById('peso-solo').value) || 0;
+      const altura = (parseFloat(document.getElementById('altura-sapata').value) || 0) / 100;
+      const fck = parseFloat(document.getElementById('fck-sapata').value) || 25;
+      const pilarA = (parseFloat(document.getElementById('pilar-a').value) || 30) / 100;
+      const pilarB = (parseFloat(document.getElementById('pilar-b').value) || 30) / 100;
+
+      if (!carga || !tensaoAdm) {
+        document.getElementById('resultado-sapata').innerHTML = `
+          <div class="alert-warning rounded-xl p-4 mt-4">
+            ⚠️ Preencha todos os campos obrigatórios
+          </div>
+        `;
+        return;
+      }
+
+      // Calculations
+      const sobrecarga = pesoSolo * profundidade;
+      const tensaoLiquida = tensaoAdm - sobrecarga;
+      const areaBase = carga / tensaoLiquida;
+
+      let largura, comprimento;
+      switch(tipoSapata) {
+        case 'quadrada':
+          largura = Math.sqrt(areaBase);
+          comprimento = largura;
+          break;
+        case 'retangular':
+          largura = Math.sqrt(areaBase / 2);
+          comprimento = largura * 2;
+          break;
+        case 'retangular-3':
+          largura = Math.sqrt(areaBase / 3);
+          comprimento = largura * 3;
+          break;
+      }
+
+      // Round up to nearest 5cm
+      largura = Math.ceil(largura * 20) / 20;
+      comprimento = Math.ceil(comprimento * 20) / 20;
+      
+      const areaReal = largura * comprimento;
+      const volumeConcreto = areaReal * altura;
+      const pesoConcretoKN = volumeConcreto * 25;
+      const cargaTotal = carga + pesoConcretoKN;
+      const tensaoReal = cargaTotal / areaReal;
+      const taxaTrabalho = (tensaoReal / tensaoAdm) * 100;
+
+      // Steel estimation (simplified)
+      const taxaAco = 30; // 30 kg/m³ para sapatas isoladas
+      const pesoAco = volumeConcreto * taxaAco;
+      
+      // Punching verification (simplified)
+      const d = altura - 0.05; // effective height
+      const perimetroCritico = 2 * (pilarA + pilarB + 4 * d);
+      const tensaoPuncao = (carga * 1000) / (perimetroCritico * d * 1000000);
+      const tensaoResistente = 0.13 * (1 + Math.sqrt(200 / (d * 1000))) * Math.pow(fck, 1/3);
+      const verificaPuncao = tensaoPuncao < tensaoResistente;
+
+      // Cost calculation
+      const volumeEscavacao = areaReal * profundidade * 1.2;
+      const areaForma = 2 * altura * (largura + comprimento);
+      
+      const custoConcreto = volumeConcreto * precos.concretoSapata;
+      const custoAco = pesoAco * precos.acoSapata;
+      const custoForma = areaForma * precos.formaSapata;
+      const custoEscavacao = volumeEscavacao * precos.escavacao;
+      const custoTotal = custoConcreto + custoAco + custoForma + custoEscavacao;
+
+      // Store results
+      state.resultados.sapata = {
+        largura, comprimento, altura, areaReal, volumeConcreto,
+        pesoAco, tensaoReal, taxaTrabalho, custoTotal, verificaPuncao
+      };
+
+      // Update diagram
+      atualizarDiagramaSapata(largura, comprimento, altura);
+
+      // Generate HTML
+      let html = `
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 animate-slideIn">
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Dimensões</div>
+            <div class="text-lg font-bold text-cyan-400">${largura.toFixed(2)} × ${comprimento.toFixed(2)} m</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Área Base</div>
+            <div class="text-lg font-bold text-cyan-400">${areaReal.toFixed(2)} m²</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Volume Concreto</div>
+            <div class="text-lg font-bold text-cyan-400">${volumeConcreto.toFixed(3)} m³</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Peso Aço</div>
+            <div class="text-lg font-bold text-cyan-400">${pesoAco.toFixed(1)} kg</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Tensão no Solo</div>
+            <div class="text-lg font-bold text-cyan-400">${tensaoReal.toFixed(1)} kN/m²</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Taxa Trabalho</div>
+            <div class="text-lg font-bold ${taxaTrabalho > 100 ? 'text-red-400' : taxaTrabalho > 85 ? 'text-yellow-400' : 'text-green-400'}">${taxaTrabalho.toFixed(1)}%</div>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="mt-4">
+          <div class="flex justify-between text-xs text-gray-400 mb-1">
+            <span>Utilização da Capacidade</span>
+            <span>${taxaTrabalho.toFixed(1)}%</span>
+          </div>
+          <div class="progress-bar h-3 rounded-full">
+            <div class="progress-fill h-full rounded-full" style="width: ${Math.min(taxaTrabalho, 100)}%"></div>
+          </div>
+        </div>
+      `;
+
+      // Alerts
+      if (taxaTrabalho > 100) {
+        html += `
+          <div class="alert-warning rounded-xl p-4 mt-4">
+            ⚠️ <strong>Atenção:</strong> Tensão excede o admissível! Aumente as dimensões ou melhore o solo.
+          </div>
+        `;
+      } else if (taxaTrabalho < 50) {
+        html += `
+          <div class="alert-info rounded-xl p-4 mt-4">
+            💡 <strong>Otimização:</strong> Sapata superdimensionada. Considere reduzir para economizar.
+          </div>
+        `;
+      }
+
+      if (!verificaPuncao) {
+        html += `
+          <div class="alert-warning rounded-xl p-4 mt-4">
+            ⚠️ <strong>Punção:</strong> Verificar armadura de punção ou aumentar altura da sapata.
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="alert-success rounded-xl p-4 mt-4">
+            ✅ <strong>Punção:</strong> Verificação OK (τ = ${tensaoPuncao.toFixed(3)} MPa < τ_R = ${tensaoResistente.toFixed(3)} MPa)
+          </div>
+        `;
+      }
+
+      // Specifications
+      html += `
+        <div class="mt-6 p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+          <h4 class="font-semibold text-cyan-400 mb-3">🔧 Especificações Técnicas</h4>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="text-gray-400">Cobrimento:</div><div>5 cm (contato com solo)</div>
+            <div class="text-gray-400">Concreto:</div><div>fck ${fck} MPa</div>
+            <div class="text-gray-400">Armadura:</div><div>Aço CA-50, Ø mín. 10mm</div>
+            <div class="text-gray-400">Espaçamento:</div><div>Máximo 20cm</div>
+            <div class="text-gray-400">Lastro:</div><div>5cm concreto magro</div>
+          </div>
+        </div>
+      `;
+
+      // Costs
+      html += `
+        <div class="mt-4 p-4 rounded-xl bg-gradient-to-r from-green-500/10 to-cyan-500/10 border border-green-500/20">
+          <h4 class="font-semibold text-green-400 mb-3">💰 Estimativa de Custos</h4>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="text-gray-400">Concreto:</div><div>R$ ${custoConcreto.toFixed(2)}</div>
+            <div class="text-gray-400">Aço:</div><div>R$ ${custoAco.toFixed(2)}</div>
+            <div class="text-gray-400">Formas:</div><div>R$ ${custoForma.toFixed(2)}</div>
+            <div class="text-gray-400">Escavação:</div><div>R$ ${custoEscavacao.toFixed(2)}</div>
+            <div class="text-gray-400 font-semibold pt-2 border-t border-gray-700">Total:</div>
+            <div class="font-bold text-green-400 pt-2 border-t border-gray-700">R$ ${custoTotal.toFixed(2)}</div>
+          </div>
+          <p class="text-xs text-gray-500 mt-3">*Valores aproximados, sem mão de obra</p>
+        </div>
+      `;
+
+      html += `
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📝</span> Memorial de Cálculo
+          </h3>
+          <pre class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE SAPATA
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS GERAIS
+Carga Total (Nk): ${cargaTotal.toFixed(2)} kN
+Tensão Admissível Solo: ${tensaoSolo.toFixed(2)} MPa
+Pilar: ${(pilarA*100).toFixed(1)}x${(pilarB*100).toFixed(1)} cm
+Fck: ${fck} MPa
+
+2. DIMENSIONAMENTO GEOMÉTRICO
+Tipo: Sapata ${tipoSapata.charAt(0).toUpperCase() + tipoSapata.slice(1)}
+Área Base Necessária: ${area.toFixed(2)} m²
+Dimensões em Planta: ${largura.toFixed(2)}m x ${comprimento.toFixed(2)}m
+Altura da Base (h0): ${(alturaBase*100).toFixed(1)} cm
+Volume de Concreto: ${volume.toFixed(2)} m³
+
+3. ARMADURAS ESTIMADAS
+Taxa de Aço Adotada: ${taxaAco.toFixed(1)} kg/m³
+Peso de Aço: ${pesoAco.toFixed(2)} kg
+
+4. VERIFICAÇÕES
+Tensão de Trabalho: ${(cargaTotal / (largura * comprimento * 1000)).toFixed(3)} MPa
+Taxa de Trabalho do Solo: ${taxaTrabalho.toFixed(2)}%
+Status: ${taxaTrabalho <= 100 ? 'OK - Atende aos critérios' : 'FALHA - Refazer dimensionamento'}</pre>
+        </div>
+      `;
+
+      document.getElementById('resultado-sapata').innerHTML = html;
+      atualizarQuickInfo('sapata', { largura, comprimento, custoTotal, taxaTrabalho });
+    }
+
+    // ==================== ESTACA CALCULATIONS ====================
+    function calcularEstaca() {
+      const cargaTotal = parseFloat(document.getElementById('carga-estaca').value) || 0;
+      const tipoEstaca = document.getElementById('tipo-estaca').value;
+      const diametro = (parseFloat(document.getElementById('diametro-estaca').value) || 0) / 100;
+      const capacidade = parseFloat(document.getElementById('capacidade-estaca').value) || 0;
+      const comprimento = parseFloat(document.getElementById('comprimento-estaca').value) || 0;
+      const fs = parseFloat(document.getElementById('fs-estaca').value) || 2;
+
+      if (!cargaTotal || !capacidade) {
+        document.getElementById('resultado-estaca').innerHTML = `
+          <div class="alert-warning rounded-xl p-4 mt-4">
+            ⚠️ Preencha todos os campos obrigatórios
+          </div>
+        `;
+        return;
+      }
+
+      const capacidadeAdm = capacidade / fs;
+      const numEstacas = Math.ceil(cargaTotal / capacidadeAdm);
+      const cargaPorEstaca = cargaTotal / numEstacas;
+      const taxaTrabalho = (cargaPorEstaca / capacidadeAdm) * 100;
+      const espacamentoMin = diametro * 100 * 3;
+
+      // Pile arrangement
+      const arranjos = {
+        1: { nome: '1 estaca central', layout: '●' },
+        2: { nome: '2 estacas em linha', layout: '● ●' },
+        3: { nome: '3 estacas triangular', layout: '●\n● ●' },
+        4: { nome: '4 estacas (2×2)', layout: '● ●\n● ●' },
+        5: { nome: '5 estacas (quincôncio)', layout: '● ● ●\n  ● ●' },
+        6: { nome: '6 estacas (2×3)', layout: '● ● ●\n● ● ●' }
+      };
+      const arranjo = arranjos[Math.min(numEstacas, 6)] || { nome: `${numEstacas} estacas`, layout: '' };
+
+      // Costs per meter
+      const custosPorMetro = {
+        'pre-moldada': precos.preMoldada,
+        'escavada': precos.escavada,
+        'helice': precos.helice,
+        'franki': precos.franki,
+        'raiz': precos.raiz
+      };
+      const custoPorMetro = custosPorMetro[tipoEstaca];
+      const custoTotal = custoPorMetro * comprimento * numEstacas + precos.mobilizacao;
+
+      // Pile type characteristics
+      const caracteristicas = {
+        'pre-moldada': { nome: 'Pré-moldada', icon: '🏗️', vantagens: ['Alta capacidade', 'Controle de qualidade', 'Rapidez'], cuidados: ['Equipamento pesado', 'Vibração', 'Transporte'] },
+        'escavada': { nome: 'Escavada (Strauss)', icon: '🕳️', vantagens: ['Sem vibração', 'Equipamento leve', 'Econômica'], cuidados: ['Nível d\'água', 'Controle concretagem'] },
+        'helice': { nome: 'Hélice Contínua', icon: '🌀', vantagens: ['Alta produtividade', 'Monitoramento', 'Sem vibração'], cuidados: ['Solo muito mole', 'Custo equipamento'] },
+        'franki': { nome: 'Franki', icon: '🔨', vantagens: ['Alta capacidade', 'Base alargada'], cuidados: ['Vibração intensa', 'Ruído'] },
+        'raiz': { nome: 'Raiz', icon: '🌱', vantagens: ['Locais confinados', 'Versatilidade'], cuidados: ['Alto custo', 'Baixa produtividade'] }
+      };
+      const info = caracteristicas[tipoEstaca];
+
+      // Store results
+      state.resultados.estaca = { numEstacas, comprimento, cargaPorEstaca, taxaTrabalho, custoTotal };
+
+      // Update diagram
+      atualizarDiagramaEstaca(numEstacas, diametro * 100, comprimento);
+
+      let html = `
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 animate-slideIn">
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Tipo</div>
+            <div class="text-lg font-bold text-cyan-400">${info.icon} ${info.nome}</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Quantidade</div>
+            <div class="text-lg font-bold text-cyan-400">${numEstacas} un</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Carga/Estaca</div>
+            <div class="text-lg font-bold text-cyan-400">${cargaPorEstaca.toFixed(1)} kN</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Taxa Trabalho</div>
+            <div class="text-lg font-bold ${taxaTrabalho > 95 ? 'text-yellow-400' : 'text-green-400'}">${taxaTrabalho.toFixed(1)}%</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Comprimento Total</div>
+            <div class="text-lg font-bold text-cyan-400">${(comprimento * numEstacas).toFixed(1)} m</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Espaç. Mínimo</div>
+            <div class="text-lg font-bold text-cyan-400">${espacamentoMin.toFixed(0)} cm</div>
+          </div>
+        </div>
+
+        <div class="alert-info rounded-xl p-4 mt-4">
+          <strong>Arranjo Sugerido:</strong> ${arranjo.nome}
+          ${arranjo.layout ? `<pre class="mt-2 text-center text-2xl">${arranjo.layout}</pre>` : ''}
+        </div>
+      `;
+
+      // Vantagens e cuidados
+      html += `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div class="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+            <h4 class="font-semibold text-green-400 mb-2">✅ Vantagens</h4>
+            <ul class="text-sm space-y-1">
+              ${info.vantagens.map(v => `<li>• ${v}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20">
+            <h4 class="font-semibold text-orange-400 mb-2">⚠️ Cuidados</h4>
+            <ul class="text-sm space-y-1">
+              ${info.cuidados.map(c => `<li>• ${c}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+
+      // Costs
+      html += `
+        <div class="mt-4 p-4 rounded-xl bg-gradient-to-r from-green-500/10 to-cyan-500/10 border border-green-500/20">
+          <h4 class="font-semibold text-green-400 mb-3">💰 Estimativa de Custos</h4>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="text-gray-400">Custo/Metro:</div><div>R$ ${custoPorMetro.toFixed(2)}/m</div>
+            <div class="text-gray-400">Custo/Estaca:</div><div>R$ ${(custoPorMetro * comprimento).toFixed(2)}</div>
+            <div class="text-gray-400">Mobilização:</div><div>R$ ${precos.mobilizacao.toFixed(2)}</div>
+            <div class="text-gray-400 font-semibold pt-2 border-t border-gray-700">Total:</div>
+            <div class="font-bold text-green-400 pt-2 border-t border-gray-700">R$ ${custoTotal.toFixed(2)}</div>
+          </div>
+        </div>
+      `;
+
+      // Next steps
+      html += `
+        <div class="mt-4 p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+          <h4 class="font-semibold text-cyan-400 mb-3">📋 Próximos Passos</h4>
+          <ol class="text-sm space-y-2">
+            <li class="flex items-start gap-2"><span class="text-cyan-400">1.</span> Realizar sondagem SPT do terreno</li>
+            <li class="flex items-start gap-2"><span class="text-cyan-400">2.</span> Projeto estrutural do bloco de coroamento</li>
+            <li class="flex items-start gap-2"><span class="text-cyan-400">3.</span> Prova de carga (mín. 1% das estacas)</li>
+            <li class="flex items-start gap-2"><span class="text-cyan-400">4.</span> Monitoramento durante execução</li>
+          </ol>
+        </div>
+      `;
+
+      html += `
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📝</span> Memorial de Cálculo
+          </h3>
+          <pre class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE ESTACAS
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS GERAIS
+Carga Total a Transferir: ${cargaTotal.toFixed(2)} kN
+Tipo de Estaca: ${tipoEstaca.toUpperCase().replace('-', ' ')}
+Diâmetro Adotado: ${(diametro*100).toFixed(1)} cm
+Comprimento Útil: ${comprimento.toFixed(2)} m
+Capacidade Estrutural (Nominal): ${capacidade.toFixed(2)} kN
+Fator de Segurança (FS): ${fs.toFixed(2)}
+
+2. DIMENSIONAMENTO
+Capacidade de Carga Adotada (FS): ${capacidadeAdm.toFixed(2)} kN
+Número de Estacas Calculado: ${numEstacas} unidade(s)
+Carga Máxima por Estaca: ${cargaPorEstaca.toFixed(2)} kN
+Taxa de Trabalho: ${taxaTrabalho.toFixed(2)}%
+
+3. VOLUMES E CONSUMOS (Totais)
+Volume de Concreto: ${(Math.PI * Math.pow(diametro/2, 2) * comprimento * numEstacas).toFixed(2)} m³
+Peso Estimado de Aço: ${(Math.PI * Math.pow(diametro/2, 2) * comprimento * numEstacas * 80).toFixed(2)} kg
+
+4. VERIFICAÇÕES
+Status: ${taxaTrabalho <= 100 ? 'OK - Atende aos critérios' : 'FALHA - Excede capacidade'}</pre>
+        </div>
+      `;
+
+      document.getElementById('resultado-estaca').innerHTML = html;
+      atualizarQuickInfo('estaca', { numEstacas, comprimento, custoTotal, taxaTrabalho });
+    }
+
+    // ==================== RADIER CALCULATIONS ====================
+    function calcularRadier() {
+      const carga = parseFloat(document.getElementById('carga-radier').value) || 0;
+      const tensaoAdm = parseFloat(document.getElementById('tensao-radier').value) || 0;
+      const comprimento = parseFloat(document.getElementById('comprimento-radier').value) || 0;
+      const largura = parseFloat(document.getElementById('largura-radier').value) || 0;
+      const altura = (parseFloat(document.getElementById('altura-radier').value) || 0) / 100;
+      const numPilares = parseFloat(document.getElementById('pilares-radier').value) || 0;
+
+      if (!carga || !comprimento || !largura) {
+        document.getElementById('resultado-radier').innerHTML = `
+          <div class="alert-warning rounded-xl p-4 mt-4">
+            ⚠️ Preencha todos os campos obrigatórios
+          </div>
+        `;
+        return;
+      }
+
+      const area = comprimento * largura;
+      const volumeConcreto = area * altura;
+      const pesoProprio = volumeConcreto * 25;
+      const cargaTotal = carga + pesoProprio;
+      const tensaoReal = cargaTotal / area;
+      const taxaTrabalho = (tensaoReal / tensaoAdm) * 100;
+      const pesoAco = volumeConcreto * 100; // ~100kg/m³ para radier
+
+      // Costs
+      const custoConcreto = volumeConcreto * precos.concretoSapata;
+      const custoAco = pesoAco * precos.acoSapata;
+      const custoForma = (comprimento + largura) * 2 * altura * precos.formaSapata;
+      const custoTotal = custoConcreto + custoAco + custoForma;
+
+      state.resultados.radier = { area, volumeConcreto, tensaoReal, taxaTrabalho, custoTotal };
+
+      atualizarDiagramaRadier(comprimento, largura, numPilares);
+
+      let html = `
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 animate-slideIn">
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Área</div>
+            <div class="text-lg font-bold text-cyan-400">${area.toFixed(1)} m²</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Volume Concreto</div>
+            <div class="text-lg font-bold text-cyan-400">${volumeConcreto.toFixed(2)} m³</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Tensão no Solo</div>
+            <div class="text-lg font-bold text-cyan-400">${tensaoReal.toFixed(1)} kN/m²</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Taxa Trabalho</div>
+            <div class="text-lg font-bold ${taxaTrabalho > 100 ? 'text-red-400' : 'text-green-400'}">${taxaTrabalho.toFixed(1)}%</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Peso Aço</div>
+            <div class="text-lg font-bold text-cyan-400">${pesoAco.toFixed(0)} kg</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Custo Total</div>
+            <div class="text-lg font-bold text-green-400">R$ ${custoTotal.toFixed(0)}</div>
+          </div>
+        </div>
+
+        ${taxaTrabalho > 100 ? `
+          <div class="alert-warning rounded-xl p-4 mt-4">
+            ⚠️ <strong>Atenção:</strong> Tensão excede o admissível! Aumente a área ou melhore o solo.
+          </div>
+        ` : ''}
+
+        <div class="mt-4 p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+          <h4 class="font-semibold text-cyan-400 mb-3">🔧 Recomendações</h4>
+          <ul class="text-sm space-y-1">
+            <li>• Malha dupla de aço (superior e inferior)</li>
+            <li>• Armadura de bordas reforçada</li>
+            <li>• Sub-base compactada (brita graduada)</li>
+            <li>• Lona plástica como barreira de umidade</li>
+          </ul>
+        </div>
+      `;
+
+      html += `
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📝</span> Memorial de Cálculo
+          </h3>
+          <pre class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE RADIER
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS GERAIS
+Carga Total (Nk): ${carga.toFixed(2)} kN
+Tensão Admissível Solo: ${tensaoAdm.toFixed(2)} MPa
+Número de Pilares: ${numPilares}
+
+2. DIMENSIONAMENTO GEOMÉTRICO
+Comprimento: ${comprimento.toFixed(2)} m
+Largura: ${largura.toFixed(2)} m
+Área da Placa: ${area.toFixed(2)} m²
+Espessura (Altura): ${(altura*100).toFixed(1)} cm
+Volume de Concreto: ${volume.toFixed(2)} m³
+
+3. ARMADURAS ESTIMADAS
+Peso de Aço: ${pesoAco.toFixed(2)} kg
+
+4. VERIFICAÇÕES
+Tensão de Trabalho Média: ${tensaoReal.toFixed(4)} MPa
+Taxa de Trabalho do Solo: ${taxaTrabalho.toFixed(2)}%
+Status: ${taxaTrabalho <= 100 ? 'OK - Atende aos critérios' : 'FALHA - Aumentar área ou espessura'}</pre>
+        </div>
+      `;
+
+      document.getElementById('resultado-radier').innerHTML = html;
+    }
+
+    // ==================== TUBULÃO CALCULATIONS ====================
+    function calcularTubulao() {
+      const carga = parseFloat(document.getElementById('carga-tubulao').value) || 0;
+      const tipo = document.getElementById('tipo-tubulao').value;
+      const dFuste = (parseFloat(document.getElementById('diametro-fuste').value) || 0) / 100;
+      const dBase = (parseFloat(document.getElementById('diametro-base').value) || 0) / 100;
+      const prof = parseFloat(document.getElementById('prof-tubulao').value) || 0;
+      const tensaoAdm = parseFloat(document.getElementById('tensao-tubulao').value) || 0;
+
+      if (!carga || !dBase || !prof) {
+        document.getElementById('resultado-tubulao').innerHTML = `
+          <div class="alert-warning rounded-xl p-4 mt-4">
+            ⚠️ Preencha todos os campos obrigatórios
+          </div>
+        `;
+        return;
+      }
+
+      const areaBase = Math.PI * Math.pow(dBase / 2, 2);
+      const capacidade = areaBase * tensaoAdm;
+      const fs = capacidade / carga;
+      const volumeFuste = Math.PI * Math.pow(dFuste / 2, 2) * (prof - 1);
+      const volumeBase = (Math.PI / 3) * 1 * (Math.pow(dBase / 2, 2) + (dBase / 2) * (dFuste / 2) + Math.pow(dFuste / 2, 2));
+      const volumeTotal = volumeFuste + volumeBase;
+
+      const custoConcreto = volumeTotal * precos.concretoSapata;
+      const custoEscavacao = volumeTotal * 200;
+      const custoTotal = custoConcreto + custoEscavacao + precos.mobilizacao;
+
+      state.resultados.tubulao = { dFuste, dBase, prof, capacidade, fs, volumeTotal, custoTotal };
+
+      atualizarDiagramaTubulao(dFuste * 100, dBase * 100, prof);
+
+      let html = `
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 animate-slideIn">
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Tipo</div>
+            <div class="text-lg font-bold text-cyan-400">${tipo === 'ceu-aberto' ? '☀️ Céu Aberto' : '💨 Ar Comprimido'}</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Área Base</div>
+            <div class="text-lg font-bold text-cyan-400">${areaBase.toFixed(2)} m²</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Capacidade</div>
+            <div class="text-lg font-bold text-cyan-400">${capacidade.toFixed(0)} kN</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Fator Segurança</div>
+            <div class="text-lg font-bold ${fs < 2 ? 'text-red-400' : fs < 3 ? 'text-yellow-400' : 'text-green-400'}">${fs.toFixed(2)}</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Volume Concreto</div>
+            <div class="text-lg font-bold text-cyan-400">${volumeTotal.toFixed(2)} m³</div>
+          </div>
+          <div class="spec-item rounded-xl p-4">
+            <div class="text-xs text-gray-400 mb-1">Custo Total</div>
+            <div class="text-lg font-bold text-green-400">R$ ${custoTotal.toFixed(0)}</div>
+          </div>
+        </div>
+
+        ${fs < 2 ? `
+          <div class="alert-warning rounded-xl p-4 mt-4">
+            ⚠️ <strong>Atenção:</strong> Fator de segurança insuficiente! Aumente o diâmetro da base.
+          </div>
+        ` : ''}
+      `;
+
+      html += `
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📝</span> Memorial de Cálculo
+          </h3>
+          <pre class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE TUBULÃO
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS GERAIS
+Carga Total (Nk): ${carga.toFixed(2)} kN
+Tipo: Tubulão ${tipo === 'ceu-aberto' ? 'a Céu Aberto' : 'Ar Comprimido'}
+Tensão Admissível Solo (Base): ${tensaoAdm.toFixed(2)} MPa
+Profundidade Total: ${prof.toFixed(2)} m
+
+2. DIMENSIONAMENTO GEOMÉTRICO
+Diâmetro do Fuste: ${(dFuste*100).toFixed(1)} cm
+Diâmetro da Base Alargada: ${(dBase*100).toFixed(1)} cm
+Área da Base Adotada: ${areaBase.toFixed(2)} m²
+
+3. VOLUMES (Concreto Simples)
+Volume do Fuste: ${volumeFuste.toFixed(2)} m³
+Volume da Base: ${volumeBase.toFixed(2)} m³
+Volume Total: ${volumeTotal.toFixed(2)} m³
+
+4. VERIFICAÇÕES
+Tensão de Trabalho Média: ${(carga/areaBase).toFixed(4)} MPa
+Fator de Segurança (FS): ${fs.toFixed(2)}
+Status: ${fs >= 2 ? 'OK - Atende aos critérios' : 'FALHA - Aumentar base ou verificar viabilidade'}</pre>
+        </div>
+      `;
+
+      document.getElementById('resultado-tubulao').innerHTML = html;
+    }
+
+    // ==================== DIAGRAM FUNCTIONS ====================
+    function atualizarDiagramaSapata(largura, comprimento, altura) {
+      const svg = document.getElementById('diagram-svg');
+      const scale = 150 / Math.max(largura, comprimento);
+      const w = largura * scale;
+      const h = comprimento * scale;
+      const hAltura = altura * scale * 2;
+      
+      svg.innerHTML = `
+        <!-- Solo -->
+        <rect x="10" y="130" width="180" height="60" fill="url(#soloGrad)" />
+        
+        <!-- Sapata 3D effect -->
+        <polygon points="${100-w/2},${130-hAltura} ${100+w/2},${130-hAltura} ${100+w/2+10},${130-hAltura+10} ${100-w/2+10},${130-hAltura+10}" fill="#0ea5e9" opacity="0.5"/>
+        <polygon points="${100+w/2},${130-hAltura} ${100+w/2},130 ${100+w/2+10},${130+10} ${100+w/2+10},${130-hAltura+10}" fill="#0284c7" opacity="0.5"/>
+        
+        <!-- Sapata front -->
+        <rect x="${100-w/2}" y="${130-hAltura}" width="${w}" height="${hAltura}" fill="url(#concretoGrad)" stroke="#00ffff" stroke-width="2"/>
+        
+        <!-- Pilar -->
+        <rect x="85" y="${80-hAltura}" width="30" height="${50}" fill="url(#concretoGrad)" stroke="#00ffff" stroke-width="1.5"/>
+        
+        <!-- Dimensões -->
+        <line x1="${100-w/2}" y1="150" x2="${100+w/2}" y2="150" stroke="#00ffff" stroke-width="1" stroke-dasharray="3"/>
+        <text x="100" y="165" text-anchor="middle" fill="#00ffff" font-size="11">${largura.toFixed(2)}m</text>
+        
+        <!-- Gradients -->
+        <defs>
+          <linearGradient id="concretoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#334155"/>
+            <stop offset="100%" style="stop-color:#1e293b"/>
+          </linearGradient>
+          <linearGradient id="soloGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#78350f"/>
+            <stop offset="100%" style="stop-color:#451a03"/>
+          </linearGradient>
+        </defs>
+      `;
+    }
+
+    function atualizarDiagramaEstaca(num, diametro, comprimento) {
+      const svg = document.getElementById('diagram-svg');
+      const positions = [
+        [[100, 100]],
+        [[70, 100], [130, 100]],
+        [[100, 70], [70, 130], [130, 130]],
+        [[70, 70], [130, 70], [70, 130], [130, 130]],
+        [[60, 70], [100, 70], [140, 70], [80, 130], [120, 130]],
+        [[60, 70], [100, 70], [140, 70], [60, 130], [100, 130], [140, 130]]
+      ];
+      
+      const pos = positions[Math.min(num, 6) - 1] || positions[5];
+      const r = Math.min(diametro / 5, 15);
+      
+      svg.innerHTML = `
+        <!-- Bloco -->
+        <rect x="40" y="40" width="120" height="120" rx="8" fill="url(#blocoGrad)" stroke="#00ffff" stroke-width="2"/>
+        
+        <!-- Estacas -->
+        ${pos.map(([x, y]) => `
+          <circle cx="${x}" cy="${y}" r="${r}" fill="url(#estacaGrad)" stroke="#8b5cf6" stroke-width="2"/>
+          <circle cx="${x}" cy="${y}" r="${r/3}" fill="#1e1b4b"/>
+        `).join('')}
+        
+        <!-- Info -->
+        <text x="100" y="185" text-anchor="middle" fill="#00ffff" font-size="11">${num} estacas × ${comprimento}m</text>
+        
+        <defs>
+          <linearGradient id="blocoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#334155"/>
+            <stop offset="100%" style="stop-color:#1e293b"/>
+          </linearGradient>
+          <radialGradient id="estacaGrad">
+            <stop offset="0%" style="stop-color:#6366f1"/>
+            <stop offset="100%" style="stop-color:#4338ca"/>
+          </radialGradient>
+        </defs>
+      `;
+    }
+
+    function atualizarDiagramaRadier(comp, larg, pilares) {
+      const svg = document.getElementById('diagram-svg');
+      const scale = 150 / Math.max(comp, larg);
+      const w = larg * scale;
+      const h = comp * scale;
+      
+      svg.innerHTML = `
+        <rect x="${100-w/2}" y="${100-h/2}" width="${w}" height="${h}" rx="4" fill="url(#concretoGrad)" stroke="#00ffff" stroke-width="2"/>
+        ${Array(Math.min(pilares, 9)).fill().map((_, i) => {
+          const cols = Math.ceil(Math.sqrt(pilares));
+          const rows = Math.ceil(pilares / cols);
+          const x = 100 - w/2 + 20 + (i % cols) * ((w - 40) / (cols - 1 || 1));
+          const y = 100 - h/2 + 20 + Math.floor(i / cols) * ((h - 40) / (rows - 1 || 1));
+          return `<rect x="${x-8}" y="${y-8}" width="16" height="16" fill="#8b5cf6" stroke="#00ffff" stroke-width="1"/>`;
+        }).join('')}
+        <text x="100" y="185" text-anchor="middle" fill="#00ffff" font-size="11">${larg.toFixed(1)}m × ${comp.toFixed(1)}m</text>
+        <defs>
+          <linearGradient id="concretoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#334155"/>
+            <stop offset="100%" style="stop-color:#1e293b"/>
+          </linearGradient>
+        </defs>
+      `;
+    }
+
+    function atualizarDiagramaTubulao(dFuste, dBase, prof) {
+      const svg = document.getElementById('diagram-svg');
+      const scale = 100 / dBase;
+      const wFuste = dFuste * scale;
+      const wBase = dBase * scale;
+      
+      svg.innerHTML = `
+        <!-- Solo -->
+        <rect x="10" y="60" width="180" height="130" fill="url(#soloGrad)"/>
+        
+        <!-- Fuste -->
+        <rect x="${100-wFuste/2}" y="30" width="${wFuste}" height="100" fill="url(#concretoGrad)" stroke="#00ffff" stroke-width="2"/>
+        
+        <!-- Base -->
+        <polygon points="${100-wFuste/2},130 ${100+wFuste/2},130 ${100+wBase/2},160 ${100-wBase/2},160" fill="url(#concretoGrad)" stroke="#00ffff" stroke-width="2"/>
+        
+        <!-- Dimensões -->
+        <text x="100" y="185" text-anchor="middle" fill="#00ffff" font-size="10">Ø${dFuste}/${dBase}cm × ${prof}m</text>
+        
+        <defs>
+          <linearGradient id="concretoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#334155"/>
+            <stop offset="100%" style="stop-color:#1e293b"/>
+          </linearGradient>
+          <linearGradient id="soloGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#78350f"/>
+            <stop offset="100%" style="stop-color:#451a03"/>
+          </linearGradient>
+        </defs>
+      `;
+    }
+
+    // ==================== QUICK INFO ====================
+    function atualizarQuickInfo(tipo, dados) {
+      const container = document.getElementById('quick-info');
+      let html = '';
+      
+      if (tipo === 'sapata') {
+        html = `
+          <div class="flex justify-between text-sm py-2 border-b border-gray-700">
+            <span class="text-gray-400">Dimensões:</span>
+            <span class="text-cyan-400 font-semibold">${dados.largura.toFixed(2)} × ${dados.comprimento.toFixed(2)}m</span>
+          </div>
+          <div class="flex justify-between text-sm py-2 border-b border-gray-700">
+            <span class="text-gray-400">Utilização:</span>
+            <span class="${dados.taxaTrabalho > 100 ? 'text-red-400' : 'text-green-400'} font-semibold">${dados.taxaTrabalho.toFixed(1)}%</span>
+          </div>
+          <div class="flex justify-between text-sm py-2">
+            <span class="text-gray-400">Custo Est.:</span>
+            <span class="text-green-400 font-semibold">R$ ${dados.custoTotal.toFixed(0)}</span>
+          </div>
+        `;
+      } else if (tipo === 'estaca') {
+        html = `
+          <div class="flex justify-between text-sm py-2 border-b border-gray-700">
+            <span class="text-gray-400">Quantidade:</span>
+            <span class="text-cyan-400 font-semibold">${dados.numEstacas} × ${dados.comprimento}m</span>
+          </div>
+          <div class="flex justify-between text-sm py-2 border-b border-gray-700">
+            <span class="text-gray-400">Utilização:</span>
+            <span class="${dados.taxaTrabalho > 95 ? 'text-yellow-400' : 'text-green-400'} font-semibold">${dados.taxaTrabalho.toFixed(1)}%</span>
+          </div>
+          <div class="flex justify-between text-sm py-2">
+            <span class="text-gray-400">Custo Est.:</span>
+            <span class="text-green-400 font-semibold">R$ ${dados.custoTotal.toFixed(0)}</span>
+          </div>
+        `;
+      }
+      
+      container.innerHTML = html;
+    }
+
+    // ==================== MAIN CALCULATE FUNCTION ====================
+    function calcular() {
+      switch(state.tipoAtual) {
+        case 'sapata': calcularSapata(); break;
+        case 'estaca': calcularEstaca(); break;
+        case 'radier': calcularRadier(); break;
+        case 'tubulao': calcularTubulao(); break;
+      }
+    }
+
+    // ==================== RESET ====================
+    function resetar() {
+      const defaults = {
+        sapata: { 'carga-sapata': 500, 'tensao-solo': 200, 'prof-sapata': 1.5, 'peso-solo': 18, 'altura-sapata': 40, 'pilar-a': 30, 'pilar-b': 30 },
+        estaca: { 'carga-estaca': 2000, 'diametro-estaca': 30, 'capacidade-estaca': 300, 'comprimento-estaca': 12, 'fs-estaca': 2.0 },
+        radier: { 'carga-radier': 5000, 'tensao-radier': 150, 'comprimento-radier': 12, 'largura-radier': 8, 'altura-radier': 30, 'pilares-radier': 6 },
+        tubulao: { 'carga-tubulao': 1500, 'diametro-fuste': 80, 'diametro-base': 160, 'prof-tubulao': 8, 'tensao-tubulao': 500 }
+      };
+      
+      const valores = defaults[state.tipoAtual];
+      Object.entries(valores).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+      });
+      
+      document.getElementById(`resultado-${state.tipoAtual}`).innerHTML = '';
+      document.getElementById('quick-info').innerHTML = '';
+      calcular();
+    }
+
+    // ==================== PRICE MODAL ====================
+    function abrirModalPrecos() {
+      document.getElementById('preco-concreto-sapata').value = precos.concretoSapata;
+      document.getElementById('preco-aco-sapata').value = precos.acoSapata;
+      document.getElementById('preco-forma-sapata').value = precos.formaSapata;
+      document.getElementById('preco-escavacao').value = precos.escavacao;
+      document.getElementById('preco-pre-moldada').value = precos.preMoldada;
+      document.getElementById('preco-escavada').value = precos.escavada;
+      document.getElementById('preco-helice').value = precos.helice;
+      document.getElementById('preco-franki').value = precos.franki;
+      document.getElementById('preco-raiz').value = precos.raiz;
+      document.getElementById('preco-mao-obra').value = precos.maoObra;
+      document.getElementById('preco-mobilizacao').value = precos.mobilizacao;
+      
+      document.getElementById('modalPrecos').classList.remove('hidden');
+      document.getElementById('modalPrecos').classList.add('flex');
+    }
+
+    function fecharModalPrecos() {
+      document.getElementById('modalPrecos').classList.add('hidden');
+      document.getElementById('modalPrecos').classList.remove('flex');
+    }
+
+    function switchPriceTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.getElementById('tab-sapatas').classList.add('hidden');
+      document.getElementById('tab-estacas').classList.add('hidden');
+      document.getElementById('tab-outros').classList.add('hidden');
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+    }
+
+    function salvarPrecos() {
+      precos = {
+        concretoSapata: parseFloat(document.getElementById('preco-concreto-sapata').value) || 450,
+        acoSapata: parseFloat(document.getElementById('preco-aco-sapata').value) || 8,
+        formaSapata: parseFloat(document.getElementById('preco-forma-sapata').value) || 50,
+        escavacao: parseFloat(document.getElementById('preco-escavacao').value) || 45,
+        preMoldada: parseFloat(document.getElementById('preco-pre-moldada').value) || 180,
+        escavada: parseFloat(document.getElementById('preco-escavada').value) || 150,
+        helice: parseFloat(document.getElementById('preco-helice').value) || 200,
+        franki: parseFloat(document.getElementById('preco-franki').value) || 220,
+        raiz: parseFloat(document.getElementById('preco-raiz').value) || 280,
+        maoObra: parseFloat(document.getElementById('preco-mao-obra').value) || 120,
+        mobilizacao: parseFloat(document.getElementById('preco-mobilizacao').value) || 2500
+      };
+      
+      localStorage.setItem('precosFundacoes', JSON.stringify(precos));
+      fecharModalPrecos();
+      calcular();
+      
+      // Visual feedback
+      const btn = document.getElementById('btnConfigurarPrecos');
+      const original = btn.innerHTML;
+      btn.innerHTML = '✓ Salvo!';
+      btn.classList.add('!border-green-500', '!text-green-500');
+      setTimeout(() => {
+        btn.innerHTML = original;
+        btn.classList.remove('!border-green-500', '!text-green-500');
+      }, 2000);
+    }
+
+    function restaurarPrecos() {
+      if (confirm('Restaurar todos os preços para os valores padrão?')) {
+        precos = { ...precosPadrao };
+        localStorage.setItem('precosFundacoes', JSON.stringify(precos));
+        abrirModalPrecos();
+      }
+    }
+
+    // ==================== COMPARISON MODAL ====================
+    function abrirModalComparar() {
+      const carga = parseFloat(document.getElementById('carga-sapata').value) || 
+                   parseFloat(document.getElementById('carga-estaca').value) || 1000;
+      
+      const comparacoes = [
+        { tipo: 'Sapata Isolada', custo: Math.random() * 5000 + 3000, tempo: '3-5 dias', indicacao: 'Cargas leves, solo bom' },
+        { tipo: 'Estaca Pré-moldada', custo: Math.random() * 8000 + 5000, tempo: '5-7 dias', indicacao: 'Cargas médias/altas' },
+        { tipo: 'Estaca Hélice', custo: Math.random() * 10000 + 7000, tempo: '4-6 dias', indicacao: 'Produtividade alta' },
+        { tipo: 'Radier', custo: Math.random() * 15000 + 10000, tempo: '7-10 dias', indicacao: 'Múltiplos pilares' },
+        { tipo: 'Tubulão', custo: Math.random() * 12000 + 8000, tempo: '5-8 dias', indicacao: 'Cargas altas, solo firme' }
+      ];
+      
+      const maxCusto = Math.max(...comparacoes.map(c => c.custo));
+      
+      let html = `
+        <div class="space-y-4">
+          <p class="text-gray-400 text-sm mb-4">Comparativo estimado para carga de ${carga} kN:</p>
+          ${comparacoes.map(c => `
+            <div class="p-4 rounded-xl bg-black/30 border border-cyan-500/10">
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-semibold">${c.tipo}</span>
+                <span class="text-green-400 font-bold">R$ ${c.custo.toFixed(0)}</span>
+              </div>
+              <div class="progress-bar h-2 rounded-full mb-2">
+                <div class="progress-fill h-full rounded-full" style="width: ${(c.custo / maxCusto * 100)}%"></div>
+              </div>
+              <div class="flex justify-between text-xs text-gray-400">
+                <span>⏱️ ${c.tempo}</span>
+                <span>📋 ${c.indicacao}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <p class="text-xs text-gray-500 mt-4">*Valores ilustrativos. Consulte orçamento detalhado.</p>
+      `;
+      
+      document.getElementById('comparativo-content').innerHTML = html;
+      document.getElementById('modalComparar').classList.remove('hidden');
+      document.getElementById('modalComparar').classList.add('flex');
+    }
+
+    function fecharModalComparar() {
+      document.getElementById('modalComparar').classList.add('hidden');
+      document.getElementById('modalComparar').classList.remove('flex');
+    }
+
+    // ==================== EXPORT ====================
+    function exportarPDF() {
+      window.print();
+    }
+
+    // ==================== THEME TOGGLE ====================
+    function toggleDarkMode() {
+      document.body.classList.toggle('light-mode');
+      const btn = document.getElementById('themeToggle');
+      btn.textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙';
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    document.getElementById('btnCalcular').addEventListener('click', calcular);
+    document.getElementById('btnReset').addEventListener('click', resetar);
+    document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+    document.getElementById('btnComparar').addEventListener('click', abrirModalComparar);
+
+    // Auto-calculate on input change
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', calcular);
+    });
+
+    // Close modals on outside click
+    document.getElementById('modalPrecos').addEventListener('click', (e) => {
+      if (e.target.id === 'modalPrecos') fecharModalPrecos();
+    });
+    document.getElementById('modalComparar').addEventListener('click', (e) => {
+      if (e.target.id === 'modalComparar') fecharModalComparar();
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        fecharModalPrecos();
+        fecharModalComparar();
+      }
+      if (e.ctrlKey && e.key === 'Enter') calcular();
+    });
+
+    // ==================== INITIALIZATION ====================
+    
+    calcular();
+  </script>
+
+    <!-- Footer -->
+    
+    
+
+    
+
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
