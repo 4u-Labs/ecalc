@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Muros de Arrimo e Contenções | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
+            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', orange: '#ff8800' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ff8800, #ff00ff); border-radius: 4px; }
+    
+    .text-glow { text-shadow: 0 0 20px rgba(255, 136, 0, 0.5); }
+    
+    .gradient-border {
+      position: relative;
+      background: #12121a;
+      border-radius: 16px;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ff8800, #ff00ff, #ff8800);
+      background-size: 300% 300%;
+      animation: gradientMove 8s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 136, 0, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(255, 136, 0, 0.6); }
+    }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      border-color: #ff8800;
+      box-shadow: 0 0 15px rgba(255, 136, 0, 0.2);
+      outline: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff8800 0%, #ff00ff 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 136, 0, 0.4);
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      border-color: #ff8800;
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-100">
+  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-orange to-neon-magenta flex items-center justify-center font-bold text-dark-900 text-xl">
+          🧱
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold text-white">Muros de Arrimo</h1>
+          <p class="text-xs text-gray-500">Empuxo e Estabilidade ao Tombamento</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-1 space-y-6">
+        <div class="gradient-border p-6">
+          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+            <span class="text-neon-orange">●</span> Geometria e Solo
+          </h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Altura do Muro (H - m)</label>
+              <input type="number" id="altura" value="3.0" min="0.5" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Largura da Base (B - m)</label>
+              <input type="number" id="base" value="1.5" min="0.3" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Material do Muro</label>
+              <select id="matMuro" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+                <option value="25">Concreto Armado (25 kN/m³)</option>
+                <option value="24" selected>Concreto Ciclópico (24 kN/m³)</option>
+                <option value="22">Alvenaria Estrutural Cheia (22 kN/m³)</option>
+                <option value="17">Gabião de Pedra (17 kN/m³)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Tipo de Solo (Retido)</label>
+              <select id="tipoSolo" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+                <option value="30,18">Areia / Solo Granular (φ=30º, γ=18 kN/m³)</option>
+                <option value="35,19">Areia Densa (φ=35º, γ=19 kN/m³)</option>
+                <option value="25,17">Argila Arenosa (φ=25º, γ=17 kN/m³)</option>
+                <option value="20,16">Argila Mole (φ=20º, γ=16 kN/m³)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Coeficiente de Atrito Base-Solo (µ)</label>
+              <input type="number" id="atrito" value="0.5" min="0.1" max="0.8" step="0.05" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+            <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 mt-4">
+              Analisar Estabilidade
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 space-y-6">
+        <div id="resultadoSection" class="gradient-border p-8 text-center opacity-50 transition-opacity duration-500">
+          <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Fator de Segurança ao Tombamento</div>
+          <div id="valFS" class="text-5xl md:text-6xl font-bold text-neon-orange text-glow mb-2">0.00</div>
+          <div id="statusFS" class="text-xl mb-4 font-semibold text-gray-300">-</div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Empuxo Ativo (Ea)</div>
+              <div id="valEa" class="text-xl font-semibold text-neon-orange">0 kN/m</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Peso do Muro (W)</div>
+              <div id="valW" class="text-xl font-semibold text-neon-magenta">0 kN/m</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Momento Tombador</div>
+              <div id="valMt" class="text-xl font-semibold text-neon-orange">0 kN.m/m</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Momento Resistente</div>
+              <div id="valMr" class="text-xl font-semibold text-neon-magenta">0 kN.m/m</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gradient-border p-6">
+          <h3 class="text-lg font-semibold mb-4 text-white">📝 Memorial de Cálculo Analítico (Rankine / Gravidade)</h3>
+          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
+    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    function calcularEstabilidade() {
+      const h = parseFloat($('altura').value) || 0;
+      const b = parseFloat($('base').value) || 0;
+      
+      const gamaMuro = parseFloat($('matMuro').value) || 24; // kN/m³
+      const soloParams = $('tipoSolo').value.split(',');
+      const phiDeg = parseFloat(soloParams[0]);
+      const gamaSolo = parseFloat(soloParams[1]); // kN/m³
+      const mu = parseFloat($('atrito').value) || 0.5;
+
+      // Cálculo do Muro (Secção Retangular Simplificada de Gravidade)
+      // W = Peso próprio = B * H * gamaMuro
+      const w = b * h * gamaMuro;
+      
+      // Braço de alavanca do peso (Centro de Gravidade)
+      const xCG = b / 2;
+      
+      // Momento Resistente (em relação ao pé do muro, ponto O)
+      const mr = w * xCG;
+
+      // Cálculo de Empuxo (Teoria de Rankine, sem coesão, sem sobrecarga, tardoz vertical)
+      // Ka = tan²(45 - φ/2)
+      const phiRad = phiDeg * Math.PI / 180;
+      const ka = Math.tan(Math.PI/4 - phiRad/2) * Math.tan(Math.PI/4 - phiRad/2);
+      
+      // Ea = 1/2 * Ka * gamaSolo * H²
+      const ea = 0.5 * ka * gamaSolo * h * h;
+      
+      // Braço de alavanca do empuxo (distribuição triangular, H/3 a partir da base)
+      const yEa = h / 3;
+      
+      // Momento Tombador
+      const mt = ea * yEa;
+
+      // Fator de Segurança contra Tombamento
+      let fsTomb = mr / mt;
+      
+      // Força resistente ao deslizamento
+      const forcaAtrito = w * mu;
+      
+      // Fator de Segurança contra Deslizamento
+      let fsDesliz = forcaAtrito / ea;
+
+      // Diagnóstico Tombamento
+      let statusT = "";
+      let statusColor = "";
+      if (fsTomb >= 1.5) {
+        statusT = "ESTÁVEL (FS ≥ 1.5)";
+        statusColor = "text-green-400";
+      } else if (fsTomb >= 1.0) {
+        statusT = "RISCO DE TOMBAMENTO (FS < 1.5)";
+        statusColor = "text-yellow-400";
+      } else {
+        statusT = "RUÍNA (TOMBARÁ)";
+        statusColor = "text-red-400";
+      }
+
+      // UI
+      $('resultadoSection').classList.remove('opacity-50');
+      $('resultadoSection').classList.add('pulse-glow');
+      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+
+      $('valFS').textContent = fsTomb.toFixed(2);
+      $('statusFS').textContent = statusT;
+      $('statusFS').className = `text-xl mb-4 font-semibold ${statusColor}`;
+      
+      $('valEa').textContent = ea.toFixed(1) + ' kN/m';
+      $('valW').textContent = w.toFixed(1) + ' kN/m';
+      $('valMt').textContent = mt.toFixed(1) + ' kN.m/m';
+      $('valMr').textContent = mr.toFixed(1) + ' kN.m/m';
+
+      $('memorial').textContent = `MEMORIAL DE CÁLCULO DE ESTABILIDADE (MURO DE GRAVIDADE)
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS
+Muro (H x B): ${h.toFixed(2)} m x ${b.toFixed(2)} m
+Gama do Muro (γm): ${gamaMuro.toFixed(2)} kN/m³
+Gama do Solo (γs): ${gamaSolo.toFixed(2)} kN/m³
+Ângulo de Atrito (φ): ${phiDeg.toFixed(1)}°
+Coef. de Atrito Base (µ): ${mu.toFixed(2)}
+
+2. CÁLCULO DO EMPUXO (RANKINE - ATIVO)
+Coeficiente de Empuxo (Ka) = tan²(45 - φ/2) = ${ka.toFixed(3)}
+Força de Empuxo (Ea) = 0.5 * Ka * γs * H²
+Ea = 0.5 * ${ka.toFixed(3)} * ${gamaSolo.toFixed(1)} * ${h.toFixed(1)}² = ${ea.toFixed(2)} kN/m
+Ponto de Aplicação (y) = H / 3 = ${(h/3).toFixed(2)} m da base
+
+3. CÁLCULO DO PESO (ESTABILIZADOR)
+Peso Próprio (W) = B * H * γm
+W = ${b.toFixed(2)} * ${h.toFixed(2)} * ${gamaMuro.toFixed(1)} = ${w.toFixed(2)} kN/m
+Braço de Alavanca (x) = B / 2 = ${(b/2).toFixed(2)} m (Seção retangular simplificada)
+
+4. VERIFICAÇÃO AO TOMBAMENTO (Ponto O - Pé do muro)
+Momento Tombador (Mt) = Ea * y = ${mt.toFixed(2)} kN.m/m
+Momento Resistente (Mr) = W * x = ${mr.toFixed(2)} kN.m/m
+F.S. Tombamento = Mr / Mt = ${fsTomb.toFixed(2)} (Mínimo recomendado: 1.5)
+>> Situação Tombamento: ${fsTomb >= 1.5 ? "OK" : "NÃO ATENDE"}
+
+5. VERIFICAÇÃO AO DESLIZAMENTO
+Força Mobilizadora = Ea = ${ea.toFixed(2)} kN/m
+Força Resistente (Atrito) = W * µ = ${w.toFixed(2)} * ${mu.toFixed(2)} = ${forcaAtrito.toFixed(2)} kN/m
+F.S. Deslizamento = Atrito / Ea = ${fsDesliz.toFixed(2)} (Mínimo recomendado: 1.5)
+>> Situação Deslizamento: ${fsDesliz >= 1.5 ? "OK" : "NÃO ATENDE (Considere dente de cisalhamento)"}
+
+Nota: Modelo teórico simplificado (seção 100% retangular de gravidade, maciço seco, sem sobrecarga, tardoz vertical liso). Deve-se verificar tensões no solo e escoamento/drenagem em projetos executivos.`;
+    }
+
+    $('btnCalcular').addEventListener('click', calcularEstabilidade);
+    $('btnReset').addEventListener('click', () => location.reload());
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if ($('year')) $('year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
