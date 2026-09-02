@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="landing-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerCalc - Calculadora Multifuncional Premium & PWA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#030508">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/icon192.png">
+    <link rel="icon" type="image/png" href="assets/icon48.png">
+</head>
+<body class="dark-theme landing-page">
+
+    <!-- CABEÇALHO -->
+    <header class="landing-header">
+        <div class="header-container">
+            <a href="index.html" id="logo-link" class="landing-logo">
+                <span class="logo-icon">🧮</span>
+                <span class="logo-text">Power<span>Calc</span></span>
+            </a>
+            <nav class="landing-nav">
+                <a href="#features">Recursos</a>
+                <a href="#pwa">Instalação</a>
+                <a href="support.html">Suporte</a>
+            </nav>
+            <a href="app.html" class="cta-button header-cta">Iniciar App</a>
+        </div>
+    </header>
+
+    <!-- SEÇÃO HERO -->
+    <section class="hero-section">
+        <div class="hero-glow"></div>
+        <div class="hero-container">
+            <div class="hero-content">
+                <span class="badge">🔥 A Calculadora Web Definitiva</span>
+                <h1>Precisão Extrema.<br>Recursos Sem Limites.</h1>
+                <p>PowerCalc une 13 modos de cálculo especializados, 68+ fórmulas técnicas integradas e suporte a inteligência artificial local gratuita em uma única interface premium ultra veloz.</p>
+                <div class="hero-actions">
+                    <a href="app.html" class="cta-button primary-cta">Experimentar Grátis <span>⚡</span></a>
+                    <a href="#pwa" class="cta-button secondary-cta">Instalar no Celular ou PC</a>
+                </div>
+            </div>
+            <div class="hero-preview">
+                <div class="mockup-frame">
+                    <div class="mockup-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span class="mockup-title">powercalc.app</span>
+                    </div>
+                    <div class="mockup-body">
+                        <!-- Preview visual simplificado da calculadora -->
+                        <div class="preview-visor">
+                            <div class="preview-formula">Média Ponderada (N=3)</div>
+                            <div class="preview-result">93,45</div>
+                        </div>
+                        <div class="preview-keyboard">
+                            <div class="preview-key active">🔢 Simples</div>
+                            <div class="preview-key">🧪 Científica</div>
+                            <div class="preview-key">💻 Programador</div>
+                            <div class="preview-key font-neon">⚙️ Engenharia</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO RECURSOS (FEATURES) -->
+    <section id="features" class="features-section">
+        <div class="section-header">
+            <h2>13 Modos de Alta Performance</h2>
+            <p>Esqueça a troca de aplicativos. O PowerCalc consolida todas as ferramentas matemáticas necessárias para o seu dia a dia.</p>
+        </div>
+        
+        <div class="features-grid">
+            <!-- Simples -->
+            <div class="feature-card">
+                <div class="card-icon">🔢</div>
+                <h3>Simples</h3>
+                <p>Cálculos diários rápidos com precisão decimal exata e layout clean e intuitivo.</p>
+            </div>
+            
+            <!-- Científica -->
+            <div class="feature-card">
+                <div class="card-icon">🧪</div>
+                <h3>Científica</h3>
+                <p>Mais de 30 funções trigonométricas e logarítmicas, com botões físicos de memória e histórico.</p>
+            </div>
+
+            <!-- Programador -->
+            <div class="feature-card">
+                <div class="card-icon">💻</div>
+                <h3>Programador</h3>
+                <p>Grid de 64 bits interativo, Complemento de Dois, Word Size variável e chaveamento instantâneo Hex/Dec/Oct/Bin.</p>
+            </div>
+
+            <!-- Engenharia -->
+            <div class="feature-card">
+                <div class="card-icon">⚙️</div>
+                <h3>Engenharia</h3>
+                <p>57 fórmulas técnicas integradas (Elétrica, Mecânica, Fluidos, Química e Produção) com busca em tempo real.</p>
+            </div>
+
+            <!-- Matrizes -->
+            <div class="feature-card">
+                <div class="card-icon">🧮</div>
+                <h3>Matrizes</h3>
+                <p>Cálculo de Determinante, Inversa, LU, Cholesky, Rank e operações de soma/multiplicação até 4x4.</p>
+            </div>
+
+            <!-- Saúde Clínico -->
+            <div class="feature-card">
+                <div class="card-icon">🏥</div>
+                <h3>Saúde & Clínico</h3>
+                <p>15 sub-calculadoras incluindo Dosagem mg/kg/BSA, eGFR (CKD-EPI 2021), Clearance e Hidratação Holliday-Segar.</p>
+            </div>
+
+            <!-- Finanças -->
+            <div class="feature-card">
+                <div class="card-icon">📈</div>
+                <h3>Finanças</h3>
+                <p>Simulador PRICE vs SAC, Juros Compostos com Aportes e calculadora de Independência Financeira (Regra FIRE).</p>
+            </div>
+
+            <!-- Estatística -->
+            <div class="feature-card">
+                <div class="card-icon">📊</div>
+                <h3>Estatística</h3>
+                <p>Estatística Descritiva com Quartis e Outliers (Tukey), Regressão Linear, Normal e Binomial.</p>
+            </div>
+
+            <!-- Conversor -->
+            <div class="feature-card">
+                <div class="card-icon">📏</div>
+                <h3>Unidades & Moedas</h3>
+                <p>Cotações mundiais e de cripto em tempo real via API Coinbase, spread, IOF e 12 categorias físicas de unidades.</p>
+            </div>
+
+            <!-- Assistente IA -->
+            <div class="feature-card highlight">
+                <div class="card-icon">🧠</div>
+                <h3>Assistente AI</h3>
+                <p>Roteamento de prompts inteligente local gratuito e integração em nuvem para resoluções avançadas passo a passo.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO PWA -->
+    <section id="pwa" class="pwa-section">
+        <div class="pwa-glow"></div>
+        <div class="pwa-container">
+            <div class="pwa-content">
+                <h2>Leve o PowerCalc no Computador ou Celular</h2>
+                <p>O PowerCalc é um Progressive Web App (PWA). Isso significa que você pode instalá-lo diretamente no seu PC, Mac, Android ou iOS. Ele roda em janela própria como um aplicativo nativo, com carregamento instantâneo, atalho na área de trabalho e suporte a funcionamento offline!</p>
+                
+                <!-- Abas Seletoras de Plataforma -->
+                <div class="pwa-tabs">
+                    <button class="pwa-tab-btn active" data-target="pc">🖥️ Computador (PC)</button>
+                    <button class="pwa-tab-btn" data-target="mobile">📱 Celular / Tablet</button>
+                </div>
+                
+                <!-- Passos para PC -->
+                <div class="pwa-steps-content active" id="steps-pc">
+                    <div class="installation-steps">
+                        <div class="step-item">
+                            <span class="step-num">1</span>
+                            <div class="step-text">
+                                <strong>Acesse pelo navegador</strong>
+                                <p>Abra este site utilizando o Google Chrome, Microsoft Edge, Opera ou Brave no seu computador.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-num">2</span>
+                            <div class="step-text">
+                                <strong>Clique no ícone de instalação</strong>
+                                <p>Na barra de endereços (ao lado do link do site), clique no ícone de computador com seta para baixo <span class="browser-icon-inline">📥</span> (ou no botão "+").</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-num">3</span>
+                            <div class="step-text">
+                                <strong>Confirme e Pronto!</strong>
+                                <p>Clique em "Instalar". Um atalho será criado em sua Área de Trabalho e o aplicativo abrirá imediatamente sem as barras do navegador.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passos para Celular -->
+                <div class="pwa-steps-content" id="steps-mobile">
+                    <div class="installation-steps">
+                        <div class="step-item">
+                            <span class="step-num">1</span>
+                            <div class="step-text">
+                                <strong>Abra no celular</strong>
+                                <p>Acesse o link do aplicativo no seu celular utilizando o Safari (iOS) ou Google Chrome (Android).</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-num">2</span>
+                            <div class="step-text">
+                                <strong>Adicione à Tela de Início</strong>
+                                <p><strong>No Android:</strong> Toque no banner "Adicionar PowerCalc à tela inicial" ou nos 3 pontinhos do menu e selecione "Instalar aplicativo".<br><strong>No iOS:</strong> Toque no botão de "Compartilhar" (ícone de quadrado com seta para cima) e selecione "Adicionar à Tela de Início".</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-num">3</span>
+                            <div class="step-text">
+                                <strong>Use offline a qualquer hora</strong>
+                                <p>Inicie o aplicativo pela tela inicial do celular. Ele carrega instantaneamente e funciona 100% offline, economizando bateria e dados.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pwa-visual">
+                <!-- Visualizador PC -->
+                <div class="pwa-visual-content active" id="visual-pc">
+                    <div class="pc-mockup">
+                        <div class="pc-browser-frame">
+                            <div class="pc-browser-header">
+                                <div class="pc-browser-dots">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot green"></span>
+                                </div>
+                                <div class="pc-browser-address">
+                                    <span class="address-lock">🔒</span>
+                                    <span class="address-url">4u.ia.br/app/powercalc</span>
+                                    <div class="pc-install-indicator">
+                                        <span class="pc-install-icon">📥</span>
+                                        <span class="pc-install-tooltip">Instalar PowerCalc</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pc-browser-body">
+                                <div class="pc-app-preview">
+                                    <span class="pc-app-icon">🧮</span>
+                                    <h3>PowerCalc Desktop</h3>
+                                    <p>Instalação PWA de um clique no PC</p>
+                                    <a href="app.html" class="cta-button pc-cta">Abrir no PC</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualizador Celular -->
+                <div class="pwa-visual-content" id="visual-mobile">
+                    <div class="phone-mockup">
+                        <div class="phone-screen">
+                            <div class="phone-app-header">
+                                <span class="phone-time">18:02</span>
+                                <span class="phone-battery">🔋</span>
+                            </div>
+                            <div class="phone-app-body">
+                                <div class="app-icon-large">🧮</div>
+                                <h3>PowerCalc Mobile</h3>
+                                <p class="phone-status-text">Instalado e Pronto Offline</p>
+                                <a href="app.html" class="cta-button phone-cta">Abrir no Celular</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RODAPÉ -->
+    <footer class="landing-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <span class="logo-icon">🧮</span>
+                    <span class="logo-text">Power<span>Calc</span></span>
+                </div>
+                <p>A união perfeita entre precisão matemática e design premium.</p>
+            </div>
+            <div class="footer-links">
+                <div class="link-group">
+                    <h4>Legal</h4>
+                    <a href="privacy.html">Política de Privacidade</a>
+                    <a href="terms.html">Termos de Uso</a>
+                </div>
+                <div class="link-group">
+                    <h4>Ajuda</h4>
+                    <a href="support.html">Suporte & FAQ</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 PowerCalc. Todos os direitos reservados. Feito com amor por <a href="https://4u.ia.br" target="_blank" class="footer-owner-link">4u.ia.br</a>.</p>
+        </div>
+    </footer>
+
+    <!-- EASTER EGG SCRIPT (5 cliques no logo) & ABAS PWA -->
+    <script>
+        // --- EASTER EGG LOGO ---
+        const logoLink = document.getElementById('logo-link');
+        if (logoLink) {
+            logoLink.addEventListener('click', function(e) {
+                const now = Date.now();
+                let clicks = parseInt(localStorage.getItem('logo_clicks') || '0');
+                let lastClick = parseInt(localStorage.getItem('logo_last_click') || '0');
+
+                // Incrementa se o clique anterior ocorreu em até 2 segundos
+                if (now - lastClick < 2000) {
+                    clicks++;
+                } else {
+                    clicks = 1;
+                }
+
+                localStorage.setItem('logo_clicks', clicks);
+                localStorage.setItem('logo_last_click', now);
+
+                if (clicks >= 5) {
+                    e.preventDefault();
+                    localStorage.removeItem('logo_clicks');
+                    localStorage.removeItem('logo_last_click');
+                    window.location.href = 'https://4u.ia.br/admin/login';
+                    return;
+                }
+
+                // Evita recargas desnecessárias e perda de cliques se o usuário já estiver na Home
+                const targetUrl = this.href;
+                const currentUrl = window.location.href;
+                
+                const cleanTarget = targetUrl.replace(/\/+$/, '').replace(/\/index\.html$/, '').replace(/\/index\.php$/, '');
+                const cleanCurrent = currentUrl.replace(/\/+$/, '').replace(/\/index\.html$/, '').replace(/\/index\.php$/, '');
+
+                if (cleanTarget === cleanCurrent) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // --- INTERATIVIDADE DE ABAS PWA ---
+        const pwaTabs = document.querySelectorAll('.pwa-tab-btn');
+        pwaTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-target');
+                
+                // Remove active de todas as abas
+                pwaTabs.forEach(t => t.classList.remove('active'));
+                // Adiciona active na clicada
+                tab.classList.add('active');
+                
+                // Alterna os passos
+                document.querySelectorAll('.pwa-steps-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`steps-${target}`).classList.add('active');
+                
+                // Alterna o visualizador
+                document.querySelectorAll('.pwa-visual-content').forEach(visual => {
+                    visual.classList.remove('active');
+                });
+                document.getElementById(`visual-${target}`).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
