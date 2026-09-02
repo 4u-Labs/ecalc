@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Conforto Acústico | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
+            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', blue: '#0088ff' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #0088ff, #8b1bf7); border-radius: 4px; }
+    
+    .text-glow { text-shadow: 0 0 20px rgba(0, 136, 255, 0.5); }
+    
+    .gradient-border {
+      position: relative;
+      background: #12121a;
+      border-radius: 16px;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #0088ff, #8b1bf7, #0088ff);
+      background-size: 300% 300%;
+      animation: gradientMove 8s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 136, 255, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(0, 136, 255, 0.6); }
+    }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      border-color: #0088ff;
+      box-shadow: 0 0 15px rgba(0, 136, 255, 0.2);
+      outline: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #0088ff 0%, #8b1bf7 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 136, 255, 0.4);
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      border-color: #0088ff;
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-100">
+  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-blue to-neon-purple flex items-center justify-center font-bold text-dark-900 text-xl">
+          🔈
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold text-white">Conforto Acústico</h1>
+          <p class="text-xs text-gray-500">Tempo de Reverberação (TR60)</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-1 space-y-6">
+        <div class="gradient-border p-6">
+          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+            <span class="text-neon-blue">●</span> Dimensões da Sala
+          </h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Comprimento (m)</label>
+              <input type="number" id="comp" value="10" min="1" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Largura (m)</label>
+              <input type="number" id="largura" value="6" min="1" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm text-gray-400 mb-2">Pé-direito (m)</label>
+              <input type="number" id="altura" value="3" min="1" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+          </div>
+        </div>
+
+        <div class="gradient-border p-6">
+          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+            <span class="text-neon-purple">●</span> Revestimentos
+          </h2>
+          <div class="space-y-4 text-sm">
+            <div>
+              <label class="block text-gray-400 mb-2">Piso</label>
+              <select id="matPiso" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+                <option value="0.02">Concreto Liso / Porcelanato</option>
+                <option value="0.05">Piso de Madeira</option>
+                <option value="0.30">Carpete Fino</option>
+                <option value="0.60">Carpete Grosso sobre Borracha</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2">Teto</label>
+              <select id="matTeto" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+                <option value="0.02">Laje de Concreto</option>
+                <option value="0.10">Gesso Liso</option>
+                <option value="0.65">Forro de Lã de Vidro / Acústico</option>
+                <option value="0.80">Painel Acústico Espesso</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2">Paredes</label>
+              <select id="matParede" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+                <option value="0.02">Alvenaria Pintada / Concreto</option>
+                <option value="0.06">Drywall / Gesso Acartonado</option>
+                <option value="0.20">Revestimento em Madeira</option>
+                <option value="0.70">Painéis de Espuma Acústica</option>
+                <option value="0.90">Lã de Rocha Espessa (Estúdio)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-2">Uso Pretendido da Sala</label>
+              <select id="usoSala" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+                <option value="0.3">Estúdio de Gravação (0.2s - 0.4s)</option>
+                <option value="0.8">Sala de Aula / Reunião (0.6s - 1.0s)</option>
+                <option value="1.5">Auditório / Teatro (1.2s - 1.8s)</option>
+                <option value="2.5">Igreja Clássica / Templo (> 2.0s)</option>
+              </select>
+            </div>
+            <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 mt-4">
+              Calcular Reverberação
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 space-y-6">
+        <div id="resultadoSection" class="gradient-border p-8 text-center opacity-50 transition-opacity duration-500">
+          <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Tempo de Reverberação (TR60)</div>
+          <div id="valorTR" class="text-5xl md:text-6xl font-bold text-neon-blue text-glow mb-2">0.0 s</div>
+          <div id="statusTr" class="text-xl mb-4 font-semibold text-gray-300">-</div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Volume Total</div>
+              <div id="valVol" class="text-xl font-semibold text-neon-blue">0 m³</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Área de Superfície</div>
+              <div id="valArea" class="text-xl font-semibold text-neon-purple">0 m²</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Área Equivalente Absorção</div>
+              <div id="valAbs" class="text-xl font-semibold text-neon-blue">0 m² (Sabines)</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">TR Recomendado</div>
+              <div id="valRec" class="text-xl font-semibold text-neon-purple">0 s</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gradient-border p-6">
+          <h3 class="text-lg font-semibold mb-4 text-white">📝 Memorial de Cálculo (Fórmula de Sabine)</h3>
+          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
+    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    function calcularAcustica() {
+      const c = parseFloat($('comp').value) || 0;
+      const l = parseFloat($('largura').value) || 0;
+      const h = parseFloat($('altura').value) || 0;
+      
+      const aPiso = c * l;
+      const aTeto = c * l;
+      const aParedes = (2 * c * h) + (2 * l * h);
+      const volume = c * l * h;
+      const areaTotal = aPiso + aTeto + aParedes;
+
+      const alphaPiso = parseFloat($('matPiso').value) || 0;
+      const alphaTeto = parseFloat($('matTeto').value) || 0;
+      const alphaParede = parseFloat($('matParede').value) || 0;
+      const usoRecomendado = parseFloat($('usoSala').value) || 0.8;
+
+      // Absorção em Sabines (m²) (Adotando coeficiente médio em 500-1000Hz)
+      const absPiso = aPiso * alphaPiso;
+      const absTeto = aTeto * alphaTeto;
+      const absParedes = aParedes * alphaParede;
+      const absorcaoTotal = absPiso + absTeto + absParedes;
+
+      // Fórmula de Sabine: TR60 = 0.161 * V / A
+      // V = volume (m³), A = absorção equivalente (m²)
+      let tr60 = 0;
+      if (absorcaoTotal > 0) {
+        tr60 = (0.161 * volume) / absorcaoTotal;
+      }
+
+      // Diagnóstico
+      let status = "";
+      let statusColor = "";
+      let diferenca = tr60 - usoRecomendado;
+
+      if (Math.abs(diferenca) <= 0.2) {
+        status = "IDEAL / ADEQUADO";
+        statusColor = "text-green-400";
+      } else if (diferenca > 0.2) {
+        status = "MUITO REVERBERANTE (Com eco)";
+        statusColor = "text-red-400";
+      } else {
+        status = "MUITO SECA (Absorve demais)";
+        statusColor = "text-yellow-400";
+      }
+
+      // UI
+      $('resultadoSection').classList.remove('opacity-50');
+      $('resultadoSection').classList.add('pulse-glow');
+      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+
+      $('valorTR').textContent = tr60.toFixed(2) + ' s';
+      $('statusTr').textContent = status;
+      $('statusTr').className = `text-xl mb-4 font-semibold ${statusColor}`;
+      
+      $('valVol').textContent = volume.toFixed(1) + ' m³';
+      $('valArea').textContent = areaTotal.toFixed(1) + ' m²';
+      $('valAbs').textContent = absorcaoTotal.toFixed(1) + ' m² (Sabines)';
+      $('valRec').textContent = `~ ${usoRecomendado.toFixed(1)} s`;
+
+      $('memorial').textContent = `MEMORIAL DE CÁLCULO ACÚSTICO (TR60)
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. DIMENSÕES
+Comprimento: ${c} m
+Largura: ${l} m
+Pé-direito: ${h} m
+Volume: ${volume.toFixed(2)} m³
+Área Total Superfície: ${areaTotal.toFixed(2)} m²
+
+2. ÁREAS E COEFICIENTES DE ABSORÇÃO (médios)
+Piso: ${aPiso.toFixed(2)} m² | Coeficiente: ${alphaPiso} | Absorção: ${absPiso.toFixed(2)} Sabines
+Teto: ${aTeto.toFixed(2)} m² | Coeficiente: ${alphaTeto} | Absorção: ${absTeto.toFixed(2)} Sabines
+Paredes: ${aParedes.toFixed(2)} m² | Coeficiente: ${alphaParede} | Absorção: ${absParedes.toFixed(2)} Sabines
+
+3. CÁLCULO (SABINE)
+Absorção Total Equivalente (A): ${absorcaoTotal.toFixed(2)} Sabines
+TR60 = 0.161 * (Volume / A)
+TR60 = 0.161 * (${volume.toFixed(2)} / ${absorcaoTotal.toFixed(2)})
+TR60 Calculado: ${tr60.toFixed(2)} segundos
+
+4. DIAGNÓSTICO
+TR60 Recomendado para o Uso: ${usoRecomendado.toFixed(2)} segundos
+Veredito: ${status}
+
+Nota: Cálculo teórico simplificado para fins de pré-dimensionamento, usando a fórmula clássica de Sabine para frequências médias. Ambientes muito absorventes podem necessitar da equação de Eyring ou Norris-Eyring.`;
+    }
+
+    $('btnCalcular').addEventListener('click', calcularAcustica);
+    $('btnReset').addEventListener('click', () => location.reload());
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if ($('year')) $('year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
