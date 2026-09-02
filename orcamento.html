@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Orçamento Rápido CUB | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
+            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00ffff, #8b1bf7); border-radius: 4px; }
+    
+    /* Glow effects */
+    .glow-cyan { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.05); }
+    .glow-magenta { box-shadow: 0 0 20px rgba(255, 0, 255, 0.3); }
+    .text-glow { text-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
+    
+    /* Animated gradient border */
+    .gradient-border {
+      position: relative;
+      background: #12121a;
+      border-radius: 16px;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #00ffff, #8b1bf7, #ff00ff, #00ffff);
+      background-size: 300% 300%;
+      animation: gradientMove 8s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    /* Pulse animation for results */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.6); }
+    }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    /* Input styles */
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      border-color: #00ffff;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+      outline: none;
+    }
+    .form-input:hover { border-color: rgba(0, 255, 255, 0.5); }
+    
+    /* Button animations */
+    .btn-primary {
+      background: linear-gradient(135deg, #00ffff 0%, #8b1bf7 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    
+    /* Card hover */
+    .card-hover:hover {
+      transform: translateY(-4px);
+      border-color: #00ffff;
+    }
+    
+    /* Progress bar animation */
+    .progress-fill {
+      background: linear-gradient(90deg, #00ffff, #8b1bf7);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Tabs */
+    .tab-active {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(139, 27, 247, 0.2));
+      border-color: #00ffff;
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+    }
+    .tooltip::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a24;
+      border: 1px solid #00ffff;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    .tooltip:hover::after {
+      opacity: 1;
+      bottom: calc(100% + 8px);
+    }
+    
+    /* Loading spinner */
+    .spinner {
+      border: 3px solid rgba(0, 255, 255, 0.1);
+      border-top-color: #00ffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Number animation */
+    .number-animate { transition: all 0.5s ease-out; }
+    
+    /* Print styles */
+    @media print {
+      body { background: white !important; }
+      .no-print { display: none !important; }
+      .print-break { page-break-before: always; }
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-100">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center font-bold text-dark-900">
+          CUB
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold text-white">Orçamento Rápido CUB</h1>
+          <p class="text-xs text-gray-500">Estimativa paramétrica de custos</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="lastUpdate" class="text-xs text-gray-500 hidden md:block"></span>
+        <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-white/5 transition-colors tooltip" data-tip="Alternar tema">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-3 mb-8 justify-center no-print">
+      <button id="btnCalcular" class="btn-primary px-8 py-3 rounded-xl font-semibold text-dark-900 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        </svg>
+        Calcular Orçamento
+      </button>
+      <button id="btnSalvar" class="px-6 py-3 rounded-xl border border-white/10 hover:border-neon-cyan hover:bg-neon-cyan/10 transition-all flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+        </svg>
+        Salvar
+      </button>
+      <button id="btnCarregar" class="px-6 py-3 rounded-xl border border-white/10 hover:border-neon-cyan hover:bg-neon-cyan/10 transition-all flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+        </svg>
+        Carregar
+      </button>
+      <button id="btnExcel" class="px-6 py-3 rounded-xl border border-white/10 hover:border-green-500 hover:bg-green-500/10 transition-all flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        Excel
+      </button>
+      <button id="btnPDF" class="px-6 py-3 rounded-xl border border-white/10 hover:border-red-500 hover:bg-red-500/10 transition-all flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        </svg>
+        PDF
+      </button>
+      <button id="btnReset" class="px-6 py-3 rounded-xl border border-white/10 hover:border-red-500 hover:bg-red-500/10 transition-all flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Limpar
+      </button>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 no-print">
+      <button class="tab-btn tab-active px-4 py-2 rounded-lg border border-white/10 whitespace-nowrap transition-all" data-tab="dados">
+        📋 Dados do Projeto
+      </button>
+      <button class="tab-btn px-4 py-2 rounded-lg border border-white/10 whitespace-nowrap transition-all" data-tab="custos">
+        💰 Custos Extras
+      </button>
+      <button class="tab-btn px-4 py-2 rounded-lg border border-white/10 whitespace-nowrap transition-all" data-tab="avancado">
+        ⚙️ Configurações
+      </button>
+    </div>
+
+    <!-- Tab Content: Dados do Projeto -->
+    <section id="tab-dados" class="tab-content">
+      <div class="gradient-border p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+          <span class="text-neon-cyan">●</span> Dados do Projeto
+        </h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Estado (UF)</label>
+            <select id="estado" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+              <option value="AC">Acre</option>
+              <option value="AL">Alagoas</option>
+              <option value="AP">Amapá</option>
+              <option value="AM">Amazonas</option>
+              <option value="BA">Bahia</option>
+              <option value="CE">Ceará</option>
+              <option value="DF">Distrito Federal</option>
+              <option value="ES">Espírito Santo</option>
+              <option value="GO">Goiás</option>
+              <option value="MA">Maranhão</option>
+              <option value="MT">Mato Grosso</option>
+              <option value="MS">Mato Grosso do Sul</option>
+              <option value="MG">Minas Gerais</option>
+              <option value="PA">Pará</option>
+              <option value="PB">Paraíba</option>
+              <option value="PR">Paraná</option>
+              <option value="PE">Pernambuco</option>
+              <option value="PI">Piauí</option>
+              <option value="RJ">Rio de Janeiro</option>
+              <option value="RN">Rio Grande do Norte</option>
+              <option value="RS">Rio Grande do Sul</option>
+              <option value="RO">Rondônia</option>
+              <option value="RR">Roraima</option>
+              <option value="SC">Santa Catarina</option>
+              <option value="SP" selected>São Paulo</option>
+              <option value="SE">Sergipe</option>
+              <option value="TO">Tocantins</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Tipo de Edificação</label>
+            <select id="tipoEdif" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+              <optgroup label="Residencial">
+                <option value="R1B">Casa Popular - Baixo Padrão</option>
+                <option value="R1N" selected>Casa Térrea - Padrão Normal</option>
+                <option value="R1A">Casa Térrea - Alto Padrão</option>
+                <option value="R8B">Prédio 8 Pav. - Baixo Padrão</option>
+                <option value="R8N">Prédio 8 Pav. - Padrão Normal</option>
+                <option value="R8A">Prédio 8 Pav. - Alto Padrão</option>
+                <option value="R16N">Prédio 16+ Pav. - Normal</option>
+                <option value="R16A">Prédio 16+ Pav. - Alto Padrão</option>
+              </optgroup>
+              <optgroup label="Comercial">
+                <option value="CSL8">Salas e Lojas - Padrão Normal</option>
+                <option value="CSL16">Escritórios - Alto Padrão</option>
+                <option value="CAL">Andares Livres</option>
+              </optgroup>
+              <optgroup label="Industrial">
+                <option value="GI">Galpão Industrial</option>
+                <option value="PIS">Prédio Industrial Simples</option>
+              </optgroup>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Área Construída (m²)</label>
+            <input type="number" id="area" value="150" step="0.01" min="1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700" placeholder="Ex: 150.00">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">
+              CUB Manual (R$/m²) 
+              <span class="text-xs text-gray-500">- deixe vazio para usar tabela</span>
+            </label>
+            <input type="number" id="cubManual" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700" placeholder="Automático">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">BDI - Benefícios e Despesas (%)</label>
+            <input type="number" id="bdi" value="25" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Contingência (%)</label>
+            <input type="number" id="contingencia" value="10" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+        </div>
+        
+        <!-- Quick CUB Reference -->
+        <div class="mt-6 p-4 bg-dark-800/50 rounded-xl border border-white/5">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-medium text-gray-300">📊 CUB de Referência</h4>
+            <span id="cubRefDate" class="text-xs text-gray-500">Ref: Jan/2025</span>
+          </div>
+          <div id="cubQuickRef" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Content: Custos Extras -->
+    <section id="tab-custos" class="tab-content hidden">
+      <div class="gradient-border p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+          <span class="text-neon-magenta">●</span> Custos Complementares
+        </h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Projeto Arquitetônico (R$)</label>
+            <input type="number" id="custoProjeto" value="0" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Projeto Estrutural (R$)</label>
+            <input type="number" id="custoEstrutural" value="0" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Projetos Complementares (R$)</label>
+            <input type="number" id="custoComplementar" value="0" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Aprovações e Licenças (R$)</label>
+            <input type="number" id="custoAprovacao" value="0" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Terraplenagem (R$)</label>
+            <input type="number" id="custoTerra" value="0" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Fundação Especial (R$)</label>
+            <input type="number" id="custoFundacao" value="0" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Paisagismo (R$)</label>
+            <input type="number" id="custoPaisagismo" value="0" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Outros Custos (R$)</label>
+            <input type="number" id="custoOutros" value="0" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+        </div>
+        
+        <!-- Calculadora de Projetos -->
+        <div class="mt-6 p-4 bg-dark-800/50 rounded-xl border border-white/5">
+          <h4 class="text-sm font-medium text-gray-300 mb-3">🧮 Estimativa Automática de Projetos</h4>
+          <div class="flex flex-wrap gap-3">
+            <button onclick="estimarProjetos()" class="px-4 py-2 bg-neon-purple/20 border border-neon-purple/50 rounded-lg text-sm hover:bg-neon-purple/30 transition-colors">
+              Calcular valores sugeridos
+            </button>
+            <span class="text-xs text-gray-500 flex items-center">
+              Baseado em % da área e padrão da edificação
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Content: Configurações Avançadas -->
+    <section id="tab-avancado" class="tab-content hidden">
+      <div class="gradient-border p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+          <span class="text-neon-green">●</span> Configurações Avançadas
+        </h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Prazo da Obra (meses)</label>
+            <input type="number" id="prazoObra" value="12" min="1" max="60" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Fator de Localização</label>
+            <select id="fatorLocal" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+              <option value="0.85">Zona Rural (-15%)</option>
+              <option value="0.95">Periferia (-5%)</option>
+              <option value="1.00" selected>Urbano Padrão</option>
+              <option value="1.10">Centro Urbano (+10%)</option>
+              <option value="1.20">Área Nobre (+20%)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Complexidade do Projeto</label>
+            <select id="complexidade" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+              <option value="0.90">Simples (-10%)</option>
+              <option value="1.00" selected>Normal</option>
+              <option value="1.15">Complexo (+15%)</option>
+              <option value="1.30">Muito Complexo (+30%)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Índice de Reajuste Anual (%)</label>
+            <input type="number" id="reajuste" value="5" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Número de Pavimentos</label>
+            <input type="number" id="pavimentos" value="1" min="1" max="50" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Tipo de Fundação</label>
+            <select id="tipoFundacao" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+              <option value="1.00">Rasa (Sapata/Radier)</option>
+              <option value="1.08">Estaca Broca</option>
+              <option value="1.15">Estaca Hélice</option>
+              <option value="1.25">Tubulão</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mt-6 grid md:grid-cols-2 gap-6">
+          <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5">
+            <h4 class="text-sm font-medium text-gray-300 mb-3">🔧 Opções de Cálculo</h4>
+            <label class="flex items-center gap-3 cursor-pointer mb-2">
+              <input type="checkbox" id="autoCalc" class="w-4 h-4 rounded bg-dark-700 border-gray-600 text-neon-cyan focus:ring-neon-cyan">
+              <span class="text-sm text-gray-400">Calcular automaticamente ao alterar valores</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer mb-2">
+              <input type="checkbox" id="incluirINCC" class="w-4 h-4 rounded bg-dark-700 border-gray-600 text-neon-cyan focus:ring-neon-cyan">
+              <span class="text-sm text-gray-400">Aplicar correção INCC no cronograma</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" id="showDetalhes" checked class="w-4 h-4 rounded bg-dark-700 border-gray-600 text-neon-cyan focus:ring-neon-cyan">
+              <span class="text-sm text-gray-400">Mostrar detalhamento completo</span>
+            </label>
+          </div>
+          <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5">
+            <h4 class="text-sm font-medium text-gray-300 mb-3">📁 Projetos Salvos</h4>
+            <div id="projetosSalvos" class="text-sm text-gray-400 max-h-32 overflow-y-auto">
+              Nenhum projeto salvo.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resultado Principal -->
+    <section id="resultadoSection" class="mb-8 opacity-50 transition-opacity duration-500">
+      <div class="gradient-border p-8 text-center">
+        <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Custo Total Estimado</div>
+        <div id="valorTotal" class="text-5xl md:text-6xl font-bold text-neon-cyan text-glow mb-2">R$ 0,00</div>
+        <div id="valorM2" class="text-xl text-gray-300 mb-4">R$ 0,00/m²</div>
+        <div id="infoReferencia" class="text-sm text-gray-500">-</div>
+        
+        <!-- Breakdown Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+          <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover transition-all">
+            <div class="text-xs text-gray-500 mb-1">Custo Direto (CUB)</div>
+            <div id="custoDireto" class="text-xl font-semibold text-neon-cyan">R$ 0,00</div>
+            <div id="percentDireto" class="text-xs text-neon-magenta">0%</div>
+          </div>
+          <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover transition-all">
+            <div class="text-xs text-gray-500 mb-1">BDI</div>
+            <div id="valorBDI" class="text-xl font-semibold text-neon-cyan">R$ 0,00</div>
+            <div id="percentBDI" class="text-xs text-neon-magenta">0%</div>
+          </div>
+          <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover transition-all">
+            <div class="text-xs text-gray-500 mb-1">Contingência</div>
+            <div id="valorContingencia" class="text-xl font-semibold text-neon-cyan">R$ 0,00</div>
+            <div id="percentContingencia" class="text-xs text-neon-magenta">0%</div>
+          </div>
+          <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover transition-all">
+            <div class="text-xs text-gray-500 mb-1">Complementares</div>
+            <div id="valorComplementares" class="text-xl font-semibold text-neon-cyan">R$ 0,00</div>
+            <div id="percentComplementares" class="text-xs text-neon-magenta">0%</div>
+          </div>
+        </div>
+        
+        <!-- Range Estimate -->
+        <div class="mt-6 p-4 bg-dark-800/30 rounded-xl">
+          <div class="text-sm text-gray-400 mb-3">Faixa de Valores Estimada</div>
+          <div class="flex items-center justify-between max-w-md mx-auto">
+            <div class="text-center">
+              <div class="text-xs text-gray-500">Mínimo (-15%)</div>
+              <div id="valorMin" class="text-lg font-semibold text-green-400">R$ 0,00</div>
+            </div>
+            <div class="flex-1 mx-4 h-2 bg-gradient-to-r from-green-500 via-neon-cyan to-red-500 rounded-full"></div>
+            <div class="text-center">
+              <div class="text-xs text-gray-500">Máximo (+20%)</div>
+              <div id="valorMax" class="text-lg font-semibold text-red-400">R$ 0,00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detalhes Grid -->
+    <div id="detalhesSection" class="grid lg:grid-cols-2 gap-6 mb-8">
+      <!-- Etapas da Obra -->
+      <div class="gradient-border p-6">
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <span class="text-neon-cyan">📊</span> Custos por Etapa
+        </h3>
+        <div id="tabelaEtapas" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
+      </div>
+      
+      <!-- Cronograma -->
+      <div class="gradient-border p-6">
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <span class="text-neon-magenta">📅</span> Cronograma Financeiro
+        </h3>
+        <div id="cronogramaContent" class="max-h-96 overflow-y-auto pr-2"></div>
+      </div>
+    </div>
+
+    <!-- Comparações -->
+    <div class="gradient-border p-6 mb-8">
+      <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <span class="text-neon-purple">📈</span> Análise Comparativa
+      </h3>
+      <div id="comparacaoCards" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div class="gradient-border p-6">
+        <h3 class="text-lg font-semibold mb-4">Composição de Custos</h3>
+        <div id="graficoPizza" class="h-80"></div>
+      </div>
+      <div class="gradient-border p-6">
+        <h3 class="text-lg font-semibold mb-4">Custos por Etapa</h3>
+        <div id="graficoBarras" class="h-80"></div>
+      </div>
+      <div class="gradient-border p-6">
+        <h3 class="text-lg font-semibold mb-4">Curva S - Desembolso</h3>
+        <div id="graficoCurvaS" class="h-80"></div>
+      </div>
+      <div class="gradient-border p-6">
+        <h3 class="text-lg font-semibold mb-4">Comparativo CUB</h3>
+        <div id="graficoComparativo" class="h-80"></div>
+      </div>
+    </div>
+
+    <!-- Memorial de Cálculo -->
+    <div class="gradient-border p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold flex items-center gap-2">
+          <span class="text-neon-green">📝</span> Memorial de Cálculo
+        </h3>
+        <button onclick="copiarMemorial()" class="text-sm px-3 py-1 border border-white/10 rounded-lg hover:border-neon-cyan transition-colors">
+          📋 Copiar
+        </button>
+      </div>
+      <pre id="resultado" class="font-mono text-xs text-gray-300 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap"></pre>
+    </div>
+
+    <!-- Observações -->
+    <div class="gradient-border p-6">
+      <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <span class="text-yellow-400">⚠️</span> Observações Importantes
+      </h3>
+      <div id="observacoes" class="text-sm text-gray-400 space-y-4"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-dark-900/90 flex items-center justify-center z-50 hidden">
+    <div class="text-center">
+      <div class="spinner w-12 h-12 mx-auto mb-4"></div>
+      <p class="text-neon-cyan">Calculando...</p>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+  <script>
+    // ===================== DADOS DE REFERÊNCIA =====================
+    const CUB_DATA = {
+      // Tabela CUB por estado e tipo (valores aproximados Jan/2025)
+      AC: { R1B: 1580, R1N: 1820, R1A: 2180, R8B: 1650, R8N: 1920, R8A: 2350, R16N: 2180, R16A: 2680, CSL8: 1750, CSL16: 2100, CAL: 1950, GI: 1180, PIS: 1320 },
+      AL: { R1B: 1520, R1N: 1750, R1A: 2100, R8B: 1590, R8N: 1850, R8A: 2280, R16N: 2100, R16A: 2580, CSL8: 1680, CSL16: 2020, CAL: 1880, GI: 1140, PIS: 1270 },
+      AP: { R1B: 1620, R1N: 1860, R1A: 2220, R8B: 1680, R8N: 1960, R8A: 2400, R16N: 2220, R16A: 2720, CSL8: 1790, CSL16: 2140, CAL: 1990, GI: 1210, PIS: 1350 },
+      AM: { R1B: 1600, R1N: 1840, R1A: 2200, R8B: 1660, R8N: 1940, R8A: 2380, R16N: 2200, R16A: 2700, CSL8: 1770, CSL16: 2120, CAL: 1970, GI: 1200, PIS: 1340 },
+      BA: { R1B: 1540, R1N: 1780, R1A: 2140, R8B: 1620, R8N: 1880, R8A: 2320, R16N: 2140, R16A: 2620, CSL8: 1720, CSL16: 2060, CAL: 1920, GI: 1160, PIS: 1300 },
+      CE: { R1B: 1500, R1N: 1720, R1A: 2060, R8B: 1560, R8N: 1820, R8A: 2240, R16N: 2060, R16A: 2540, CSL8: 1660, CSL16: 1990, CAL: 1850, GI: 1120, PIS: 1250 },
+      DF: { R1B: 1720, R1N: 1980, R1A: 2380, R8B: 1800, R8N: 2100, R8A: 2580, R16N: 2380, R16A: 2920, CSL8: 1920, CSL16: 2300, CAL: 2140, GI: 1300, PIS: 1450 },
+      ES: { R1B: 1640, R1N: 1880, R1A: 2260, R8B: 1720, R8N: 2000, R8A: 2460, R16N: 2260, R16A: 2780, CSL8: 1830, CSL16: 2180, CAL: 2030, GI: 1230, PIS: 1380 },
+      GO: { R1B: 1580, R1N: 1820, R1A: 2180, R8B: 1650, R8N: 1920, R8A: 2360, R16N: 2180, R16A: 2680, CSL8: 1760, CSL16: 2100, CAL: 1960, GI: 1190, PIS: 1330 },
+      MA: { R1B: 1480, R1N: 1700, R1A: 2040, R8B: 1540, R8N: 1800, R8A: 2220, R16N: 2040, R16A: 2500, CSL8: 1640, CSL16: 1960, CAL: 1820, GI: 1100, PIS: 1230 },
+      MT: { R1B: 1620, R1N: 1860, R1A: 2240, R8B: 1700, R8N: 1980, R8A: 2440, R16N: 2240, R16A: 2760, CSL8: 1800, CSL16: 2160, CAL: 2010, GI: 1220, PIS: 1360 },
+      MS: { R1B: 1600, R1N: 1840, R1A: 2200, R8B: 1680, R8N: 1960, R8A: 2400, R16N: 2200, R16A: 2720, CSL8: 1780, CSL16: 2130, CAL: 1980, GI: 1200, PIS: 1340 },
+      MG: { R1B: 1620, R1N: 1860, R1A: 2240, R8B: 1700, R8N: 1980, R8A: 2440, R16N: 2240, R16A: 2760, CSL8: 1800, CSL16: 2160, CAL: 2010, GI: 1220, PIS: 1360 },
+      PA: { R1B: 1560, R1N: 1800, R1A: 2160, R8B: 1640, R8N: 1900, R8A: 2340, R16N: 2160, R16A: 2660, CSL8: 1740, CSL16: 2080, CAL: 1940, GI: 1180, PIS: 1320 },
+      PB: { R1B: 1500, R1N: 1720, R1A: 2060, R8B: 1560, R8N: 1820, R8A: 2240, R16N: 2060, R16A: 2540, CSL8: 1660, CSL16: 1990, CAL: 1850, GI: 1120, PIS: 1250 },
+      PR: { R1B: 1660, R1N: 1900, R1A: 2280, R8B: 1740, R8N: 2020, R8A: 2480, R16N: 2280, R16A: 2800, CSL8: 1840, CSL16: 2200, CAL: 2050, GI: 1240, PIS: 1390 },
+      PE: { R1B: 1520, R1N: 1760, R1A: 2120, R8B: 1600, R8N: 1860, R8A: 2300, R16N: 2120, R16A: 2600, CSL8: 1700, CSL16: 2040, CAL: 1900, GI: 1150, PIS: 1280 },
+      PI: { R1B: 1480, R1N: 1700, R1A: 2040, R8B: 1540, R8N: 1800, R8A: 2220, R16N: 2040, R16A: 2500, CSL8: 1640, CSL16: 1960, CAL: 1820, GI: 1100, PIS: 1230 },
+      RJ: { R1B: 1720, R1N: 1980, R1A: 2380, R8B: 1800, R8N: 2100, R8A: 2580, R16N: 2380, R16A: 2920, CSL8: 1920, CSL16: 2300, CAL: 2140, GI: 1300, PIS: 1450 },
+      RN: { R1B: 1500, R1N: 1720, R1A: 2060, R8B: 1560, R8N: 1820, R8A: 2240, R16N: 2060, R16A: 2540, CSL8: 1660, CSL16: 1990, CAL: 1850, GI: 1120, PIS: 1250 },
+      RS: { R1B: 1680, R1N: 1920, R1A: 2300, R8B: 1760, R8N: 2040, R8A: 2500, R16N: 2300, R16A: 2820, CSL8: 1860, CSL16: 2220, CAL: 2070, GI: 1260, PIS: 1400 },
+      RO: { R1B: 1580, R1N: 1820, R1A: 2180, R8B: 1650, R8N: 1920, R8A: 2360, R16N: 2180, R16A: 2680, CSL8: 1760, CSL16: 2100, CAL: 1960, GI: 1190, PIS: 1330 },
+      RR: { R1B: 1640, R1N: 1880, R1A: 2260, R8B: 1720, R8N: 2000, R8A: 2460, R16N: 2260, R16A: 2780, CSL8: 1830, CSL16: 2180, CAL: 2030, GI: 1230, PIS: 1380 },
+      SC: { R1B: 1700, R1N: 1960, R1A: 2360, R8B: 1780, R8N: 2080, R8A: 2560, R16N: 2360, R16A: 2900, CSL8: 1900, CSL16: 2280, CAL: 2120, GI: 1280, PIS: 1430 },
+      SP: { R1B: 1780, R1N: 2050, R1A: 2460, R8B: 1860, R8N: 2180, R8A: 2680, R16N: 2460, R16A: 3020, CSL8: 2000, CSL16: 2400, CAL: 2240, GI: 1360, PIS: 1520 },
+      SE: { R1B: 1500, R1N: 1720, R1A: 2060, R8B: 1560, R8N: 1820, R8A: 2240, R16N: 2060, R16A: 2540, CSL8: 1660, CSL16: 1990, CAL: 1850, GI: 1120, PIS: 1250 },
+      TO: { R1B: 1560, R1N: 1800, R1A: 2160, R8B: 1640, R8N: 1900, R8A: 2340, R16N: 2160, R16A: 2660, CSL8: 1740, CSL16: 2080, CAL: 1940, GI: 1180, PIS: 1320 }
+    };
+
+    const TIPOS_DESCRICAO = {
+      R1B: "Residencial Casa - Baixo Padrão",
+      R1N: "Residencial Casa - Padrão Normal",
+      R1A: "Residencial Casa - Alto Padrão",
+      R8B: "Residencial 8 Pav. - Baixo Padrão",
+      R8N: "Residencial 8 Pav. - Padrão Normal",
+      R8A: "Residencial 8 Pav. - Alto Padrão",
+      R16N: "Residencial 16+ Pav. - Normal",
+      R16A: "Residencial 16+ Pav. - Alto Padrão",
+      CSL8: "Comercial Salas - Normal",
+      CSL16: "Comercial - Alto Padrão",
+      CAL: "Comercial Andares Livres",
+      GI: "Galpão Industrial",
+      PIS: "Industrial Simples"
+    };
+
+    const ETAPAS_OBRA = [
+      { nome: "Serviços Preliminares", percentual: 3, icone: "🚧" },
+      { nome: "Fundações", percentual: 8, icone: "🏗️" },
+      { nome: "Estrutura", percentual: 20, icone: "🔩" },
+      { nome: "Alvenaria", percentual: 10, icone: "🧱" },
+      { nome: "Cobertura", percentual: 5, icone: "🏠" },
+      { nome: "Instalações Hidráulicas", percentual: 8, icone: "🚿" },
+      { nome: "Instalações Elétricas", percentual: 10, icone: "⚡" },
+      { nome: "Revestimentos", percentual: 14, icone: "🎨" },
+      { nome: "Pisos", percentual: 8, icone: "🔲" },
+      { nome: "Esquadrias", percentual: 6, icone: "🚪" },
+      { nome: "Pintura", percentual: 5, icone: "🖌️" },
+      { nome: "Limpeza Final", percentual: 3, icone: "✨" }
+    ];
+
+    const CURVA_S = [0.02, 0.06, 0.12, 0.22, 0.35, 0.50, 0.65, 0.78, 0.88, 0.94, 0.98, 1.00];
+
+    // ===================== UTILITÁRIOS =====================
+    const fmtBRL = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const fmtNum = (v, dec = 2) => isNaN(v) ? "-" : Number(v).toFixed(dec);
+    const $ = id => document.getElementById(id);
+
+    function showToast(message, type = 'success') {
+      const container = $('toastContainer');
+      const colors = {
+        success: 'bg-green-500/20 border-green-500 text-green-400',
+        error: 'bg-red-500/20 border-red-500 text-red-400',
+        info: 'bg-blue-500/20 border-blue-500 text-blue-400'
+      };
+      const toast = document.createElement('div');
+      toast.className = `p-4 rounded-xl border ${colors[type]} transform translate-x-full transition-transform duration-300`;
+      toast.innerHTML = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-x-full'), 10);
+      setTimeout(() => {
+        toast.classList.add('translate-x-full');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function animateNumber(element, target, duration = 800) {
+      const start = parseFloat(element.textContent.replace(/[^\d.-]/g, '')) || 0;
+      const startTime = performance.now();
+      
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = start + (target - start) * eased;
+        element.textContent = fmtBRL(current);
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    // ===================== TABS =====================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        btn.classList.add('tab-active');
+        $(`tab-${btn.dataset.tab}`).classList.remove('hidden');
+      });
+    });
+
+    // ===================== CUB QUICK REFERENCE =====================
+    function updateCubQuickRef() {
+      const estado = $('estado').value;
+      const cubData = CUB_DATA[estado] || CUB_DATA.SP;
+      const container = $('cubQuickRef');
+      
+      const tipos = ['R1N', 'R8N', 'CSL8', 'GI'];
+      container.innerHTML = tipos.map(tipo => `
+        <div class="p-2 bg-dark-700/50 rounded-lg text-center">
+          <div class="text-xs text-gray-500">${TIPOS_DESCRICAO[tipo].split(' - ')[0]}</div>
+          <div class="text-neon-cyan font-semibold">${fmtBRL(cubData[tipo])}/m²</div>
+        </div>
+      `).join('');
+    }
+
+    // ===================== ESTIMAR PROJETOS =====================
+    function estimarProjetos() {
+      const area = parseFloat($('area').value) || 0;
+      const tipoEdif = $('tipoEdif').value;
+      
+      // Fatores baseados no tipo de edificação
+      const fatores = {
+        R1B: { arq: 25, est: 12, comp: 8 },
+        R1N: { arq: 35, est: 15, comp: 12 },
+        R1A: { arq: 50, est: 20, comp: 18 },
+        R8B: { arq: 30, est: 18, comp: 15 },
+        R8N: { arq: 40, est: 22, comp: 20 },
+        R8A: { arq: 60, est: 28, comp: 25 },
+        R16N: { arq: 45, est: 25, comp: 22 },
+        R16A: { arq: 70, est: 32, comp: 28 },
+        CSL8: { arq: 35, est: 18, comp: 15 },
+        CSL16: { arq: 50, est: 25, comp: 22 },
+        CAL: { arq: 40, est: 22, comp: 18 },
+        GI: { arq: 20, est: 15, comp: 10 },
+        PIS: { arq: 25, est: 18, comp: 12 }
+      };
+      
+      const f = fatores[tipoEdif] || fatores.R1N;
+      $('custoProjeto').value = (area * f.arq).toFixed(2);
+      $('custoEstrutural').value = (area * f.est).toFixed(2);
+      $('custoComplementar').value = (area * f.comp).toFixed(2);
+      $('custoAprovacao').value = (area * 8).toFixed(2);
+      
+      showToast('Valores de projetos estimados com base na área e padrão', 'info');
+    }
+
+    // ===================== CÁLCULO PRINCIPAL =====================
+    function calcular() {
+      try {
+        $('loadingOverlay').classList.remove('hidden');
+        
+        setTimeout(() => {
+          const estado = $('estado').value;
+          const tipoEdif = $('tipoEdif').value;
+          const area = parseFloat($('area').value) || 0;
+          const cubManual = parseFloat($('cubManual').value) || null;
+          const bdiPct = parseFloat($('bdi').value) || 0;
+          const contingenciaPct = parseFloat($('contingencia').value) || 0;
+          const prazoObra = parseInt($('prazoObra').value) || 12;
+          const fatorLocal = parseFloat($('fatorLocal').value) || 1;
+          const complexidade = parseFloat($('complexidade').value) || 1;
+          const tipoFundacao = parseFloat($('tipoFundacao').value) || 1;
+          
+          // Custos complementares
+          const custoProjeto = parseFloat($('custoProjeto').value) || 0;
+          const custoEstrutural = parseFloat($('custoEstrutural').value) || 0;
+          const custoComplementar = parseFloat($('custoComplementar').value) || 0;
+          const custoAprovacao = parseFloat($('custoAprovacao').value) || 0;
+          const custoTerra = parseFloat($('custoTerra').value) || 0;
+          const custoFundacao = parseFloat($('custoFundacao').value) || 0;
+          const custoPaisagismo = parseFloat($('custoPaisagismo').value) || 0;
+          const custoOutros = parseFloat($('custoOutros').value) || 0;
+
+          if (area <= 0) {
+            showToast('Informe a área construída', 'error');
+            $('loadingOverlay').classList.add('hidden');
+            return;
+          }
+
+          // Obter CUB
+          const cubBase = cubManual || CUB_DATA[estado]?.[tipoEdif] || 1900;
+          const cubAjustado = cubBase * fatorLocal * complexidade * tipoFundacao;
+          
+          // Cálculos
+          const custoDireto = area * cubAjustado;
+          const valorBDI = custoDireto * (bdiPct / 100);
+          const custoComBDI = custoDireto + valorBDI;
+          const valorContingencia = custoComBDI * (contingenciaPct / 100);
+          const custoObra = custoComBDI + valorContingencia;
+          
+          const custoComplementares = custoProjeto + custoEstrutural + custoComplementar + 
+                                       custoAprovacao + custoTerra + custoFundacao + 
+                                       custoPaisagismo + custoOutros;
+          
+          const custoFinal = custoObra + custoComplementares;
+          const custoM2Final = custoFinal / area;
+
+          // Percentuais
+          const pctDireto = (custoDireto / custoFinal) * 100;
+          const pctBDI = (valorBDI / custoFinal) * 100;
+          const pctContingencia = (valorContingencia / custoFinal) * 100;
+          const pctComplementares = (custoComplementares / custoFinal) * 100;
+
+          // Atualizar UI com animações
+          $('resultadoSection').classList.remove('opacity-50');
+          $('resultadoSection').classList.add('pulse-glow');
+          setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 2000);
+
+          animateNumber($('valorTotal'), custoFinal);
+          $('valorM2').textContent = `${fmtBRL(custoM2Final)}/m²`;
+          $('infoReferencia').textContent = `CUB ${estado} • ${TIPOS_DESCRICAO[tipoEdif]} • ${fmtBRL(cubAjustado)}/m² • ${fmtNum(area)}m²`;
+
+          $('custoDireto').textContent = fmtBRL(custoDireto);
+          $('percentDireto').textContent = `${fmtNum(pctDireto, 1)}%`;
+          $('valorBDI').textContent = fmtBRL(valorBDI);
+          $('percentBDI').textContent = `${fmtNum(pctBDI, 1)}%`;
+          $('valorContingencia').textContent = fmtBRL(valorContingencia);
+          $('percentContingencia').textContent = `${fmtNum(pctContingencia, 1)}%`;
+          $('valorComplementares').textContent = fmtBRL(custoComplementares);
+          $('percentComplementares').textContent = `${fmtNum(pctComplementares, 1)}%`;
+
+          $('valorMin').textContent = fmtBRL(custoFinal * 0.85);
+          $('valorMax').textContent = fmtBRL(custoFinal * 1.20);
+
+          // Renderizar componentes
+          renderEtapas(custoObra);
+          renderCronograma(custoObra, prazoObra);
+          renderComparacoes(estado, tipoEdif, area, custoM2Final);
+          renderGraficos(custoDireto, valorBDI, valorContingencia, custoComplementares, custoObra, prazoObra, estado, tipoEdif);
+          renderMemorial(estado, tipoEdif, area, cubAjustado, custoDireto, valorBDI, valorContingencia, custoComplementares, custoFinal, custoM2Final, bdiPct, contingenciaPct);
+          renderObservacoes(estado, tipoEdif);
+
+          $('lastUpdate').textContent = `Atualizado: ${new Date().toLocaleTimeString('pt-BR')}`;
+          $('loadingOverlay').classList.add('hidden');
+          showToast('Orçamento calculado com sucesso!', 'success');
+        }, 300);
+      } catch (error) {
+        $('loadingOverlay').classList.add('hidden');
+        showToast(`Erro: ${error.message}`, 'error');
+        console.error(error);
+      }
+    }
+
+    // ===================== RENDER FUNCTIONS =====================
+    function renderEtapas(custoTotal) {
+      const container = $('tabelaEtapas');
+      container.innerHTML = ETAPAS_OBRA.map(etapa => {
+        const valor = custoTotal * (etapa.percentual / 100);
+        return `
+          <div class="flex items-center gap-4 p-3 bg-dark-800/30 rounded-xl hover:bg-dark-800/50 transition-colors">
+            <span class="text-2xl">${etapa.icone}</span>
+            <div class="flex-1">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-sm text-gray-300">${etapa.nome}</span>
+                <span class="text-sm font-semibold text-neon-cyan">${fmtBRL(valor)}</span>
+              </div>
+              <div class="h-2 bg-dark-700 rounded-full overflow-hidden">
+                <div class="progress-fill h-full rounded-full" style="width: ${etapa.percentual * 5}%"></div>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">${etapa.percentual}%</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCronograma(custoTotal, prazoMeses) {
+      const container = $('cronogramaContent');
+      const intervalo = 12 / prazoMeses;
+      let acumuladoAnterior = 0;
+      
+      let html = '<div class="space-y-2">';
+      for (let i = 1; i <= prazoMeses; i++) {
+        const idx = Math.min(Math.floor(i * intervalo) - 1, CURVA_S.length - 1);
+        const pctAcumulado = CURVA_S[Math.max(0, idx)] * 100;
+        const valorAcumulado = custoTotal * (pctAcumulado / 100);
+        const valorMensal = valorAcumulado - acumuladoAnterior;
+        
+        html += `
+          <div class="flex items-center gap-4 p-3 bg-dark-800/30 rounded-xl">
+            <div class="w-16 text-center">
+              <div class="text-xs text-gray-500">Mês</div>
+              <div class="text-lg font-semibold text-neon-magenta">${i}</div>
+            </div>
+            <div class="flex-1">
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-400">Mensal: ${fmtBRL(valorMensal)}</span>
+                <span class="text-neon-cyan">Acum: ${fmtBRL(valorAcumulado)}</span>
+              </div>
+              <div class="h-2 bg-dark-700 rounded-full overflow-hidden">
+                <div class="bg-gradient-to-r from-neon-cyan to-neon-magenta h-full rounded-full transition-all duration-500" style="width: ${pctAcumulado}%"></div>
+              </div>
+            </div>
+            <div class="text-xs text-gray-500 w-12 text-right">${fmtNum(pctAcumulado, 0)}%</div>
+          </div>
+        `;
+        acumuladoAnterior = valorAcumulado;
+      }
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function renderComparacoes(estado, tipoAtual, area, custoM2Atual) {
+      const container = $('comparacaoCards');
+      const cubData = CUB_DATA[estado];
+      const tiposComparar = ['R1N', 'R8N', 'R16A', 'CSL8', 'GI'];
+      
+      container.innerHTML = tiposComparar.map(tipo => {
+        const cubTipo = cubData[tipo];
+        const custoM2Tipo = cubTipo * 1.35; // Considerando BDI médio
+        const diferenca = ((custoM2Tipo - custoM2Atual) / custoM2Atual) * 100;
+        const isAtual = tipo === tipoAtual;
+        
+        return `
+          <div class="p-4 rounded-xl border transition-all ${isAtual ? 'border-neon-cyan bg-neon-cyan/10' : 'border-white/5 hover:border-white/20'}">
+            <div class="text-xs text-gray-500 mb-1">${TIPOS_DESCRICAO[tipo].split(' - ')[0]}</div>
+            <div class="text-lg font-semibold ${isAtual ? 'text-neon-cyan' : 'text-gray-300'}">${fmtBRL(custoM2Tipo)}/m²</div>
+            ${isAtual 
+              ? '<div class="text-xs text-green-400 mt-1">✓ Selecionado</div>' 
+              : `<div class="text-xs ${diferenca > 0 ? 'text-red-400' : 'text-green-400'} mt-1">${diferenca > 0 ? '+' : ''}${fmtNum(diferenca, 1)}%</div>`
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderGraficos(custoDireto, valorBDI, valorContingencia, custoComplementares, custoTotal, prazoMeses, estado, tipoEdif) {
+      if (!window.Plotly) return;
+
+      const layoutBase = {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: '#9ca3af', size: 11 },
+        margin: { t: 30, b: 50, l: 60, r: 20 }
+      };
+
+      // Pizza - Composição
+      Plotly.newPlot('graficoPizza', [{
+        values: [custoDireto, valorBDI, valorContingencia, custoComplementares],
+        labels: ['Custo Direto', 'BDI', 'Contingência', 'Complementares'],
+        type: 'pie',
+        hole: 0.5,
+        marker: { colors: ['#00ffff', '#ff00ff', '#ffaa00', '#00ff88'] },
+        textinfo: 'percent',
+        textfont: { color: '#fff' }
+      }], { ...layoutBase }, { displayModeBar: false });
+
+      // Barras - Etapas
+      Plotly.newPlot('graficoBarras', [{
+        x: ETAPAS_OBRA.map(e => e.nome.substring(0, 10)),
+        y: ETAPAS_OBRA.map(e => custoTotal * (e.percentual / 100)),
+        type: 'bar',
+        marker: { 
+          color: ETAPAS_OBRA.map((_, i) => `hsl(${180 + i * 15}, 100%, 50%)`),
+          line: { color: 'rgba(0,255,255,0.5)', width: 1 }
+        }
+      }], { 
+        ...layoutBase, 
+        xaxis: { tickangle: -45, gridcolor: 'rgba(255,255,255,0.05)' },
+        yaxis: { gridcolor: 'rgba(255,255,255,0.05)' }
+      }, { displayModeBar: false });
+
+      // Curva S
+      const meses = [], acumulados = [];
+      const intervalo = 12 / prazoMeses;
+      for (let i = 1; i <= prazoMeses; i++) {
+        meses.push(`M${i}`);
+        const idx = Math.min(Math.floor(i * intervalo) - 1, CURVA_S.length - 1);
+        acumulados.push(CURVA_S[Math.max(0, idx)] * custoTotal);
+      }
+
+      Plotly.newPlot('graficoCurvaS', [{
+        x: meses, y: acumulados,
+        type: 'scatter', mode: 'lines+markers',
+        line: { color: '#00ffff', width: 3, shape: 'spline' },
+        marker: { color: '#00ffff', size: 8 },
+        fill: 'tozeroy',
+        fillcolor: 'rgba(0,255,255,0.1)'
+      }], { 
+        ...layoutBase,
+        yaxis: { gridcolor: 'rgba(255,255,255,0.05)' },
+        xaxis: { gridcolor: 'rgba(255,255,255,0.05)' }
+      }, { displayModeBar: false });
+
+      // Comparativo CUB
+      const cubData = CUB_DATA[estado];
+      const tipos = Object.keys(cubData);
+      Plotly.newPlot('graficoComparativo', [{
+        x: tipos.map(t => TIPOS_DESCRICAO[t].split(' - ')[0].substring(0, 12)),
+        y: tipos.map(t => cubData[t]),
+        type: 'bar',
+        marker: { 
+          color: tipos.map(t => t === tipoEdif ? '#00ffff' : '#4b5563')
+        }
+      }], { 
+        ...layoutBase,
+        xaxis: { tickangle: -45, gridcolor: 'rgba(255,255,255,0.05)' },
+        yaxis: { title: 'R$/m²', gridcolor: 'rgba(255,255,255,0.05)' }
+      }, { displayModeBar: false });
+    }
+
+    function renderMemorial(estado, tipoEdif, area, cubM2, custoDireto, valorBDI, valorContingencia, custoComplementares, custoFinal, custoM2Final, bdiPct, contingenciaPct) {
+      const memorial = `
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    MEMORIAL DE CÁLCULO - ORÇAMENTO CUB                       ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║ Data: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}
+║ 
+║ DADOS DO PROJETO:
+║ ├─ Estado: ${estado}
+║ ├─ Tipo: ${TIPOS_DESCRICAO[tipoEdif]}
+║ ├─ Área: ${fmtNum(area)} m²
+║ └─ CUB/m²: ${fmtBRL(cubM2)}
+║
+║ COMPOSIÇÃO DE CUSTOS:
+║ ├─ Custo Direto (CUB × Área):
+║ │   ${fmtNum(area)} m² × ${fmtBRL(cubM2)}/m² = ${fmtBRL(custoDireto)}
+║ │
+║ ├─ BDI (${fmtNum(bdiPct)}%):
+║ │   ${fmtBRL(custoDireto)} × ${fmtNum(bdiPct)}% = ${fmtBRL(valorBDI)}
+║ │
+║ ├─ Contingência (${fmtNum(contingenciaPct)}%):
+║ │   ${fmtBRL(custoDireto + valorBDI)} × ${fmtNum(contingenciaPct)}% = ${fmtBRL(valorContingencia)}
+║ │
+║ └─ Custos Complementares: ${fmtBRL(custoComplementares)}
+║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║ CUSTO TOTAL: ${fmtBRL(custoFinal)}
+║ CUSTO/m²: ${fmtBRL(custoM2Final)}
+╠══════════════════════════════════════════════════════════════════════════════╣
+║ FAIXA DE VALORES:
+║ ├─ Mínimo (-15%): ${fmtBRL(custoFinal * 0.85)}
+║ ├─ Estimado: ${fmtBRL(custoFinal)}
+║ └─ Máximo (+20%): ${fmtBRL(custoFinal * 1.20)}
+╚══════════════════════════════════════════════════════════════════════════════╝
+      `;
+      $('resultado').textContent = memorial;
+    }
+
+    function renderObservacoes(estado, tipoEdif) {
+      const obs = `
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="font-semibold text-neon-cyan mb-2">📋 Sobre o CUB</h4>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Valor de referência do SINDUSCON/${estado}</li>
+              <li>Inclui mão de obra + materiais + equipamentos</li>
+              <li>NÃO inclui: terreno, projeto, taxas, mobiliário</li>
+              <li>Atualizado mensalmente</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-neon-magenta mb-2">💰 BDI Típico</h4>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Administração central: 3-5%</li>
+              <li>Seguros e garantias: 1-2%</li>
+              <li>Impostos: 8-12%</li>
+              <li>Lucro: 5-10%</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-yellow-400 mb-2">⚠️ NÃO Inclusos</h4>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Custo do terreno</li>
+              <li>Paisagismo externo</li>
+              <li>Mobiliário e decoração</li>
+              <li>Elevadores e ar-condicionado central</li>
+              <li>Ligações definitivas</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-green-400 mb-2">✓ Recomendações</h4>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Use para viabilidade inicial</li>
+              <li>Solicite orçamentos de construtoras</li>
+              <li>Mantenha reserva de 15-20%</li>
+              <li>Acompanhe variação mensal do CUB</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      $('observacoes').innerHTML = obs;
+    }
+
+    // ===================== COPIAR MEMORIAL =====================
+    function copiarMemorial() {
+      const texto = $('resultado').textContent;
+      navigator.clipboard.writeText(texto).then(() => {
+        showToast('Memorial copiado para a área de transferência!', 'success');
+      });
+    }
+
+    // ===================== SALVAR/CARREGAR =====================
+    function salvarProjeto() {
+      const projeto = {
+        id: Date.now(),
+        nome: prompt('Nome do projeto:', `Projeto ${new Date().toLocaleDateString('pt-BR')}`),
+        data: new Date().toISOString(),
+        dados: {
+          estado: $('estado').value,
+          tipoEdif: $('tipoEdif').value,
+          area: $('area').value,
+          cubManual: $('cubManual').value,
+          bdi: $('bdi').value,
+          contingencia: $('contingencia').value,
+          prazoObra: $('prazoObra').value,
+          custoProjeto: $('custoProjeto').value,
+          custoEstrutural: $('custoEstrutural').value,
+          custoComplementar: $('custoComplementar').value,
+          custoAprovacao: $('custoAprovacao').value,
+          custoTerra: $('custoTerra').value,
+          custoFundacao: $('custoFundacao').value,
+          custoPaisagismo: $('custoPaisagismo').value,
+          custoOutros: $('custoOutros').value
+        }
+      };
+      
+      if (!projeto.nome) return;
+      
+      const projetos = JSON.parse(localStorage.getItem('orcamentoCUB_projetos') || '[]');
+      projetos.push(projeto);
+      localStorage.setItem('orcamentoCUB_projetos', JSON.stringify(projetos));
+      
+      atualizarListaProjetos();
+      showToast('Projeto salvo com sucesso!', 'success');
+    }
+
+    function carregarProjeto() {
+      const projetos = JSON.parse(localStorage.getItem('orcamentoCUB_projetos') || '[]');
+      if (projetos.length === 0) {
+        showToast('Nenhum projeto salvo', 'info');
+        return;
+      }
+      
+      const lista = projetos.map((p, i) => `${i + 1}. ${p.nome} (${new Date(p.data).toLocaleDateString('pt-BR')})`).join('\n');
+      const escolha = prompt(`Escolha o número do projeto:\n\n${lista}`);
+      
+      if (!escolha) return;
+      
+      const idx = parseInt(escolha) - 1;
+      if (idx >= 0 && idx < projetos.length) {
+        const dados = projetos[idx].dados;
+        Object.keys(dados).forEach(key => {
+          if ($(key)) $(key).value = dados[key];
+        });
+        showToast(`Projeto "${projetos[idx].nome}" carregado!`, 'success');
+        calcular();
+      }
+    }
+
+    function atualizarListaProjetos() {
+      const projetos = JSON.parse(localStorage.getItem('orcamentoCUB_projetos') || '[]');
+      const container = $('projetosSalvos');
+      
+      if (projetos.length === 0) {
+        container.innerHTML = 'Nenhum projeto salvo.';
+        return;
+      }
+      
+      container.innerHTML = projetos.slice(-5).reverse().map(p => `
+        <div class="flex justify-between items-center py-1 border-b border-white/5">
+          <span>${p.nome}</span>
+          <span class="text-xs text-gray-500">${new Date(p.data).toLocaleDateString('pt-BR')}</span>
+        </div>
+      `).join('');
+    }
+
+    // ===================== EXPORTAÇÕES =====================
+    async function exportarExcel() {
+      if (!window.XLSX) {
+        showToast('Biblioteca XLSX não disponível', 'error');
+        return;
+      }
+      
+      const memorial = $('resultado').textContent;
+      const linhas = memorial.split('\n').map(l => [l]);
+      
+      const ws = XLSX.utils.aoa_to_sheet(linhas);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Orçamento");
+      
+      XLSX.writeFile(wb, `orcamento_cub_${new Date().toISOString().slice(0,10)}.xlsx`);
+      showToast('Arquivo Excel exportado!', 'success');
+    }
+
+    async function exportarPDF() {
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        showToast('Biblioteca jsPDF não disponível', 'error');
+        return;
+      }
+      
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const margin = 40;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('Orçamento Rápido CUB', margin, 40);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(new Date().toLocaleString('pt-BR'), margin, 56);
+      
+      const memorial = $('resultado').textContent;
+      const linhas = memorial.split('\n');
+      
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(8);
+      
+      let y = 80;
+      for (const linha of linhas) {
+        if (y > 780) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(linha.substring(0, 95), margin, y);
+        y += 12;
+      }
+      
+      doc.save(`orcamento_cub_${new Date().toISOString().slice(0,10)}.pdf`);
+      showToast('Arquivo PDF exportado!', 'success');
+    }
+
+    // ===================== LIMPAR =====================
+    function limpar() {
+      if (!confirm('Limpar todos os campos?')) return;
+      
+      $('estado').value = 'SP';
+      $('tipoEdif').value = 'R1N';
+      $('area').value = '150';
+      $('cubManual').value = '';
+      $('bdi').value = '25';
+      $('contingencia').value = '10';
+      $('prazoObra').value = '12';
+      $('custoProjeto').value = '0';
+      $('custoEstrutural').value = '0';
+      $('custoComplementar').value = '0';
+      $('custoAprovacao').value = '0';
+      $('custoTerra').value = '0';
+      $('custoFundacao').value = '0';
+      $('custoPaisagismo').value = '0';
+      $('custoOutros').value = '0';
+      
+      $('resultadoSection').classList.add('opacity-50');
+      $('valorTotal').textContent = 'R$ 0,00';
+      $('valorM2').textContent = 'R$ 0,00/m²';
+      
+      showToast('Campos limpos!', 'info');
+    }
+
+    // ===================== AUTO CALC =====================
+    function setupAutoCalc() {
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.addEventListener('change', () => {
+          if ($('autoCalc')?.checked) calcular();
+        });
+      });
+    }
+
+    // ===================== INIT =====================
+    document.addEventListener('DOMContentLoaded', () => {
+      if ($('ano')) $('ano').textContent = new Date().getFullYear();
+      
+      $('btnCalcular').addEventListener('click', calcular);
+      $('btnSalvar').addEventListener('click', salvarProjeto);
+      $('btnCarregar').addEventListener('click', carregarProjeto);
+      $('btnExcel').addEventListener('click', exportarExcel);
+      $('btnPDF').addEventListener('click', exportarPDF);
+      $('btnReset').addEventListener('click', limpar);
+      
+      $('estado').addEventListener('change', updateCubQuickRef);
+      
+      updateCubQuickRef();
+      atualizarListaProjetos();
+      setupAutoCalc();
+    });
+  </script>
+
+    <!-- Footer -->
+    
+    
+
+    
+
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
