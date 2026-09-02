@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Calculadora de Vãos | Hub Engenharia Civil</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.4);
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .result-animate {
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+        }
+        
+        .diagram-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 1.5s ease forwards;
+        }
+        
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+        
+        .input-focus {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .input-focus:focus {
+            transform: scale(1.01);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        .radio-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .radio-card:has(input:checked) {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+        }
+        .radio-card:hover:not(:has(input:checked)) {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .stat-card {
+            animation: fadeInScale 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+        }
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        .progress-bar {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .tooltip-wrapper {
+            position: relative;
+        }
+        .tooltip-wrapper .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background: #1e293b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 50;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .tooltip-wrapper .tooltip-content::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1e293b;
+        }
+        .tooltip-wrapper:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Range slider custom */
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+            transition: transform 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        .dark input[type="range"] {
+            background: #334155;
+        }
+        
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 40;
+        }
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 30px rgba(37, 99, 235, 0.6);
+        }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .print-break { page-break-before: always; }
+            body { background: white !important; }
+        }
+        
+        /* Confetti animation */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        /* Number counter animation */
+        .counter-value {
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+        .counter-value.updating {
+            transform: scale(1.2);
+        }
+
+        /* Dark mode toggle button */
+        .theme-toggle {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .theme-toggle svg {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle .icon-sun {
+            opacity: 0;
+            transform: rotate(180deg) scale(0);
+        }
+        .theme-toggle .icon-moon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .dark .theme-toggle .icon-sun {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .dark .theme-toggle .icon-moon {
+            opacity: 0;
+            transform: rotate(-180deg) scale(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-slate-900 min-h-screen transition-colors duration-300">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 shadow-xl no-print sticky top-0 z-30">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="text-left flex-1">
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2">
+                        <span class="text-3xl">🏗️</span>
+                        <span>Calculadora de Vãos</span>
+                    </h1>
+                    <p class="text-blue-100 text-xs sm:text-sm mt-1">Vigas e Lajes - Pré-dimensionamento NBR 6118</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleDarkMode()" class="theme-toggle p-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all backdrop-blur-sm" title="Alternar Modo Escuro" aria-label="Alternar Modo Escuro">
+                        <svg class="icon-moon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                        <svg class="icon-sun w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </button>
+                    <button onclick="exportarPDF()" class="p-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all backdrop-blur-sm hidden sm:block" title="Exportar PDF" aria-label="Exportar PDF">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </button>
+                    <button onclick="window.print()" class="p-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all backdrop-blur-sm" title="Imprimir" aria-label="Imprimir">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Quick Stats Bar -->
+    <div id="quick-stats" class="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700 py-3 no-print" style="display: none;">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center gap-6 text-sm">
+                <div class="flex items-center gap-2">
+                    <span class="text-gray-500 dark:text-gray-400">Último cálculo:</span>
+                    <span id="last-calc-type" class="font-semibold text-blue-600 dark:text-blue-400">-</span>
+                </div>
+                <div class="hidden sm:flex items-center gap-2">
+                    <span class="text-gray-500 dark:text-gray-400">Resultado:</span>
+                    <span id="last-calc-result" class="font-semibold text-green-600 dark:text-green-400">-</span>
+                </div>
+                <div class="hidden md:flex items-center gap-2">
+                    <span class="text-gray-500 dark:text-gray-400">Total calculados:</span>
+                    <span id="total-calcs" class="font-semibold text-purple-600 dark:text-purple-400">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Tipo de Elemento -->
+        <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-6 card-hover border border-gray-100 dark:border-slate-700">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <span class="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 p-2 rounded-xl">📐</span>
+                Tipo de Elemento Estrutural
+            </h2>
+            <div class="grid grid-cols-2 gap-4">
+                <label class="cursor-pointer">
+                    <input type="radio" name="tipo" value="viga" checked class="sr-only peer"/>
+                    <div class="radio-card border-2 border-gray-200 dark:border-slate-600 rounded-xl p-4 sm:p-6 text-center">
+                        <div class="text-4xl sm:text-5xl mb-2 transition-transform hover:scale-110">🏛️</div>
+                        <div class="font-bold text-lg">Viga</div>
+                        <div class="text-sm opacity-75 mt-1">Elemento linear horizontal</div>
+                    </div>
+                </label>
+                <label class="cursor-pointer">
+                    <input type="radio" name="tipo" value="laje" class="sr-only peer"/>
+                    <div class="radio-card border-2 border-gray-200 dark:border-slate-600 rounded-xl p-4 sm:p-6 text-center">
+                        <div class="text-4xl sm:text-5xl mb-2 transition-transform hover:scale-110">🧱</div>
+                        <div class="font-bold text-lg">Laje</div>
+                        <div class="text-sm opacity-75 mt-1">Elemento plano horizontal</div>
+                    </div>
+                </label>
+            </div>
+        </section>
+
+        <!-- Configuração Viga -->
+        <section id="config-viga" class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-6 card-hover border border-gray-100 dark:border-slate-700">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <span class="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 p-2 rounded-xl">⚙️</span>
+                Configuração da Viga
+            </h2>
+            
+            <!-- Diagrama da Viga -->
+            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-slate-700 dark:to-slate-600 rounded-xl p-4 mb-6">
+                <div class="text-center text-sm text-gray-600 dark:text-gray-300 mb-2 font-medium">Diagrama do Apoio</div>
+                <svg id="viga-diagram" viewBox="0 0 400 120" class="w-full max-w-md mx-auto h-28"></svg>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Tipo de Apoio
+                        <span class="tooltip-wrapper cursor-help text-blue-500 ml-1">
+                            ⓘ
+                            <span class="tooltip-content">Define as condições de contorno da viga. Afeta diretamente o momento fletor e a flecha.</span>
+                        </span>
+                    </label>
+                    <select id="apoio-viga" class="w-full p-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none input-focus bg-white dark:bg-slate-700 dark:text-white">
+                        <option value="simples">🔘 Simplesmente Apoiada</option>
+                        <option value="continua">🔗 Contínua</option>
+                        <option value="balanco">📏 Em Balanço</option>
+                        <option value="engastada">🔒 Bi-engastada</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Material
+                        <span class="tooltip-wrapper cursor-help text-blue-500 ml-1">
+                            ⓘ
+                            <span class="tooltip-content">O material influencia o módulo de elasticidade e a relação altura/vão.</span>
+                        </span>
+                    </label>
+                    <select id="material-viga" class="w-full p-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none input-focus bg-white dark:bg-slate-700 dark:text-white">
+                        <option value="concreto">🪨 Concreto Armado</option>
+                        <option value="aco">⚙️ Aço</option>
+                        <option value="madeira">🪵 Madeira</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Vão (L) em metros
+                        <span class="tooltip-wrapper cursor-help text-blue-500 ml-1">
+                            ⓘ
+                            <span class="tooltip-content">Distância entre apoios. Vãos maiores requerem alturas maiores.</span>
+                        </span>
+                    </label>
+                    <div class="relative">
+                        <input type="number" id="vao-viga" value="5.0" min="0.5" max="30" step="0.1" 
+                            class="w-full p-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none input-focus pr-12 bg-white dark:bg-slate-700 dark:text-white"/>
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">m</span>
+                    </div>
+                    <input type="range" id="vao-viga-range" min="0.5" max="20" step="0.5" value="5.0" 
+                        class="w-full mt-2"/>
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>0.5m</span>
+                        <span id="vao-viga-display" class="font-semibold text-blue-600 dark:text-blue-400">5.0m</span>
+                        <span>20m</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Carga Estimada
+                        <span class="tooltip-wrapper cursor-help text-blue-500 ml-1">
+                            ⓘ
+                            <span class="tooltip-content">Carga distribuída total incluindo peso próprio e sobrecarga.</span>
+                        </span>
+                    </label>
+                    <div class="relative">
+                        <input type="number" id="carga-viga" value="10" min="1" max="200" step="1" 
+                            class="w-full p-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none input-focus pr-16 bg-white dark:bg-slate-700 dark:text-white"/>
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">kN/m</span>
+                    </div>
+                    <input type="range" id="carga-viga-range" min="1" max="100" step="1" value="10" 
+                        class="w-full mt-2"/>
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>1 kN/m</span>
+                        <span id="carga-viga-display" class="font-semibold text-blue-600 dark:text-blue-400">10 kN/m</span>
+                        <span>100 kN/m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uso predefinido -->
+            <div class="mt-6 pt-6 border-t dark:border-slate-600">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    ⚡ Predefinições de Uso
+                </label>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="aplicarPredefinicaoViga('residencial')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-lg text-sm transition-all dark:text-white">
+                        🏠 Residencial
+                    </button>
+                    <button onclick="aplicarPredefinicaoViga('comercial')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-lg text-sm transition-all dark:text-white">
+                        🏢 Comercial
+                    </button>
+                    <button onclick="aplicarPredefinicaoViga('industrial')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-lg text-sm transition-all dark:text-white">
+                        🏭 Industrial
+                    </button>
+                    <button onclick="aplicarPredefinicaoViga('garagem')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-lg text-sm transition-all dark:text-white">
+                        🚗 Garagem
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuração Laje -->
+        <section id="config-laje" class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-6 card-hover border border-gray-100 dark:border-slate-700" style="display: none;">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <span class="bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 p-2 rounded-xl">⚙️</span>
+                Configuração da Laje
+            </h2>
+
+            <!-- Diagrama da Laje -->
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-slate-700 dark:to-slate-600 rounded-xl p-4 mb-6">
+                <div class="text-center text-sm text-gray-600 dark:text-gray-300 mb-2 font-medium">Vista da Laje</div>
+                <svg id="laje-diagram" viewBox="0 0 400 150" class="w-full max-w-md mx-auto h-36"></svg>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de Laje</label>
+                    <select id="tipo-laje" class="w-full p-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none input-focus bg-white dark:bg-slate-700 dark:text-white">
+                        <option value="macica">📋 Maciça</option>
+                        <option value="nervurada">🔲 Nervurada</option>
+                        <option value="cogumelo">🍄 Cogumelo</option>
+                        <option value="trelica">🔺 Treliçada (Pré-moldada)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Direção de Armação</label>
+                    <select id="direcao-laje" class="w-full p-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none input-focus bg-white dark:bg-slate-700 dark:text-white">
+                        <option value="armada-1">↔️ Armada em 1 Direção (Lx/Ly > 2)</option>
+                        <option value="armada-2">✚ Armada em 2 Direções (Lx/Ly ≤ 2)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Menor Vão (Lx) em metros</label>
+                    <div class="relative">
+                        <input type="number" id="vao-laje" value="4.0" min="1" max="15" step="0.1" 
+                            class="w-full p-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none input-focus pr-12 bg-white dark:bg-slate-700 dark:text-white"/>
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">m</span>
+                    </div>
+                    <input type="range" id="vao-laje-range" min="1" max="15" step="0.5" value="4.0" 
+                        class="w-full mt-2"/>
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>1m</span>
+                        <span id="vao-laje-display" class="font-semibold text-purple-600 dark:text-purple-400">4.0m</span>
+                        <span>15m</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sobrecarga de Uso</label>
+                    <div class="relative">
+                        <input type="number" id="sobrecarga-laje" value="2.0" min="0.5" max="20" step="0.5" 
+                            class="w-full p-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none input-focus pr-16 bg-white dark:bg-slate-700 dark:text-white"/>
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">kN/m²</span>
+                    </div>
+                    <input type="range" id="sobrecarga-range" min="0.5" max="20" step="0.5" value="2.0" 
+                        class="w-full mt-2"/>
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>0.5</span>
+                        <span id="sobrecarga-display" class="font-semibold text-purple-600 dark:text-purple-400">2.0 kN/m²</span>
+                        <span>20 kN/m²</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uso predefinido Laje -->
+            <div class="mt-6 pt-6 border-t dark:border-slate-600">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    ⚡ Predefinições de Uso (NBR 6120)
+                </label>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="aplicarPredefinicaoLaje('dormitorio')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-purple-900 rounded-lg text-sm transition-all dark:text-white">
+                        🛏️ Dormitório (1.5)
+                    </button>
+                    <button onclick="aplicarPredefinicaoLaje('sala')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-purple-900 rounded-lg text-sm transition-all dark:text-white">
+                        🛋️ Sala (2.0)
+                    </button>
+                    <button onclick="aplicarPredefinicaoLaje('escritorio')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-purple-900 rounded-lg text-sm transition-all dark:text-white">
+                        💼 Escritório (3.0)
+                    </button>
+                    <button onclick="aplicarPredefinicaoLaje('loja')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-purple-900 rounded-lg text-sm transition-all dark:text-white">
+                        🏪 Loja (4.0)
+                    </button>
+                    <button onclick="aplicarPredefinicaoLaje('garagem')" class="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-purple-900 rounded-lg text-sm transition-all dark:text-white">
+                        🚗 Garagem (5.0)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Botão Calcular -->
+        <button id="btn-calcular" onclick="calcular()" class="w-full btn-primary text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg mb-6 flex items-center justify-center gap-3 no-print">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+            <span>Calcular Dimensões</span>
+            <span class="hidden sm:inline text-blue-200 text-sm">(Enter)</span>
+        </button>
+
+        <!-- Resultados -->
+        <section id="resultado" class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-6 result-animate border border-gray-100 dark:border-slate-700" style="display: none;">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                    <span class="bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 p-2 rounded-xl">📊</span>
+                    Resultados
+                </h2>
+                <div class="flex gap-2 no-print">
+                    <button onclick="copiarResultados()" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 transition-colors px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Copiar</span>
+                    </button>
+                    <button onclick="compartilhar()" class="flex items-center gap-2 text-green-600 hover:text-green-800 dark:text-green-400 transition-colors px-3 py-1 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/30">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Compartilhar</span>
+                    </button>
+                </div>
+            </div>
+            <div id="output"></div>
+        </section>
+
+        <!-- Recomendações -->
+        <section id="recomendacoes" class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-6 mb-6 border border-amber-200 dark:border-amber-800" style="display: none;">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <span class="text-2xl">💡</span>
+                Recomendações
+            </h3>
+            <div id="recomendacoes-content" class="space-y-3"></div>
+        </section>
+
+        <!-- Seção Visual 3D -->
+        <section id="visual-3d" class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-6 border border-gray-100 dark:border-slate-700" style="display: none;">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <span class="bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400 p-2 rounded-xl">🎨</span>
+                Visualização da Seção
+            </h2>
+            <div id="secao-visual" class="flex justify-center items-center"></div>
+        </section>
+
+        <!-- Comparativo -->
+        <section id="comparativo" class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-6 border border-gray-100 dark:border-slate-700" style="display: none;">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <span class="bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400 p-2 rounded-xl">🔄</span>
+                Comparativo
+            </h2>
+            <div id="comp-output" class="overflow-x-auto"></div>
+        </section>
+
+        <!-- Gráfico de Barras -->
+        <section id="grafico-section" class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-6 border border-gray-100 dark:border-slate-700" style="display: none;">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 p-2 rounded-xl">📈</span>
+                Gráfico Comparativo
+            </h2>
+            <div id="grafico-container" class="h-64"></div>
+        </section>
+
+        <!-- Notas Técnicas -->
+        <section class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-slate-800 dark:to-slate-700 rounded-2xl p-6 mb-6 border border-blue-100 dark:border-slate-600">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <span class="text-2xl">ℹ️</span>
+                Notas Técnicas
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border dark:border-slate-600">
+                    <div class="font-semibold text-blue-700 dark:text-blue-400 mb-2 flex items-center gap-2">
+                        <span>📏</span> Vigas
+                    </div>
+                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                        <li>• Altura: L/10 a L/15 (apoio simples)</li>
+                        <li>• Largura mínima: 12 cm (NBR 6118)</li>
+                        <li>• Relação b/h usual: 0.3 a 0.5</li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border dark:border-slate-600">
+                    <div class="font-semibold text-purple-700 dark:text-purple-400 mb-2 flex items-center gap-2">
+                        <span>🧱</span> Lajes
+                    </div>
+                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                        <li>• Espessura mínima: 7 cm (cobertura)</li>
+                        <li>• Espessura mínima: 8 cm (piso)</li>
+                        <li>• Flecha limite: L/250</li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border dark:border-slate-600">
+                    <div class="font-semibold text-amber-700 dark:text-amber-400 mb-2 flex items-center gap-2">
+                        <span>⚠️</span> Importante
+                    </div>
+                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                        <li>• Valores para pré-dimensionamento</li>
+                        <li>• Cálculo estrutural obrigatório</li>
+                        <li>• Consultar engenheiro estrutural</li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border dark:border-slate-600">
+                    <div class="font-semibold text-green-700 dark:text-green-400 mb-2 flex items-center gap-2">
+                        <span>✅</span> Referências
+                    </div>
+                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                        <li>• NBR 6118:2014 - Concreto</li>
+                        <li>• NBR 6120:2019 - Cargas</li>
+                        <li>• NBR 8800:2008 - Aço</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Histórico -->
+        <section id="historico-section" class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-6 no-print border border-gray-100 dark:border-slate-700" style="display: none;">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                    <span class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 p-2 rounded-xl">📜</span>
+                    Histórico de Cálculos
+                </h2>
+                <button onclick="limparHistorico()" class="text-red-500 hover:text-red-700 text-sm flex items-center gap-1 px-3 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Limpar
+                </button>
+            </div>
+            <div id="historico-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 dark:bg-slate-950 text-white py-8 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-lg font-semibold">&copy; <span id="ano"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+            <p class="text-gray-400 text-sm mt-2">Desenvolvido para auxílio em pré-dimensionamento estrutural</p>
+            <div class="flex justify-center gap-4 mt-4">
+                <span class="text-xs text-gray-500">NBR 6118:2014</span>
+                <span class="text-xs text-gray-500">•</span>
+                <span class="text-xs text-gray-500">NBR 6120:2019</span>
+                <span class="text-xs text-gray-500">•</span>
+                <span class="text-xs text-gray-500">NBR 8800:2008</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- FAB - Scroll to Top -->
+    <button id="fab-top" onclick="scrollToTop()" class="fab no-print" style="display: none;" aria-label="Voltar ao topo">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+    </button>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <span id="toast-icon">✓</span>
+        <span id="toast-message"></span>
+    </div>
+
+    <script>
+        // ==================== INICIALIZAÇÃO ====================
+        document.getElementById('ano').textContent = new Date().getFullYear();
+        let historico = JSON.parse(localStorage.getItem('calculoHistorico') || '[]');
+        
+        // Detectar preferência do sistema e localStorage
+        function getPreferredTheme() {
+            const savedTheme = localStorage.getItem('darkMode');
+            if (savedTheme !== null) {
+                return savedTheme === 'true';
+            }
+            // Verificar preferência do sistema
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        
+        let isDarkMode = getPreferredTheme();
+        
+        // Aplicar tema inicial
+        function applyTheme(dark) {
+            if (dark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        
+        // Aplicar tema ao carregar
+        applyTheme(isDarkMode);
+
+        // Escutar mudanças na preferência do sistema
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (localStorage.getItem('darkMode') === null) {
+                    isDarkMode = e.matches;
+                    applyTheme(isDarkMode);
+                }
+            });
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        
+        // Alternar entre viga e laje
+        document.querySelectorAll('input[name="tipo"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const configViga = document.getElementById('config-viga');
+                const configLaje = document.getElementById('config-laje');
+                
+                if (this.value === 'viga') {
+                    configViga.style.display = 'block';
+                    configLaje.style.display = 'none';
+                    atualizarDiagramaViga();
+                } else {
+                    configViga.style.display = 'none';
+                    configLaje.style.display = 'block';
+                    atualizarDiagramaLaje();
+                }
+                
+                ocultarResultados();
+            });
+        });
+
+        // Sincronizar sliders com inputs
+        const syncInputs = [
+            ['vao-viga', 'vao-viga-range', 'vao-viga-display', 'm'],
+            ['carga-viga', 'carga-viga-range', 'carga-viga-display', ' kN/m'],
+            ['vao-laje', 'vao-laje-range', 'vao-laje-display', 'm'],
+            ['sobrecarga-laje', 'sobrecarga-range', 'sobrecarga-display', ' kN/m²']
+        ];
+
+        syncInputs.forEach(([inputId, rangeId, displayId, suffix]) => {
+            const input = document.getElementById(inputId);
+            const range = document.getElementById(rangeId);
+            const display = document.getElementById(displayId);
+            
+            if (input && range) {
+                const updateValue = (value) => {
+                    input.value = value;
+                    range.value = value;
+                    if (display) display.textContent = value + suffix;
+                };
+                
+                input.addEventListener('input', () => updateValue(input.value));
+                range.addEventListener('input', () => updateValue(range.value));
+            }
+        });
+
+        // Atualizar diagramas quando mudar opções
+        document.getElementById('apoio-viga').addEventListener('change', atualizarDiagramaViga);
+        document.getElementById('tipo-laje').addEventListener('change', atualizarDiagramaLaje);
+        document.getElementById('direcao-laje').addEventListener('change', atualizarDiagramaLaje);
+
+        // Atalho de teclado Enter para calcular
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.target.matches('select')) {
+                calcular();
+            }
+        });
+
+        // Scroll listener para FAB
+        window.addEventListener('scroll', () => {
+            const fab = document.getElementById('fab-top');
+            if (window.scrollY > 500) {
+                fab.style.display = 'flex';
+            } else {
+                fab.style.display = 'none';
+            }
+        });
+
+        // Inicializar diagramas e histórico
+        atualizarDiagramaViga();
+        atualizarHistorico();
+        atualizarQuickStats();
+
+        // ==================== FUNÇÕES DE DIAGRAMA ====================
+        
+        function atualizarDiagramaViga() {
+            const apoio = document.getElementById('apoio-viga').value;
+            const svg = document.getElementById('viga-diagram');
+            
+            const diagramas = {
+                simples: `
+                    <defs>
+                        <linearGradient id="vigaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#3b82f6"/>
+                            <stop offset="100%" style="stop-color:#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                    <line x1="50" y1="60" x2="350" y2="60" stroke="url(#vigaGrad)" stroke-width="10" stroke-linecap="round" class="diagram-line"/>
+                    <polygon points="50,68 35,90 65,90" fill="#475569"/>
+                    <polygon points="350,68 335,90 365,90" fill="#475569"/>
+                    <circle cx="50" cy="60" r="8" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <circle cx="350" cy="60" r="8" fill="#10b981" stroke="white" stroke-width="2"/>
+                    <text x="200" y="108" text-anchor="middle" fill="#64748b" font-size="11" font-weight="500">Simplesmente Apoiada</text>
+                    <line x1="50" y1="25" x2="350" y2="25" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,5"/>
+                    <text x="200" y="18" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600">L</text>
+                    <path d="M 180 40 Q 200 55 220 40" stroke="#f59e0b" stroke-width="2" fill="none"/>
+                    <polygon points="220,40 215,48 223,45" fill="#f59e0b"/>
+                `,
+                continua: `
+                    <defs>
+                        <linearGradient id="vigaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#3b82f6"/>
+                            <stop offset="100%" style="stop-color:#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                    <line x1="25" y1="60" x2="375" y2="60" stroke="url(#vigaGrad)" stroke-width="10" stroke-linecap="round" class="diagram-line"/>
+                    <polygon points="25,68 10,90 40,90" fill="#475569"/>
+                    <polygon points="200,68 185,90 215,90" fill="#475569"/>
+                    <polygon points="375,68 360,90 390,90" fill="#475569"/>
+                    <circle cx="25" cy="60" r="6" fill="#10b981"/>
+                    <circle cx="200" cy="60" r="6" fill="#10b981"/>
+                    <circle cx="375" cy="60" r="6" fill="#10b981"/>
+                    <text x="200" y="108" text-anchor="middle" fill="#64748b" font-size="11" font-weight="500">Viga Contínua (2 vãos)</text>
+                    <text x="112" y="45" text-anchor="middle" fill="#64748b" font-size="10">L₁</text>
+                    <text x="287" y="45" text-anchor="middle" fill="#64748b" font-size="10">L₂</text>
+                `,
+                balanco: `
+                    <defs>
+                        <linearGradient id="vigaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#3b82f6"/>
+                            <stop offset="100%" style="stop-color:#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                    <line x1="80" y1="60" x2="350" y2="60" stroke="url(#vigaGrad)" stroke-width="10" stroke-linecap="round" class="diagram-line"/>
+                    <rect x="65" y="40" width="25" height="50" fill="#475569" rx="2"/>
+                    <line x1="65" y1="35" x2="65" y2="95" stroke="#374151" stroke-width="4"/>
+                    <circle cx="350" cy="60" r="10" fill="#ef4444" stroke="white" stroke-width="2"/>
+                    <text x="200" y="108" text-anchor="middle" fill="#64748b" font-size="11" font-weight="500">Em Balanço (Engaste + Livre)</text>
+                    <path d="M 340 35 L 350 60 L 340 85" stroke="#ef4444" stroke-width="2" fill="none" stroke-dasharray="4,2"/>
+                    <text x="360" y="65" fill="#ef4444" font-size="10">P</text>
+                `,
+                engastada: `
+                    <defs>
+                        <linearGradient id="vigaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#3b82f6"/>
+                            <stop offset="100%" style="stop-color:#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                    <line x1="50" y1="60" x2="350" y2="60" stroke="url(#vigaGrad)" stroke-width="10" stroke-linecap="round" class="diagram-line"/>
+                    <rect x="35" y="40" width="25" height="50" fill="#475569" rx="2"/>
+                    <rect x="340" y="40" width="25" height="50" fill="#475569" rx="2"/>
+                    <line x1="35" y1="35" x2="35" y2="95" stroke="#374151" stroke-width="4"/>
+                    <line x1="365" y1="35" x2="365" y2="95" stroke="#374151" stroke-width="4"/>
+                    <text x="200" y="108" text-anchor="middle" fill="#64748b" font-size="11" font-weight="500">Bi-engastada</text>
+                `
+            };
+            
+            svg.innerHTML = diagramas[apoio] || '';
+        }
+
+        function atualizarDiagramaLaje() {
+            const tipo = document.getElementById('tipo-laje').value;
+            const direcao = document.getElementById('direcao-laje').value;
+            const svg = document.getElementById('laje-diagram');
+            
+            let content = `
+                <defs>
+                    <linearGradient id="lajeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#a78bfa"/>
+                        <stop offset="100%" style="stop-color:#818cf8"/>
+                    </linearGradient>
+                    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#c4b5fd" stroke-width="0.5"/>
+                    </pattern>
+                </defs>
+                <rect x="50" y="35" width="300" height="70" fill="url(#lajeGrad)" stroke="#7c3aed" stroke-width="2" rx="4"/>
+                <rect x="52" y="37" width="296" height="66" fill="url(#grid)" rx="3"/>
+            `;
+            
+            if (direcao === 'armada-2') {
+                // Armadura em duas direções
+                for (let i = 70; i <= 330; i += 40) {
+                    content += `<line x1="${i}" y1="40" x2="${i}" y2="100" stroke="#3b82f6" stroke-width="2" opacity="0.7"/>`;
+                }
+                for (let j = 45; j <= 95; j += 20) {
+                    content += `<line x1="55" y1="${j}" x2="345" y2="${j}" stroke="#10b981" stroke-width="2" opacity="0.7"/>`;
+                }
+                content += `<text x="200" y="128" text-anchor="middle" fill="#64748b" font-size="11" font-weight="500">Armada em 2 Direções</text>`;
+            } else {
+                // Armadura em uma direção
+                for (let j = 45; j <= 95; j += 15) {
+                    content += `<line x1="55" y1="${j}" x2="345" y2="${j}" stroke="#3b82f6" stroke-width="2" opacity="0.7"/>`;
+                }
+                content += `<text x="200" y="128" text-anchor="middle" fill="#64748b" font-size="11" font-weight="500">Armada em 1 Direção</text>`;
+            }
+            
+            // Cotas
+            content += `
+                <line x1="50" y1="115" x2="350" y2="115" stroke="#94a3b8" stroke-width="1"/>
+                <line x1="50" y1="110" x2="50" y2="120" stroke="#94a3b8" stroke-width="1"/>
+                <line x1="350" y1="110" x2="350" y2="120" stroke="#94a3b8" stroke-width="1"/>
+                <text x="200" y="142" text-anchor="middle" fill="#64748b" font-size="10">Lx (menor vão)</text>
+            `;
+            
+            svg.innerHTML = content;
+        }
+
+        // ==================== FUNÇÕES DE CÁLCULO ====================
+
+        function ocultarResultados() {
+            document.getElementById('resultado').style.display = 'none';
+            document.getElementById('comparativo').style.display = 'none';
+            document.getElementById('visual-3d').style.display = 'none';
+            document.getElementById('grafico-section').style.display = 'none';
+            document.getElementById('recomendacoes').style.display = 'none';
+        }
+
+        function calcular() {
+            const btn = document.getElementById('btn-calcular');
+            btn.innerHTML = `
+                <svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Calculando...</span>
+            `;
+            
+            setTimeout(() => {
+                const tipo = document.querySelector('input[name="tipo"]:checked').value;
+                
+                if (tipo === 'viga') {
+                    calcularViga();
+                } else {
+                    calcularLaje();
+                }
+                
+                btn.innerHTML = `
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Calcular Dimensões</span>
+                    <span class="hidden sm:inline text-blue-200 text-sm">(Enter)</span>
+                `;
+                
+                // Scroll suave para resultados
+                document.getElementById('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Efeito de celebração
+                criarConfetti();
+            }, 500);
+        }
+
+        function calcularViga() {
+            const apoio = document.getElementById('apoio-viga').value;
+            const material = document.getElementById('material-viga').value;
+            const vao = parseFloat(document.getElementById('vao-viga').value);
+            const carga = parseFloat(document.getElementById('carga-viga').value);
+
+            if (!vao || vao <= 0) {
+                showToast('Insira um vão válido maior que zero', 'error');
+                return;
+            }
+
+            const fatores = {
+                concreto: { simples: { h: 10, b_h: 0.4 }, continua: { h: 12, b_h: 0.4 }, balanco: { h: 5, b_h: 0.35 }, engastada: { h: 15, b_h: 0.4 } },
+                aco: { simples: { h: 20, b_h: 0.5 }, continua: { h: 25, b_h: 0.5 }, balanco: { h: 10, b_h: 0.45 }, engastada: { h: 30, b_h: 0.5 } },
+                madeira: { simples: { h: 15, b_h: 0.5 }, continua: { h: 18, b_h: 0.5 }, balanco: { h: 8, b_h: 0.45 }, engastada: { h: 20, b_h: 0.5 } }
+            };
+
+            const fator = fatores[material][apoio];
+            const h = (vao * 100) / fator.h;
+            const b = h * fator.b_h;
+            
+            // Arredondar para múltiplos de 5
+            let hFinal = Math.ceil(h / 5) * 5;
+            let bFinal = Math.ceil(b / 5) * 5;
+            
+            // Garantir largura mínima (12cm para concreto)
+            if (material === 'concreto' && bFinal < 12) bFinal = 12;
+            if (material === 'madeira' && bFinal < 6) bFinal = 6;
+            if (material === 'aco' && bFinal < 10) bFinal = 10;
+
+            let momentoMax, cortanteMax, flechaEstimada;
+            const modulo = getModuloElastico(material);
+            const inercia = getInercia(bFinal, hFinal);
+            const L = vao * 100; // em cm
+
+            switch(apoio) {
+                case 'simples':
+                    momentoMax = (carga * vao * vao) / 8;
+                    cortanteMax = (carga * vao) / 2;
+                    flechaEstimada = (5 * carga * Math.pow(L, 4)) / (384 * modulo * inercia);
+                    break;
+                case 'continua':
+                    momentoMax = (carga * vao * vao) / 10; // Momento no apoio central
+                    cortanteMax = (5 * carga * vao) / 8;
+                    flechaEstimada = (carga * Math.pow(L, 4)) / (185 * modulo * inercia);
+                    break;
+                case 'balanco':
+                    momentoMax = (carga * vao * vao) / 2;
+                    cortanteMax = carga * vao;
+                    flechaEstimada = (carga * Math.pow(L, 4)) / (8 * modulo * inercia);
+                    break;
+                case 'engastada':
+                    momentoMax = (carga * vao * vao) / 12;
+                    cortanteMax = (carga * vao) / 2;
+                    flechaEstimada = (carga * Math.pow(L, 4)) / (384 * modulo * inercia);
+                    break;
+            }
+
+            const flechaLimite = L / 250;
+            const flechaOk = flechaEstimada <= flechaLimite;
+            const utilizacao = (flechaEstimada / flechaLimite) * 100;
+
+            const output = document.getElementById('output');
+            output.innerHTML = `
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                    <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-4 text-center shadow-lg">
+                        <div class="text-2xl sm:text-3xl font-bold counter-value">${hFinal}</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Altura (cm)</div>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-4 text-center shadow-lg">
+                        <div class="text-2xl sm:text-3xl font-bold counter-value">${bFinal}</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Largura (cm)</div>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-4 text-center shadow-lg">
+                        <div class="text-2xl sm:text-3xl font-bold">${(bFinal/hFinal).toFixed(2)}</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Relação b/h</div>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-xl p-4 text-center shadow-lg">
+                        <div class="text-2xl sm:text-3xl font-bold">L/${fator.h}</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Critério</div>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-4">
+                        <h4 class="font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="text-lg">📐</span> Esforços Solicitantes
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Momento Máximo:</span>
+                                <span class="font-bold text-blue-600 dark:text-blue-400">${momentoMax.toFixed(2)} kN.m</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Cortante Máximo:</span>
+                                <span class="font-bold text-green-600 dark:text-green-400">${cortanteMax.toFixed(2)} kN</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Peso Linear:</span>
+                                <span class="font-medium dark:text-gray-200">${calcularPeso(material, bFinal, hFinal).toFixed(1)} kg/m</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-4">
+                        <h4 class="font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="text-lg">📏</span> Verificação de Flecha
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Flecha Estimada:</span>
+                                <span class="font-bold ${flechaOk ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">${flechaEstimada.toFixed(3)} cm</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Flecha Limite (L/250):</span>
+                                <span class="font-medium dark:text-gray-200">${flechaLimite.toFixed(3)} cm</span>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="dark:text-gray-300">Utilização</span>
+                                    <span class="${utilizacao <= 100 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">${Math.min(utilizacao, 100).toFixed(1)}%</span>
+                                </div>
+                                <div class="h-3 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                                    <div class="h-full progress-bar rounded-full ${utilizacao <= 70 ? 'bg-green-500' : utilizacao <= 100 ? 'bg-yellow-500' : 'bg-red-500'}" 
+                                         style="width: ${Math.min(utilizacao, 100)}%"></div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-3 ${flechaOk ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'} font-semibold flex items-center justify-center gap-2">
+                                ${flechaOk ? '✓ Flecha OK' : '⚠️ Revisar dimensões'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">🏗️</span>
+                            <div>
+                                <div class="font-semibold text-blue-800 dark:text-blue-300">Seção Recomendada</div>
+                                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">${bFinal} × ${hFinal} cm</div>
+                                <div class="text-sm text-blue-600/70 dark:text-blue-400/70 mt-1">
+                                    ${getNomeMaterial(material)} - ${getDescricaoApoio(apoio)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">💰</span>
+                            <div>
+                                <div class="font-semibold text-emerald-800 dark:text-emerald-300">Orçamento Est. 2025</div>
+                                <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">R$ ${(estimarCusto(material, bFinal, hFinal, vao) * vao).toLocaleString('pt-BR', {maximumFractionDigits: 0})}</div>
+                                <div class="text-sm text-emerald-600/70 dark:text-emerald-300/70 mt-1">
+                                    R$ ${estimarCusto(material, bFinal, hFinal, vao).toLocaleString('pt-BR', {maximumFractionDigits: 0})}/m • Estimativa SINAPI
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultado').style.display = 'block';
+            mostrarSecaoViga(bFinal, hFinal, material);
+            gerarComparativoViga(vao, carga, apoio);
+            gerarGraficoViga(vao, apoio);
+            gerarRecomendacoes('viga', { h: hFinal, b: bFinal, flechaOk, material, apoio });
+            
+            // Atualizar estatísticas
+            atualizarQuickStats(`Viga ${getNomeMaterial(material)}`, `${bFinal}×${hFinal} cm`);
+            
+            // Salvar no histórico
+            salvarHistorico({
+                tipo: 'Viga',
+                material: getNomeMaterial(material),
+                apoio: getDescricaoApoio(apoio),
+                vao: vao,
+                carga: carga,
+                resultado: `${bFinal}×${hFinal} cm`,
+                data: new Date().toLocaleString('pt-BR')
+            });
+            
+            showToast('Cálculo realizado com sucesso!', 'success');
+        }
+
+        function calcularLaje() {
+            const tipo = document.getElementById('tipo-laje').value;
+            const direcao = document.getElementById('direcao-laje').value;
+            const vao = parseFloat(document.getElementById('vao-laje').value);
+            const sobrecarga = parseFloat(document.getElementById('sobrecarga-laje').value);
+
+            if (!vao || vao <= 0) {
+                showToast('Insira um vão válido maior que zero', 'error');
+                return;
+            }
+
+            let hMin, criterio, fator;
+            
+            switch(tipo) {
+                case 'macica':
+                    fator = direcao === 'armada-1' ? 25 : 35;
+                    hMin = Math.max((vao * 100) / fator, direcao === 'armada-1' ? 10 : 8);
+                    criterio = `L/${fator} (mín. ${direcao === 'armada-1' ? 10 : 8}cm)`;
+                    break;
+                case 'nervurada':
+                    fator = 30;
+                    hMin = Math.max((vao * 100) / 30, 12);
+                    criterio = 'L/30 (mín. 12cm)';
+                    break;
+                case 'cogumelo':
+                    fator = 28;
+                    hMin = Math.max((vao * 100) / 28, 16);
+                    criterio = 'L/28 (mín. 16cm)';
+                    break;
+                case 'trelica':
+                    fator = 35;
+                    hMin = Math.max((vao * 100) / 35, 12);
+                    criterio = 'L/35 (mín. 12cm)';
+                    break;
+            }
+
+            const hFinal = Math.ceil(hMin);
+            const pesoProprio = getPesoProprio(tipo, hFinal);
+            const cargaTotal = pesoProprio + sobrecarga;
+            const concretoM3 = getConcretoM3(tipo, hFinal);
+            const acoKg = estimarAcoLaje(tipo, hFinal, cargaTotal);
+            
+            // Cálculo de momento para laje
+            let momento;
+            if (direcao === 'armada-1') {
+                momento = (cargaTotal * vao * vao) / 8;
+            } else {
+                momento = (cargaTotal * vao * vao) / 12; // Aproximação para 2 direções
+            }
+
+            const output = document.getElementById('output');
+            output.innerHTML = `
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-4 text-center shadow-lg">
+                        <div class="text-2xl sm:text-3xl font-bold counter-value">${hFinal}</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Espessura (cm)</div>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-4 text-center shadow-lg">
+                        <div class="text-2xl sm:text-3xl font-bold">${cargaTotal.toFixed(1)}</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Carga (kN/m²)</div>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-4 text-center shadow-lg">
+                        <div class="text-2xl sm:text-3xl font-bold">${concretoM3.toFixed(3)}</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Concreto (m³/m²)</div>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-xl p-4 text-center shadow-lg">
+                        <div class="text-2xl sm:text-3xl font-bold">${acoKg.toFixed(1)}</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Aço (kg/m²)</div>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-4">
+                        <h4 class="font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="text-lg">📋</span> Especificações
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Tipo:</span>
+                                <span class="font-bold text-purple-600 dark:text-purple-400">${getNomeTipo(tipo)}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Armação:</span>
+                                <span class="font-medium dark:text-gray-200">${direcao === 'armada-1' ? 'Uma direção' : 'Duas direções'}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Critério:</span>
+                                <span class="font-medium dark:text-gray-200">${criterio}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Momento:</span>
+                                <span class="font-medium dark:text-gray-200">${momento.toFixed(2)} kN.m/m</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-4">
+                        <h4 class="font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="text-lg">⚖️</span> Composição de Cargas
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Peso Próprio:</span>
+                                <span class="font-medium dark:text-gray-200">${pesoProprio.toFixed(2)} kN/m²</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Sobrecarga:</span>
+                                <span class="font-medium dark:text-gray-200">${sobrecarga.toFixed(2)} kN/m²</span>
+                            </div>
+                            <div class="flex justify-between items-center border-t dark:border-slate-600 pt-3 mt-3">
+                                <span class="text-gray-800 dark:text-gray-200 font-semibold">Carga Total:</span>
+                                <span class="font-bold text-blue-600 dark:text-blue-400 text-lg">${cargaTotal.toFixed(2)} kN/m²</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-purple-50 dark:bg-purple-900/30 rounded-xl border border-purple-200 dark:border-purple-800">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">🧱</span>
+                            <div>
+                                <div class="font-semibold text-purple-800 dark:text-purple-300">Espessura Recomendada</div>
+                                <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">h = ${hFinal} cm</div>
+                                <div class="text-sm text-purple-600/70 dark:text-purple-400/70 mt-1">
+                                    ${getNomeTipo(tipo)} - ${direcao === 'armada-1' ? 'Armada em 1 direção' : 'Armada em 2 direções'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">💰</span>
+                            <div>
+                                <div class="font-semibold text-emerald-800 dark:text-emerald-300">Orçamento Est. 2025</div>
+                                <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">R$ ${(estimarCustoLaje(tipo, hFinal) * vao * vao).toLocaleString('pt-BR', {maximumFractionDigits: 0})} total</div>
+                                <div class="text-sm text-emerald-600/70 dark:text-emerald-300/70 mt-1">
+                                    R$ ${estimarCustoLaje(tipo, hFinal).toLocaleString('pt-BR', {maximumFractionDigits: 0})}/m² • Estimativa SINAPI
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultado').style.display = 'block';
+            mostrarSecaoLaje(hFinal, tipo);
+            gerarComparativoLaje(vao, sobrecarga, direcao);
+            gerarRecomendacoes('laje', { h: hFinal, tipo, direcao });
+            
+            // Atualizar estatísticas
+            atualizarQuickStats(`Laje ${getNomeTipo(tipo)}`, `h = ${hFinal} cm`);
+            
+            salvarHistorico({
+                tipo: 'Laje',
+                material: getNomeTipo(tipo),
+                direcao: direcao === 'armada-1' ? '1 direção' : '2 direções',
+                vao: vao,
+                sobrecarga: sobrecarga,
+                resultado: `h = ${hFinal} cm`,
+                data: new Date().toLocaleString('pt-BR')
+            });
+            
+            showToast('Cálculo realizado com sucesso!', 'success');
+        }
+
+        // ==================== VISUALIZAÇÕES ====================
+
+        function mostrarSecaoViga(b, h, material) {
+            const cores = {
+                concreto: { fill: '#cbd5e1', stroke: '#64748b', pattern: '#94a3b8' },
+                aco: { fill: '#fbbf24', stroke: '#d97706', pattern: '#f59e0b' },
+                madeira: { fill: '#d4a574', stroke: '#92400e', pattern: '#b8956a' }
+            };
+            
+            const cor = cores[material];
+            const escala = Math.min(150 / h, 180 / b);
+            const bDraw = b * escala;
+            const hDraw = h * escala;
+            const centerX = 125;
+            const centerY = 90;
+            
+            const container = document.getElementById('secao-visual');
+            container.innerHTML = `
+                <div class="text-center">
+                    <svg width="260" height="200" viewBox="0 0 260 200">
+                        <defs>
+                            <linearGradient id="secaoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:${cor.fill}"/>
+                                <stop offset="100%" style="stop-color:${cor.pattern}"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Seção -->
+                        <rect x="${centerX - bDraw/2}" y="${centerY - hDraw/2}" width="${bDraw}" height="${hDraw}" 
+                              fill="url(#secaoGrad)" stroke="${cor.stroke}" stroke-width="3" rx="2"/>
+                        
+                        ${material === 'concreto' ? `
+                        <!-- Armaduras -->
+                        <circle cx="${centerX - bDraw/2 + 12}" cy="${centerY + hDraw/2 - 12}" r="4" fill="#374151"/>
+                        <circle cx="${centerX + bDraw/2 - 12}" cy="${centerY + hDraw/2 - 12}" r="4" fill="#374151"/>
+                        <circle cx="${centerX - bDraw/2 + 12}" cy="${centerY - hDraw/2 + 12}" r="3" fill="#374151"/>
+                        <circle cx="${centerX + bDraw/2 - 12}" cy="${centerY - hDraw/2 + 12}" r="3" fill="#374151"/>
+                        ` : ''}
+                        
+                        <!-- Cota Altura -->
+                        <line x1="${centerX - bDraw/2 - 25}" y1="${centerY - hDraw/2}" 
+                              x2="${centerX - bDraw/2 - 25}" y2="${centerY + hDraw/2}" 
+                              stroke="#374151" stroke-width="1.5"/>
+                        <line x1="${centerX - bDraw/2 - 32}" y1="${centerY - hDraw/2}" 
+                              x2="${centerX - bDraw/2 - 18}" y2="${centerY - hDraw/2}" 
+                              stroke="#374151" stroke-width="1.5"/>
+                        <line x1="${centerX - bDraw/2 - 32}" y1="${centerY + hDraw/2}" 
+                              x2="${centerX - bDraw/2 - 18}" y2="${centerY + hDraw/2}" 
+                              stroke="#374151" stroke-width="1.5"/>
+                        <text x="${centerX - bDraw/2 - 38}" y="${centerY + 5}" text-anchor="end" fill="#374151" font-size="13" font-weight="bold">${h}</text>
+                        
+                        <!-- Cota Largura -->
+                        <line x1="${centerX - bDraw/2}" y1="${centerY + hDraw/2 + 25}" 
+                              x2="${centerX + bDraw/2}" y2="${centerY + hDraw/2 + 25}" 
+                              stroke="#374151" stroke-width="1.5"/>
+                        <line x1="${centerX - bDraw/2}" y1="${centerY + hDraw/2 + 18}" 
+                              x2="${centerX - bDraw/2}" y2="${centerY + hDraw/2 + 32}" 
+                              stroke="#374151" stroke-width="1.5"/>
+                        <line x1="${centerX + bDraw/2}" y1="${centerY + hDraw/2 + 18}" 
+                              x2="${centerX + bDraw/2}" y2="${centerY + hDraw/2 + 32}" 
+                              stroke="#374151" stroke-width="1.5"/>
+                        <text x="${centerX}" y="${centerY + hDraw/2 + 45}" text-anchor="middle" fill="#374151" font-size="13" font-weight="bold">${b}</text>
+                    </svg>
+                    <div class="text-gray-500 dark:text-gray-400 text-sm mt-2">Seção Transversal (cm) - ${getNomeMaterial(material)}</div>
+                </div>
+            `;
+            
+            document.getElementById('visual-3d').style.display = 'block';
+        }
+
+        function mostrarSecaoLaje(h, tipo) {
+            const container = document.getElementById('secao-visual');
+            const hDraw = Math.max(h * 2.5, 40);
+            const width = 220;
+            const startY = 70;
+            
+            let content = `
+                <defs>
+                    <linearGradient id="lajeSecaoGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#c4b5fd"/>
+                        <stop offset="100%" style="stop-color:#a78bfa"/>
+                    </linearGradient>
+                </defs>
+            `;
+            
+            if (tipo === 'nervurada' || tipo === 'trelica') {
+                content += `
+                    <rect x="20" y="${startY}" width="${width}" height="${hDraw}" fill="url(#lajeSecaoGrad)" stroke="#7c3aed" stroke-width="2"/>
+                    <rect x="45" y="${startY + 15}" width="35" height="${hDraw - 15}" fill="white" stroke="#7c3aed"/>
+                    <rect x="105" y="${startY + 15}" width="35" height="${hDraw - 15}" fill="white" stroke="#7c3aed"/>
+                    <rect x="165" y="${startY + 15}" width="35" height="${hDraw - 15}" fill="white" stroke="#7c3aed"/>
+                    <!-- Armaduras nas nervuras -->
+                    <circle cx="62" cy="${startY + hDraw - 8}" r="3" fill="#374151"/>
+                    <circle cx="122" cy="${startY + hDraw - 8}" r="3" fill="#374151"/>
+                    <circle cx="182" cy="${startY + hDraw - 8}" r="3" fill="#374151"/>
+                `;
+            } else {
+                content += `
+                    <rect x="20" y="${startY}" width="${width}" height="${hDraw}" fill="url(#lajeSecaoGrad)" stroke="#7c3aed" stroke-width="2"/>
+                    <!-- Armadura inferior -->
+                    <line x1="30" y1="${startY + hDraw - 10}" x2="${width + 10}" y2="${startY + hDraw - 10}" stroke="#374151" stroke-width="3" stroke-dasharray="8,4"/>
+                `;
+            }
+            
+            // Cota de altura
+            content += `
+                <line x1="${width + 30}" y1="${startY}" x2="${width + 30}" y2="${startY + hDraw}" stroke="#374151" stroke-width="1.5"/>
+                <line x1="${width + 23}" y1="${startY}" x2="${width + 37}" y2="${startY}" stroke="#374151" stroke-width="1.5"/>
+                <line x1="${width + 23}" y1="${startY + hDraw}" x2="${width + 37}" y2="${startY + hDraw}" stroke="#374151" stroke-width="1.5"/>
+                <text x="${width + 45}" y="${startY + hDraw/2 + 5}" fill="#374151" font-size="13" font-weight="bold">${h} cm</text>
+            `;
+            
+            container.innerHTML = `
+                <div class="text-center">
+                    <svg width="280" height="160" viewBox="0 0 280 160">
+                        ${content}
+                    </svg>
+                    <div class="text-gray-500 dark:text-gray-400 text-sm mt-2">Seção Transversal - ${getNomeTipo(tipo)}</div>
+                </div>
+            `;
+            
+            document.getElementById('visual-3d').style.display = 'block';
+        }
+
+        function gerarComparativoViga(vao, carga, apoio) {
+            const materiais = ['concreto', 'aco', 'madeira'];
+            const resultados = [];
+            
+            materiais.forEach(mat => {
+                const fatores = {
+                    concreto: { simples: { h: 10, b_h: 0.4 }, continua: { h: 12, b_h: 0.4 }, balanco: { h: 5, b_h: 0.35 }, engastada: { h: 15, b_h: 0.4 } },
+                    aco: { simples: { h: 20, b_h: 0.5 }, continua: { h: 25, b_h: 0.5 }, balanco: { h: 10, b_h: 0.45 }, engastada: { h: 30, b_h: 0.5 } },
+                    madeira: { simples: { h: 15, b_h: 0.5 }, continua: { h: 18, b_h: 0.5 }, balanco: { h: 8, b_h: 0.45 }, engastada: { h: 20, b_h: 0.5 } }
+                };
+                
+                const fator = fatores[mat][apoio];
+                const h = Math.ceil(((vao * 100) / fator.h) / 5) * 5;
+                const b = Math.max(Math.ceil((h * fator.b_h) / 5) * 5, mat === 'concreto' ? 12 : 6);
+                const peso = calcularPeso(mat, b, h);
+                const custo = estimarCusto(mat, b, h, vao);
+                
+                resultados.push({ material: mat, h, b, peso, custo });
+            });
+
+            const compOutput = document.getElementById('comp-output');
+            compOutput.innerHTML = `
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-100 dark:bg-slate-700">
+                        <tr>
+                            <th class="p-3 text-left font-semibold text-gray-700 dark:text-gray-200">Material</th>
+                            <th class="p-3 text-center font-semibold text-gray-700 dark:text-gray-200">Seção (cm)</th>
+                            <th class="p-3 text-center font-semibold text-gray-700 dark:text-gray-200">Peso (kg/m)</th>
+                            <th class="p-3 text-center font-semibold text-gray-700 dark:text-gray-200 hidden sm:table-cell">Custo Est.</th>
+                            <th class="p-3 text-left font-semibold text-gray-700 dark:text-gray-200">Vantagem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${resultados.map((r, i) => `
+                            <tr class="${i % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50 dark:bg-slate-700/50'} hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
+                                <td class="p-3 font-medium text-gray-800 dark:text-gray-200">${getIconeMaterial(r.material)} ${getNomeMaterial(r.material)}</td>
+                                <td class="p-3 text-center font-mono dark:text-gray-200">${r.b}×${r.h}</td>
+                                <td class="p-3 text-center dark:text-gray-200">${r.peso.toFixed(1)}</td>
+                                <td class="p-3 text-center hidden sm:table-cell text-green-600 dark:text-green-400">R$ ${r.custo.toFixed(0)}/m</td>
+                                <td class="p-3 text-gray-600 dark:text-gray-400 text-xs sm:text-sm">${getVantagemMaterial(r.material)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('comparativo').style.display = 'block';
+        }
+
+        function gerarComparativoLaje(vao, sobrecarga, direcao) {
+            const tipos = ['macica', 'nervurada', 'cogumelo', 'trelica'];
+            const resultados = [];
+            
+            tipos.forEach(tipo => {
+                let hMin;
+                switch(tipo) {
+                    case 'macica':
+                        hMin = Math.max((vao * 100) / (direcao === 'armada-1' ? 25 : 35), direcao === 'armada-1' ? 10 : 8);
+                        break;
+                    case 'nervurada':
+                        hMin = Math.max((vao * 100) / 30, 12);
+                        break;
+                    case 'cogumelo':
+                        hMin = Math.max((vao * 100) / 28, 16);
+                        break;
+                    case 'trelica':
+                        hMin = Math.max((vao * 100) / 35, 12);
+                        break;
+                }
+                
+                const h = Math.ceil(hMin);
+                const concreto = getConcretoM3(tipo, h);
+                const aco = estimarAcoLaje(tipo, h, sobrecarga);
+                
+                resultados.push({ tipo, h, concreto, aco });
+            });
+
+            const compOutput = document.getElementById('comp-output');
+            compOutput.innerHTML = `
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-100 dark:bg-slate-700">
+                        <tr>
+                            <th class="p-3 text-left font-semibold text-gray-700 dark:text-gray-200">Tipo</th>
+                            <th class="p-3 text-center font-semibold text-gray-700 dark:text-gray-200">h (cm)</th>
+                            <th class="p-3 text-center font-semibold text-gray-700 dark:text-gray-200">Concreto</th>
+                            <th class="p-3 text-center font-semibold text-gray-700 dark:text-gray-200">Aço</th>
+                            <th class="p-3 text-left font-semibold text-gray-700 dark:text-gray-200">Aplicação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${resultados.map((r, i) => `
+                            <tr class="${i % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50 dark:bg-slate-700/50'} hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors">
+                                <td class="p-3 font-medium text-gray-800 dark:text-gray-200">${getIconeLaje(r.tipo)} ${getNomeTipo(r.tipo)}</td>
+                                <td class="p-3 text-center font-mono font-bold dark:text-gray-200">${r.h}</td>
+                                <td class="p-3 text-center dark:text-gray-200">${r.concreto.toFixed(3)} m³/m²</td>
+                                <td class="p-3 text-center dark:text-gray-200">${r.aco.toFixed(1)} kg/m²</td>
+                                <td class="p-3 text-gray-600 dark:text-gray-400 text-xs sm:text-sm">${getAplicacaoLaje(r.tipo)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('comparativo').style.display = 'block';
+        }
+
+        function gerarGraficoViga(vao, apoio) {
+            const materiais = ['concreto', 'aco', 'madeira'];
+            const cores = ['#3b82f6', '#f59e0b', '#10b981'];
+            const nomes = ['Concreto', 'Aço', 'Madeira'];
+            
+            const fatores = {
+                concreto: { simples: 10, continua: 12, balanco: 5, engastada: 15 },
+                aco: { simples: 20, continua: 25, balanco: 10, engastada: 30 },
+                madeira: { simples: 15, continua: 18, balanco: 8, engastada: 20 }
+            };
+            
+            const alturas = materiais.map(m => Math.ceil(((vao * 100) / fatores[m][apoio]) / 5) * 5);
+            const maxAltura = Math.max(...alturas);
+            
+            const container = document.getElementById('grafico-container');
+            container.innerHTML = `
+                <div class="flex items-end justify-around h-48 border-b-2 border-gray-300 dark:border-gray-600 pb-4 px-4">
+                    ${materiais.map((m, i) => `
+                        <div class="flex flex-col items-center flex-1 mx-2">
+                            <div class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">${alturas[i]} cm</div>
+                            <div class="w-full max-w-20 rounded-t-lg transition-all duration-1000 ease-out relative group" 
+                                 style="height: ${(alturas[i] / maxAltura) * 150}px; background: linear-gradient(to top, ${cores[i]}, ${cores[i]}dd);">
+                                <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-t-lg"></div>
+                            </div>
+                            <div class="text-xs mt-2 font-medium text-gray-600 dark:text-gray-400">${nomes[i]}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="text-center text-gray-500 dark:text-gray-400 text-sm mt-4 font-medium">
+                    📊 Comparação de Alturas das Vigas para Vão de ${vao}m
+                </div>
+            `;
+            
+            document.getElementById('grafico-section').style.display = 'block';
+        }
+
+        function gerarRecomendacoes(tipo, dados) {
+            const recomendacoes = [];
+            
+            if (tipo === 'viga') {
+                if (!dados.flechaOk) {
+                    recomendacoes.push({
+                        tipo: 'warning',
+                        texto: 'Considere aumentar a altura da viga em 5-10cm para atender ao limite de flecha.'
+                    });
+                }
+                if (dados.b / dados.h < 0.3) {
+                    recomendacoes.push({
+                        tipo: 'info',
+                        texto: 'Relação b/h baixa. Verifique a estabilidade lateral da viga.'
+                    });
+                }
+                if (dados.material === 'concreto' && dados.h > 60) {
+                    recomendacoes.push({
+                        tipo: 'info',
+                        texto: 'Para vigas altas (h > 60cm), considere armadura de pele nas faces.'
+                    });
+                }
+                if (dados.apoio === 'balanco') {
+                    recomendacoes.push({
+                        tipo: 'warning',
+                        texto: 'Vigas em balanço são sensíveis a cargas na extremidade. Considere vãos menores.'
+                    });
+                }
+                recomendacoes.push({
+                    tipo: 'success',
+                    texto: `Seção ${dados.b}×${dados.h}cm atende aos critérios de pré-dimensionamento.`
+                });
+            } else {
+                if (dados.h > 20) {
+                    recomendacoes.push({
+                        tipo: 'info',
+                        texto: 'Para espessuras maiores que 20cm, considere laje nervurada como alternativa econômica.'
+                    });
+                }
+                if (dados.direcao === 'armada-1' && dados.h > 15) {
+                    recomendacoes.push({
+                        tipo: 'info',
+                        texto: 'Verifique se a relação entre vãos permite armação em apenas uma direção (Lx/Ly > 2).'
+                    });
+                }
+                if (dados.tipo === 'cogumelo') {
+                    recomendacoes.push({
+                        tipo: 'warning',
+                        texto: 'Lajes cogumelo requerem verificação especial de punção junto aos pilares.'
+                    });
+                }
+                recomendacoes.push({
+                    tipo: 'success',
+                    texto: `Espessura de ${dados.h}cm adequada para o vão especificado.`
+                });
+            }
+            
+            const container = document.getElementById('recomendacoes-content');
+            container.innerHTML = recomendacoes.map(rec => {
+                const icons = { success: '✅', warning: '⚠️', info: 'ℹ️' };
+                const colors = { 
+                    success: 'bg-green-100 dark:bg-green-900/40 border-green-300 dark:border-green-700', 
+                    warning: 'bg-yellow-100 dark:bg-yellow-900/40 border-yellow-300 dark:border-yellow-700', 
+                    info: 'bg-blue-100 dark:bg-blue-900/40 border-blue-300 dark:border-blue-700' 
+                };
+                return `
+                    <div class="flex items-start gap-3 p-3 rounded-lg ${colors[rec.tipo]} border">
+                        <span class="text-xl">${icons[rec.tipo]}</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-200">${rec.texto}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('recomendacoes').style.display = 'block';
+        }
+
+        // ==================== FUNÇÕES AUXILIARES ====================
+
+        function getModuloElastico(material) {
+            return { concreto: 2800, aco: 21000, madeira: 1200 }[material]; // kN/cm²
+        }
+
+        function getInercia(b, h) {
+            return (b * Math.pow(h, 3)) / 12; // cm⁴
+        }
+
+        function calcularPeso(material, b, h) {
+            const densidades = { concreto: 25, aco: 78.5, madeira: 6 }; // kN/m³
+            return (b * h) / 10000 * densidades[material] * 100; // kg/m
+        }
+
+        function getPesoProprio(tipo, h) {
+            const fatores = { macica: 25, nervurada: 18, cogumelo: 25, trelica: 15 }; // kN/m³ equivalente
+            return (h / 100) * fatores[tipo];
+        }
+
+        function getConcretoM3(tipo, h) {
+            const fatores = { macica: 1.0, nervurada: 0.65, cogumelo: 1.0, trelica: 0.55 };
+            return (h / 100) * fatores[tipo];
+        }
+
+        function estimarAcoLaje(tipo, h, carga) {
+            const taxas = { macica: 1.0, nervurada: 0.8, cogumelo: 1.2, trelica: 0.6 };
+            return taxas[tipo] * (h / 10) * (1 + carga / 10);
+        }
+
+        function estimarCusto(material, b, h, vao) {
+            // Referência 2025 R$/m ou R$/kg
+            const precoConcreto = 480; 
+            const precoAcoViga = 9.80;
+            const precoFormaViga = 95;
+            const precoMadeira = 3800; // R$/m³
+            
+            if (material === 'concreto') {
+                const volM3 = (b * h / 10000);
+                const areaForma = (b + 2*h) / 100;
+                const pesoAco = volM3 * 100; // Taxa média 100kg/m³
+                return (volM3 * precoConcreto) + (areaForma * precoFormaViga) + (pesoAco * precoAcoViga) + 120; // R$/m linear inc. labor
+            } else if (material === 'aco') {
+                return calcularPeso(material, b, h) * 18; // R$/m linear fabricado e instalado
+            } else {
+                return (b * h / 10000) * precoMadeira + 85; // R$/m linear
+            }
+        }
+
+        function estimarCustoLaje(tipo, h) {
+            const precos = { macica: 320, nervurada: 280, cogumelo: 380, trelica: 240 };
+            return precos[tipo] * (h / 12) + 85; // Custo por m² 2025
+        }
+
+        function getNomeTipo(tipo) {
+            return { macica: 'Maciça', nervurada: 'Nervurada', cogumelo: 'Cogumelo', trelica: 'Treliçada' }[tipo];
+        }
+
+        function getNomeMaterial(material) {
+            return { concreto: 'Concreto Armado', aco: 'Aço', madeira: 'Madeira' }[material];
+        }
+
+        function getIconeMaterial(material) {
+            return { concreto: '🪨', aco: '⚙️', madeira: '🪵' }[material];
+        }
+
+        function getIconeLaje(tipo) {
+            return { macica: '📋', nervurada: '🔲', cogumelo: '🍄', trelica: '🔺' }[tipo];
+        }
+
+        function getVantagemMaterial(material) {
+            return { 
+                concreto: 'Durável e resistente ao fogo', 
+                aco: 'Menor altura e peso', 
+                madeira: 'Sustentável e leve' 
+            }[material];
+        }
+
+        function getDescricaoApoio(apoio) {
+            return { 
+                simples: 'Simplesmente Apoiada', 
+                continua: 'Contínua', 
+                balanco: 'Em Balanço', 
+                engastada: 'Bi-engastada' 
+            }[apoio];
+        }
+
+        function getAplicacaoLaje(tipo) {
+            return { 
+                macica: 'Pequenos vãos, simples execução', 
+                nervurada: 'Grandes vãos, econômica', 
+                cogumelo: 'Edifícios comerciais', 
+                trelica: 'Montagem rápida' 
+            }[tipo];
+        }
+
+        // ==================== PREDEFINIÇÕES ====================
+
+        function aplicarPredefinicaoViga(uso) {
+            const predefinicoes = {
+                residencial: { vao: 4, carga: 8 },
+                comercial: { vao: 6, carga: 15 },
+                industrial: { vao: 10, carga: 30 },
+                garagem: { vao: 5, carga: 12 }
+            };
+            
+            const pred = predefinicoes[uso];
+            document.getElementById('vao-viga').value = pred.vao;
+            document.getElementById('vao-viga-range').value = pred.vao;
+            document.getElementById('vao-viga-display').textContent = pred.vao + 'm';
+            document.getElementById('carga-viga').value = pred.carga;
+            document.getElementById('carga-viga-range').value = pred.carga;
+            document.getElementById('carga-viga-display').textContent = pred.carga + ' kN/m';
+            
+            showToast(`Predefinição "${uso}" aplicada`, 'info');
+        }
+
+        function aplicarPredefinicaoLaje(uso) {
+            const predefinicoes = {
+                dormitorio: 1.5,
+                sala: 2.0,
+                escritorio: 3.0,
+                loja: 4.0,
+                garagem: 5.0
+            };
+            
+            const sobrecarga = predefinicoes[uso];
+            document.getElementById('sobrecarga-laje').value = sobrecarga;
+            document.getElementById('sobrecarga-range').value = sobrecarga;
+            document.getElementById('sobrecarga-display').textContent = sobrecarga + ' kN/m²';
+            
+            showToast(`Sobrecarga para "${uso}" aplicada: ${sobrecarga} kN/m²`, 'info');
+        }
+
+        // ==================== HISTÓRICO ====================
+
+        function salvarHistorico(item) {
+            historico.unshift(item);
+            if (historico.length > 15) historico.pop();
+            localStorage.setItem('calculoHistorico', JSON.stringify(historico));
+            atualizarHistorico();
+        }
+
+        function atualizarHistorico() {
+            const section = document.getElementById('historico-section');
+            const list = document.getElementById('historico-list');
+            
+            if (historico.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            list.innerHTML = historico.map((item, index) => `
+                <div class="bg-gray-50 dark:bg-slate-700 rounded-lg p-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors cursor-pointer" onclick="restaurarCalculo(${index})">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="font-semibold text-blue-600 dark:text-blue-400">${item.tipo}</span>
+                        <span class="text-gray-400">|</span>
+                        <span class="text-gray-600 dark:text-gray-300">${item.material}</span>
+                        <span class="text-gray-400">|</span>
+                        <span class="text-gray-600 dark:text-gray-300">Vão: ${item.vao}m</span>
+                        <span class="text-gray-400">→</span>
+                        <span class="font-bold text-green-600 dark:text-green-400">${item.resultado}</span>
+                    </div>
+                    <span class="text-gray-400 text-xs">${item.data}</span>
+                </div>
+            `).join('');
+        }
+
+        function restaurarCalculo(index) {
+            const item = historico[index];
+            showToast(`Cálculo "${item.tipo} - ${item.resultado}" selecionado`, 'info');
+        }
+
+        function limparHistorico() {
+            if (confirm('Tem certeza que deseja limpar todo o histórico?')) {
+                historico = [];
+                localStorage.removeItem('calculoHistorico');
+                atualizarHistorico();
+                showToast('Histórico limpo com sucesso', 'success');
+            }
+        }
+
+        // ==================== QUICK STATS ====================
+
+        function atualizarQuickStats(tipo, resultado) {
+            if (tipo && resultado) {
+                document.getElementById('quick-stats').style.display = 'block';
+                document.getElementById('last-calc-type').textContent = tipo;
+                document.getElementById('last-calc-result').textContent = resultado;
+            }
+            document.getElementById('total-calcs').textContent = historico.length;
+        }
+
+        // ==================== UTILITÁRIOS ====================
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            applyTheme(isDarkMode);
+            localStorage.setItem('darkMode', isDarkMode);
+            showToast(isDarkMode ? 'Modo escuro ativado' : 'Modo claro ativado', 'info');
+        }
+
+        function copiarResultados() {
+            const output = document.getElementById('output');
+            const texto = output.innerText;
+            navigator.clipboard.writeText(texto).then(() => {
+                showToast('Resultados copiados para a área de transferência!', 'success');
+            }).catch(() => {
+                showToast('Erro ao copiar resultados', 'error');
+            });
+        }
+
+        function compartilhar() {
+            const texto = document.getElementById('output').innerText;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Cálculo de Vão - Hub Engenharia',
+                    text: texto
+                });
+            } else {
+                copiarResultados();
+            }
+        }
+
+        function exportarPDF() {
+            showToast('Preparando impressão...', 'info');
+            setTimeout(() => window.print(), 500);
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            const icons = { success: '✓', error: '✗', info: 'ℹ', warning: '⚠' };
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
+            
+            toastIcon.textContent = icons[type];
+            toastMessage.textContent = message;
+            toast.className = `fixed bottom-4 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-4 ${colors[type]} text-white px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-300 z-50 flex items-center gap-3`;
+            
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateY(20px)';
+                toast.style.opacity = '0';
+            }, 3000);
+        }
+
+        function criarConfetti() {
+            const cores = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+            for (let i = 0; i < 15; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+    </script>
+</body>
+</html>
