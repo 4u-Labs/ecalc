@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Dimensionamento de Pilares | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+      min-height: 100vh;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #00ffff, #8b5cf6);
+      border-radius: 4px;
+    }
+    
+    /* Glow effects */
+    .glow-cyan {
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+    .glow-purple {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    }
+    .text-glow {
+      text-shadow: 0 0 20px currentColor;
+    }
+    
+    /* Glass morphism */
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Animated gradient border */
+    .gradient-border {
+      position: relative;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      padding: 2px;
+      background: linear-gradient(135deg, #00ffff, #8b5cf6, #00ffff);
+      background-size: 200% 200%;
+      animation: gradientMove 3s ease infinite;
+      border-radius: inherit;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    /* Pulse animation */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8); }
+    }
+    
+    .pulse-active {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    
+    /* Input styling */
+    .input-cyber {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    .input-cyber:focus {
+      border-color: #00ffff;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      outline: none;
+    }
+    .input-cyber:invalid {
+      border-color: #ef4444;
+    }
+    
+    /* Button styling */
+    .btn-cyber {
+      background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%);
+      color: #000;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-cyber::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn-cyber:hover::before {
+      left: 100%;
+    }
+    .btn-cyber:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 255, 255, 0.4);
+    }
+    
+    /* Type buttons */
+    .tipo-btn {
+      transition: all 0.3s ease;
+    }
+    .tipo-btn.active {
+      background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%);
+      color: #000;
+      transform: scale(1.02);
+    }
+    
+    /* Pilar visualization */
+    .pilar-3d {
+      perspective: 800px;
+    }
+    .pilar-visual {
+      transform-style: preserve-3d;
+      animation: rotate3d 20s linear infinite;
+    }
+    @keyframes rotate3d {
+      0% { transform: rotateY(0deg) rotateX(5deg); }
+      100% { transform: rotateY(360deg) rotateX(5deg); }
+    }
+    .pilar-visual:hover {
+      animation-play-state: paused;
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      background: linear-gradient(90deg, #00ffff, #8b5cf6);
+      transition: width 0.5s ease;
+    }
+    
+    /* Tooltip */
+    .tooltip-cyber {
+      position: relative;
+    }
+    .tooltip-cyber::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: #00ffff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+    }
+    .tooltip-cyber:hover::after {
+      opacity: 1;
+      bottom: calc(100% + 8px);
+    }
+    
+    /* Tabs */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Print styles */
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .glass {
+        background: white !important;
+        border: 1px solid #ccc !important;
+      }
+    }
+  </style>
+</head>
+<body class="text-gray-200">
+  <!-- Header -->
+  <header class="no-print sticky top-0 z-50 glass border-b border-cyan-500/20">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="#" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+          🏗️ EngCalc
+        </a>
+        <span class="text-xs text-gray-500 hidden sm:inline">Dimensionamento de Pilares</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="exportarPDF()" class="p-2 rounded-lg hover:bg-white/10 transition-all tooltip-cyber" data-tooltip="Exportar PDF">
+          📄
+        </button>
+        <button onclick="window.print()" class="p-2 rounded-lg hover:bg-white/10 transition-all tooltip-cyber" data-tooltip="Imprimir">
+          🖨️
+        </button>
+        <button onclick="compartilhar()" class="p-2 rounded-lg hover:bg-white/10 transition-all tooltip-cyber" data-tooltip="Compartilhar">
+          📤
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Quick Actions -->
+    <div class="no-print flex flex-wrap gap-3 justify-center mb-8">
+      <button id="btnCalcular" class="btn-cyber px-8 py-3 rounded-xl font-semibold text-lg flex items-center gap-2">
+        <span>⚡</span> Calcular
+      </button>
+      <button onclick="abrirModalPrecos()" class="px-6 py-3 rounded-xl border border-cyan-500/30 hover:border-cyan-500 hover:bg-cyan-500/10 transition-all flex items-center gap-2">
+        <span>⚙️</span> Preços
+      </button>
+      <button onclick="abrirHistorico()" class="px-6 py-3 rounded-xl border border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 transition-all flex items-center gap-2">
+        <span>📊</span> Histórico
+      </button>
+      <button onclick="limparTudo()" class="px-6 py-3 rounded-xl border border-red-500/30 hover:border-red-500 hover:bg-red-500/10 transition-all flex items-center gap-2">
+        <span>🗑️</span> Limpar
+      </button>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Left Column - Inputs -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Tipo de Seção -->
+        <section class="glass rounded-2xl p-6">
+          <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm">1</span>
+            Tipo de Seção
+          </h2>
+          <div class="grid grid-cols-3 gap-3">
+            <button class="tipo-btn active p-4 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-500 transition-all text-center" data-tipo="retangular">
+              <div class="text-3xl mb-2">▭</div>
+              <div class="font-medium">Retangular</div>
+            </button>
+            <button class="tipo-btn p-4 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-500 transition-all text-center" data-tipo="quadrada">
+              <div class="text-3xl mb-2">◻</div>
+              <div class="font-medium">Quadrada</div>
+            </button>
+            <button class="tipo-btn p-4 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-500 transition-all text-center" data-tipo="circular">
+              <div class="text-3xl mb-2">⚫</div>
+              <div class="font-medium">Circular</div>
+            </button>
+          </div>
+        </section>
+
+        <!-- Geometria -->
+        <section class="glass rounded-2xl p-6">
+          <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm">2</span>
+            Geometria do Pilar
+          </h2>
+          <div id="geometria-inputs" class="grid sm:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400 flex items-center gap-2">
+                Base (b)
+                <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Menor dimensão da seção transversal">ⓘ</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="base" value="20" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400 flex items-center gap-2">
+                Altura (h)
+                <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Maior dimensão da seção transversal">ⓘ</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="altura" value="40" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400">Comprimento (L)</label>
+              <div class="relative">
+                <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">m</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400 flex items-center gap-2">
+                Cobrimento (c)
+                <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="NBR 6118: mín. 2,5cm (int.) ou 3,0cm (ext.)">ⓘ</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-4 py-3 rounded-xl" />
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cargas -->
+        <section class="glass rounded-2xl p-6">
+          <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm">3</span>
+            Cargas Atuantes
+            <span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full">Valores de cálculo</span>
+          </h2>
+          <div class="grid sm:grid-cols-3 gap-4">
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400">Carga Axial (Nd)</label>
+              <div class="relative">
+                <input type="number" id="carga-axial" value="500" min="0" class="input-cyber w-full px-4 py-3 rounded-xl" />
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">kN</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400">Momento X (Mdx)</label>
+              <div class="relative">
+                <input type="number" id="momento-x" value="20" min="0" class="input-cyber w-full px-4 py-3 rounded-xl" />
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">kN.m</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400">Momento Y (Mdy)</label>
+              <div class="relative">
+                <input type="number" id="momento-y" value="0" min="0" class="input-cyber w-full px-4 py-3 rounded-xl" />
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">kN.m</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+            <p class="text-sm text-cyan-300">
+              💡 <strong>Dica:</strong> Cargas devem ser de cálculo (já majoradas γf = 1,4). 
+              Para pilares centrais sem excentricidade, use apenas carga axial.
+            </p>
+          </div>
+        </section>
+
+        <!-- Materiais -->
+        <section class="glass rounded-2xl p-6">
+          <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm">4</span>
+            Materiais e Condições
+          </h2>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400">Classe do Concreto</label>
+              <select id="fck" class="input-cyber w-full px-4 py-3 rounded-xl appearance-none cursor-pointer">
+                <option value="20">C20 (fck = 20 MPa)</option>
+                <option value="25" selected>C25 (fck = 25 MPa)</option>
+                <option value="30">C30 (fck = 30 MPa)</option>
+                <option value="35">C35 (fck = 35 MPa)</option>
+                <option value="40">C40 (fck = 40 MPa)</option>
+                <option value="45">C45 (fck = 45 MPa)</option>
+                <option value="50">C50 (fck = 50 MPa)</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400">Tipo de Aço</label>
+              <select id="aco" class="input-cyber w-full px-4 py-3 rounded-xl appearance-none cursor-pointer">
+                <option value="500">CA-50 (fyk = 500 MPa)</option>
+                <option value="600">CA-60 (fyk = 600 MPa)</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400 flex items-center gap-2">
+                Vinculação
+                <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Define o comprimento equivalente (le = k × L)">ⓘ</span>
+              </label>
+              <select id="vinculacao" class="input-cyber w-full px-4 py-3 rounded-xl appearance-none cursor-pointer">
+                <option value="1.0" selected>Engastado-Engastado (k=1,0)</option>
+                <option value="0.7">Engastado-Rotulado (k=0,7)</option>
+                <option value="0.5">Bi-engastado c/ transl. impedida (k=0,5)</option>
+                <option value="2.0">Balanço (k=2,0)</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm text-gray-400">Taxa de Armadura Desejada</label>
+              <div class="relative">
+                <input type="number" id="taxa-armadura" value="1.5" min="0.4" max="8.0" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+              </div>
+              <div class="h-2 bg-gray-700 rounded-full overflow-hidden mt-2">
+                <div id="taxa-bar" class="h-full progress-bar" style="width: 18.75%"></div>
+              </div>
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>0,4% (mín)</span>
+                <span>4% (emenda)</span>
+                <span>8% (máx)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column - Live Preview -->
+      <div class="space-y-6">
+        <!-- Visualização do Pilar -->
+        <section class="glass rounded-2xl p-6 sticky top-20">
+          <h2 class="text-lg font-semibold text-cyan-400 mb-4">👁️ Visualização</h2>
+          <div id="pilar-preview" class="pilar-3d flex items-center justify-center min-h-[250px]">
+            <div class="pilar-visual text-center">
+              <div id="pilar-shape" class="w-24 h-40 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border-2 border-cyan-500 rounded-lg mx-auto flex items-center justify-center">
+                <div class="grid grid-cols-2 gap-2 p-2">
+                  <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                </div>
+              </div>
+              <div id="pilar-dims" class="text-cyan-400 font-mono text-sm mt-3">20 × 40 cm</div>
+            </div>
+          </div>
+          
+          <!-- Quick Stats -->
+          <div id="quick-stats" class="grid grid-cols-2 gap-3 mt-4">
+            <div class="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-center">
+              <div class="text-2xl font-bold text-cyan-400" id="stat-area">800</div>
+              <div class="text-xs text-gray-400">Área (cm²)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-center">
+              <div class="text-2xl font-bold text-purple-400" id="stat-esbeltez">--</div>
+              <div class="text-xs text-gray-400">Esbeltez (λ)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-center">
+              <div class="text-2xl font-bold text-green-400" id="stat-taxa">1.5%</div>
+              <div class="text-xs text-gray-400">Taxa Real</div>
+            </div>
+            <div class="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-center">
+              <div class="text-2xl font-bold text-yellow-400" id="stat-custo">--</div>
+              <div class="text-xs text-gray-400">Custo (R$)</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Resultados -->
+    <section id="resultado-section" class="mt-8 glass rounded-2xl p-6 hidden">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-cyan-400 flex items-center gap-3">
+          📋 Resultados do Dimensionamento
+        </h2>
+        <div class="flex gap-2 no-print">
+          <button onclick="copiarResultados()" class="px-4 py-2 rounded-lg border border-cyan-500/30 hover:bg-cyan-500/10 text-sm transition-all">
+            📋 Copiar
+          </button>
+          <button onclick="salvarHistorico()" class="px-4 py-2 rounded-lg border border-purple-500/30 hover:bg-purple-500/10 text-sm transition-all">
+            💾 Salvar
+          </button>
+        </div>
+      </div>
+      
+      <!-- Tabs -->
+      <div class="flex gap-2 mb-6 overflow-x-auto pb-2 no-print">
+        <button class="tab-btn active px-4 py-2 rounded-lg bg-cyan-500/20 text-cyan-400 whitespace-nowrap" data-tab="resumo">
+          📊 Resumo
+        </button>
+        <button class="tab-btn px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap" data-tab="armadura">
+          🔩 Armadura
+        </button>
+        <button class="tab-btn px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap" data-tab="verificacoes">
+          ✅ Verificações
+        </button>
+        <button class="tab-btn px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap" data-tab="custos">
+          💰 Custos
+        </button>
+        <button class="tab-btn px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap" data-tab="detalhamento">
+          📐 Detalhamento
+        </button>
+      </div>
+      
+      <div id="resultado"></div>
+    </section>
+
+    <!-- Referências NBR -->
+    <section class="mt-8 glass rounded-2xl p-6">
+      <h2 class="text-xl font-semibold text-cyan-400 mb-4">📚 Referências Normativas</h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div class="font-semibold text-purple-400">NBR 6118:2023</div>
+          <div class="text-sm text-gray-400">Projeto de Estruturas de Concreto - Procedimento</div>
+        </div>
+        <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div class="font-semibold text-purple-400">Item 17.3</div>
+          <div class="text-sm text-gray-400">Pilares - dimensões mínimas e armaduras</div>
+        </div>
+        <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div class="font-semibold text-purple-400">Item 15.8</div>
+          <div class="text-sm text-gray-400">Esbeltez e efeitos de 2ª ordem</div>
+        </div>
+        <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div class="font-semibold text-purple-400">Item 17.3.5</div>
+          <div class="text-sm text-gray-400">Armaduras longitudinal e transversal</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de Preços -->
+  <div id="modalPrecos" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto gradient-border">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-cyan-400">⚙️ Configurar Preços</h3>
+          <button onclick="fecharModalPrecos()" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center text-2xl transition-all">×</button>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+            <label class="text-sm text-gray-400">Aço CA-50/60 (por kg)</label>
+            <div class="relative mt-2">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
+              <input type="number" id="preco-aco" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="0.50" value="7.50">
+            </div>
+          </div>
+          
+          <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+            <label class="text-sm text-gray-400">Concreto Base C20 (por m³)</label>
+            <div class="relative mt-2">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
+              <input type="number" id="preco-concreto-base" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="10" value="350">
+            </div>
+          </div>
+          
+          <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+            <label class="text-sm text-gray-400">Adicional por MPa (acima de C20)</label>
+            <div class="relative mt-2">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
+              <input type="number" id="preco-adicional-fck" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="1" value="15">
+            </div>
+          </div>
+          
+          <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+            <label class="text-sm text-gray-400">Forma e Escoramento (por m²)</label>
+            <div class="relative mt-2">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
+              <input type="number" id="preco-forma" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="5" value="45">
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex gap-3 mt-6">
+          <button onclick="restaurarPrecosPilares()" class="flex-1 py-3 rounded-xl border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 transition-all">
+            🔄 Restaurar
+          </button>
+          <button onclick="salvarPrecosPilares()" class="flex-1 py-3 rounded-xl btn-cyber">
+            ✓ Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Histórico -->
+  <div id="modalHistorico" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto gradient-border">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-cyan-400">📊 Histórico de Cálculos</h3>
+          <button onclick="fecharHistorico()" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center text-2xl transition-all">×</button>
+        </div>
+        <div id="lista-historico" class="space-y-3">
+          <p class="text-gray-500 text-center py-8">Nenhum cálculo salvo ainda.</p>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button onclick="limparHistorico()" class="flex-1 py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all">
+            🗑️ Limpar Tudo
+          </button>
+          <button onclick="fecharHistorico()" class="flex-1 py-3 rounded-xl btn-cyber">
+            ✓ Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 right-4 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <div class="glass rounded-xl px-6 py-4 border border-cyan-500/30 flex items-center gap-3">
+      <span id="toast-icon">✅</span>
+      <span id="toast-message">Operação realizada com sucesso!</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  
+
+  <script>
+    // ==================== CONFIGURAÇÕES ====================
+    let tipoSecao = 'retangular';
+    let ultimoResultado = null;
+    
+    const precosPilaresPadrao = {
+      acoKg: 9.80,
+      concretoBase: 480,
+      adicionalFck: 20,
+      forma: 95
+    };
+    
+    let precosPilares = JSON.parse(localStorage.getItem('precosPilares')) || { ...precosPilaresPadrao };
+    let historicoCalculos = JSON.parse(localStorage.getItem('historicoCalculos')) || [];
+    
+    const bitolasComerciais = [6.3, 8, 10, 12.5, 16, 20, 25, 32, 40];
+    const areasBitolas = {
+      6.3: 0.315, 8: 0.50, 10: 0.80, 12.5: 1.25, 16: 2.00,
+      20: 3.15, 25: 5.00, 32: 8.00, 40: 12.50
+    };
+    
+    // ==================== INICIALIZAÇÃO ====================
+    
+    
+    // Event Listeners
+    document.querySelectorAll('.tipo-btn').forEach(btn => {
+      btn.addEventListener('click', () => selecionarTipo(btn.dataset.tipo));
+    });
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => selecionarTab(btn.dataset.tab));
+    });
+    
+    document.getElementById('btnCalcular').addEventListener('click', calcular);
+    
+    // Auto-cálculo com debounce
+    let calculoTimeout;
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', () => {
+        clearTimeout(calculoTimeout);
+        calculoTimeout = setTimeout(() => {
+          atualizarPreview();
+          calcular();
+        }, 300);
+      });
+    });
+    
+    // Taxa de armadura slider
+    document.getElementById('taxa-armadura').addEventListener('input', (e) => {
+      const valor = parseFloat(e.target.value);
+      const porcentagem = ((valor - 0.4) / (8 - 0.4)) * 100;
+      document.getElementById('taxa-bar').style.width = porcentagem + '%';
+    });
+    
+    // ==================== FUNÇÕES PRINCIPAIS ====================
+    function selecionarTipo(tipo) {
+      tipoSecao = tipo;
+      document.querySelectorAll('.tipo-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tipo === tipo);
+      });
+      
+      const geometriaDiv = document.getElementById('geometria-inputs');
+      
+      if (tipo === 'circular') {
+        geometriaDiv.innerHTML = `
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Diâmetro (D)</label>
+            <div class="relative">
+              <input type="number" id="diametro" value="30" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Comprimento (L)</label>
+            <div class="relative">
+              <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">m</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Cobrimento (c)</label>
+            <div class="relative">
+              <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+            </div>
+          </div>
+        `;
+      } else if (tipo === 'quadrada') {
+        geometriaDiv.innerHTML = `
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Lado (a)</label>
+            <div class="relative">
+              <input type="number" id="lado" value="30" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Comprimento (L)</label>
+            <div class="relative">
+              <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">m</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Cobrimento (c)</label>
+            <div class="relative">
+              <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+            </div>
+          </div>
+        `;
+      } else {
+        geometriaDiv.innerHTML = `
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400 flex items-center gap-2">
+              Base (b)
+              <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Menor dimensão da seção transversal">ⓘ</span>
+            </label>
+            <div class="relative">
+              <input type="number" id="base" value="20" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400 flex items-center gap-2">
+              Altura (h)
+              <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Maior dimensão da seção transversal">ⓘ</span>
+            </label>
+            <div class="relative">
+              <input type="number" id="altura" value="40" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Comprimento (L)</label>
+            <div class="relative">
+              <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">m</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400 flex items-center gap-2">
+              Cobrimento (c)
+              <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="NBR 6118: mín. 2,5cm (int.) ou 3,0cm (ext.)">ⓘ</span>
+            </label>
+            <div class="relative">
+              <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-4 py-3 rounded-xl" />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Re-attach listeners
+      document.querySelectorAll('#geometria-inputs input').forEach(el => {
+        el.addEventListener('input', () => {
+          clearTimeout(calculoTimeout);
+          calculoTimeout = setTimeout(() => {
+            atualizarPreview();
+            calcular();
+          }, 300);
+        });
+      });
+      
+      atualizarPreview();
+      calcular();
+    }
+    
+    function atualizarPreview() {
+      let base, altura;
+      
+      if (tipoSecao === 'circular') {
+        const diametro = parseFloat(document.getElementById('diametro')?.value || 30);
+        base = altura = diametro;
+        document.getElementById('pilar-dims').textContent = `Ø ${diametro} cm`;
+        document.getElementById('pilar-shape').style.borderRadius = '50%';
+        document.getElementById('stat-area').textContent = Math.round(Math.PI * Math.pow(diametro/2, 2));
+      } else if (tipoSecao === 'quadrada') {
+        const lado = parseFloat(document.getElementById('lado')?.value || 30);
+        base = altura = lado;
+        document.getElementById('pilar-dims').textContent = `${lado} × ${lado} cm`;
+        document.getElementById('pilar-shape').style.borderRadius = '8px';
+        document.getElementById('stat-area').textContent = Math.round(lado * lado);
+      } else {
+        base = parseFloat(document.getElementById('base')?.value || 20);
+        altura = parseFloat(document.getElementById('altura')?.value || 40);
+        document.getElementById('pilar-dims').textContent = `${base} × ${altura} cm`;
+        document.getElementById('pilar-shape').style.borderRadius = '8px';
+        document.getElementById('stat-area').textContent = Math.round(base * altura);
+      }
+      
+      // Ajustar tamanho visual
+      const escala = Math.min(120 / Math.max(base, altura), 4);
+      const shape = document.getElementById('pilar-shape');
+      shape.style.width = (base * escala) + 'px';
+      shape.style.height = (altura * escala) + 'px';
+    }
+    
+    function calcular() {
+      let base, altura, area, inercia;
+      
+      const comprimento = parseFloat(document.getElementById('comprimento')?.value || 3) * 100;
+      const cobrimento = parseFloat(document.getElementById('cobrimento')?.value || 3);
+      const cargaAxial = parseFloat(document.getElementById('carga-axial')?.value || 500);
+      const momentoX = parseFloat(document.getElementById('momento-x')?.value || 0);
+      const momentoY = parseFloat(document.getElementById('momento-y')?.value || 0);
+      const fck = parseFloat(document.getElementById('fck')?.value || 25);
+      const fyk = parseFloat(document.getElementById('aco')?.value || 500);
+      const vinculacao = parseFloat(document.getElementById('vinculacao')?.value || 1);
+      const taxaArmadura = parseFloat(document.getElementById('taxa-armadura')?.value || 1.5);
+      
+      // Calcular geometria
+      if (tipoSecao === 'circular') {
+        const diametro = parseFloat(document.getElementById('diametro')?.value || 30);
+        base = altura = diametro;
+        area = Math.PI * Math.pow(diametro / 2, 2);
+        inercia = Math.PI * Math.pow(diametro / 2, 4) / 4;
+      } else if (tipoSecao === 'quadrada') {
+        const lado = parseFloat(document.getElementById('lado')?.value || 30);
+        base = altura = lado;
+        area = lado * lado;
+        inercia = Math.pow(lado, 4) / 12;
+      } else {
+        base = parseFloat(document.getElementById('base')?.value || 20);
+        altura = parseFloat(document.getElementById('altura')?.value || 40);
+        area = base * altura;
+        inercia = base * Math.pow(altura, 3) / 12;
+      }
+      
+      // Verificações dimensionais
+      const verificacoes = verificarDimensoes(base, altura, area, comprimento);
+      
+      // Esbeltez
+      const comprimentoEquivalente = comprimento * vinculacao;
+      const raioGiracao = Math.sqrt(inercia / area);
+      const esbeltez = comprimentoEquivalente / raioGiracao;
+      
+      // Classificação
+      let classificacao, considerarSegundaOrdem, corClassificacao;
+      if (esbeltez <= 35) {
+        classificacao = 'Pilar Robusto (λ ≤ 35)';
+        considerarSegundaOrdem = false;
+        corClassificacao = 'green';
+      } else if (esbeltez <= 90) {
+        classificacao = 'Pilar Medianamente Esbelto (35 < λ ≤ 90)';
+        considerarSegundaOrdem = true;
+        corClassificacao = 'cyan';
+      } else if (esbeltez <= 140) {
+        classificacao = 'Pilar Esbelto (90 < λ ≤ 140)';
+        considerarSegundaOrdem = true;
+        corClassificacao = 'yellow';
+      } else {
+        classificacao = '⚠️ Pilar Muito Esbelto (λ > 140)';
+        considerarSegundaOrdem = true;
+        corClassificacao = 'red';
+      }
+      
+      // Momentos mínimos
+      const ea = Math.max(comprimento / 300, 1.5);
+      const momentoMinX = cargaAxial * Math.max(0.015 + 0.03 * altura / 100, ea / 100);
+      const momentoMinY = cargaAxial * Math.max(0.015 + 0.03 * base / 100, ea / 100);
+      const momentoCalculoX = Math.max(momentoX, momentoMinX);
+      const momentoCalculoY = Math.max(momentoY, momentoMinY);
+      
+      // Armadura
+      const areaAcoNecessaria = (area * taxaArmadura) / 100;
+      const armadura = calcularArmadura(areaAcoNecessaria, base, altura, cobrimento);
+      const estribos = calcularEstribos(base, altura, armadura.bitola, fck);
+      
+      // Verificação de capacidade resistente
+      const capacidade = verificarCapacidade(base, altura, area, cargaAxial, momentoCalculoX, fck, armadura.areaTotal);
+      
+      // Custos
+      const custo = calcularCusto(armadura, estribos, comprimento / 100, area / 10000, base, altura, fck);
+      
+      // Atualizar estatísticas rápidas
+      document.getElementById('stat-esbeltez').textContent = esbeltez.toFixed(1);
+      document.getElementById('stat-taxa').textContent = ((armadura.areaTotal / area) * 100).toFixed(2) + '%';
+      document.getElementById('stat-custo').textContent = custo.total.toFixed(0);
+      
+      // Guardar resultado
+      ultimoResultado = {
+        tipoSecao, base, altura, area, comprimento: comprimento / 100, cobrimento,
+        cargaAxial, momentoX, momentoY, fck, fyk, esbeltez, classificacao,
+        corClassificacao, considerarSegundaOrdem, momentoCalculoX, momentoCalculoY,
+        taxaArmadura, armadura, estribos, verificacoes, capacidade, custo
+      };
+      
+      // Mostrar resultados
+      document.getElementById('resultado-section').classList.remove('hidden');
+      gerarResultado(ultimoResultado);
+    }
+    
+    function verificarDimensoes(base, altura, area, comprimento) {
+      const verificacoes = [];
+      const menorDimensao = Math.min(base, altura);
+      
+      // Dimensão mínima NBR 6118
+      if (menorDimensao < 19) {
+        verificacoes.push({
+          tipo: 'erro',
+          titulo: 'Dimensão Mínima',
+          msg: `Não atende NBR 6118. Mínimo 19 cm (atual: ${menorDimensao.toFixed(1)} cm)`,
+          referencia: 'NBR 6118 item 13.2.3'
+        });
+      } else {
+        verificacoes.push({
+          tipo: 'sucesso',
+          titulo: 'Dimensão Mínima',
+          msg: `OK - ${menorDimensao.toFixed(1)} cm ≥ 19 cm`,
+          referencia: 'NBR 6118 item 13.2.3'
+        });
+      }
+      
+      // Área mínima
+      if (area < 360) {
+        verificacoes.push({
+          tipo: 'erro',
+          titulo: 'Área Mínima',
+          msg: `Área muito pequena. Mínimo 360 cm² (atual: ${area.toFixed(0)} cm²)`,
+          referencia: 'NBR 6118 item 13.2.3'
+        });
+      } else {
+        verificacoes.push({
+          tipo: 'sucesso',
+          titulo: 'Área Mínima',
+          msg: `OK - ${area.toFixed(0)} cm² ≥ 360 cm²`,
+          referencia: 'NBR 6118 item 13.2.3'
+        });
+      }
+      
+      // Relação entre dimensões
+      const relacao = Math.max(base, altura) / Math.min(base, altura);
+      if (relacao > 5) {
+        verificacoes.push({
+          tipo: 'aviso',
+          titulo: 'Relação h/b',
+          msg: `Relação alta (${relacao.toFixed(1)}). Considere parede estrutural.`,
+          referencia: 'Recomendação prática'
+        });
+      }
+      
+      return verificacoes;
+    }
+    
+    function calcularArmadura(areaTotal, base, altura, cobrimento) {
+      const areaSecao = base * altura;
+      const areaMin = 0.004 * areaSecao;
+      const areaMax = 0.08 * areaSecao;
+      
+      let areaFinal = Math.max(areaTotal, areaMin);
+      areaFinal = Math.min(areaFinal, areaMax);
+      
+      let melhorConfig = null;
+      let menorDiferenca = Infinity;
+      
+      for (let bitola of bitolasComerciais) {
+        if (bitola < 10) continue;
+        
+        const areaBitola = areasBitolas[bitola];
+        const numBarras = Math.ceil(areaFinal / areaBitola);
+        let numMinimo = tipoSecao === 'circular' ? 6 : 4;
+        
+        if (numBarras < numMinimo) continue;
+        
+        const areaTotalCalc = numBarras * areaBitola;
+        const diferenca = Math.abs(areaTotalCalc - areaFinal);
+        const espacamento = calcularEspacamento(base, altura, numBarras, bitola, cobrimento);
+        
+        if (espacamento < 2) continue;
+        
+        if (diferenca < menorDiferenca) {
+          menorDiferenca = diferenca;
+          melhorConfig = {
+            bitola,
+            quantidade: numBarras,
+            areaTotal: areaTotalCalc,
+            areaUnitaria: areaBitola,
+            espacamento,
+            areaMinima: areaMin,
+            areaMaxima: areaMax
+          };
+        }
+      }
+      
+      return melhorConfig || {
+        bitola: 12.5,
+        quantidade: 4,
+        areaTotal: 5.0,
+        areaUnitaria: 1.25,
+        espacamento: 10,
+        areaMinima: areaMin,
+        areaMaxima: areaMax
+      };
+    }
+    
+    function calcularEspacamento(base, altura, numBarras, bitola, cobrimento) {
+      const perimetroUtil = 2 * (base + altura) - 8 * (cobrimento + bitola / 10);
+      return perimetroUtil / numBarras;
+    }
+    
+    function calcularEstribos(base, altura, bitolaLong, fck) {
+      let bitolaEstribo = Math.max(5, bitolaLong / 4);
+      let bitolaComercial = 5;
+      if (bitolaEstribo >= 6.3) bitolaComercial = 6.3;
+      if (bitolaEstribo >= 8) bitolaComercial = 8;
+      
+      const menorDimensao = Math.min(base, altura);
+      const espacamentoMax = Math.min(20, menorDimensao, 12 * bitolaLong / 10);
+      const espacamentoRecomendado = Math.floor(espacamentoMax * 0.67);
+      
+      return {
+        bitola: bitolaComercial,
+        espacamento: espacamentoRecomendado,
+        espacamentoMax
+      };
+    }
+    
+    function verificarCapacidade(base, altura, area, Nd, Md, fck, As) {
+      // Cálculo simplificado da capacidade
+      const fcd = fck / 1.4;
+      const fyd = 500 / 1.15;
+      
+      // Capacidade à compressão centrada
+      const Nrd = 0.85 * fcd * (area / 10) + As * fyd / 10;
+      const taxaUtilizacao = (Nd / Nrd) * 100;
+      
+      return {
+        Nrd: Nrd,
+        taxaUtilizacao: Math.min(taxaUtilizacao, 100),
+        status: taxaUtilizacao <= 100 ? 'ok' : 'excedido'
+      };
+    }
+    
+    function calcularCusto(armadura, estribos, comprimento, areaSecaoM2, base, altura, fck) {
+      const precoConcretoM3 = precosPilares.concretoBase + (fck - 20) * precosPilares.adicionalFck;
+      
+      // Peso do aço longitudinal
+      const pesoUnitario = Math.pow(armadura.bitola / 10, 2) * 0.617;
+      const pesoLong = armadura.quantidade * pesoUnitario * comprimento;
+      
+      // Peso dos estribos
+      const perimetroEstribo = 2 * ((base - 6) + (altura - 6)) / 100;
+      const numEstribos = Math.ceil(comprimento / (estribos.espacamento / 100));
+      const pesoEstribos = numEstribos * perimetroEstribo * Math.pow(estribos.bitola / 10, 2) * 0.617;
+      
+      const pesoAcoTotal = pesoLong + pesoEstribos;
+      const custoAco = pesoAcoTotal * precosPilares.acoKg;
+      
+      // Concreto
+      const volumeConcreto = areaSecaoM2 * comprimento;
+      const custoConcreto = volumeConcreto * precoConcretoM3;
+      
+      // Forma
+      const perimetro = tipoSecao === 'circular' 
+        ? Math.PI * Math.sqrt(areaSecaoM2 * 10000 / Math.PI) / 100
+        : 2 * (base + altura) / 100;
+      const areaForma = perimetro * comprimento;
+      const custoForma = areaForma * precosPilares.forma;
+      
+      const total = custoAco + custoConcreto + custoForma;
+      
+      return {
+        pesoAcoLong: pesoLong,
+        pesoAcoEstribos: pesoEstribos,
+        pesoAcoTotal,
+        custoAco,
+        volumeConcreto,
+        custoConcreto,
+        areaForma,
+        custoForma,
+        total,
+        porcentagens: {
+          aco: (custoAco / total) * 100,
+          concreto: (custoConcreto / total) * 100,
+          forma: (custoForma / total) * 100
+        }
+      };
+    }
+    
+    function selecionarTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+        btn.classList.toggle('bg-cyan-500/20', btn.dataset.tab === tab);
+        btn.classList.toggle('text-cyan-400', btn.dataset.tab === tab);
+      });
+      
+      if (ultimoResultado) {
+        gerarResultado(ultimoResultado, tab);
+      }
+    }
+    
+    function gerarResultado(dados, tab = 'resumo') {
+      const {
+        tipoSecao, base, altura, area, comprimento, cobrimento, cargaAxial,
+        momentoX, momentoY, fck, fyk, esbeltez, classificacao, corClassificacao,
+        considerarSegundaOrdem, momentoCalculoX, momentoCalculoY, taxaArmadura,
+        armadura, estribos, verificacoes, capacidade, custo
+      } = dados;
+      
+      let html = '';
+      
+      // Tab: Resumo
+      if (tab === 'resumo') {
+        html = `
+          <div class="tab-content active">
+            <!-- Classificação -->
+            <div class="p-4 rounded-xl border mb-6 ${
+              corClassificacao === 'green' ? 'bg-green-500/10 border-green-500/30' :
+              corClassificacao === 'cyan' ? 'bg-cyan-500/10 border-cyan-500/30' :
+              corClassificacao === 'yellow' ? 'bg-yellow-500/10 border-yellow-500/30' :
+              'bg-red-500/10 border-red-500/30'
+            }">
+              <div class="font-semibold text-lg ${
+                corClassificacao === 'green' ? 'text-green-400' :
+                corClassificacao === 'cyan' ? 'text-cyan-400' :
+                corClassificacao === 'yellow' ? 'text-yellow-400' :
+                'text-red-400'
+              }">${classificacao}</div>
+              <div class="text-sm text-gray-400 mt-1">
+                ${considerarSegundaOrdem 
+                  ? '⚠️ Considerar efeitos de 2ª ordem no dimensionamento'
+                  : '✅ Dispensável análise de efeitos de 2ª ordem'
+                }
+              </div>
+            </div>
+            
+            <!-- Cards de resumo -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div class="p-4 rounded-xl bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20">
+                <div class="text-xs text-gray-400 mb-1">Seção</div>
+                <div class="text-2xl font-bold text-cyan-400">${tipoSecao === 'circular' ? 'Ø' + base : base + '×' + altura}</div>
+                <div class="text-xs text-gray-500">cm</div>
+              </div>
+              <div class="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-transparent border border-purple-500/20">
+                <div class="text-xs text-gray-400 mb-1">Esbeltez (λ)</div>
+                <div class="text-2xl font-bold text-purple-400">${esbeltez.toFixed(1)}</div>
+                <div class="text-xs text-gray-500">L=${comprimento.toFixed(2)}m</div>
+              </div>
+              <div class="p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-transparent border border-green-500/20">
+                <div class="text-xs text-gray-400 mb-1">Armadura</div>
+                <div class="text-2xl font-bold text-green-400">${armadura.quantidade}Ø${armadura.bitola}</div>
+                <div class="text-xs text-gray-500">${armadura.areaTotal.toFixed(2)} cm²</div>
+              </div>
+              <div class="p-4 rounded-xl bg-gradient-to-br from-yellow-500/10 to-transparent border border-yellow-500/20">
+                <div class="text-xs text-gray-400 mb-1">Custo Total</div>
+                <div class="text-2xl font-bold text-yellow-400">R$ ${custo.total.toFixed(0)}</div>
+                <div class="text-xs text-gray-500">estimado</div>
+              </div>
+            </div>
+            
+            <!-- Capacidade -->
+            <div class="mb-6">
+              <div class="flex justify-between text-sm mb-2">
+                <span class="text-gray-400">Utilização da Seção</span>
+                <span class="${capacidade.taxaUtilizacao > 100 ? 'text-red-400' : capacidade.taxaUtilizacao > 80 ? 'text-yellow-400' : 'text-green-400'}">${capacidade.taxaUtilizacao.toFixed(1)}%</span>
+              </div>
+              <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full transition-all duration-500 ${
+                  capacidade.taxaUtilizacao > 100 ? 'bg-red-500' : 
+                  capacidade.taxaUtilizacao > 80 ? 'bg-yellow-500' : 'bg-green-500'
+                }" style="width: ${Math.min(capacidade.taxaUtilizacao, 100)}%"></div>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                Nd = ${cargaAxial.toFixed(0)} kN | Nrd = ${capacidade.Nrd.toFixed(0)} kN
+              </div>
+            </div>
+            
+            <!-- Visualização da seção -->
+            <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+              <h3 class="font-semibold mb-4">Seção Transversal</h3>
+              <div class="flex justify-center">
+                ${gerarSVGSecao(base, altura, armadura, cobrimento, tipoSecao)}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Tab: Armadura
+      else if (tab === 'armadura') {
+        html = `
+          <div class="tab-content active">
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Armadura Longitudinal -->
+              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-cyan-400 mb-4">🔩 Armadura Longitudinal</h3>
+                <div class="space-y-3">
+                  <div class="flex justify-between py-2 border-b border-white/10">
+                    <span class="text-gray-400">Configuração</span>
+                    <span class="font-bold text-cyan-400">${armadura.quantidade}Ø${armadura.bitola} mm</span>
+                  </div>
+                  <div class="flex justify-between py-2 border-b border-white/10">
+                    <span class="text-gray-400">Área Total</span>
+                    <span>${armadura.areaTotal.toFixed(2)} cm²</span>
+                  </div>
+                  <div class="flex justify-between py-2 border-b border-white/10">
+                    <span class="text-gray-400">Taxa Real</span>
+                    <span>${((armadura.areaTotal / area) * 100).toFixed(2)}%</span>
+                  </div>
+                  <div class="flex justify-between py-2 border-b border-white/10">
+                    <span class="text-gray-400">Área Mínima</span>
+                    <span class="text-gray-500">${armadura.areaMinima.toFixed(2)} cm² (0,4%)</span>
+                  </div>
+                  <div class="flex justify-between py-2 border-b border-white/10">
+                    <span class="text-gray-400">Espaçamento</span>
+                    <span>${armadura.espacamento.toFixed(1)} cm</span>
+                  </div>
+                  <div class="flex justify-between py-2">
+                    <span class="text-gray-400">Cobrimento</span>
+                    <span>${cobrimento.toFixed(1)} cm</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Armadura Transversal -->
+              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-purple-400 mb-4">⚙️ Armadura Transversal (Estribos)</h3>
+                <div class="space-y-3">
+                  <div class="flex justify-between py-2 border-b border-white/10">
+                    <span class="text-gray-400">Bitola</span>
+                    <span class="font-bold text-purple-400">Ø${estribos.bitola} mm</span>
+                  </div>
+                  <div class="flex justify-between py-2 border-b border-white/10">
+                    <span class="text-gray-400">Espaçamento</span>
+                    <span>c/${estribos.espacamento} cm</span>
+                  </div>
+                  <div class="flex justify-between py-2 border-b border-white/10">
+                    <span class="text-gray-400">Espaçamento Máximo</span>
+                    <span class="text-gray-500">${estribos.espacamentoMax.toFixed(1)} cm</span>
+                  </div>
+                  <div class="flex justify-between py-2">
+                    <span class="text-gray-400">Tipo de Aço</span>
+                    <span>CA-${fyk === 500 ? '50' : '60'}</span>
+                  </div>
+                </div>
+                
+                <div class="mt-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+                  <div class="text-sm text-yellow-400 font-medium mb-1">⚠️ Regiões Especiais</div>
+                  <ul class="text-xs text-gray-400 space-y-1">
+                    <li>• Extremidades (30cm): espaçamento ≤ ${Math.min(20, estribos.espacamento)} cm</li>
+                    <li>• Emendas: espaçamento ≤ ${Math.floor(estribos.espacamento * 0.75)} cm</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tabela de bitolas -->
+            <div class="mt-6 p-6 rounded-xl bg-white/5 border border-white/10 overflow-x-auto">
+              <h3 class="font-semibold mb-4">📊 Opções de Armadura</h3>
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-white/10">
+                    <th class="text-left py-2 text-gray-400">Bitola</th>
+                    <th class="text-center py-2 text-gray-400">Qtd</th>
+                    <th class="text-center py-2 text-gray-400">Área (cm²)</th>
+                    <th class="text-center py-2 text-gray-400">Taxa (%)</th>
+                    <th class="text-center py-2 text-gray-400">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${gerarTabelaBitolas(area, armadura.areaMinima)}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Tab: Verificações
+      else if (tab === 'verificacoes') {
+        html = `
+          <div class="tab-content active">
+            <div class="space-y-4">
+              ${verificacoes.map(v => `
+                <div class="p-4 rounded-xl border ${
+                  v.tipo === 'erro' ? 'bg-red-500/10 border-red-500/30' :
+                  v.tipo === 'aviso' ? 'bg-yellow-500/10 border-yellow-500/30' :
+                  'bg-green-500/10 border-green-500/30'
+                }">
+                  <div class="flex items-start gap-3">
+                    <span class="text-xl">${v.tipo === 'erro' ? '❌' : v.tipo === 'aviso' ? '⚠️' : '✅'}</span>
+                    <div class="flex-1">
+                      <div class="font-semibold ${
+                        v.tipo === 'erro' ? 'text-red-400' :
+                        v.tipo === 'aviso' ? 'text-yellow-400' :
+                        'text-green-400'
+                      }">${v.titulo}</div>
+                      <div class="text-sm text-gray-300 mt-1">${v.msg}</div>
+                      <div class="text-xs text-gray-500 mt-1">${v.referencia}</div>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+              
+              <!-- Verificação de esbeltez -->
+              <div class="p-4 rounded-xl border ${
+                esbeltez <= 90 ? 'bg-green-500/10 border-green-500/30' :
+                esbeltez <= 140 ? 'bg-yellow-500/10 border-yellow-500/30' :
+                'bg-red-500/10 border-red-500/30'
+              }">
+                <div class="flex items-start gap-3">
+                  <span class="text-xl">${esbeltez <= 140 ? '✅' : '❌'}</span>
+                  <div class="flex-1">
+                    <div class="font-semibold ${
+                      esbeltez <= 90 ? 'text-green-400' :
+                      esbeltez <= 140 ? 'text-yellow-400' :
+                      'text-red-400'
+                    }">Índice de Esbeltez</div>
+                    <div class="text-sm text-gray-300 mt-1">
+                      λ = ${esbeltez.toFixed(1)} ${esbeltez <= 140 ? '≤ 140 (limite NBR)' : '> 140 (EXCEDE LIMITE!)'}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">NBR 6118 item 15.8.1</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Verificação de capacidade -->
+              <div class="p-4 rounded-xl border ${
+                capacidade.taxaUtilizacao <= 80 ? 'bg-green-500/10 border-green-500/30' :
+                capacidade.taxaUtilizacao <= 100 ? 'bg-yellow-500/10 border-yellow-500/30' :
+                'bg-red-500/10 border-red-500/30'
+              }">
+                <div class="flex items-start gap-3">
+                  <span class="text-xl">${capacidade.status === 'ok' ? '✅' : '❌'}</span>
+                  <div class="flex-1">
+                    <div class="font-semibold ${
+                      capacidade.taxaUtilizacao <= 80 ? 'text-green-400' :
+                      capacidade.taxaUtilizacao <= 100 ? 'text-yellow-400' :
+                      'text-red-400'
+                    }">Capacidade Resistente</div>
+                    <div class="text-sm text-gray-300 mt-1">
+                      Utilização: ${capacidade.taxaUtilizacao.toFixed(1)}% (Nd/Nrd = ${cargaAxial.toFixed(0)}/${capacidade.Nrd.toFixed(0)} kN)
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">Verificação simplificada à compressão</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Tab: Custos
+      else if (tab === 'custos') {
+        html = `
+          <div class="tab-content active">
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Detalhamento -->
+              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-cyan-400 mb-4">💰 Detalhamento de Custos</h3>
+                <div class="space-y-4">
+                  <div class="p-4 rounded-lg bg-cyan-500/10">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="text-gray-400">Aço</span>
+                      <span class="font-bold text-cyan-400">R$ ${custo.custoAco.toFixed(2)}</span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      ${custo.pesoAcoTotal.toFixed(1)} kg × R$ ${precosPilares.acoKg.toFixed(2)}/kg
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      (Long: ${custo.pesoAcoLong.toFixed(1)} kg | Estr: ${custo.pesoAcoEstribos.toFixed(1)} kg)
+                    </div>
+                  </div>
+                  
+                  <div class="p-4 rounded-lg bg-purple-500/10">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="text-gray-400">Concreto C${fck}</span>
+                      <span class="font-bold text-purple-400">R$ ${custo.custoConcreto.toFixed(2)}</span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      ${custo.volumeConcreto.toFixed(3)} m³ × R$ ${(precosPilares.concretoBase + (fck - 20) * precosPilares.adicionalFck).toFixed(0)}/m³
+                    </div>
+                  </div>
+                  
+                  <div class="p-4 rounded-lg bg-yellow-500/10">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="text-gray-400">Formas</span>
+                      <span class="font-bold text-yellow-400">R$ ${custo.custoForma.toFixed(2)}</span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      ${custo.areaForma.toFixed(2)} m² × R$ ${precosPilares.forma.toFixed(0)}/m²
+                    </div>
+                  </div>
+                  
+                  <div class="p-4 rounded-lg bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30">
+                    <div class="flex justify-between items-center">
+                      <span class="font-semibold">TOTAL</span>
+                      <span class="text-2xl font-bold text-cyan-400">R$ ${custo.total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Gráfico -->
+              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-purple-400 mb-4">📊 Distribuição</h3>
+                <div class="aspect-square max-w-[250px] mx-auto">
+                  <canvas id="chartCustos"></canvas>
+                </div>
+                <div class="mt-4 space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-cyan-500"></span> Aço</span>
+                    <span>${custo.porcentagens.aco.toFixed(1)}%</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-purple-500"></span> Concreto</span>
+                    <span>${custo.porcentagens.concreto.toFixed(1)}%</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-yellow-500"></span> Forma</span>
+                    <span>${custo.porcentagens.forma.toFixed(1)}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-4 p-4 rounded-xl bg-gray-500/10 border border-gray-500/20">
+              <p class="text-sm text-gray-400">
+                ⚠️ <strong>Nota:</strong> Valores estimados para referência. Não incluem mão de obra, equipamentos, transporte e variações regionais. Consulte fornecedores locais para orçamento preciso.
+              </p>
+            </div>
+          </div>
+        `;
+        
+        // Criar gráfico após renderizar
+        setTimeout(() => criarGraficoCustos(custo), 100);
+      }
+      
+      // Tab: Detalhamento
+      else if (tab === 'detalhamento') {
+        html = `
+          <div class="tab-content active">
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Detalhes Geométricos -->
+              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-cyan-400 mb-4">📐 Dados Geométricos</h3>
+                <table class="w-full text-sm">
+                  <tbody>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Tipo de Seção</td>
+                      <td class="py-2 text-right">${tipoSecao.charAt(0).toUpperCase() + tipoSecao.slice(1)}</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Dimensões</td>
+                      <td class="py-2 text-right">${tipoSecao === 'circular' ? 'Ø' + base : base + ' × ' + altura} cm</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Área da Seção</td>
+                      <td class="py-2 text-right">${area.toFixed(2)} cm²</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Comprimento</td>
+                      <td class="py-2 text-right">${comprimento.toFixed(2)} m</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Cobrimento</td>
+                      <td class="py-2 text-right">${cobrimento.toFixed(1)} cm</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-gray-400">Esbeltez (λ)</td>
+                      <td class="py-2 text-right">${esbeltez.toFixed(2)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Dados de Carregamento -->
+              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-purple-400 mb-4">⚡ Carregamento</h3>
+                <table class="w-full text-sm">
+                  <tbody>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Carga Axial (Nd)</td>
+                      <td class="py-2 text-right">${cargaAxial.toFixed(2)} kN</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Momento X Aplicado</td>
+                      <td class="py-2 text-right">${momentoX.toFixed(2)} kN.m</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Momento X Cálculo</td>
+                      <td class="py-2 text-right">${momentoCalculoX.toFixed(2)} kN.m</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Momento Y Aplicado</td>
+                      <td class="py-2 text-right">${momentoY.toFixed(2)} kN.m</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-gray-400">Momento Y Cálculo</td>
+                      <td class="py-2 text-right">${momentoCalculoY.toFixed(2)} kN.m</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Materiais -->
+              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-green-400 mb-4">🧱 Materiais</h3>
+                <table class="w-full text-sm">
+                  <tbody>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Concreto</td>
+                      <td class="py-2 text-right">C${fck} (fck = ${fck} MPa)</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">fcd</td>
+                      <td class="py-2 text-right">${(fck / 1.4).toFixed(2)} MPa</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Aço</td>
+                      <td class="py-2 text-right">CA-${fyk === 500 ? '50' : '60'} (fyk = ${fyk} MPa)</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-gray-400">fyd</td>
+                      <td class="py-2 text-right">${(fyk / 1.15).toFixed(2)} MPa</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Quantitativos -->
+              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-yellow-400 mb-4">📋 Quantitativos</h3>
+                <table class="w-full text-sm">
+                  <tbody>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Volume Concreto</td>
+                      <td class="py-2 text-right">${custo.volumeConcreto.toFixed(4)} m³</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Aço Longitudinal</td>
+                      <td class="py-2 text-right">${custo.pesoAcoLong.toFixed(2)} kg</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Aço Transversal</td>
+                      <td class="py-2 text-right">${custo.pesoAcoEstribos.toFixed(2)} kg</td>
+                    </tr>
+                    <tr class="border-b border-white/5">
+                      <td class="py-2 text-gray-400">Aço Total</td>
+                      <td class="py-2 text-right font-semibold">${custo.pesoAcoTotal.toFixed(2)} kg</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-gray-400">Área de Forma</td>
+                      <td class="py-2 text-right">${custo.areaForma.toFixed(2)} m²</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Observações -->
+            <div class="mt-6 p-6 rounded-xl bg-white/5 border border-white/10">
+              <h3 class="font-semibold mb-4">📝 Observações para Execução</h3>
+              <ul class="space-y-2 text-sm text-gray-300">
+                <li class="flex gap-2"><span>•</span>Verificar interferências com vigas e lajes antes do lançamento</li>
+                <li class="flex gap-2"><span>•</span>Emendas por traspasse: preferir fora de regiões críticas (extremidades)</li>
+                <li class="flex gap-2"><span>•</span>Garantir cobrimento com uso de espaçadores adequados</li>
+                <li class="flex gap-2"><span>•</span>Adensamento com vibrador de agulha, cuidado com segregação</li>
+                <li class="flex gap-2"><span>•</span>Cura úmida por no mínimo 7 dias</li>
+                <li class="flex gap-2"><span>•</span><strong class="text-yellow-400">Este é um pré-dimensionamento. O projeto executivo deve ser elaborado por engenheiro estrutural.</strong></li>
+              </ul>
+            </div>
+          </div>
+        `;
+      }
+      
+      html += `
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📝</span> Memorial de Cálculo
+          </h3>
+          <pre class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE PILARES
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS GERAIS
+Seção: ${tipoSecao === 'circular' ? 'Circular Ø' + base + 'cm' : base + 'x' + altura + ' cm'}
+Área: ${area.toFixed(2)} cm²
+Carga Axial: ${cargaAxial.toFixed(2)} kN
+Momento X: ${momentoX.toFixed(2)} kN.m
+Momento Y: ${momentoY.toFixed(2)} kN.m
+Concreto: C${fck}
+Aço: CA-${fyk === 500 ? '50' : '60'}
+
+2. ARMADURAS
+Área de Armadura Mínima: ${armadura.areaMinima.toFixed(2)} cm²
+Área de Armadura Adotada: ${armadura.areaTotal.toFixed(2)} cm²
+Bitola: ${armadura.quantidade}x Ø${armadura.bitola}mm
+Taxa de Armadura: ${((armadura.areaTotal / area) * 100).toFixed(2)}%
+
+3. ESTRIBOS
+Bitola: Ø${estribos.bitola}mm
+Espaçamento: ${estribos.espacamento} cm
+
+4. VERIFICAÇÕES
+Esbeltez: ${esbeltez.toFixed(2)}
+Classificação: ${classificacao}</pre>
+        </div>
+      `;
+
+      document.getElementById('resultado').innerHTML = html;
+    }
+    
+    function gerarSVGSecao(base, altura, armadura, cobrimento, tipo) {
+      const escala = Math.min(200 / Math.max(base, altura), 8);
+      const w = base * escala;
+      const h = altura * escala;
+      const cob = cobrimento * escala;
+      const barraR = 4;
+      
+      let svg = `<svg width="${w + 40}" height="${h + 40}" viewBox="0 0 ${w + 40} ${h + 40}">`;
+      
+      // Fundo
+      if (tipo === 'circular') {
+        const r = w / 2;
+        svg += `<circle cx="${w/2 + 20}" cy="${h/2 + 20}" r="${r}" fill="rgba(0,255,255,0.1)" stroke="#00ffff" stroke-width="2"/>`;
+      } else {
+        svg += `<rect x="20" y="20" width="${w}" height="${h}" fill="rgba(0,255,255,0.1)" stroke="#00ffff" stroke-width="2" rx="4"/>`;
+      }
+      
+      // Armaduras (simplificado)
+      const numBarras = armadura.quantidade;
+      const barras = [];
+      
+      if (tipo === 'circular') {
+        const r = (w / 2) - cob - barraR;
+        for (let i = 0; i < numBarras; i++) {
+          const angle = (2 * Math.PI * i) / numBarras;
+          barras.push({
+            x: w/2 + 20 + r * Math.cos(angle),
+            y: h/2 + 20 + r * Math.sin(angle)
+          });
+        }
+      } else {
+        // Cantos
+        barras.push({ x: 20 + cob + barraR, y: 20 + cob + barraR });
+        barras.push({ x: 20 + w - cob - barraR, y: 20 + cob + barraR });
+        barras.push({ x: 20 + cob + barraR, y: 20 + h - cob - barraR });
+        barras.push({ x: 20 + w - cob - barraR, y: 20 + h - cob - barraR });
+        
+        // Barras intermediárias
+        const restantes = numBarras - 4;
+        if (restantes > 0) {
+          const porLado = Math.floor(restantes / 2);
+          // Lado vertical
+          for (let i = 0; i < porLado; i++) {
+            const y = 20 + cob + barraR + ((h - 2*cob - 2*barraR) / (porLado + 1)) * (i + 1);
+            barras.push({ x: 20 + cob + barraR, y });
+            barras.push({ x: 20 + w - cob - barraR, y });
+          }
+        }
+      }
+      
+      // Desenhar barras
+      barras.slice(0, numBarras).forEach(b => {
+        svg += `<circle cx="${b.x}" cy="${b.y}" r="${barraR}" fill="#ef4444" stroke="#dc2626" stroke-width="1"/>`;
+      });
+      
+      // Cotas
+      svg += `<text x="${w/2 + 20}" y="12" text-anchor="middle" fill="#00ffff" font-size="10">${base} cm</text>`;
+      svg += `<text x="10" y="${h/2 + 24}" text-anchor="middle" fill="#00ffff" font-size="10" transform="rotate(-90 10 ${h/2 + 20})">${altura} cm</text>`;
+      
+      svg += '</svg>';
+      return svg;
+    }
+    
+    function gerarTabelaBitolas(area, areaMinima) {
+      let html = '';
+      
+      for (let bitola of [10, 12.5, 16, 20, 25]) {
+        const areaBitola = areasBitolas[bitola];
+        const numMin = Math.ceil(areaMinima / areaBitola);
+        const numBarras = Math.max(numMin, 4);
+        const areaTotal = numBarras * areaBitola;
+        const taxa = (areaTotal / area) * 100;
+        
+        const isSelected = bitola === ultimoResultado?.armadura?.bitola;
+        
+        html += `
+          <tr class="${isSelected ? 'bg-cyan-500/20' : ''} border-b border-white/5">
+            <td class="py-2">Ø${bitola} mm</td>
+            <td class="text-center py-2">${numBarras}</td>
+            <td class="text-center py-2">${areaTotal.toFixed(2)}</td>
+            <td class="text-center py-2">${taxa.toFixed(2)}%</td>
+            <td class="text-center py-2">
+              ${taxa >= 0.4 && taxa <= 8 
+                ? '<span class="text-green-400">✓</span>' 
+                : '<span class="text-red-400">✗</span>'
+              }
+            </td>
+          </tr>
+        `;
+      }
+      
+      return html;
+    }
+    
+    function criarGraficoCustos(custo) {
+      const ctx = document.getElementById('chartCustos');
+      if (!ctx) return;
+      
+      // Destruir gráfico existente se houver
+      if (window.chartCustosInstance) {
+        window.chartCustosInstance.destroy();
+      }
+      
+      window.chartCustosInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Aço', 'Concreto', 'Forma'],
+          datasets: [{
+            data: [custo.custoAco, custo.custoConcreto, custo.custoForma],
+            backgroundColor: ['#06b6d4', '#8b5cf6', '#eab308'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          cutout: '60%'
+        }
+      });
+    }
+    
+    // ==================== MODAIS E UTILITÁRIOS ====================
+    function abrirModalPrecos() {
+      document.getElementById('preco-aco').value = precosPilares.acoKg.toFixed(2);
+      document.getElementById('preco-concreto-base').value = precosPilares.concretoBase.toFixed(0);
+      document.getElementById('preco-adicional-fck').value = precosPilares.adicionalFck.toFixed(0);
+      document.getElementById('preco-forma').value = precosPilares.forma.toFixed(0);
+      document.getElementById('modalPrecos').classList.remove('hidden');
+    }
+    
+    function fecharModalPrecos() {
+      document.getElementById('modalPrecos').classList.add('hidden');
+    }
+    
+    function salvarPrecosPilares() {
+      precosPilares.acoKg = parseFloat(document.getElementById('preco-aco').value) || 7.50;
+      precosPilares.concretoBase = parseFloat(document.getElementById('preco-concreto-base').value) || 350;
+      precosPilares.adicionalFck = parseFloat(document.getElementById('preco-adicional-fck').value) || 15;
+      precosPilares.forma = parseFloat(document.getElementById('preco-forma').value) || 45;
+      
+      localStorage.setItem('precosPilares', JSON.stringify(precosPilares));
+      fecharModalPrecos();
+      calcular();
+      mostrarToast('✅', 'Preços salvos com sucesso!');
+    }
+    
+    function restaurarPrecosPilares() {
+      precosPilares = { ...precosPilaresPadrao };
+      localStorage.setItem('precosPilares', JSON.stringify(precosPilares));
+      document.getElementById('preco-aco').value = precosPilares.acoKg.toFixed(2);
+      document.getElementById('preco-concreto-base').value = precosPilares.concretoBase.toFixed(0);
+      document.getElementById('preco-adicional-fck').value = precosPilares.adicionalFck.toFixed(0);
+      document.getElementById('preco-forma').value = precosPilares.forma.toFixed(0);
+      mostrarToast('🔄', 'Preços restaurados!');
+    }
+    
+    function abrirHistorico() {
+      renderizarHistorico();
+      document.getElementById('modalHistorico').classList.remove('hidden');
+    }
+    
+    function fecharHistorico() {
+      document.getElementById('modalHistorico').classList.add('hidden');
+    }
+    
+    function salvarHistorico() {
+      if (!ultimoResultado) return;
+      
+      const item = {
+        id: Date.now(),
+        data: new Date().toLocaleString('pt-BR'),
+        tipo: ultimoResultado.tipoSecao,
+        secao: `${ultimoResultado.base}×${ultimoResultado.altura}`,
+        carga: ultimoResultado.cargaAxial,
+        armadura: `${ultimoResultado.armadura.quantidade}Ø${ultimoResultado.armadura.bitola}`,
+        custo: ultimoResultado.custo.total
+      };
+      
+      historicoCalculos.unshift(item);
+      if (historicoCalculos.length > 20) historicoCalculos.pop();
+      
+      localStorage.setItem('historicoCalculos', JSON.stringify(historicoCalculos));
+      mostrarToast('💾', 'Cálculo salvo no histórico!');
+    }
+    
+    function renderizarHistorico() {
+      const container = document.getElementById('lista-historico');
+      
+      if (historicoCalculos.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum cálculo salvo ainda.</p>';
+        return;
+      }
+      
+      container.innerHTML = historicoCalculos.map(item => `
+        <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center">
+          <div>
+            <div class="font-semibold">${item.secao} cm - ${item.armadura}</div>
+            <div class="text-sm text-gray-400">${item.data} | Nd=${item.carga}kN | R$${item.custo.toFixed(0)}</div>
+          </div>
+          <button onclick="removerHistorico(${item.id})" class="p-2 rounded-lg hover:bg-red-500/20 text-red-400">🗑️</button>
+        </div>
+      `).join('');
+    }
+    
+    function removerHistorico(id) {
+      historicoCalculos = historicoCalculos.filter(item => item.id !== id);
+      localStorage.setItem('historicoCalculos', JSON.stringify(historicoCalculos));
+      renderizarHistorico();
+    }
+    
+    function limparHistorico() {
+      if (confirm('Deseja limpar todo o histórico?')) {
+        historicoCalculos = [];
+        localStorage.removeItem('historicoCalculos');
+        renderizarHistorico();
+        mostrarToast('🗑️', 'Histórico limpo!');
+      }
+    }
+    
+    function limparTudo() {
+      if (confirm('Deseja limpar todos os dados e reiniciar?')) {
+        location.reload();
+      }
+    }
+    
+    function copiarResultados() {
+      if (!ultimoResultado) return;
+      
+      const texto = `
+DIMENSIONAMENTO DE PILAR
+========================
+Seção: ${ultimoResultado.tipoSecao === 'circular' ? 'Ø' + ultimoResultado.base : ultimoResultado.base + '×' + ultimoResultado.altura} cm
+Comprimento: ${ultimoResultado.comprimento.toFixed(2)} m
+Esbeltez: λ = ${ultimoResultado.esbeltez.toFixed(1)}
+
+CARGAS:
+Nd = ${ultimoResultado.cargaAxial} kN
+Mdx = ${ultimoResultado.momentoX} kN.m
+Mdy = ${ultimoResultado.momentoY} kN.m
+
+ARMADURA:
+Longitudinal: ${ultimoResultado.armadura.quantidade}Ø${ultimoResultado.armadura.bitola} mm (As = ${ultimoResultado.armadura.areaTotal.toFixed(2)} cm²)
+Transversal: Ø${ultimoResultado.estribos.bitola} c/${ultimoResultado.estribos.espacamento} cm
+
+CUSTO ESTIMADO: R$ ${ultimoResultado.custo.total.toFixed(2)}
+      `.trim();
+      
+      navigator.clipboard.writeText(texto).then(() => {
+        mostrarToast('📋', 'Resultados copiados!');
+      });
+    }
+    
+    function exportarPDF() {
+      mostrarToast('📄', 'Preparando para impressão...');
+      setTimeout(() => window.print(), 500);
+    }
+    
+    function compartilhar() {
+      if (navigator.share && ultimoResultado) {
+        navigator.share({
+          title: 'Dimensionamento de Pilar',
+          text: `Pilar ${ultimoResultado.base}×${ultimoResultado.altura}cm - ${ultimoResultado.armadura.quantidade}Ø${ultimoResultado.armadura.bitola}`,
+          url: window.location.href
+        });
+      } else {
+        copiarResultados();
+      }
+    }
+    
+    function mostrarToast(icon, message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-icon').textContent = icon;
+      document.getElementById('toast-message').textContent = message;
+      
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+    
+    // Fechar modais com ESC ou clique fora
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        fecharModalPrecos();
+        fecharHistorico();
+      }
+    });
+    
+    document.getElementById('modalPrecos').addEventListener('click', (e) => {
+      if (e.target.id === 'modalPrecos') fecharModalPrecos();
+    });
+    
+    document.getElementById('modalHistorico').addEventListener('click', (e) => {
+      if (e.target.id === 'modalHistorico') fecharHistorico();
+    });
+    
+    // Inicialização
+    atualizarPreview();
+    setTimeout(calcular, 100);
+  </script>
+
+    <!-- Footer -->
+    
+    
+
+    
+
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
