@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Combate a Incêndio (PPCI) | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
+            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', red: '#ff3333', orange: '#ff8800' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ff3333, #ff8800); border-radius: 4px; }
+    
+    .glow-red { box-shadow: 0 0 20px rgba(255, 51, 51, 0.3), inset 0 0 20px rgba(255, 51, 51, 0.05); }
+    .text-glow { text-shadow: 0 0 20px rgba(255, 51, 51, 0.5); }
+    
+    .gradient-border {
+      position: relative;
+      background: #12121a;
+      border-radius: 16px;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ff3333, #ff8800, #ff3333);
+      background-size: 300% 300%;
+      animation: gradientMove 8s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 51, 51, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(255, 51, 51, 0.6); }
+    }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      border-color: #ff3333;
+      box-shadow: 0 0 15px rgba(255, 51, 51, 0.2);
+      outline: none;
+    }
+    .form-input:hover { border-color: rgba(255, 51, 51, 0.5); }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #ff3333 0%, #ff8800 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 51, 51, 0.4);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    
+    .card-hover:hover {
+      transform: translateY(-4px);
+      border-color: #ff3333;
+    }
+    
+    .progress-fill {
+      background: linear-gradient(90deg, #ff3333, #ff8800);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @media print {
+      body { background: white !important; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-100">
+  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-red to-neon-orange flex items-center justify-center font-bold text-dark-900 text-xl">
+          🔥
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold text-white">Combate a Incêndio (PPCI)</h1>
+          <p class="text-xs text-gray-500">Estimativa de Extintores e RTI</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Limpar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Painel de Dados -->
+      <div class="lg:col-span-1 space-y-6">
+        <div class="gradient-border p-6">
+          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+            <span class="text-neon-red">●</span> Dados da Edificação
+          </h2>
+          
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Área Construída (m²)</label>
+              <input type="number" id="area" value="500" min="1" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+            
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Risco de Incêndio (Carga)</label>
+              <select id="risco" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+                <option value="baixo">Baixo (< 300 MJ/m²)</option>
+                <option value="medio" selected>Médio (300 a 1200 MJ/m²)</option>
+                <option value="alto">Alto (> 1200 MJ/m²)</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Número de Pavimentos</label>
+              <input type="number" id="pavimentos" value="1" min="1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+            
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Classe de Ocupação Principal</label>
+              <select id="ocupacao" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+                <option value="residencial">Residencial (A)</option>
+                <option value="comercial" selected>Comercial/Serviços (B/C)</option>
+                <option value="industrial">Industrial (I)</option>
+                <option value="deposito">Depósito (J)</option>
+                <option value="reuniao">Local de Reunião de Público (F)</option>
+              </select>
+            </div>
+
+            <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 mt-4 shadow-lg shadow-red-500/30">
+              Calcular Sistema PPCI
+            </button>
+          </div>
+        </div>
+
+        <div class="gradient-border p-6 text-sm text-gray-400">
+          <h3 class="text-neon-orange font-semibold mb-2">⚠️ Atenção</h3>
+          <p>Esta é uma ferramenta de pré-dimensionamento baseada em parâmetros gerais de Instruções Técnicas (como as do Corpo de Bombeiros de SP - IT-16 e IT-22). <b>Não substitui o projeto executivo de PPCI assinado por um engenheiro responsável.</b></p>
+        </div>
+      </div>
+
+      <!-- Resultados -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Main Result -->
+        <div id="resultadoSection" class="gradient-border p-8 text-center opacity-50 transition-opacity duration-500">
+          <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Reserva Técnica de Incêndio (RTI)</div>
+          <div id="valorRTI" class="text-5xl md:text-6xl font-bold text-neon-red text-glow mb-2">0 m³</div>
+          <div id="infoHidrante" class="text-xl text-gray-300 mb-4">Hidrantes: Não Exigido</div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Total de Extintores</div>
+              <div id="qtdExtintores" class="text-xl font-semibold text-neon-orange">0</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Capacidade Extintora</div>
+              <div id="capExtintora" class="text-xl font-semibold text-neon-orange">-</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Dist. Máx. Caminhamento</div>
+              <div id="distMax" class="text-xl font-semibold text-neon-orange">0 m</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Vazão do Hidrante</div>
+              <div id="vazaoHidrante" class="text-xl font-semibold text-neon-orange">0 L/min</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="gradient-border p-6">
+            <h3 class="text-lg font-semibold mb-4 text-neon-orange">🧯 Distribuição de Extintores</h3>
+            <div id="listaExtintores" class="space-y-3">
+              <!-- Preenchido via JS -->
+            </div>
+          </div>
+          <div class="gradient-border p-6">
+            <h3 class="text-lg font-semibold mb-4 text-neon-red">🚰 Sistema de Hidrantes</h3>
+            <div id="listaHidrantes" class="space-y-3 text-sm text-gray-300">
+              <!-- Preenchido via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Memorial -->
+        <div class="gradient-border p-6">
+          <h3 class="text-lg font-semibold mb-4 text-white">📝 Memorial Descritivo</h3>
+          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
+    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    function calcularPPCI() {
+      const area = parseFloat($('area').value) || 0;
+      const risco = $('risco').value;
+      const pavimentos = parseInt($('pavimentos').value) || 1;
+      const ocupacao = $('ocupacao').value;
+
+      if (area <= 0) return alert("Área inválida");
+
+      // 1. Extintores (IT-16 / NBR 12693)
+      let areaPorExtintor = 500;
+      let distMax = 25;
+      let capMinima = "2-A";
+      
+      if (risco === 'medio') {
+        areaPorExtintor = 250;
+        distMax = 20;
+        capMinima = "3-A / 20-B";
+      } else if (risco === 'alto') {
+        areaPorExtintor = 150;
+        distMax = 15;
+        capMinima = "4-A / 40-B";
+      }
+
+      // No mínimo 2 extintores por pavimento (Água + Pó/CO2), exceto áreas minúsculas
+      let qtdBase = Math.ceil(area / areaPorExtintor);
+      const minPorPavimento = 2;
+      let totalExtintores = Math.max(qtdBase, minPorPavimento * pavimentos);
+
+      // 2. Hidrantes e RTI (IT-22)
+      // Regra simplificada: Hidrantes exigidos para > 750m² ou > 12m de altura.
+      let exigeHidrante = (area > 750 || pavimentos > 3);
+      let rti = 0;
+      let tipoSistema = "Não exigido";
+      let vazao = 0;
+      let pressao = 0;
+
+      if (exigeHidrante) {
+        if (risco === 'baixo') {
+          tipoSistema = "Tipo 1 (Esguicho 13mm)";
+          rti = Math.max(8, area * 0.008); // 8m³ minimo simplificado
+          vazao = 130;
+          pressao = 10; // mca
+        } else if (risco === 'medio') {
+          tipoSistema = "Tipo 2/3 (Esguicho 16mm/19mm)";
+          rti = Math.max(12, area * 0.012); 
+          vazao = 200;
+          pressao = 25;
+        } else {
+          tipoSistema = "Tipo 4/5 (Alta demanda)";
+          rti = Math.max(18, area * 0.018);
+          vazao = 300;
+          pressao = 40;
+        }
+        rti = Math.ceil(rti);
+        // Limites práticos para reservatório em edifícios comuns
+        if (rti > 120) rti = 120;
+      }
+
+      // Atualizar UI
+      $('resultadoSection').classList.remove('opacity-50');
+      $('resultadoSection').classList.add('pulse-glow');
+      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+
+      $('valorRTI').textContent = `${rti} m³`;
+      $('infoHidrante').textContent = `Sistema de Hidrantes: ${exigeHidrante ? 'Exigido' : 'Isento'}`;
+      
+      $('qtdExtintores').textContent = totalExtintores;
+      $('capExtintora').textContent = capMinima;
+      $('distMax').textContent = `${distMax} m`;
+      $('vazaoHidrante').textContent = exigeHidrante ? `${vazao} L/min` : '-';
+
+      // Lista Extintores
+      let qAgua = Math.ceil(totalExtintores * 0.4);
+      let qPo = totalExtintores - qAgua;
+      $('listaExtintores').innerHTML = `
+        <div class="flex justify-between border-b border-white/10 pb-2">
+          <span>💧 Água Pressurizada (10L)</span>
+          <span class="font-bold text-neon-orange">${qAgua} unid.</span>
+        </div>
+        <div class="flex justify-between border-b border-white/10 pb-2">
+          <span>⚪ Pó Químico Seco (PQS)</span>
+          <span class="font-bold text-neon-orange">${qPo} unid.</span>
+        </div>
+        <div class="flex justify-between pt-2">
+          <span>⚠️ Gás Carbônico (CO2)</span>
+          <span class="text-gray-400 text-xs text-right w-40">Substituir parte do PQS em áreas elétricas (quadros, servidores)</span>
+        </div>
+      `;
+
+      // Lista Hidrantes
+      if (exigeHidrante) {
+        $('listaHidrantes').innerHTML = `
+          <div class="flex justify-between mb-2"><span>Classificação:</span> <strong class="text-neon-red">${tipoSistema}</strong></div>
+          <div class="flex justify-between mb-2"><span>Volume da RTI:</span> <strong>${rti} m³ (${rti * 1000} Litros)</strong></div>
+          <div class="flex justify-between mb-2"><span>Vazão mínima (2 jatos):</span> <strong>${vazao} L/min</strong></div>
+          <div class="flex justify-between mb-2"><span>Pressão mínima (jato mais desfav.):</span> <strong>${pressao} mca</strong></div>
+          <div class="flex justify-between mb-2"><span>Mangueira:</span> <strong>Tipo 2 - 30m</strong></div>
+        `;
+      } else {
+        $('listaHidrantes').innerHTML = `<p class="text-gray-500 italic">Edificação isenta de sistema de hidrantes pelas dimensões/risco informados.</p>`;
+      }
+
+      // Memorial
+      $('memorial').textContent = `MEMORIAL DE PRÉ-DIMENSIONAMENTO - PPCI
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS DA EDIFICAÇÃO
+Área: ${area} m² | Pavimentos: ${pavimentos}
+Risco: ${risco.toUpperCase()} | Ocupação: ${ocupacao.toUpperCase()}
+
+2. PROTEÇÃO POR EXTINTORES (Referência IT-16 / NBR 12693)
+Total Estimado: ${totalExtintores} extintores
+Capacidade Extintora Mínima: ${capMinima}
+Distância Máxima de Caminhamento: ${distMax} metros
+Área de Cobertura por Unidade: ${areaPorExtintor} m²
+
+3. REDE DE HIDRANTES E RTI (Referência IT-22)
+Exigência: ${exigeHidrante ? 'SIM' : 'NÃO'}
+${exigeHidrante ? `Tipo de Sistema: ${tipoSistema}
+Reserva Técnica de Incêndio (RTI): ${rti} m³
+Vazão Mínima Requerida: ${vazao} L/min
+Pressão Residual Mínima: ${pressao} mca` : ''}
+
+Nota: Valores estimativos para estudo de viabilidade.`;
+    }
+
+    $('btnCalcular').addEventListener('click', calcularPPCI);
+    $('btnReset').addEventListener('click', () => {
+      $('area').value = 500;
+      $('risco').value = 'medio';
+      $('pavimentos').value = 1;
+      $('resultadoSection').classList.add('opacity-50');
+      $('memorial').textContent = 'Aguardando cálculo...';
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if ($('year')) $('year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
