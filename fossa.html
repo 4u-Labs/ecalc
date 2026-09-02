@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Fossa Séptica e Sumidouro | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+      min-height: 100vh;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,255,0.5); }
+    
+    /* Animações */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,255,255,0.2); }
+      50% { box-shadow: 0 0 40px rgba(0,255,255,0.4); }
+    }
+    
+    @keyframes flow {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    @keyframes ripple {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    
+    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+    .animate-slide-in { animation: slideIn 0.3s ease-out; }
+    .animate-pulse-glow { animation: pulse-glow 2s infinite; }
+    
+    /* Glassmorphism */
+    .glass {
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .glass-cyan {
+      background: rgba(0,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,255,255,0.2);
+    }
+    
+    /* Gradiente principal */
+    .gradient-text {
+      background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%);
+    }
+    
+    /* Botões de sistema */
+    .sistema-btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .sistema-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .sistema-btn:hover::before {
+      left: 100%;
+    }
+    
+    .sistema-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,255,255,0.2);
+    }
+    
+    .sistema-btn.active {
+      background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%);
+      color: #000;
+      transform: scale(1.02);
+    }
+    
+    /* Cards de solo */
+    .solo-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .solo-card:hover {
+      border-color: rgba(0,255,255,0.5);
+      transform: translateY(-2px);
+    }
+    
+    .solo-card.active {
+      background: rgba(0,255,255,0.15);
+      border-color: #00ffff;
+      box-shadow: 0 0 20px rgba(0,255,255,0.2);
+    }
+    
+    /* Tabs */
+    .tab-btn {
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .tab-btn::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #00ffff, #8b5cf6);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    
+    .tab-btn.active::after {
+      transform: scaleX(1);
+    }
+    
+    .tab-btn.active {
+      color: #00ffff;
+    }
+    
+    /* Diagrama visual */
+    .diagrama-container {
+      perspective: 1000px;
+    }
+    
+    .componente-3d {
+      transition: all 0.4s ease;
+      transform-style: preserve-3d;
+    }
+    
+    .componente-3d:hover {
+      transform: translateY(-10px) rotateX(5deg);
+      box-shadow: 0 20px 40px rgba(0,255,255,0.3);
+    }
+    
+    /* Fluxo animado */
+    .fluxo-linha {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .fluxo-linha::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 20px;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #00ffff, transparent);
+      border-radius: 2px;
+      animation: flow 2s infinite;
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00ffff, #8b5cf6);
+      border-radius: 4px;
+      transition: width 1s ease-out;
+    }
+    
+    /* Etapas de construção */
+    .etapa-item {
+      position: relative;
+      padding-left: 50px;
+    }
+    
+    .etapa-item::before {
+      content: attr(data-step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 35px;
+      height: 35px;
+      background: linear-gradient(135deg, #00ffff, #8b5cf6);
+      color: #000;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+    
+    .etapa-item::after {
+      content: '';
+      position: absolute;
+      left: 17px;
+      top: 40px;
+      bottom: -15px;
+      width: 2px;
+      background: linear-gradient(180deg, #00ffff, transparent);
+    }
+    
+    .etapa-item:last-child::after {
+      display: none;
+    }
+    
+    /* Dimensões visual */
+    .dimensao-box {
+      position: relative;
+      border: 2px dashed rgba(0,255,255,0.4);
+    }
+    
+    .dimensao-box::before,
+    .dimensao-box::after {
+      content: '';
+      position: absolute;
+      background: #00ffff;
+    }
+    
+    /* Tabela de materiais */
+    .tabela-materiais {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .tabela-materiais th,
+    .tabela-materiais td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .tabela-materiais th {
+      background: rgba(0,255,255,0.1);
+      color: #00ffff;
+      font-weight: 600;
+    }
+    
+    .tabela-materiais tr:hover {
+      background: rgba(255,255,255,0.03);
+    }
+    
+    .tabela-materiais tfoot td {
+      background: rgba(0,255,255,0.1);
+      font-weight: 700;
+      color: #00ffff;
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-5px);
+      background: rgba(0,0,0,0.9);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .tooltip:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-10px);
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    /* Range slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    
+    input[type="range"]::-webkit-slider-track {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #00ffff, #8b5cf6);
+      border-radius: 50%;
+      cursor: pointer;
+      margin-top: -6px;
+    }
+    
+    /* Print */
+    @media print {
+      body { background: white !important; color: black !important; }
+      .no-print { display: none !important; }
+      .glass, .glass-cyan { background: white !important; border: 1px solid #ccc !important; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .diagrama-fluxo { flex-direction: column !important; }
+      .seta-fluxo { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body class="text-gray-200">
+  <!-- Header -->
+  <header class="glass border-b border-cyan-500/20 sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center shadow-lg">
+            <i class="fas fa-toilet text-black text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold gradient-text">Fossa Séptica & Sumidouro</h1>
+            <p class="text-xs text-gray-400">Dimensionamento NBR 7229 / NBR 13969</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="exportarPDF()" class="tooltip px-3 py-2 glass rounded-lg hover:bg-white/10 transition-all" data-tooltip="Exportar PDF">
+            <i class="fas fa-file-pdf text-cyan-400"></i>
+          </button>
+          <button onclick="salvarProjeto()" class="tooltip px-3 py-2 glass rounded-lg hover:bg-white/10 transition-all" data-tooltip="Salvar Projeto">
+            <i class="fas fa-save text-cyan-400"></i>
+          </button>
+          <button onclick="carregarProjeto()" class="tooltip px-3 py-2 glass rounded-lg hover:bg-white/10 transition-all" data-tooltip="Carregar Projeto">
+            <i class="fas fa-folder-open text-cyan-400"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-4 justify-center mb-8 no-print">
+      <button id="btnCalcular" class="px-8 py-3 gradient-bg text-black font-bold rounded-xl hover:shadow-lg hover:shadow-cyan-500/30 transition-all transform hover:scale-105">
+        <i class="fas fa-calculator mr-2"></i> Calcular
+      </button>
+      <button id="btnConfigurarPrecos" class="px-6 py-3 glass-cyan rounded-xl text-cyan-400 hover:bg-cyan-500/20 transition-all">
+        <i class="fas fa-cog mr-2"></i> Configurar Preços
+      </button>
+      <button id="btnComparar" class="px-6 py-3 glass-cyan rounded-xl text-cyan-400 hover:bg-cyan-500/20 transition-all">
+        <i class="fas fa-balance-scale mr-2"></i> Comparar Materiais
+      </button>
+      <button id="btnReset" class="px-6 py-3 glass rounded-xl text-gray-400 hover:text-red-400 hover:border-red-500/50 transition-all">
+        <i class="fas fa-trash mr-2"></i> Limpar
+      </button>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="glass-cyan rounded-xl p-4 mb-8 no-print">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm text-gray-400">Progresso do Dimensionamento</span>
+        <span id="progressText" class="text-sm text-cyan-400 font-semibold">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+      </div>
+      <div class="flex justify-between mt-3 text-xs text-gray-500">
+        <span id="step1" class="flex items-center gap-1"><i class="fas fa-circle text-gray-600"></i> Sistema</span>
+        <span id="step2" class="flex items-center gap-1"><i class="fas fa-circle text-gray-600"></i> Edificação</span>
+        <span id="step3" class="flex items-center gap-1"><i class="fas fa-circle text-gray-600"></i> Solo</span>
+        <span id="step4" class="flex items-center gap-1"><i class="fas fa-circle text-gray-600"></i> Resultado</span>
+      </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="flex gap-1 mb-6 glass rounded-xl p-1 no-print overflow-x-auto">
+      <button class="tab-btn active flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all" data-tab="sistema">
+        <i class="fas fa-cogs mr-2"></i> Sistema
+      </button>
+      <button class="tab-btn flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all" data-tab="edificacao">
+        <i class="fas fa-building mr-2"></i> Edificação
+      </button>
+      <button class="tab-btn flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all" data-tab="solo">
+        <i class="fas fa-mountain mr-2"></i> Solo
+      </button>
+      <button class="tab-btn flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all" data-tab="resultados">
+        <i class="fas fa-chart-bar mr-2"></i> Resultados
+      </button>
+      <button class="tab-btn flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all" data-tab="materiais">
+        <i class="fas fa-list mr-2"></i> Materiais
+      </button>
+    </div>
+
+    <!-- Tab: Sistema -->
+    <section id="tab-sistema" class="tab-content glass-cyan rounded-2xl p-6 mb-6 animate-fade-in">
+      <h2 class="text-xl font-bold text-cyan-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-cogs"></i> Sistema de Tratamento
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <button class="sistema-btn active glass p-6 rounded-xl text-center border-2 border-cyan-500/20" data-sistema="completo">
+          <div class="text-4xl mb-3">💧</div>
+          <div class="text-lg font-semibold text-white">Sistema Completo</div>
+          <div class="text-sm text-gray-400 mt-2">Fossa + Sumidouro</div>
+          <div class="text-xs text-cyan-400 mt-2">Recomendado</div>
+        </button>
+        <button class="sistema-btn glass p-6 rounded-xl text-center border-2 border-cyan-500/20" data-sistema="fossa">
+          <div class="text-4xl mb-3">🚽</div>
+          <div class="text-lg font-semibold text-white">Apenas Fossa</div>
+          <div class="text-sm text-gray-400 mt-2">Tanque séptico</div>
+          <div class="text-xs text-gray-500 mt-2">Requer destino do efluente</div>
+        </button>
+        <button class="sistema-btn glass p-6 rounded-xl text-center border-2 border-cyan-500/20" data-sistema="sumidouro">
+          <div class="text-4xl mb-3">🕳️</div>
+          <div class="text-lg font-semibold text-white">Apenas Sumidouro</div>
+          <div class="text-sm text-gray-400 mt-2">Infiltração no solo</div>
+          <div class="text-xs text-gray-500 mt-2">Para efluente tratado</div>
+        </button>
+      </div>
+      
+      <!-- Diagrama Visual do Sistema -->
+      <div class="glass rounded-xl p-6 mt-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <i class="fas fa-project-diagram text-cyan-400"></i> Fluxo do Sistema
+        </h3>
+        <div id="diagrama-sistema" class="diagrama-container">
+          <div class="diagrama-fluxo flex items-center justify-center gap-4 flex-wrap py-6">
+            <div class="componente-3d glass-cyan rounded-xl p-5 text-center min-w-32">
+              <div class="text-4xl mb-2">🏠</div>
+              <div class="text-sm font-semibold text-cyan-400">Edificação</div>
+              <div class="text-xs text-gray-400 mt-1">Origem</div>
+            </div>
+            <div class="seta-fluxo text-3xl text-cyan-400 fluxo-linha px-4">→</div>
+            <div class="componente-3d glass-cyan rounded-xl p-5 text-center min-w-32" id="comp-fossa">
+              <div class="text-4xl mb-2">🚽</div>
+              <div class="text-sm font-semibold text-cyan-400">Fossa Séptica</div>
+              <div class="text-xs text-gray-400 mt-1">Tratamento</div>
+            </div>
+            <div class="seta-fluxo text-3xl text-cyan-400 fluxo-linha px-4" id="seta-sumidouro">→</div>
+            <div class="componente-3d glass-cyan rounded-xl p-5 text-center min-w-32" id="comp-sumidouro">
+              <div class="text-4xl mb-2">🕳️</div>
+              <div class="text-sm font-semibold text-cyan-400">Sumidouro</div>
+              <div class="text-xs text-gray-400 mt-1">Infiltração</div>
+            </div>
+            <div class="seta-fluxo text-3xl text-cyan-400 fluxo-linha px-4" id="seta-solo">→</div>
+            <div class="componente-3d glass-cyan rounded-xl p-5 text-center min-w-32" id="comp-solo">
+              <div class="text-4xl mb-2">🌱</div>
+              <div class="text-sm font-semibold text-cyan-400">Solo</div>
+              <div class="text-xs text-gray-400 mt-1">Destino final</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6 p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl flex items-start gap-3">
+        <i class="fas fa-lightbulb text-cyan-400 text-xl mt-0.5"></i>
+        <div>
+          <p class="text-cyan-400 font-semibold">Sistema Completo é o mais recomendado</p>
+          <p class="text-gray-400 text-sm mt-1">
+            A fossa séptica trata o esgoto e o sumidouro faz a infiltração segura no solo. 
+            Este sistema atende às normas NBR 7229 e NBR 13969.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab: Edificação -->
+    <section id="tab-edificacao" class="tab-content glass-cyan rounded-2xl p-6 mb-6 hidden">
+      <h2 class="text-xl font-bold text-cyan-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-building"></i> Dados da Edificação
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-users mr-1"></i> Número de Pessoas
+          </label>
+          <input type="number" id="num-pessoas" value="5" min="1" max="500" class="w-full px-4 py-3 bg-black/30 border border-cyan-500/30 rounded-xl text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all">
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-home mr-1"></i> Tipo de Edificação
+          </label>
+          <select id="tipo-edificacao" class="w-full px-4 py-3 bg-black/30 border border-cyan-500/30 rounded-xl text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all">
+            <option value="residencial">🏠 Residencial</option>
+            <option value="apartamento">🏢 Apartamento</option>
+            <option value="hotel">🏨 Hotel/Pousada</option>
+            <option value="escola-ext">🏫 Escola (externato)</option>
+            <option value="escola-int">🏫 Escola (internato)</option>
+            <option value="hospital">🏥 Hospital</option>
+            <option value="restaurante">🍽️ Restaurante</option>
+            <option value="escritorio">💼 Escritório</option>
+            <option value="fabrica">🏭 Fábrica</option>
+            <option value="igreja">⛪ Igreja/Templo</option>
+            <option value="cinema">🎬 Cinema/Teatro</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-tint mr-1"></i> Contribuição (L/pessoa/dia)
+          </label>
+          <input type="number" id="contribuicao" value="130" min="20" max="500" class="w-full px-4 py-3 bg-black/30 border border-cyan-500/30 rounded-xl text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all">
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-clock mr-1"></i> Tempo de Detenção (dias)
+          </label>
+          <input type="number" id="tempo-detencao" value="1" min="0.5" max="5" step="0.1" class="w-full px-4 py-3 bg-black/30 border border-cyan-500/30 rounded-xl text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all">
+        </div>
+      </div>
+      
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-cyan-400" id="stat-contribuicao">650</div>
+          <div class="text-xs text-gray-400">L/dia total</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-purple-400" id="stat-volume">0.85</div>
+          <div class="text-xs text-gray-400">m³ estimado</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-green-400" id="stat-limpeza">12</div>
+          <div class="text-xs text-gray-400">meses p/ limpeza</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-amber-400" id="stat-custo">---</div>
+          <div class="text-xs text-gray-400">custo estimado</div>
+        </div>
+      </div>
+      
+      <!-- Configurações Avançadas -->
+      <div class="glass rounded-xl p-5 mt-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <i class="fas fa-sliders-h text-cyan-400"></i> Configurações da Fossa
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Formato</label>
+            <select id="formato-fossa" class="w-full px-4 py-3 bg-black/30 border border-cyan-500/30 rounded-xl text-white">
+              <option value="cilindrico">⭕ Cilíndrico</option>
+              <option value="retangular">⬜ Retangular</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Material</label>
+            <select id="material-fossa" class="w-full px-4 py-3 bg-black/30 border border-cyan-500/30 rounded-xl text-white">
+              <option value="concreto">🧱 Concreto armado</option>
+              <option value="aneis">⭕ Anéis pré-moldados</option>
+              <option value="fibra">🔵 Fibra de vidro</option>
+              <option value="polietileno">🟢 Polietileno (pronta)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Tipo de Sumidouro</label>
+            <select id="tipo-sumidouro" class="w-full px-4 py-3 bg-black/30 border border-cyan-500/30 rounded-xl text-white">
+              <option value="circular">⭕ Circular (anéis)</option>
+              <option value="retangular">⬜ Retangular (alvenaria)</option>
+              <option value="valas">➖ Valas de infiltração</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6 p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl flex items-start gap-3">
+        <i class="fas fa-info-circle text-purple-400 text-xl mt-0.5"></i>
+        <div>
+          <p class="text-purple-400 font-semibold">Contribuições NBR 7229</p>
+          <p class="text-gray-400 text-sm mt-1">
+            Residencial: 130 L | Hotel: 100 L | Escola (ext): 50 L | Hospital: 250 L | Escritório: 50 L
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab: Solo -->
+    <section id="tab-solo" class="tab-content glass-cyan rounded-2xl p-6 mb-6 hidden">
+      <h2 class="text-xl font-bold text-cyan-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-mountain"></i> Características do Solo
+      </h2>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
+        <div class="solo-card active glass p-4 rounded-xl text-center border-2 border-cyan-500/20" data-solo="areia-grossa" data-coef="140">
+          <div class="text-2xl mb-2">🏖️</div>
+          <div class="text-sm font-medium text-white">Areia Grossa</div>
+          <div class="text-xs text-cyan-400 mt-1">140 L/m²/dia</div>
+        </div>
+        <div class="solo-card glass p-4 rounded-xl text-center border-2 border-cyan-500/20" data-solo="areia-fina" data-coef="100">
+          <div class="text-2xl mb-2">⏳</div>
+          <div class="text-sm font-medium text-white">Areia Fina</div>
+          <div class="text-xs text-cyan-400 mt-1">100 L/m²/dia</div>
+        </div>
+        <div class="solo-card glass p-4 rounded-xl text-center border-2 border-cyan-500/20" data-solo="areia-argilosa" data-coef="60">
+          <div class="text-2xl mb-2">🟤</div>
+          <div class="text-sm font-medium text-white">Areia Argilosa</div>
+          <div class="text-xs text-cyan-400 mt-1">60 L/m²/dia</div>
+        </div>
+        <div class="solo-card glass p-4 rounded-xl text-center border-2 border-cyan-500/20" data-solo="argila-arenosa" data-coef="40">
+          <div class="text-2xl mb-2">🟠</div>
+          <div class="text-sm font-medium text-white">Argila Arenosa</div>
+          <div class="text-xs text-cyan-400 mt-1">40 L/m²/dia</div>
+        </div>
+        <div class="solo-card glass p-4 rounded-xl text-center border-2 border-cyan-500/20" data-solo="argila" data-coef="20">
+          <div class="text-2xl mb-2">🔴</div>
+          <div class="text-sm font-medium text-white">Argila</div>
+          <div class="text-xs text-cyan-400 mt-1">20 L/m²/dia</div>
+        </div>
+        <div class="solo-card glass p-4 rounded-xl text-center border-2 border-green-500/30" data-solo="personalizado" data-coef="0">
+          <div class="text-2xl mb-2">📝</div>
+          <div class="text-sm font-medium text-green-400">Personalizado</div>
+          <div class="text-xs text-gray-400 mt-1">Definir valor</div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-water mr-1"></i> Coeficiente de Infiltração (L/m²/dia)
+          </label>
+          <div class="relative">
+            <input type="range" id="coef-range" min="10" max="200" value="140" class="w-full">
+            <div class="flex justify-between mt-2">
+              <span class="text-xs text-gray-500">10</span>
+              <span id="coef-display" class="text-lg text-cyan-400 font-bold">140</span>
+              <span class="text-xs text-gray-500">200</span>
+            </div>
+          </div>
+          <input type="hidden" id="coef-infiltracao" value="140">
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            <i class="fas fa-ruler-vertical mr-1"></i> Nível do Lençol Freático (m)
+          </label>
+          <input type="number" id="nivel-lencol" value="5" min="0" max="50" step="0.5" class="w-full px-4 py-3 bg-black/30 border border-cyan-500/30 rounded-xl text-white">
+          <p class="text-xs text-gray-500 mt-1">Distância da superfície ao lençol freático</p>
+        </div>
+      </div>
+      
+      <!-- Indicador de Qualidade do Solo -->
+      <div class="glass rounded-xl p-5 mt-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Avaliação do Solo</h3>
+        <div id="avaliacao-solo" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="text-center p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
+            <i class="fas fa-check-circle text-green-400 text-2xl mb-2"></i>
+            <div class="text-sm text-green-400 font-semibold">Excelente</div>
+            <div class="text-xs text-gray-400">Boa capacidade de infiltração</div>
+          </div>
+          <div class="text-center p-4 bg-black/20 rounded-xl opacity-50">
+            <i class="fas fa-exclamation-circle text-amber-400 text-2xl mb-2"></i>
+            <div class="text-sm text-amber-400 font-semibold">Moderado</div>
+            <div class="text-xs text-gray-400">Pode exigir área maior</div>
+          </div>
+          <div class="text-center p-4 bg-black/20 rounded-xl opacity-50">
+            <i class="fas fa-times-circle text-red-400 text-2xl mb-2"></i>
+            <div class="text-sm text-red-400 font-semibold">Limitado</div>
+            <div class="text-xs text-gray-400">Considere valas ou filtro</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-3">
+        <i class="fas fa-exclamation-triangle text-amber-400 text-xl mt-0.5"></i>
+        <div>
+          <p class="text-amber-400 font-semibold">Teste de Infiltração Recomendado</p>
+          <p class="text-gray-400 text-sm mt-1">
+            NBR 13969 recomenda ensaio de campo para determinar com precisão o coeficiente de infiltração. 
+            Valores tabelados são estimativas para pré-dimensionamento.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab: Resultados -->
+    <section id="tab-resultados" class="tab-content glass-cyan rounded-2xl p-6 mb-6 hidden">
+      <h2 class="text-xl font-bold text-cyan-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-chart-bar"></i> Dimensionamento
+      </h2>
+      <div id="resultado">
+        <div class="text-center py-12 text-gray-500">
+          <i class="fas fa-calculator text-5xl mb-4 opacity-30"></i>
+          <p>Clique em "Calcular" para gerar os resultados</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab: Lista de Materiais -->
+    <section id="tab-materiais" class="tab-content glass-cyan rounded-2xl p-6 mb-6 hidden">
+      <h2 class="text-xl font-bold text-cyan-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-list"></i> Lista de Materiais e Custos
+      </h2>
+      <div id="lista-materiais">
+        <div class="text-center py-12 text-gray-500">
+          <i class="fas fa-boxes text-5xl mb-4 opacity-30"></i>
+          <p>Execute o cálculo para gerar a lista de materiais</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Referências NBR -->
+    <section class="glass rounded-2xl p-6 mb-6">
+      <h2 class="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-3">
+        <i class="fas fa-book"></i> Referências Normativas
+      </h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="glass p-4 rounded-xl">
+          <h3 class="font-semibold text-white mb-2">NBR 7229:1993</h3>
+          <ul class="text-sm text-gray-400 space-y-1">
+            <li>• Projeto e construção de tanques sépticos</li>
+            <li>• Contribuições de esgoto por tipo</li>
+            <li>• Tempo de detenção hidráulica</li>
+            <li>• Dimensionamento do volume útil</li>
+          </ul>
+        </div>
+        <div class="glass p-4 rounded-xl">
+          <h3 class="font-semibold text-white mb-2">NBR 13969:1997</h3>
+          <ul class="text-sm text-gray-400 space-y-1">
+            <li>• Tratamento complementar</li>
+            <li>• Disposição final de efluentes</li>
+            <li>• Dimensionamento de sumidouros</li>
+            <li>• Valas de infiltração</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  
+
+  <!-- Modal Container -->
+  <div id="modal-container"></div>
+
+  <script>
+    // =============================================
+    // CONFIGURAÇÕES E DADOS
+    // =============================================
+    
+    let sistemaAtual = 'completo';
+    let soloAtual = 'areia-grossa';
+    let coefInfiltracao = 140;
+    let ultimoCalculo = null;
+    
+    // Preços configuráveis
+    let precosConfig = {
+      // Fossa
+      concreto_cil: 2450,
+      concreto_ret: 2800,
+      aneis: 1650,
+      fibra_cil: 3200,
+      fibra_ret: 3600,
+      polietileno: 1950,
+      // Serviços
+      escavacao: 110,
+      tubulacao_fossa: 580,
+      tampa_fossa: 360,
+      instalacao_perc: 30,
+      // Sumidouro
+      brita: 185,
+      alvenaria: 1150,
+      tampa_sumidouro: 290,
+      tubulacao_sumidouro: 460,
+      instalacao_sumidouro_perc: 35,
+      // Valas
+      manta_geotextil: 35,
+      tubo_drenagem: 48
+    };
+    
+    const precosConfigPadrao = { ...precosConfig };
+    
+    // Contribuições por tipo de edificação (NBR 7229)
+    const contribuicoesPadrao = {
+      'residencial': 130,
+      'apartamento': 130,
+      'hotel': 100,
+      'escola-ext': 50,
+      'escola-int': 150,
+      'hospital': 250,
+      'restaurante': 25, // por refeição
+      'escritorio': 50,
+      'fabrica': 70,
+      'igreja': 5,
+      'cinema': 2
+    };
+    
+    // =============================================
+    // INICIALIZAÇÃO
+    // =============================================
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      carregarPrecosConfig();
+      setupEventListeners();
+      atualizarStats();
+      atualizarProgress();
+    });
+    
+    function setupEventListeners() {
+      // Tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+      
+      // Sistema buttons
+      document.querySelectorAll('.sistema-btn').forEach(btn => {
+        btn.addEventListener('click', () => selecionarSistema(btn.dataset.sistema));
+      });
+      
+      // Solo cards
+      document.querySelectorAll('.solo-card').forEach(card => {
+        card.addEventListener('click', () => selecionarSolo(card));
+      });
+      
+      // Botões principais
+      document.getElementById('btnCalcular').addEventListener('click', calcular);
+      document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+      document.getElementById('btnComparar').addEventListener('click', compararMateriais);
+      document.getElementById('btnReset').addEventListener('click', resetarProjeto);
+      
+      // Tipo de edificação
+      document.getElementById('tipo-edificacao').addEventListener('change', (e) => {
+        const contrib = contribuicoesPadrao[e.target.value] || 130;
+        document.getElementById('contribuicao').value = contrib;
+        atualizarStats();
+      });
+      
+      // Coeficiente slider
+      const coefRange = document.getElementById('coef-range');
+      coefRange.addEventListener('input', (e) => {
+        coefInfiltracao = parseInt(e.target.value);
+        document.getElementById('coef-display').textContent = coefInfiltracao;
+        document.getElementById('coef-infiltracao').value = coefInfiltracao;
+        atualizarAvaliacaoSolo();
+      });
+      
+      // Inputs para atualizar stats
+      ['num-pessoas', 'contribuicao', 'tempo-detencao'].forEach(id => {
+        document.getElementById(id).addEventListener('input', atualizarStats);
+      });
+    }
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    }
+    
+    // =============================================
+    // SELEÇÕES
+    // =============================================
+    
+    function selecionarSistema(sistema) {
+      sistemaAtual = sistema;
+      
+      document.querySelectorAll('.sistema-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.sistema === sistema);
+      });
+      
+      // Atualizar diagrama
+      const compFossa = document.getElementById('comp-fossa');
+      const compSumidouro = document.getElementById('comp-sumidouro');
+      const setaSumidouro = document.getElementById('seta-sumidouro');
+      const compSolo = document.getElementById('comp-solo');
+      const setaSolo = document.getElementById('seta-solo');
+      
+      if (sistema === 'fossa') {
+        compSumidouro.style.opacity = '0.3';
+        setaSumidouro.style.opacity = '0.3';
+        compSolo.style.opacity = '0.3';
+        setaSolo.style.opacity = '0.3';
+      } else if (sistema === 'sumidouro') {
+        compFossa.style.opacity = '0.3';
+        compSumidouro.style.opacity = '1';
+        setaSumidouro.style.opacity = '0.3';
+        compSolo.style.opacity = '1';
+        setaSolo.style.opacity = '1';
+      } else {
+        compFossa.style.opacity = '1';
+        compSumidouro.style.opacity = '1';
+        setaSumidouro.style.opacity = '1';
+        compSolo.style.opacity = '1';
+        setaSolo.style.opacity = '1';
+      }
+      
+      atualizarProgress();
+    }
+    
+    function selecionarSolo(card) {
+      document.querySelectorAll('.solo-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      
+      soloAtual = card.dataset.solo;
+      const coef = parseInt(card.dataset.coef);
+      
+      if (soloAtual !== 'personalizado') {
+        coefInfiltracao = coef;
+        document.getElementById('coef-range').value = coef;
+        document.getElementById('coef-display').textContent = coef;
+        document.getElementById('coef-infiltracao').value = coef;
+      }
+      
+      atualizarAvaliacaoSolo();
+      atualizarProgress();
+    }
+    
+    function atualizarAvaliacaoSolo() {
+      const avaliacoes = document.querySelectorAll('#avaliacao-solo > div');
+      
+      avaliacoes.forEach(av => {
+        av.classList.remove('bg-green-500/10', 'border-green-500/30');
+        av.classList.add('bg-black/20', 'opacity-50');
+      });
+      
+      if (coefInfiltracao >= 80) {
+        avaliacoes[0].classList.remove('bg-black/20', 'opacity-50');
+        avaliacoes[0].classList.add('bg-green-500/10', 'border', 'border-green-500/30');
+      } else if (coefInfiltracao >= 40) {
+        avaliacoes[1].classList.remove('bg-black/20', 'opacity-50');
+        avaliacoes[1].classList.add('bg-amber-500/10', 'border', 'border-amber-500/30');
+      } else {
+        avaliacoes[2].classList.remove('bg-black/20', 'opacity-50');
+        avaliacoes[2].classList.add('bg-red-500/10', 'border', 'border-red-500/30');
+      }
+    }
+    
+    function atualizarStats() {
+      const numPessoas = parseInt(document.getElementById('num-pessoas').value) || 5;
+      const contribuicao = parseFloat(document.getElementById('contribuicao').value) || 130;
+      const tempoDetencao = parseFloat(document.getElementById('tempo-detencao').value) || 1;
+      
+      const contribuicaoDiaria = numPessoas * contribuicao;
+      const volumeUtil = contribuicaoDiaria * tempoDetencao;
+      const volumeTotal = volumeUtil * 1.25 / 1000;
+      
+      document.getElementById('stat-contribuicao').textContent = contribuicaoDiaria.toFixed(0);
+      document.getElementById('stat-volume').textContent = volumeTotal.toFixed(2);
+      document.getElementById('stat-limpeza').textContent = Math.max(6, Math.floor(24 / (numPessoas / 5)));
+      
+      if (ultimoCalculo) {
+        const custoTotal = (ultimoCalculo.custoFossa?.total || 0) + (ultimoCalculo.custoSumidouro?.total || 0);
+        document.getElementById('stat-custo').textContent = 'R$' + (custoTotal / 1000).toFixed(1) + 'k';
+      }
+    }
+    
+    function atualizarProgress() {
+      let progress = 25;
+      
+      document.getElementById('step1').innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Sistema';
+      
+      const numPessoas = parseInt(document.getElementById('num-pessoas').value);
+      if (numPessoas > 0) {
+        progress = 50;
+        document.getElementById('step2').innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Edificação';
+      }
+      
+      if (soloAtual) {
+        progress = 75;
+        document.getElementById('step3').innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Solo';
+      }
+      
+      if (ultimoCalculo) {
+        progress = 100;
+        document.getElementById('step4').innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Resultado';
+      }
+      
+      document.getElementById('progressFill').style.width = progress + '%';
+      document.getElementById('progressText').textContent = progress + '%';
+    }
+    
+    // =============================================
+    // CÁLCULOS
+    // =============================================
+    
+    function calcular() {
+      const numPessoas = parseInt(document.getElementById('num-pessoas').value);
+      const contribuicao = parseFloat(document.getElementById('contribuicao').value);
+      const tempoDetencao = parseFloat(document.getElementById('tempo-detencao').value);
+      const formatoFossa = document.getElementById('formato-fossa').value;
+      const materialFossa = document.getElementById('material-fossa').value;
+      const tipoSumidouro = document.getElementById('tipo-sumidouro').value;
+      const nivelLencol = parseFloat(document.getElementById('nivel-lencol').value) || 5;
+      
+      if (!numPessoas || numPessoas < 1) {
+        mostrarNotificacao('Informe o número de pessoas!', 'error');
+        return;
+      }
+      
+      // Contribuição diária
+      const contribuicaoDiaria = numPessoas * contribuicao;
+      
+      // Ajuste do tempo de detenção conforme NBR 7229
+      let tempoDetencaoAjustado = tempoDetencao;
+      if (contribuicaoDiaria <= 1500) tempoDetencaoAjustado = Math.max(tempoDetencao, 1.0);
+      else if (contribuicaoDiaria <= 3000) tempoDetencaoAjustado = Math.max(tempoDetencao, 1.17);
+      else if (contribuicaoDiaria <= 4500) tempoDetencaoAjustado = Math.max(tempoDetencao, 1.33);
+      else if (contribuicaoDiaria <= 6000) tempoDetencaoAjustado = Math.max(tempoDetencao, 1.50);
+      else tempoDetencaoAjustado = Math.max(tempoDetencao, 1.67);
+      
+      // Volume útil e volume de lodo
+      const volumeUtil = contribuicaoDiaria * tempoDetencaoAjustado;
+      const taxaLodo = numPessoas <= 10 ? 0.30 : numPessoas <= 20 ? 0.25 : 0.20;
+      const volumeLodo = numPessoas * 65 * 1; // 65 L/pessoa para 1 ano de acúmulo
+      const volumeTotal = volumeUtil + volumeLodo;
+      const volumeTotalM3 = volumeTotal / 1000;
+      
+      // Dimensões da fossa
+      let dimensoesFossa = null;
+      if (sistemaAtual !== 'sumidouro') {
+        dimensoesFossa = calcularDimensoesFossa(volumeTotalM3, formatoFossa);
+      }
+      
+      // Dimensões do sumidouro
+      let dimensoesSumidouro = null;
+      let numSumidouros = 1;
+      if (sistemaAtual !== 'fossa') {
+        const resultado = calcularSumidouro(contribuicaoDiaria, coefInfiltracao, tipoSumidouro, nivelLencol);
+        dimensoesSumidouro = resultado.dimensoes;
+        numSumidouros = resultado.quantidade;
+      }
+      
+      // Custos
+      const custoFossa = dimensoesFossa ? calcularCustoFossa(volumeTotalM3, materialFossa, formatoFossa) : null;
+      const custoSumidouro = dimensoesSumidouro ? calcularCustoSumidouro(dimensoesSumidouro, tipoSumidouro, numSumidouros) : null;
+      
+      // Salvar resultado
+      ultimoCalculo = {
+        numPessoas,
+        contribuicao,
+        contribuicaoDiaria,
+        tempoDetencao: tempoDetencaoAjustado,
+        volumeUtil,
+        volumeLodo,
+        volumeTotal,
+        volumeTotalM3,
+        dimensoesFossa,
+        dimensoesSumidouro,
+        numSumidouros,
+        formatoFossa,
+        materialFossa,
+        tipoSumidouro,
+        custoFossa,
+        custoSumidouro,
+        nivelLencol
+      };
+      
+      // Renderizar
+      gerarResultado(ultimoCalculo);
+      gerarListaMateriais(ultimoCalculo);
+      atualizarStats();
+      atualizarProgress();
+      
+      switchTab('resultados');
+      mostrarNotificacao('Cálculo concluído com sucesso!', 'success');
+    }
+    
+    function calcularDimensoesFossa(volume, formato) {
+      let dimensoes = {};
+      
+      if (formato === 'cilindrico') {
+        // Proporção ideal: altura = 1.5 * diâmetro
+        const diametro = Math.pow((4 * volume) / (1.5 * Math.PI), 1/3);
+        let altura = diametro * 1.5;
+        
+        // Limites NBR: altura entre 1.2m e 2.8m
+        altura = Math.max(1.2, Math.min(2.8, altura));
+        const diametroFinal = Math.sqrt((4 * volume) / (Math.PI * altura));
+        
+        dimensoes = {
+          tipo: 'Cilíndrico',
+          diametro: diametroFinal,
+          altura: altura,
+          areaBase: Math.PI * Math.pow(diametroFinal / 2, 2),
+          volume: volume
+        };
+      } else {
+        // Proporção: comprimento = 2 * largura
+        const altura = Math.max(1.2, Math.min(2.8, Math.pow(volume / 2, 1/3) * 1.3));
+        const largura = Math.sqrt(volume / (2 * altura));
+        const comprimento = largura * 2;
+        
+        dimensoes = {
+          tipo: 'Retangular',
+          comprimento: comprimento,
+          largura: largura,
+          altura: altura,
+          areaBase: comprimento * largura,
+          volume: volume
+        };
+      }
+      
+      return dimensoes;
+    }
+    
+    function calcularSumidouro(contribuicaoDiaria, coefInfiltracao, tipo, nivelLencol) {
+      const areaInfiltracao = contribuicaoDiaria / coefInfiltracao;
+      
+      // Profundidade máxima considerando lençol freático
+      let profundidadeMax = Math.max(1.0, nivelLencol - 1.5);
+      profundidadeMax = Math.min(profundidadeMax, 3.0);
+      
+      let dimensoes = {};
+      let quantidade = 1;
+      
+      if (tipo === 'circular') {
+        // Área = pi*r² + 2*pi*r*h
+        const h = profundidadeMax;
+        const a = Math.PI;
+        const b = 2 * Math.PI * h;
+        const c = -areaInfiltracao;
+        const raio = (-b + Math.sqrt(b*b - 4*a*c)) / (2*a);
+        
+        // Diâmetro máximo prático: 3m
+        let diametro = raio * 2;
+        if (diametro > 3.0) {
+          diametro = 3.0;
+          const areaUnitaria = Math.PI * Math.pow(1.5, 2) + 2 * Math.PI * 1.5 * h;
+          quantidade = Math.ceil(areaInfiltracao / areaUnitaria);
+        }
+        
+        const areaFundo = Math.PI * Math.pow(diametro/2, 2);
+        const areaLateral = 2 * Math.PI * (diametro/2) * h;
+        
+        dimensoes = {
+          tipo: 'Circular',
+          diametro: diametro,
+          profundidade: h,
+          areaInfiltracao: areaInfiltracao,
+          areaFundo: areaFundo,
+          areaLateral: areaLateral,
+          volumeUtil: Math.PI * Math.pow(diametro/2, 2) * h
+        };
+      } else if (tipo === 'retangular') {
+        const h = profundidadeMax;
+        // Área = L*W + 2*(L+W)*h, com L = 2W
+        const w = Math.sqrt(areaInfiltracao / (6*h + 2));
+        const l = w * 2;
+        
+        dimensoes = {
+          tipo: 'Retangular',
+          comprimento: l,
+          largura: w,
+          profundidade: h,
+          areaInfiltracao: areaInfiltracao,
+          areaFundo: l * w,
+          areaLaterais: 2 * (l + w) * h,
+          volumeUtil: l * w * h
+        };
+      } else {
+        // Valas de infiltração
+        const larguraVala = 0.5;
+        const profundidade = 0.6;
+        const comprimentoTotal = areaInfiltracao / (larguraVala + 2 * profundidade);
+        const comprimentoMax = 30; // máximo por vala
+        quantidade = Math.ceil(comprimentoTotal / comprimentoMax);
+        
+        dimensoes = {
+          tipo: 'Valas',
+          comprimentoTotal: comprimentoTotal,
+          comprimentoPorVala: comprimentoTotal / quantidade,
+          largura: larguraVala,
+          profundidade: profundidade,
+          areaInfiltracao: areaInfiltracao
+        };
+      }
+      
+      return { dimensoes, quantidade };
+    }
+    
+    function calcularCustoFossa(volume, material, formato) {
+      const custosPorMaterial = {
+        'concreto': { cilindrico: precosConfig.concreto_cil, retangular: precosConfig.concreto_ret },
+        'aneis': { cilindrico: precosConfig.aneis, retangular: precosConfig.aneis },
+        'fibra': { cilindrico: precosConfig.fibra_cil, retangular: precosConfig.fibra_ret },
+        'polietileno': { cilindrico: precosConfig.polietileno, retangular: precosConfig.polietileno }
+      };
+      
+      const custoBase = custosPorMaterial[material][formato] * volume;
+      const escavacao = volume * 1.3 * precosConfig.escavacao;
+      const tubulacao = precosConfig.tubulacao_fossa;
+      const tampa = precosConfig.tampa_fossa;
+      const instalacao = custoBase * (precosConfig.instalacao_perc / 100);
+      
+      return {
+        material: custoBase,
+        escavacao: escavacao,
+        tubulacao: tubulacao,
+        tampa: tampa,
+        instalacao: instalacao,
+        total: custoBase + escavacao + tubulacao + tampa + instalacao
+      };
+    }
+    
+    function calcularCustoSumidouro(dimensoes, tipo, quantidade) {
+      const volume = dimensoes.volumeUtil || (dimensoes.comprimentoTotal * dimensoes.largura * dimensoes.profundidade);
+      
+      const escavacao = volume * 1.2 * precosConfig.escavacao * quantidade;
+      const brita = volume * 0.7 * precosConfig.brita * quantidade;
+      
+      let estrutura = 0;
+      if (tipo === 'valas') {
+        estrutura = dimensoes.comprimentoTotal * precosConfig.tubo_drenagem;
+        estrutura += dimensoes.comprimentoTotal * dimensoes.largura * precosConfig.manta_geotextil;
+      } else {
+        estrutura = volume * precosConfig.alvenaria * quantidade;
+      }
+      
+      const tampa = precosConfig.tampa_sumidouro * quantidade;
+      const tubulacao = precosConfig.tubulacao_sumidouro;
+      const instalacao = (estrutura + brita) * (precosConfig.instalacao_sumidouro_perc / 100);
+      
+      return {
+        escavacao: escavacao,
+        brita: brita,
+        estrutura: estrutura,
+        tampa: tampa,
+        tubulacao: tubulacao,
+        instalacao: instalacao,
+        total: escavacao + brita + estrutura + tampa + tubulacao + instalacao
+      };
+    }
+    
+    // =============================================
+    // RENDERIZAÇÃO
+    // =============================================
+    
+    function gerarResultado(dados) {
+      const custoTotal = (dados.custoFossa?.total || 0) + (dados.custoSumidouro?.total || 0);
+      
+      let html = `
+        <!-- Resumo Principal -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="glass rounded-xl p-4 text-center animate-fade-in">
+            <i class="fas fa-users text-cyan-400 text-2xl mb-2"></i>
+            <div class="text-2xl font-bold text-white">${dados.numPessoas}</div>
+            <div class="text-xs text-gray-400">Pessoas</div>
+          </div>
+          <div class="glass rounded-xl p-4 text-center animate-fade-in" style="animation-delay: 0.1s">
+            <i class="fas fa-tint text-blue-400 text-2xl mb-2"></i>
+            <div class="text-2xl font-bold text-white">${dados.contribuicaoDiaria}</div>
+            <div class="text-xs text-gray-400">L/dia</div>
+          </div>
+          <div class="glass rounded-xl p-4 text-center animate-fade-in" style="animation-delay: 0.2s">
+            <i class="fas fa-cube text-purple-400 text-2xl mb-2"></i>
+            <div class="text-2xl font-bold text-white">${dados.volumeTotalM3.toFixed(2)}</div>
+            <div class="text-xs text-gray-400">m³ fossa</div>
+          </div>
+          <div class="glass rounded-xl p-4 text-center animate-fade-in" style="animation-delay: 0.3s">
+            <i class="fas fa-money-bill-wave text-green-400 text-2xl mb-2"></i>
+            <div class="text-2xl font-bold text-white">R$ ${(custoTotal/1000).toFixed(1)}k</div>
+            <div class="text-xs text-gray-400">Custo Total</div>
+          </div>
+        </div>
+      `;
+      
+      // Diagrama do sistema
+      if (sistemaAtual === 'completo') {
+        html += `
+          <div class="glass rounded-xl p-5 mb-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+              <i class="fas fa-project-diagram"></i> Sistema Dimensionado
+            </h3>
+            <div class="flex items-center justify-center gap-4 flex-wrap py-4">
+              <div class="glass-cyan rounded-xl p-4 text-center">
+                <div class="text-3xl mb-2">🏠</div>
+                <div class="text-sm font-semibold text-white">Edificação</div>
+                <div class="text-xs text-cyan-400">${dados.numPessoas} pessoas</div>
+              </div>
+              <div class="text-2xl text-cyan-400">→</div>
+              <div class="glass-cyan rounded-xl p-4 text-center border-2 border-cyan-500">
+                <div class="text-3xl mb-2">🚽</div>
+                <div class="text-sm font-semibold text-white">Fossa Séptica</div>
+                <div class="text-xs text-cyan-400">${dados.volumeTotalM3.toFixed(2)} m³</div>
+              </div>
+              <div class="text-2xl text-cyan-400">→</div>
+              <div class="glass-cyan rounded-xl p-4 text-center border-2 border-purple-500">
+                <div class="text-3xl mb-2">🕳️</div>
+                <div class="text-sm font-semibold text-white">Sumidouro${dados.numSumidouros > 1 ? ` (${dados.numSumidouros}x)` : ''}</div>
+                <div class="text-xs text-purple-400">${dados.dimensoesSumidouro.areaInfiltracao.toFixed(1)} m²</div>
+              </div>
+              <div class="text-2xl text-cyan-400">→</div>
+              <div class="glass-cyan rounded-xl p-4 text-center">
+                <div class="text-3xl mb-2">🌱</div>
+                <div class="text-sm font-semibold text-white">Solo</div>
+                <div class="text-xs text-green-400">Infiltração</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Fossa Séptica
+      if (dados.dimensoesFossa) {
+        html += `
+          <div class="glass rounded-xl p-5 mb-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+              <i class="fas fa-toilet"></i> Fossa Séptica
+            </h3>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div class="bg-black/30 rounded-lg p-3">
+                <div class="text-xs text-gray-500 mb-1">Volume Útil</div>
+                <div class="text-xl font-bold text-white">${(dados.volumeUtil/1000).toFixed(2)} m³</div>
+              </div>
+              <div class="bg-black/30 rounded-lg p-3">
+                <div class="text-xs text-gray-500 mb-1">Volume Lodo</div>
+                <div class="text-xl font-bold text-white">${(dados.volumeLodo/1000).toFixed(2)} m³</div>
+              </div>
+              <div class="bg-black/30 rounded-lg p-3">
+                <div class="text-xs text-gray-500 mb-1">Volume Total</div>
+                <div class="text-xl font-bold text-cyan-400">${dados.volumeTotalM3.toFixed(2)} m³</div>
+              </div>
+              <div class="bg-black/30 rounded-lg p-3">
+                <div class="text-xs text-gray-500 mb-1">Tempo Detenção</div>
+                <div class="text-xl font-bold text-white">${dados.tempoDetencao.toFixed(1)} dias</div>
+              </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4">
+                <h4 class="font-semibold text-white mb-3">📐 Dimensões</h4>
+                ${dados.dimensoesFossa.tipo === 'Cilíndrico' ? `
+                  <div class="space-y-2 text-sm">
+                    <div class="flex justify-between"><span class="text-gray-400">Diâmetro:</span><span class="text-cyan-400 font-bold">${dados.dimensoesFossa.diametro.toFixed(2)} m</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400">Altura útil:</span><span class="text-cyan-400 font-bold">${dados.dimensoesFossa.altura.toFixed(2)} m</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400">Área base:</span><span class="text-cyan-400 font-bold">${dados.dimensoesFossa.areaBase.toFixed(2)} m²</span></div>
+                  </div>
+                ` : `
+                  <div class="space-y-2 text-sm">
+                    <div class="flex justify-between"><span class="text-gray-400">Comprimento:</span><span class="text-cyan-400 font-bold">${dados.dimensoesFossa.comprimento.toFixed(2)} m</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400">Largura:</span><span class="text-cyan-400 font-bold">${dados.dimensoesFossa.largura.toFixed(2)} m</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400">Altura útil:</span><span class="text-cyan-400 font-bold">${dados.dimensoesFossa.altura.toFixed(2)} m</span></div>
+                  </div>
+                `}
+              </div>
+              
+              <div class="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
+                <h4 class="font-semibold text-white mb-3">🔧 Especificações</h4>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between"><span class="text-gray-400">Formato:</span><span class="text-purple-400">${dados.dimensoesFossa.tipo}</span></div>
+                  <div class="flex justify-between"><span class="text-gray-400">Material:</span><span class="text-purple-400">${getNomeMaterial(dados.materialFossa)}</span></div>
+                  <div class="flex justify-between"><span class="text-gray-400">Custo:</span><span class="text-purple-400 font-bold">R$ ${dados.custoFossa.total.toFixed(2)}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Sumidouro
+      if (dados.dimensoesSumidouro) {
+        html += `
+          <div class="glass rounded-xl p-5 mb-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+              <i class="fas fa-arrow-down"></i> Sumidouro ${dados.numSumidouros > 1 ? `(${dados.numSumidouros} unidades)` : ''}
+            </h3>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div class="bg-black/30 rounded-lg p-3">
+                <div class="text-xs text-gray-500 mb-1">Área Infiltração</div>
+                <div class="text-xl font-bold text-cyan-400">${dados.dimensoesSumidouro.areaInfiltracao.toFixed(2)} m²</div>
+              </div>
+              <div class="bg-black/30 rounded-lg p-3">
+                <div class="text-xs text-gray-500 mb-1">Coef. Solo</div>
+                <div class="text-xl font-bold text-white">${coefInfiltracao} L/m²/dia</div>
+              </div>
+              <div class="bg-black/30 rounded-lg p-3">
+                <div class="text-xs text-gray-500 mb-1">Tipo</div>
+                <div class="text-xl font-bold text-white">${dados.dimensoesSumidouro.tipo}</div>
+              </div>
+              <div class="bg-black/30 rounded-lg p-3">
+                <div class="text-xs text-gray-500 mb-1">Quantidade</div>
+                <div class="text-xl font-bold text-purple-400">${dados.numSumidouros}</div>
+              </div>
+            </div>
+            
+            <div class="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4">
+              <h4 class="font-semibold text-white mb-3">📐 Dimensões ${dados.numSumidouros > 1 ? '(cada unidade)' : ''}</h4>
+              ${dados.dimensoesSumidouro.tipo === 'Circular' ? `
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div><span class="text-gray-400">Diâmetro:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.diametro.toFixed(2)} m</span></div>
+                  <div><span class="text-gray-400">Profundidade:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.profundidade.toFixed(2)} m</span></div>
+                  <div><span class="text-gray-400">Área fundo:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.areaFundo.toFixed(2)} m²</span></div>
+                  <div><span class="text-gray-400">Área lateral:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.areaLateral.toFixed(2)} m²</span></div>
+                </div>
+              ` : dados.dimensoesSumidouro.tipo === 'Valas' ? `
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div><span class="text-gray-400">Comprimento total:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.comprimentoTotal.toFixed(2)} m</span></div>
+                  <div><span class="text-gray-400">Por vala:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.comprimentoPorVala.toFixed(2)} m</span></div>
+                  <div><span class="text-gray-400">Largura:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.largura.toFixed(2)} m</span></div>
+                  <div><span class="text-gray-400">Profundidade:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.profundidade.toFixed(2)} m</span></div>
+                </div>
+              ` : `
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div><span class="text-gray-400">Comprimento:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.comprimento.toFixed(2)} m</span></div>
+                  <div><span class="text-gray-400">Largura:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.largura.toFixed(2)} m</span></div>
+                  <div><span class="text-gray-400">Profundidade:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.profundidade.toFixed(2)} m</span></div>
+                  <div><span class="text-gray-400">Volume:</span><br><span class="text-cyan-400 font-bold">${dados.dimensoesSumidouro.volumeUtil.toFixed(2)} m³</span></div>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Etapas de construção
+      html += `
+        <div class="glass rounded-xl p-5 mb-6">
+          <h3 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+            <i class="fas fa-hard-hat"></i> Etapas de Construção
+          </h3>
+          <div class="space-y-6">
+            ${dados.dimensoesFossa ? `
+              <div class="etapa-item bg-black/20 rounded-lg p-4" data-step="1">
+                <h4 class="font-semibold text-white mb-2">Escavação da Fossa</h4>
+                <p class="text-sm text-gray-400">Escavar ${(dados.volumeTotalM3 * 1.3).toFixed(2)} m³. Fundo nivelado e compactado.</p>
+              </div>
+              <div class="etapa-item bg-black/20 rounded-lg p-4" data-step="2">
+                <h4 class="font-semibold text-white mb-2">Montagem da Estrutura</h4>
+                <p class="text-sm text-gray-400">${dados.materialFossa === 'aneis' ? 'Lastro de concreto 5cm. Montagem dos anéis com rejuntamento.' : 'Lastro de concreto 5cm. Construção conforme projeto.'}</p>
+              </div>
+              <div class="etapa-item bg-black/20 rounded-lg p-4" data-step="3">
+                <h4 class="font-semibold text-white mb-2">Impermeabilização</h4>
+                <p class="text-sm text-gray-400">Aplicar impermeabilizante interno. Testar estanqueidade por 24h.</p>
+              </div>
+            ` : ''}
+            ${dados.dimensoesSumidouro ? `
+              <div class="etapa-item bg-black/20 rounded-lg p-4" data-step="${dados.dimensoesFossa ? '4' : '1'}">
+                <h4 class="font-semibold text-white mb-2">Escavação do Sumidouro</h4>
+                <p class="text-sm text-gray-400">Escavar com afastamento mínimo de 3m da fossa. ${dados.numSumidouros > 1 ? `Repetir para ${dados.numSumidouros} unidades.` : ''}</p>
+              </div>
+              <div class="etapa-item bg-black/20 rounded-lg p-4" data-step="${dados.dimensoesFossa ? '5' : '2'}">
+                <h4 class="font-semibold text-white mb-2">Enchimento com Brita</h4>
+                <p class="text-sm text-gray-400">Brita nº 3 ou 4 no fundo (30cm) e laterais.</p>
+              </div>
+            ` : ''}
+            <div class="etapa-item bg-black/20 rounded-lg p-4" data-step="${(dados.dimensoesFossa ? 3 : 0) + (dados.dimensoesSumidouro ? 3 : 1)}">
+              <h4 class="font-semibold text-white mb-2">Tubulações e Testes</h4>
+              <p class="text-sm text-gray-400">Tubos DN 100mm com declividade 2%. Teste de funcionamento.</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Recomendações
+      html += `
+        <div class="glass rounded-xl p-5">
+          <h3 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+            <i class="fas fa-exclamation-circle"></i> Recomendações NBR
+          </h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <ul class="space-y-2 text-sm text-gray-400">
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-green-400 mt-1"></i>
+                <span>Distância mínima 1,5m de edificações</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-green-400 mt-1"></i>
+                <span>Distância mínima 15m de poços/nascentes</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-green-400 mt-1"></i>
+                <span>Tampa hermética com abertura de inspeção</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-green-400 mt-1"></i>
+                <span>Ventilação: tubo 75mm a 2m acima da cobertura</span>
+              </li>
+            </ul>
+            <ul class="space-y-2 text-sm text-gray-400">
+              <li class="flex items-start gap-2">
+                <i class="fas fa-calendar-alt text-cyan-400 mt-1"></i>
+                <span>Limpeza da fossa: a cada 12-24 meses</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-ban text-red-400 mt-1"></i>
+                <span>Não descartar: gorduras, produtos químicos</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-file-signature text-purple-400 mt-1"></i>
+                <span>ART obrigatória para projeto e execução</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-water text-blue-400 mt-1"></i>
+                <span>Lençol freático: mín. 1,5m abaixo do sumidouro</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('resultado').innerHTML = html;
+    }
+    
+    function gerarListaMateriais(dados) {
+      const custoTotal = (dados.custoFossa?.total || 0) + (dados.custoSumidouro?.total || 0);
+      
+      let html = `
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <p class="text-gray-400">Orçamento detalhado do sistema</p>
+          </div>
+          <button onclick="copiarOrcamento()" class="px-4 py-2 glass rounded-lg hover:bg-white/10 transition-all">
+            <i class="fas fa-copy mr-2"></i> Copiar
+          </button>
+        </div>
+      `;
+      
+      // Fossa
+      if (dados.custoFossa) {
+        html += `
+          <div class="mb-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-3 flex items-center gap-2">
+              <i class="fas fa-toilet"></i> Fossa Séptica
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="tabela-materiais">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th class="text-right">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>${getNomeMaterial(dados.materialFossa)} - ${dados.volumeTotalM3.toFixed(2)} m³</td>
+                    <td class="text-right">R$ ${dados.custoFossa.material.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Escavação e preparo</td>
+                    <td class="text-right">R$ ${dados.custoFossa.escavacao.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Tubulações e conexões</td>
+                    <td class="text-right">R$ ${dados.custoFossa.tubulacao.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Tampa de inspeção</td>
+                    <td class="text-right">R$ ${dados.custoFossa.tampa.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Mão de obra (${precosConfig.instalacao_perc}%)</td>
+                    <td class="text-right">R$ ${dados.custoFossa.instalacao.toFixed(2)}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td><strong>Subtotal Fossa</strong></td>
+                    <td class="text-right"><strong>R$ ${dados.custoFossa.total.toFixed(2)}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Sumidouro
+      if (dados.custoSumidouro) {
+        html += `
+          <div class="mb-6">
+            <h3 class="text-lg font-bold text-purple-400 mb-3 flex items-center gap-2">
+              <i class="fas fa-arrow-down"></i> Sumidouro ${dados.numSumidouros > 1 ? `(${dados.numSumidouros}x)` : ''}
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="tabela-materiais">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th class="text-right">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Escavação</td>
+                    <td class="text-right">R$ ${dados.custoSumidouro.escavacao.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Brita nº 3/4</td>
+                    <td class="text-right">R$ ${dados.custoSumidouro.brita.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>${dados.tipoSumidouro === 'circular' ? 'Anéis pré-moldados' : dados.tipoSumidouro === 'valas' ? 'Tubos e manta' : 'Alvenaria'}</td>
+                    <td class="text-right">R$ ${dados.custoSumidouro.estrutura.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Tampa(s)</td>
+                    <td class="text-right">R$ ${dados.custoSumidouro.tampa.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Tubulação de ligação</td>
+                    <td class="text-right">R$ ${dados.custoSumidouro.tubulacao.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Mão de obra (${precosConfig.instalacao_sumidouro_perc}%)</td>
+                    <td class="text-right">R$ ${dados.custoSumidouro.instalacao.toFixed(2)}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td><strong>Subtotal Sumidouro</strong></td>
+                    <td class="text-right"><strong>R$ ${dados.custoSumidouro.total.toFixed(2)}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Total
+      html += `
+        <div class="glass-cyan rounded-xl p-5 mt-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <div class="text-sm text-gray-400">Investimento Total</div>
+              <div class="text-3xl font-bold gradient-text">R$ ${custoTotal.toFixed(2)}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm text-gray-400">Custo por pessoa</div>
+              <div class="text-xl font-bold text-white">R$ ${(custoTotal / dados.numPessoas).toFixed(2)}</div>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-3">* Valores aproximados. Não inclui projeto, licenças e taxas.</p>
+        </div>
+      `;
+      
+      document.getElementById('lista-materiais').innerHTML = html;
+    }
+    
+    // =============================================
+    // FUNÇÕES AUXILIARES
+    // =============================================
+    
+    function getNomeMaterial(material) {
+      const nomes = {
+        'concreto': 'Concreto Armado',
+        'aneis': 'Anéis Pré-moldados',
+        'fibra': 'Fibra de Vidro',
+        'polietileno': 'Polietileno'
+      };
+      return nomes[material] || material;
+    }
+    
+    function copiarOrcamento() {
+      if (!ultimoCalculo) return;
+      
+      let texto = 'ORÇAMENTO - SISTEMA FOSSA/SUMIDOURO\n';
+      texto += '='.repeat(40) + '\n\n';
+      texto += `Pessoas: ${ultimoCalculo.numPessoas}\n`;
+      texto += `Volume fossa: ${ultimoCalculo.volumeTotalM3.toFixed(2)} m³\n\n`;
+      
+      if (ultimoCalculo.custoFossa) {
+        texto += 'FOSSA SÉPTICA:\n';
+        texto += `- Material: R$ ${ultimoCalculo.custoFossa.material.toFixed(2)}\n`;
+        texto += `- Escavação: R$ ${ultimoCalculo.custoFossa.escavacao.toFixed(2)}\n`;
+        texto += `- Total: R$ ${ultimoCalculo.custoFossa.total.toFixed(2)}\n\n`;
+      }
+      
+      if (ultimoCalculo.custoSumidouro) {
+        texto += 'SUMIDOURO:\n';
+        texto += `- Total: R$ ${ultimoCalculo.custoSumidouro.total.toFixed(2)}\n\n`;
+      }
+      
+      const total = (ultimoCalculo.custoFossa?.total || 0) + (ultimoCalculo.custoSumidouro?.total || 0);
+      texto += `TOTAL GERAL: R$ ${total.toFixed(2)}\n`;
+      
+      navigator.clipboard.writeText(texto).then(() => {
+        mostrarNotificacao('Orçamento copiado!', 'success');
+      });
+    }
+    
+    // =============================================
+    // MODAIS
+    // =============================================
+    
+    function criarModal(titulo, conteudo, botoes = []) {
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
+      modal.id = 'modal-ativo';
+      
+      const botoesHtml = botoes.map(btn => `
+        <button onclick="${btn.action}" class="px-6 py-3 rounded-xl font-semibold transition-all
+          ${btn.class === 'btn-primary' ? 'gradient-bg text-black hover:shadow-lg' : 'glass text-gray-400 hover:text-white'}">
+          ${btn.text}
+        </button>
+      `).join('');
+      
+      modal.innerHTML = `
+        <div class="modal-content glass-cyan rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-cyan-400">${titulo}</h2>
+            <button onclick="fecharModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+          </div>
+          ${conteudo}
+          <div class="flex gap-3 justify-end mt-6">
+            ${botoesHtml}
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      modal.onclick = (e) => { if (e.target === modal) fecharModal(); };
+    }
+    
+    function fecharModal() {
+      const modal = document.getElementById('modal-ativo');
+      if (modal) modal.remove();
+    }
+    
+    function abrirModalPrecos() {
+      const conteudo = `
+        <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
+          <h3 class="font-semibold text-white">Materiais da Fossa (R$/m³)</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400 text-sm">Concreto Cil.</span>
+              <input type="number" id="preco_concreto_cil" value="${precosConfig.concreto_cil}" class="w-24 px-2 py-1 bg-black/30 border border-cyan-500/30 rounded text-cyan-400 text-right">
+            </div>
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400 text-sm">Concreto Ret.</span>
+              <input type="number" id="preco_concreto_ret" value="${precosConfig.concreto_ret}" class="w-24 px-2 py-1 bg-black/30 border border-cyan-500/30 rounded text-cyan-400 text-right">
+            </div>
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400 text-sm">Anéis</span>
+              <input type="number" id="preco_aneis" value="${precosConfig.aneis}" class="w-24 px-2 py-1 bg-black/30 border border-cyan-500/30 rounded text-cyan-400 text-right">
+            </div>
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400 text-sm">Polietileno</span>
+              <input type="number" id="preco_polietileno" value="${precosConfig.polietileno}" class="w-24 px-2 py-1 bg-black/30 border border-cyan-500/30 rounded text-cyan-400 text-right">
+            </div>
+          </div>
+          
+          <h3 class="font-semibold text-white mt-4">Serviços</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400 text-sm">Escavação (m³)</span>
+              <input type="number" id="preco_escavacao" value="${precosConfig.escavacao}" class="w-24 px-2 py-1 bg-black/30 border border-cyan-500/30 rounded text-cyan-400 text-right">
+            </div>
+            <div class="flex items-center justify-between bg-black/20 rounded-lg p-3">
+              <span class="text-gray-400 text-sm">Mão de obra (%)</span>
+              <input type="number" id="preco_instalacao_perc" value="${precosConfig.instalacao_perc}" class="w-24 px-2 py-1 bg-black/30 border border-cyan-500/30 rounded text-cyan-400 text-right">
+            </div>
+          </div>
+        </div>
+      `;
+      
+      criarModal('⚙️ Configurar Preços', conteudo, [
+        { text: 'Restaurar Padrão', class: 'btn-outline', action: 'restaurarPrecos()' },
+        { text: 'Salvar', class: 'btn-primary', action: 'salvarPrecos()' }
+      ]);
+    }
+    
+    function salvarPrecos() {
+      precosConfig.concreto_cil = parseFloat(document.getElementById('preco_concreto_cil').value) || 1800;
+      precosConfig.concreto_ret = parseFloat(document.getElementById('preco_concreto_ret').value) || 2000;
+      precosConfig.aneis = parseFloat(document.getElementById('preco_aneis').value) || 1200;
+      precosConfig.polietileno = parseFloat(document.getElementById('preco_polietileno').value) || 1500;
+      precosConfig.escavacao = parseFloat(document.getElementById('preco_escavacao').value) || 80;
+      precosConfig.instalacao_perc = parseFloat(document.getElementById('preco_instalacao_perc').value) || 25;
+      
+      localStorage.setItem('fossa_precos_config', JSON.stringify(precosConfig));
+      fecharModal();
+      mostrarNotificacao('Preços salvos!', 'success');
+    }
+    
+    function restaurarPrecos() {
+      if (confirm('Restaurar preços padrão?')) {
+        precosConfig = { ...precosConfigPadrao };
+        localStorage.removeItem('fossa_precos_config');
+        fecharModal();
+        mostrarNotificacao('Preços restaurados!', 'info');
+      }
+    }
+    
+    function carregarPrecosConfig() {
+      const saved = localStorage.getItem('fossa_precos_config');
+      if (saved) {
+        try {
+          precosConfig = { ...precosConfigPadrao, ...JSON.parse(saved) };
+        } catch(e) {}
+      }
+    }
+    
+    function compararMateriais() {
+      if (!ultimoCalculo) {
+        mostrarNotificacao('Execute o cálculo primeiro!', 'warning');
+        return;
+      }
+      
+      const vol = ultimoCalculo.volumeTotalM3;
+      const materiais = ['concreto', 'aneis', 'fibra', 'polietileno'];
+      
+      let html = '<div class="space-y-3">';
+      
+      materiais.forEach(mat => {
+        const custo = calcularCustoFossa(vol, mat, ultimoCalculo.formatoFossa);
+        const isAtual = mat === ultimoCalculo.materialFossa;
+        
+        html += `
+          <div class="p-4 rounded-xl ${isAtual ? 'bg-cyan-500/20 border border-cyan-500' : 'bg-black/20'}">
+            <div class="flex justify-between items-center">
+              <div>
+                <div class="font-semibold ${isAtual ? 'text-cyan-400' : 'text-white'}">${getNomeMaterial(mat)}</div>
+                <div class="text-xs text-gray-400">${isAtual ? '✓ Selecionado' : ''}</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xl font-bold ${isAtual ? 'text-cyan-400' : 'text-white'}">R$ ${custo.total.toFixed(0)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      
+      criarModal('⚖️ Comparar Materiais', html, [
+        { text: 'Fechar', class: 'btn-primary', action: 'fecharModal()' }
+      ]);
+    }
+    
+    // =============================================
+    // PERSISTÊNCIA
+    // =============================================
+    
+    function salvarProjeto() {
+      const projeto = {
+        nome: prompt('Nome do projeto:', 'Fossa Séptica'),
+        sistema: sistemaAtual,
+        solo: soloAtual,
+        coefInfiltracao,
+        dados: {
+          numPessoas: document.getElementById('num-pessoas').value,
+          tipoEdificacao: document.getElementById('tipo-edificacao').value,
+          contribuicao: document.getElementById('contribuicao').value,
+          tempoDetencao: document.getElementById('tempo-detencao').value,
+          formatoFossa: document.getElementById('formato-fossa').value,
+          materialFossa: document.getElementById('material-fossa').value,
+          tipoSumidouro: document.getElementById('tipo-sumidouro').value,
+          nivelLencol: document.getElementById('nivel-lencol').value
+        },
+        resultado: ultimoCalculo,
+        timestamp: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(projeto, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${projeto.nome.replace(/\s+/g, '_')}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      mostrarNotificacao('Projeto salvo!', 'success');
+    }
+    
+    function carregarProjeto() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const projeto = JSON.parse(ev.target.result);
+              
+              sistemaAtual = projeto.sistema || 'completo';
+              soloAtual = projeto.solo || 'areia-grossa';
+              coefInfiltracao = projeto.coefInfiltracao || 140;
+              
+              if (projeto.dados) {
+                document.getElementById('num-pessoas').value = projeto.dados.numPessoas;
+                document.getElementById('tipo-edificacao').value = projeto.dados.tipoEdificacao;
+                document.getElementById('contribuicao').value = projeto.dados.contribuicao;
+                document.getElementById('tempo-detencao').value = projeto.dados.tempoDetencao;
+                document.getElementById('formato-fossa').value = projeto.dados.formatoFossa;
+                document.getElementById('material-fossa').value = projeto.dados.materialFossa;
+                document.getElementById('tipo-sumidouro').value = projeto.dados.tipoSumidouro;
+                document.getElementById('nivel-lencol').value = projeto.dados.nivelLencol;
+              }
+              
+              // Atualizar UI
+              document.querySelectorAll('.sistema-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.sistema === sistemaAtual);
+              });
+              
+              document.getElementById('coef-range').value = coefInfiltracao;
+              document.getElementById('coef-display').textContent = coefInfiltracao;
+              
+              atualizarStats();
+              atualizarProgress();
+              
+              mostrarNotificacao(`Projeto "${projeto.nome}" carregado!`, 'success');
+            } catch(err) {
+              mostrarNotificacao('Erro ao carregar projeto', 'error');
+            }
+          };
+          reader.readAsText(file);
+        }
+      };
+      input.click();
+    }
+    
+    function exportarPDF() {
+      if (!ultimoCalculo) {
+        mostrarNotificacao('Execute o cálculo primeiro!', 'warning');
+        return;
+      }
+      window.print();
+    }
+    
+    function resetarProjeto() {
+      if (confirm('Limpar todos os dados?')) {
+        location.reload();
+      }
+    }
+    
+    // =============================================
+    // NOTIFICAÇÕES
+    // =============================================
+    
+    function mostrarNotificacao(mensagem, tipo = 'info') {
+      const cores = {
+        success: 'from-green-500 to-green-600',
+        error: 'from-red-500 to-red-600',
+        warning: 'from-amber-500 to-orange-500',
+        info: 'from-cyan-500 to-blue-600'
+      };
+      
+      const icones = {
+        success: 'fa-check-circle',
+        error: 'fa-times-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+      
+      const notif = document.createElement('div');
+      notif.className = `fixed bottom-6 right-6 bg-gradient-to-r ${cores[tipo]} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-fade-in z-50`;
+      notif.innerHTML = `<i class="fas ${icones[tipo]}"></i><span>${mensagem}</span>`;
+      
+      document.body.appendChild(notif);
+      
+      setTimeout(() => {
+        notif.style.opacity = '0';
+        notif.style.transform = 'translateY(20px)';
+        notif.style.transition = 'all 0.3s ease';
+        setTimeout(() => notif.remove(), 300);
+      }, 3000);
+    }
+  </script>
+
+    <!-- Footer -->
+    
+    
+
+    
+
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
