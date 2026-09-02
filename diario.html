@@ -1,0 +1,2722 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diário de Obra</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .tab-active {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .weather-card { transition: all 0.2s ease; }
+        .weather-card:hover { transform: scale(1.05); }
+        .weather-card.selected { transform: scale(1.05); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3); }
+
+        .funcao-chip { transition: all 0.2s ease; }
+        .funcao-chip:hover { transform: translateY(-2px); }
+
+        .stat-card { transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px) scale(1.02); }
+
+        .photo-thumb {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .photo-thumb:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+
+        .photo-upload-zone {
+            border: 3px dashed #d1d5db;
+            transition: all 0.3s;
+        }
+        .photo-upload-zone:hover, .photo-upload-zone.dragover {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .logo-preview { max-width: 200px; max-height: 80px; object-fit: contain; }
+
+        .equip-chip { transition: all 0.2s ease; }
+        .equip-chip:hover { transform: translateY(-2px); }
+        .equip-chip.selected {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            border-color: transparent !important;
+            color: white !important;
+        }
+
+        @media print {
+            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+
+    <!-- Tailwind @apply helpers (precisa ser em style do tailwind para funcionar no CDN) -->
+    <style type="text/tailwindcss">
+        @layer components {
+            .input-style {
+                @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200;
+            }
+            .btn-primary {
+                @apply bg-gradient-to-r from-amber-500 to-orange-600 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200;
+            }
+            .btn-secondary {
+                @apply bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-amber-500 via-orange-500 to-orange-600 text-white shadow-2xl">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div id="headerLogo" class="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
+                        <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-extrabold tracking-tight">Diário de Obra</h1>
+                        <p id="headerObraNome" class="text-amber-100 text-sm font-medium mt-1">Configure os dados da obra</p>
+                    </div>
+                </div>
+                <div class="text-right hidden sm:block">
+                    <p class="text-amber-100 text-sm">Data atual</p>
+                    <p id="currentDate" class="font-bold text-lg"></p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tabs Navigation -->
+    <nav class="bg-white/80 glass shadow-lg sticky top-0 z-40 border-b border-gray-100">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex gap-2 overflow-x-auto pb-1">
+                <button onclick="showTab('registro')" id="tab-registro" class="tab-btn tab-active px-5 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-100 transition-all duration-200 whitespace-nowrap flex items-center gap-2">
+                    <span>📝</span> Novo Registro
+                </button>
+                <button onclick="showTab('historico')" id="tab-historico" class="tab-btn px-5 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-100 transition-all duration-200 whitespace-nowrap flex items-center gap-2">
+                    <span>📋</span> Histórico
+                </button>
+                <button onclick="showTab('equipe')" id="tab-equipe" class="tab-btn px-5 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-100 transition-all duration-200 whitespace-nowrap flex items-center gap-2">
+                    <span>👷</span> Equipe
+                </button>
+                <button onclick="showTab('equipamentos')" id="tab-equipamentos" class="tab-btn px-5 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-100 transition-all duration-200 whitespace-nowrap flex items-center gap-2">
+                    <span>🚜</span> Equipamentos
+                </button>
+                <button onclick="showTab('obra')" id="tab-obra" class="tab-btn px-5 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-100 transition-all duration-200 whitespace-nowrap flex items-center gap-2">
+                    <span>🏗️</span> Dados da Obra
+                </button>
+                <button onclick="showTab('relatorios')" id="tab-relatorios" class="tab-btn px-5 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-100 transition-all duration-200 whitespace-nowrap flex items-center gap-2">
+                    <span>📊</span> Relatórios
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Tab: Novo Registro -->
+        <section id="section-registro" class="tab-content fade-in">
+            <div class="bg-white rounded-3xl shadow-xl p-8 max-w-4xl mx-auto border border-gray-100">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-gradient-to-br from-amber-400 to-orange-500 text-white p-4 rounded-2xl shadow-lg">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Novo Registro</h2>
+                            <p class="text-gray-500">Diário #<span id="numeroDiario" class="font-semibold text-amber-600">0001</span></p>
+                        </div>
+                    </div>
+                    <!-- Botão Duplicar do Último -->
+                    <button onclick="duplicarUltimoRegistro()" id="btnDuplicarUltimo" class="hidden btn-secondary flex items-center gap-2 text-sm">
+                        <span>📋</span> Copiar Último Registro
+                    </button>
+                </div>
+
+                <form id="diarioForm" class="space-y-8">
+                    <!-- Data, Horário e Clima -->
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">📅 Data do Registro</label>
+                            <input type="date" id="dataRegistro" required class="input-style text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">🕐 Horário de Trabalho</label>
+                            <div class="flex gap-2 items-center">
+                                <input type="time" id="horaInicio" class="input-style text-center" value="07:00">
+                                <span class="text-gray-400 font-bold">às</span>
+                                <input type="time" id="horaFim" class="input-style text-center" value="17:00">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">🌤️ Clima</label>
+                            <div class="grid grid-cols-4 gap-2">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="clima" value="ensolarado" class="hidden peer" checked>
+                                    <div class="weather-card peer-checked:selected peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-gray-50 border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-100">
+                                        <span class="text-2xl">☀️</span>
+                                        <p class="text-xs font-semibold mt-1">Sol</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="clima" value="nublado" class="hidden peer">
+                                    <div class="weather-card peer-checked:selected peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-gray-50 border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-100">
+                                        <span class="text-2xl">⛅</span>
+                                        <p class="text-xs font-semibold mt-1">Nublado</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="clima" value="chuvoso" class="hidden peer">
+                                    <div class="weather-card peer-checked:selected peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-gray-50 border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-100">
+                                        <span class="text-2xl">🌧️</span>
+                                        <p class="text-xs font-semibold mt-1">Chuva</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="clima" value="tempestade" class="hidden peer">
+                                    <div class="weather-card peer-checked:selected peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-gray-50 border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-100">
+                                        <span class="text-2xl">⛈️</span>
+                                        <p class="text-xs font-semibold mt-1">Tempest.</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipe Presente -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-3">👷 Equipe Presente (por função)</label>
+                        <div id="equipePresente" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                            <!-- Gerado via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Equipamentos Utilizados -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-3">🚜 Equipamentos Utilizados</label>
+                        <div id="equipamentosRegistro" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                            <!-- Gerado via JS -->
+                        </div>
+                        <p class="text-gray-400 text-xs mt-2">💡 Clique no equipamento para selecionar e informe as horas de uso</p>
+                    </div>
+
+                    <!-- Atividades Realizadas - Card -->
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-5 border-2 border-green-200 hover:border-green-400 transition-all">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-2.5 rounded-xl shadow-md">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-green-800">Atividades Realizadas</h3>
+                                <p class="text-green-600 text-xs">Descreva detalhadamente as atividades do dia</p>
+                            </div>
+                        </div>
+                        <textarea id="atividades" rows="6" placeholder="• Concretagem da laje do 2º pavimento\n• Montagem das formas dos pilares\n• Instalação de tubulação elétrica\n• Execução de contrapiso\n• Marcação de alvenaria..." class="w-full px-4 py-3 border-2 border-green-200 bg-white rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 text-gray-700 placeholder-gray-400"></textarea>
+                    </div>
+
+                    <!-- Materiais Utilizados - Card -->
+                    <div class="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-5 border-2 border-purple-200 hover:border-purple-400 transition-all">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-gradient-to-br from-purple-500 to-violet-600 text-white p-2.5 rounded-xl shadow-md">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-purple-800">🧱 Materiais Utilizados</h3>
+                                <p class="text-purple-600 text-xs">Liste todos os materiais consumidos no dia</p>
+                            </div>
+                        </div>
+                        <textarea id="materiais" rows="6" placeholder="• Concreto usinado FCK 30 - 120m³\n• Aço CA-50 ∅ 12,5mm - 800kg\n• Eletrodutos 3/4\" - 150 unidades\n• Areia média - 8m³\n• Cimento CP-II - 40 sacos..." class="w-full px-4 py-3 border-2 border-purple-200 bg-white rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 text-gray-700 placeholder-gray-400"></textarea>
+                    </div>
+
+                    <!-- Ocorrências - Card -->
+                    <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl p-5 border-2 border-red-200 hover:border-red-400 transition-all">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-gradient-to-br from-red-500 to-orange-600 text-white p-2.5 rounded-xl shadow-md">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-red-800">⚠️ Ocorrências / Problemas</h3>
+                                <p class="text-red-600 text-xs">Registre qualquer problema, atraso ou incidente</p>
+                            </div>
+                        </div>
+                        <textarea id="ocorrencias" rows="6" placeholder="• Atraso na entrega de materiais\n• Problema identificado e solução aplicada\n• Falta de EPI - medida corretiva\n• Condições climáticas adversas\n• Outros problemas relevantes..." class="w-full px-4 py-3 border-2 border-red-200 bg-white rounded-xl focus:ring-4 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200 text-gray-700 placeholder-gray-400"></textarea>
+                    </div>
+
+                    <!-- Observações - Card -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border-2 border-blue-200 hover:border-blue-400 transition-all">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-2.5 rounded-xl shadow-md">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-blue-800">📝 Observações Gerais</h3>
+                                <p class="text-blue-600 text-xs">Informações adicionais, visitas, previsões para o próximo dia</p>
+                            </div>
+                        </div>
+                        <textarea id="observacoes" rows="5" placeholder="• Tempo bom durante todo o dia\n• Visita do engenheiro fiscal às 14h\n• Previsão para amanhã: continuar desforma\n• Observações sobre segurança e qualidade..." class="w-full px-4 py-3 border-2 border-blue-200 bg-white rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-gray-700 placeholder-gray-400"></textarea>
+                    </div>
+
+                    <!-- Upload de Fotos -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-3">📸 Registro Fotográfico</label>
+                        <div id="photoUploadZone" class="photo-upload-zone rounded-2xl p-8 text-center cursor-pointer">
+                            <input type="file" id="photoInput" accept="image/*" multiple class="hidden">
+                            <div class="text-5xl mb-3">📷</div>
+                            <p class="text-gray-600 font-semibold">Clique ou arraste fotos aqui</p>
+                            <p class="text-gray-400 text-sm mt-1">JPG, PNG até 5MB cada (máx. 10 fotos)</p>
+                        </div>
+                        <div id="photoPreview" class="flex flex-wrap gap-3 mt-4"></div>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" class="flex-1 btn-primary flex items-center justify-center gap-2 text-lg py-4">
+                            <span>💾</span> Salvar Registro
+                        </button>
+                        <button type="button" onclick="limparFormulario()" class="btn-secondary flex items-center gap-2">
+                            <span>🗑️</span> Limpar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Tab: Histórico -->
+        <section id="section-historico" class="tab-content hidden">
+            <div class="max-w-5xl mx-auto fade-in">
+                <!-- Filtros -->
+                <div class="bg-white rounded-3xl shadow-xl p-6 mb-6 border border-gray-100">
+                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <span>🔍</span> Filtrar Registros
+                    </h3>
+                    <div class="flex flex-wrap gap-4 items-end">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-xs font-semibold text-gray-500 mb-2">Buscar</label>
+                            <input type="text" id="searchHistorico" placeholder="Pesquisar nos registros..." class="input-style">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-2">Data Início</label>
+                            <input type="date" id="filterDataInicio" class="input-style">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-2">Data Fim</label>
+                            <input type="date" id="filterDataFim" class="input-style">
+                        </div>
+                        <button onclick="filtrarHistorico()" class="btn-primary">
+                            Filtrar
+                        </button>
+                        <button onclick="limparFiltros()" class="btn-secondary">
+                            Limpar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Registros -->
+                <div id="historicoList" class="space-y-6">
+                    <div class="bg-white rounded-3xl shadow-xl p-12 text-center border border-gray-100">
+                        <div class="text-6xl mb-4">📋</div>
+                        <p class="text-gray-500 text-lg">Nenhum registro encontrado</p>
+                        <p class="text-gray-400 text-sm mt-2">Comece adicionando um novo registro</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Equipe -->
+        <section id="section-equipe" class="tab-content hidden">
+            <div class="max-w-4xl mx-auto fade-in">
+                <!-- Gerenciar Funções -->
+                <div class="bg-white rounded-3xl shadow-xl p-8 mb-6 border border-gray-100">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="bg-gradient-to-br from-blue-400 to-blue-600 text-white p-3 rounded-2xl shadow-lg">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Gerenciar Equipe</h2>
+                            <p class="text-gray-500">Configure as funções disponíveis na obra</p>
+                        </div>
+                    </div>
+
+                    <!-- Adicionar Nova Função -->
+                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                        <h3 class="font-bold text-gray-700 mb-4">➕ Adicionar Nova Função</h3>
+                        <form id="addFuncaoForm" class="flex gap-4">
+                            <input type="text" id="novaFuncao" placeholder="Nome da função (ex: Azulejista)" class="input-style flex-1">
+                            <button type="submit" class="btn-primary whitespace-nowrap">
+                                Adicionar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Lista de Funções -->
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-gray-700">📋 Funções Cadastradas</h3>
+                            <span id="totalFuncoes" class="bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-sm font-bold">0 funções</span>
+                        </div>
+                        <div id="funcoesList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                            <!-- Gerado via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dica -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+                    <div class="flex items-start gap-4">
+                        <span class="text-3xl">💡</span>
+                        <div>
+                            <h4 class="font-bold text-blue-800">Dica</h4>
+                            <p class="text-blue-700 text-sm mt-1">No novo registro, você pode informar a quantidade de trabalhadores de cada função presente no dia. As funções aqui cadastradas aparecerão automaticamente no formulário.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Equipamentos -->
+        <section id="section-equipamentos" class="tab-content hidden">
+            <div class="max-w-4xl mx-auto fade-in">
+                <!-- Gerenciar Equipamentos -->
+                <div class="bg-white rounded-3xl shadow-xl p-8 mb-6 border border-gray-100">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="bg-gradient-to-br from-emerald-400 to-teal-600 text-white p-3 rounded-2xl shadow-lg">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Gerenciar Equipamentos</h2>
+                            <p class="text-gray-500">Configure as máquinas e equipamentos da obra</p>
+                        </div>
+                    </div>
+
+                    <!-- Adicionar Novo Equipamento -->
+                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                        <h3 class="font-bold text-gray-700 mb-4">➕ Adicionar Novo Equipamento</h3>
+                        <form id="addEquipamentoForm" class="flex gap-4">
+                            <input type="text" id="novoEquipamento" placeholder="Nome do equipamento (ex: Betoneira 400L)" class="input-style flex-1">
+                            <button type="submit" class="btn-primary whitespace-nowrap">
+                                Adicionar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Lista de Equipamentos -->
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-gray-700">🚜 Equipamentos Cadastrados</h3>
+                            <span id="totalEquipamentos" class="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-bold">0 equipamentos</span>
+                        </div>
+                        <div id="equipamentosList" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <!-- Gerado via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dica -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-200">
+                    <div class="flex items-start gap-4">
+                        <span class="text-3xl">💡</span>
+                        <div>
+                            <h4 class="font-bold text-emerald-800">Dica</h4>
+                            <p class="text-emerald-700 text-sm mt-1">No novo registro, você pode selecionar os equipamentos utilizados e informar as horas de operação. Isso ajuda no controle de manutenção e custos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Dados da Obra -->
+        <section id="section-obra" class="tab-content hidden">
+            <div class="max-w-4xl mx-auto fade-in">
+                <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="bg-gradient-to-br from-emerald-400 to-emerald-600 text-white p-3 rounded-2xl shadow-lg">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Dados da Obra</h2>
+                            <p class="text-gray-500">Informações que aparecerão no cabeçalho do PDF</p>
+                        </div>
+                    </div>
+
+                    <form id="obraForm" class="space-y-6">
+                        <!-- Logo da Empresa -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">🏢 Logo da Empresa</label>
+                            <div class="flex items-center gap-6">
+                                <div id="logoPreviewContainer" class="w-48 h-24 bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300 overflow-hidden">
+                                    <div id="logoPlaceholder" class="text-gray-400 text-sm text-center leading-tight">
+                                        <div>Sem logo</div>
+                                        <div class="text-xs text-gray-400 mt-1">Tamanho recomendado: 200×80 px</div>
+                                    </div>
+                                    <img id="logoPreview" src="" alt="Logo" class="logo-preview hidden">
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <input type="file" id="logoInput" accept="image/*" class="hidden">
+                                    <button type="button" onclick="document.getElementById('logoInput').click()" class="btn-secondary text-sm py-2">
+                                        📤 Carregar Logo
+                                    </button>
+                                    <button type="button" onclick="removerLogo()" class="text-red-500 text-sm hover:underline">
+                                        🗑️ Remover
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">🏗️ Nome da Obra</label>
+                                <input type="text" id="obraNome" placeholder="Ex: Residencial Vista Verde" class="input-style">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">📋 Contrato / Número</label>
+                                <input type="text" id="obraContrato" placeholder="Ex: CONT-2025-001" class="input-style">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">📍 Endereço da Obra</label>
+                            <input type="text" id="obraEndereco" placeholder="Rua, número, bairro, cidade - UF" class="input-style">
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">👤 Cliente / Contratante</label>
+                                <input type="text" id="obraCliente" placeholder="Nome do cliente ou empresa" class="input-style">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">🏢 Construtora / Executora</label>
+                                <input type="text" id="obraConstrutora" placeholder="Nome da construtora" class="input-style">
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">👷 Engenheiro Responsável</label>
+                                <input type="text" id="obraEngenheiro" placeholder="Nome do engenheiro" class="input-style">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">📝 CREA/CAU</label>
+                                <input type="text" id="obraCrea" placeholder="Número do registro" class="input-style">
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">📅 Data de Início</label>
+                                <input type="date" id="obraDataInicio" class="input-style">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">📅 Previsão de Término</label>
+                                <input type="date" id="obraDataFim" class="input-style">
+                            </div>
+                        </div>
+
+                        <!-- Assinaturas no PDF -->
+                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                            <div class="flex items-start justify-between gap-4 mb-3">
+                                <div>
+                                    <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                                        <span>✍️</span> Assinaturas no PDF
+                                    </h3>
+                                    <p class="text-gray-500 text-sm mt-1">Cadastre quantas assinaturas desejar (nome, função e empresa). Elas serão exibidas no final do PDF.</p>
+                                </div>
+                                <button type="button" onclick="limparAssinaturas()" class="text-xs text-red-600 hover:underline whitespace-nowrap">
+                                    Limpar
+                                </button>
+                            </div>
+
+                            <div id="assinaturasList" class="space-y-3">
+                                <!-- Gerado via JS -->
+                            </div>
+
+                            <div class="mt-5 grid md:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-2">Nome</label>
+                                    <input id="assinaturaNome" type="text" placeholder="Ex: João da Silva" class="input-style">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-2">Função</label>
+                                    <input id="assinaturaFuncao" type="text" placeholder="Ex: Engenheiro Responsável" class="input-style">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-2">Empresa</label>
+                                    <input id="assinaturaEmpresa" type="text" placeholder="Ex: Construtora XYZ" class="input-style">
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex flex-wrap gap-3">
+                                <button type="button" onclick="adicionarAssinatura()" class="btn-secondary text-sm py-2">
+                                    ➕ Adicionar assinatura
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" class="btn-primary flex items-center justify-center gap-2 w-full py-4">
+                                <span>💾</span> Salvar Dados da Obra
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Relatórios -->
+        <section id="section-relatorios" class="tab-content hidden">
+            <div class="max-w-4xl mx-auto fade-in">
+                <!-- Cards de Estatísticas -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-gradient-to-br from-amber-400 to-orange-500 text-white p-4 rounded-2xl shadow-lg">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Registros</p>
+                                <p id="statRegistros" class="text-3xl font-extrabold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-gradient-to-br from-blue-400 to-blue-600 text-white p-4 rounded-2xl shadow-lg">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Funções</p>
+                                <p id="statFuncoes" class="text-3xl font-extrabold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-gradient-to-br from-emerald-400 to-teal-600 text-white p-4 rounded-2xl shadow-lg">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Equipam.</p>
+                                <p id="statEquipamentos" class="text-3xl font-extrabold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-gradient-to-br from-red-400 to-red-600 text-white p-4 rounded-2xl shadow-lg">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Ocorrências</p>
+                                <p id="statOcorrencias" class="text-3xl font-extrabold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumo de Horas -->
+                <div class="bg-white rounded-3xl shadow-xl p-6 mb-6 border border-gray-100">
+                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <span>🕐</span> Resumo de Horas Trabalhadas
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 text-center">
+                            <p class="text-blue-600 text-sm font-semibold">Total de Horas</p>
+                            <p id="statHorasTotais" class="text-3xl font-extrabold text-blue-800">0h</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 text-center">
+                            <p class="text-green-600 text-sm font-semibold">Média por Dia</p>
+                            <p id="statHorasMedia" class="text-3xl font-extrabold text-green-800">0h</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 text-center">
+                            <p class="text-amber-600 text-sm font-semibold">Dias Trabalhados</p>
+                            <p id="statDias" class="text-3xl font-extrabold text-amber-800">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exportar -->
+                <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                        <span class="bg-gradient-to-br from-purple-400 to-purple-600 text-white p-3 rounded-xl">📤</span>
+                        Exportar Dados
+                    </h2>
+                    <p class="text-gray-500 mb-6">Exporte seus registros em diferentes formatos para backup ou impressão.</p>
+
+                    <!-- Seleção de período -->
+                    <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                        <h3 class="font-bold text-gray-700 mb-4">📅 Período para Exportação</h3>
+                        <div class="flex flex-wrap gap-4 items-end">
+                            <div class="flex-1 min-w-[150px]">
+                                <label class="block text-xs font-semibold text-gray-500 mb-2">Data Início</label>
+                                <input type="date" id="exportDataInicio" class="input-style">
+                            </div>
+                            <div class="flex-1 min-w-[150px]">
+                                <label class="block text-xs font-semibold text-gray-500 mb-2">Data Fim</label>
+                                <input type="date" id="exportDataFim" class="input-style">
+                            </div>
+                            <button onclick="limparPeriodoExport()" class="btn-secondary text-sm">
+                                Limpar (Todos)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Exportar diário específico -->
+                    <div class="bg-gray-50 rounded-2xl p-6 mb-6 border border-gray-200">
+                        <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <span>📄</span> Exportar Diário Específico
+                        </h3>
+                        <div class="grid md:grid-cols-3 gap-4 items-end">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-gray-500 mb-2">Selecione o diário (número + data)</label>
+                                <select id="exportDiarioSelect" class="input-style"></select>
+                                <p class="text-gray-400 text-xs mt-2">💡 Dica: você também pode localizar pelo número abaixo e clicar em “Selecionar”.</p>
+                            </div>
+                            <button onclick="exportarDiarioSelecionado()" class="btn-primary w-full">
+                                Exportar este Diário (PDF)
+                            </button>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-4 mt-5 items-end">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-2">Buscar por nº do diário</label>
+                                <input id="exportDiarioNumero" type="text" inputmode="numeric" placeholder="Ex: 0000 ou 12" class="input-style">
+                            </div>
+                            <div class="md:col-span-2 flex gap-3">
+                                <button onclick="selecionarDiarioPorNumero()" class="btn-secondary flex-1">
+                                    Selecionar
+                                </button>
+                                <button onclick="document.getElementById('exportDiarioNumero').value=''; renderExportDiarioOptions();" class="btn-secondary">
+                                    Limpar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <button onclick="exportarPDF()" class="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl font-semibold hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/>
+                            </svg>
+                            Exportar PDF Completo
+                        </button>
+                        <button onclick="exportarJSON()" class="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl font-semibold hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                            </svg>
+                            Exportar JSON (Backup)
+                        </button>
+                        <button onclick="document.getElementById('importJSONInput').click()" class="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl font-semibold hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+    </svg>
+    Importar JSON (Restaurar)
+</button>
+<input type="file" id="importJSONInput" accept=".json" class="hidden">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Editar Registro -->
+    <div id="modalEditarRegistro" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b px-8 py-5 flex justify-between items-center rounded-t-3xl z-10">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <span>✏️</span> Editar Registro
+                </h3>
+                <button onclick="fecharModalEditar()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            </div>
+            <form id="editarRegistroForm" class="p-8 space-y-6">
+                <input type="hidden" id="editId">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Data</label>
+                        <input type="date" id="editData" required class="input-style">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Horário</label>
+                        <div class="flex gap-2 items-center">
+                            <input type="time" id="editHoraInicio" class="input-style text-center text-sm">
+                            <span class="text-gray-400">-</span>
+                            <input type="time" id="editHoraFim" class="input-style text-center text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Clima</label>
+                        <select id="editClima" class="input-style">
+                            <option value="ensolarado">☀️ Ensolarado</option>
+                            <option value="nublado">⛅ Nublado</option>
+                            <option value="chuvoso">🌧️ Chuvoso</option>
+                            <option value="tempestade">⛈️ Tempestade</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Equipe (por função)</label>
+                    <div id="editEquipe" class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto p-2">
+                        <!-- Gerado via JS -->
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">🚜 Equipamentos</label>
+                    <div id="editEquipamentos" class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto p-2">
+                        <!-- Gerado via JS -->
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Atividades</label>
+                    <textarea id="editAtividades" rows="3" class="input-style resize-none"></textarea>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Materiais</label>
+                        <textarea id="editMateriais" rows="3" class="input-style resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Ocorrências</label>
+                        <textarea id="editOcorrencias" rows="3" class="input-style resize-none"></textarea>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Observações</label>
+                    <textarea id="editObservacoes" rows="2" class="input-style resize-none"></textarea>
+                </div>
+
+                <!-- Fotos no Modal -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">📸 Fotos</label>
+                    <div id="editPhotoPreview" class="flex flex-wrap gap-3 mb-3"></div>
+                    <div id="editPhotoUploadZone" class="photo-upload-zone rounded-xl p-4 text-center cursor-pointer">
+                        <input type="file" id="editPhotoInput" accept="image/*" multiple class="hidden">
+                        <p class="text-gray-500 text-sm">📷 Clique para adicionar fotos</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 btn-primary py-4">
+                        💾 Salvar Alterações
+                    </button>
+                    <button type="button" onclick="fecharModalEditar()" class="btn-secondary">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Visualizar Foto -->
+    <div id="modalFoto" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+        <div class="relative max-w-4xl max-h-[90vh]">
+            <button onclick="fecharModalFoto()" class="absolute -top-12 right-0 text-white text-4xl hover:scale-110 transition">&times;</button>
+            <img id="modalFotoImg" src="" alt="Foto" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl">
+        </div>
+    </div>
+
+    <!-- Modal Boas-vindas (apenas primeira abertura) -->
+    <div id="modalWelcome" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-8 py-6">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h3 class="text-2xl font-extrabold">Bem-vindo ao Diário de Obra</h3>
+                        <p class="text-white/90 mt-2">Criamos um <span class="font-bold">Diário #0000</span> (MODELO) para você ver como fica preenchido e como sai no PDF.</p>
+                    </div>
+                    <button onclick="fecharWelcome(true)" class="text-white/80 hover:text-white text-3xl leading-none">&times;</button>
+                </div>
+            </div>
+            <div class="px-8 py-6 space-y-5">
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                    <p class="font-bold text-amber-900">Sugestões rápidas:</p>
+                    <ul class="list-disc pl-5 mt-2 text-amber-900/90 text-sm space-y-1">
+                        <li>Abra o <span class="font-semibold">Diário #0000</span> no Histórico e veja um preenchimento completo.</li>
+                        <li>Clique em <span class="font-semibold">📄</span> para gerar o PDF do modelo e entender a impressão.</li>
+                        <li>Use <span class="font-semibold">📋 Copiar</span> para começar um novo registro já preenchido e só ajustar.</li>
+                    </ul>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-3">
+                    <button onclick="welcomeIrParaModelo()" class="btn-secondary">
+                        📋 Ver Modelo
+                    </button>
+                    <button onclick="welcomeGerarPDFModelo()" class="btn-primary">
+                        📄 PDF do Modelo
+                    </button>
+                    <button onclick="welcomeComecarComModelo()" class="btn-secondary">
+                        📝 Começar com Modelo
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2 text-sm text-gray-600 select-none">
+                        <input id="welcomeDontShow" type="checkbox" class="accent-amber-600">
+                        Não mostrar novamente
+                    </label>
+                    <button onclick="fecharWelcome(true)" class="text-sm text-gray-500 hover:text-gray-800 underline">
+                        Entendi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 transform translate-x-[150%] transition-transform duration-500 z-50">
+        <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
+            <span class="text-2xl">✅</span>
+            <span id="toastMessage" class="font-semibold">Operação realizada!</span>
+        </div>
+    </div>
+
+    <script>
+        // Funções padrão de obra
+        const funcoesDefault = [
+            'Pedreiro', 'Servente', 'Mestre de Obras', 'Encarregado',
+            'Armador', 'Carpinteiro', 'Eletricista', 'Encanador',
+            'Pintor', 'Gesseiro', 'Azulejista', 'Serralheiro',
+            'Soldador', 'Operador de Máquinas', 'Almoxarife',
+            'Engenheiro', 'Técnico de Segurança', 'Ajudante Geral',
+            'Pedreiro de Acabamento', 'Impermeabilizador', 'Vidraceiro',
+            'Marmorista', 'Bombeiro Hidráulico', 'Meio Oficial'
+        ];
+
+        // Equipamentos padrão
+        const equipamentosDefault = [
+            'Betoneira 400L', 'Betoneira 600L', 'Retroescavadeira',
+            'Caminhão Basculante', 'Caminhão Munck', 'Minicarregadeira',
+            'Compactador de Solo', 'Vibrador de Concreto', 'Serra Circular',
+            'Furadeira Industrial', 'Martelete', 'Andaime',
+            'Escora Metálica', 'Gerador', 'Compressor de Ar',
+            'Bomba de Água', 'Guindaste', 'Grua',
+            'Plataforma Elevatória', 'Policorte', 'Guincho de Coluna'
+        ];
+
+        // Registro de exemplo (Diário #0000) - MODELO DE PREENCHIMENTO
+        const registroExemplo = {
+            id: 0,
+            numero: 0,
+            data: '2025-01-13',
+            horaInicio: '07:00',
+            horaFim: '17:00',
+            clima: 'ensolarado',
+            equipe: {
+                'Mestre de Obras': 1,
+                'Encarregado': 1,
+                'Pedreiro': 4,
+                'Servente': 6,
+                'Armador': 3,
+                'Carpinteiro': 2,
+                'Eletricista': 2,
+                'Encanador': 1,
+                'Operador de Máquinas': 1,
+                'Técnico de Segurança': 1
+            },
+            equipamentos: {
+                'Betoneira 400L': 8,
+                'Vibrador de Concreto': 6,
+                'Retroescavadeira': 4,
+                'Andaime': 10,
+                'Serra Circular': 5,
+                'Compactador de Solo': 3
+            },
+            atividades: `• Concretagem da laje do 2º pavimento - Volume: 120m³ de concreto FCK 30\n• Montagem das formas dos pilares P12 a P18 do 3º pavimento\n• Instalação de tubulação elétrica no 1º pavimento (eletrodutos e caixas)\n• Execução de contrapiso na área de garagem - espessura 8cm\n• Marcação de alvenaria do térreo (eixos A e B)\n• Preparação da armadura para os pilares do próximo pavimento`,
+            materiais: `• Concreto usinado FCK 30 - 120m³ (4 caminhões)\n• Aço CA-50 ∅ 12,5mm - 800kg\n• Aço CA-60 ∅ 5mm - 200kg\n• Eletrodutos 3/4\" - 150 unidades\n• Caixas de passagem 4x2 - 45 unidades\n• Areia média lavada - 8m³\n• Cimento CP-II Z-32 - 40 sacos (50kg cada)\n• Arame recozido nº 18 - 15kg`,
+            ocorrencias: `• Atraso de 2 horas na entrega do concreto devido ao trânsito intenso na região\n• Identificado pequeno deslocamento na forma do pilar P15 - corrigido imediatamente antes da concretagem\n• Falta de EPI (capacete) em 2 colaboradores - advertência verbal aplicada e situação regularizada\n• Bomba de concreto apresentou problema mecânico às 14h - resolvido em 30 minutos`,
+            observacoes: `• Tempo ensolarado durante todo o dia, temperatura média de 28°C\n• Visita do engenheiro fiscal da prefeitura às 14h - aprovado sem ressalvas\n• Previsão para amanhã: início da desforma da laje após período de cura de 24h\n• Equipe de armadores iniciará montagem da ferragem dos pilares do 3º pavimento\n• Reunião de segurança realizada às 07h15 com toda a equipe (DDS)\n• Almoxarifado solicitou reposição de cimento e aço para os próximos dias`,
+            fotos: [],
+            criadoEm: '2025-01-13T08:00:00.000Z',
+            isExemplo: true
+        };
+
+        // Dados da obra exemplo
+        const obraExemplo = {
+            nome: 'Edifício Residencial Vista Verde',
+            contrato: 'CONT-2025-0042',
+            endereco: 'Rua das Palmeiras, 500 - Centro - São Paulo/SP',
+            cliente: 'Incorporadora ABC Ltda',
+            construtora: 'Construtora XYZ S.A.',
+            engenheiro: 'Eng. Carlos Alberto Silva',
+            crea: 'CREA-SP 123456789',
+            dataInicio: '2025-01-02',
+            dataFim: '2026-06-30',
+            logo: '',
+            assinaturas: [
+                { nome: 'Eng. Carlos Alberto Silva', funcao: 'Responsável Técnico', empresa: 'Construtora XYZ S.A.' },
+                { nome: 'Maria Oliveira', funcao: 'Fiscal / Contratante', empresa: 'Incorporadora ABC Ltda' }
+            ]
+        };
+
+        // Dados
+        let registros = JSON.parse(localStorage.getItem('diarioObra_registros')) || [];
+        let funcoes = JSON.parse(localStorage.getItem('diarioObra_funcoes')) || [...funcoesDefault];
+        let equipamentos = JSON.parse(localStorage.getItem('diarioObra_equipamentos')) || [...equipamentosDefault];
+        let dadosObra = JSON.parse(localStorage.getItem('diarioObra_obra')) || {...obraExemplo};
+        // normalização para usuários antigos
+        if (!dadosObra || typeof dadosObra !== 'object') dadosObra = { ...obraExemplo };
+        if (!Array.isArray(dadosObra.assinaturas)) dadosObra.assinaturas = Array.isArray(obraExemplo.assinaturas) ? [...obraExemplo.assinaturas] : [];
+
+        let fotosTemp = [];
+        let editFotosTemp = [];
+        let equipamentosSelecionados = {};
+        let editEquipamentosSelecionados = {};
+
+        // Estado do "Histórico" (modo carrossel)
+        let historicoState = {
+            lista: [],
+            index: 0,
+            mode: 'all' // 'all' | 'filtered'
+        };
+
+        const SEED_KEY = 'diarioObra_seeded_v1';
+        const WELCOME_DISMISS_KEY = 'diarioObra_welcomeDismissed_v1';
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            const isFirstTime = !localStorage.getItem(SEED_KEY);
+
+            // Seed do conteúdo demo APENAS na primeira abertura
+            if (isFirstTime) {
+                registros = [registroExemplo];
+                funcoes = [...funcoesDefault];
+                equipamentos = [...equipamentosDefault];
+                dadosObra = {...obraExemplo};
+                saveData();
+                localStorage.setItem(SEED_KEY, '1');
+            }
+
+            setCurrentDate();
+            renderEquipeForm();
+            renderEquipamentosForm();
+            renderFuncoesList();
+            renderEquipamentosList();
+            renderHistorico();
+            updateStats();
+            renderExportDiarioOptions();
+            updateNumeroDiario();
+            carregarDadosObra();
+            setupPhotoUpload();
+            updateHeaderObra();
+            updateBtnDuplicar();
+
+            // Se for primeira vez, mostrar o modelo + modal de boas-vindas
+            if (isFirstTime && !localStorage.getItem(WELCOME_DISMISS_KEY)) {
+                showTab('historico');
+                setTimeout(() => {
+                    abrirWelcome();
+                    showToast('📋 Modelo criado: Diário #0000');
+                }, 250);
+            }
+        });
+
+        // Data atual
+        function setCurrentDate() {
+            const hoje = new Date();
+            document.getElementById('currentDate').textContent = hoje.toLocaleDateString('pt-BR', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+            document.getElementById('dataRegistro').valueAsDate = hoje;
+        }
+
+        // Atualizar header com nome da obra
+        function updateHeaderObra() {
+            const headerNome = document.getElementById('headerObraNome');
+            if (dadosObra.nome) {
+                headerNome.textContent = dadosObra.nome;
+            } else {
+                headerNome.textContent = 'Configure os dados da obra';
+            }
+
+            // Atualizar logo no header se existir
+            const headerLogo = document.getElementById('headerLogo');
+            if (dadosObra.logo) {
+                headerLogo.innerHTML = `<img src="${dadosObra.logo}" alt="Logo" class="w-10 h-10 object-contain">`;
+            } else {
+                headerLogo.innerHTML = `
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/>
+                    </svg>
+                `;
+            }
+        }
+
+        // Atualizar número do diário
+        function updateNumeroDiario() {
+            const maxNumero = registros.reduce((max, r) => Math.max(max, r.numero ?? 0), -1);
+            const numero = (maxNumero + 1).toString().padStart(4, '0');
+            document.getElementById('numeroDiario').textContent = numero;
+        }
+
+        // Atualizar botão duplicar
+        function updateBtnDuplicar() {
+            const btn = document.getElementById('btnDuplicarUltimo');
+            if (registros.length > 0) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        // Navegação por Tabs
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('tab-active'));
+
+            const section = document.getElementById(`section-${tabName}`);
+            section.classList.remove('hidden');
+            section.classList.add('fade-in');
+            document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+
+            if (tabName === 'historico') renderHistorico();
+            if (tabName === 'relatorios') {
+                updateStats();
+                renderExportDiarioOptions();
+            }
+            if (tabName === 'equipe') renderFuncoesList();
+            if (tabName === 'equipamentos') renderEquipamentosList();
+            if (tabName === 'registro') {
+                renderEquipeForm();
+                renderEquipamentosForm();
+            }
+        }
+
+        // Salvar dados
+        function saveData() {
+            localStorage.setItem('diarioObra_registros', JSON.stringify(registros));
+            localStorage.setItem('diarioObra_funcoes', JSON.stringify(funcoes));
+            localStorage.setItem('diarioObra_equipamentos', JSON.stringify(equipamentos));
+            localStorage.setItem('diarioObra_obra', JSON.stringify(dadosObra));
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+
+            const colors = type === 'success'
+                ? 'from-green-500 to-emerald-600'
+                : 'from-red-500 to-red-600';
+            const icon = type === 'success' ? '✅' : '❌';
+
+            toast.querySelector('div').className = `bg-gradient-to-r ${colors} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3`;
+            toast.querySelector('span:first-child').textContent = icon;
+
+            toast.classList.remove('translate-x-[150%]');
+            setTimeout(() => toast.classList.add('translate-x-[150%]'), 3500);
+        }
+
+        // ==================== BOAS-VINDAS (DEMO) ====================
+        function abrirWelcome() {
+            document.getElementById('modalWelcome').classList.remove('hidden');
+        }
+
+        function fecharWelcome(allowRemember = false) {
+            const dontShow = document.getElementById('welcomeDontShow');
+            if (allowRemember && dontShow && dontShow.checked) {
+                localStorage.setItem(WELCOME_DISMISS_KEY, '1');
+            }
+            document.getElementById('modalWelcome').classList.add('hidden');
+        }
+
+        function welcomeIrParaModelo() {
+            fecharWelcome(true);
+            showTab('historico');
+            setTimeout(() => {
+                // vai para o registro de id=0 (MODELO) no carrossel
+                const idx = historicoState.lista.findIndex(r => r.id === 0);
+                if (idx >= 0) historicoGoToIndex(idx);
+            }, 150);
+        }
+
+        function welcomeGerarPDFModelo() {
+            exportarRegistroPDF(0);
+        }
+
+        function welcomeComecarComModelo() {
+            fecharWelcome(true);
+            duplicarRegistro(0);
+        }
+
+        // Fechar modal welcome ao clicar fora
+        document.getElementById('modalWelcome').addEventListener('click', (e) => {
+            if (e.target.id === 'modalWelcome') fecharWelcome(true);
+        });
+
+        // ==================== DUPLICAR REGISTRO ====================
+        function duplicarUltimoRegistro() {
+            if (registros.length === 0) return;
+            const ultimo = registros[0];
+            duplicarRegistro(ultimo.id);
+        }
+
+        function duplicarRegistro(id) {
+            const registro = registros.find(r => r.id === id);
+            if (!registro) return;
+
+            document.getElementById('dataRegistro').valueAsDate = new Date();
+            document.getElementById('horaInicio').value = registro.horaInicio || '07:00';
+            document.getElementById('horaFim').value = registro.horaFim || '17:00';
+
+            const climaRadio = document.querySelector(`input[name="clima"][value="${registro.clima}"]`);
+            if (climaRadio) climaRadio.checked = true;
+
+            renderEquipeForm('equipePresente', registro.equipe || {});
+
+            equipamentosSelecionados = {...(registro.equipamentos || {})};
+            renderEquipamentosForm();
+
+            document.getElementById('atividades').value = registro.atividades || '';
+            document.getElementById('materiais').value = registro.materiais || '';
+            document.getElementById('ocorrencias').value = '';
+            document.getElementById('observacoes').value = '';
+
+            fotosTemp = [];
+            renderPhotoPreview();
+
+            showTab('registro');
+            showToast('📋 Dados copiados! Ajuste a data e informações conforme necessário.');
+        }
+
+        // ==================== UPLOAD DE FOTOS ====================
+        function setupPhotoUpload() {
+            const zone = document.getElementById('photoUploadZone');
+            const input = document.getElementById('photoInput');
+
+            zone.addEventListener('click', () => input.click());
+
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            input.addEventListener('change', (e) => handleFiles(e.target.files));
+
+            const editZone = document.getElementById('editPhotoUploadZone');
+            const editInput = document.getElementById('editPhotoInput');
+
+            editZone.addEventListener('click', () => editInput.click());
+            editInput.addEventListener('change', (e) => handleEditFiles(e.target.files));
+        }
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('Arquivo muito grande (máx 5MB)', 'error');
+                    return;
+                }
+                if (fotosTemp.length >= 10) {
+                    showToast('Máximo de 10 fotos', 'error');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    fotosTemp.push({
+                        data: e.target.result,
+                        name: file.name,
+                        timestamp: new Date().toISOString()
+                    });
+                    renderPhotoPreview();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function handleEditFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.size > 5 * 1024 * 1024) return;
+                if (editFotosTemp.length >= 10) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    editFotosTemp.push({
+                        data: e.target.result,
+                        name: file.name,
+                        timestamp: new Date().toISOString()
+                    });
+                    renderEditPhotoPreview();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPhotoPreview() {
+            const container = document.getElementById('photoPreview');
+            container.innerHTML = fotosTemp.map((foto, idx) => `
+                <div class="relative group">
+                    <img src="${foto.data}" alt="${foto.name}" class="photo-thumb" onclick="abrirModalFoto('${foto.data}')">
+                    <button type="button" onclick="removerFotoTemp(${idx})" class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-sm opacity-0 group-hover:opacity-100 transition">×</button>
+                </div>
+            `).join('');
+        }
+
+        function renderEditPhotoPreview() {
+            const container = document.getElementById('editPhotoPreview');
+            container.innerHTML = editFotosTemp.map((foto, idx) => `
+                <div class="relative group">
+                    <img src="${foto.data}" alt="${foto.name}" class="photo-thumb" onclick="abrirModalFoto('${foto.data}')">
+                    <button type="button" onclick="removerEditFotoTemp(${idx})" class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-sm opacity-0 group-hover:opacity-100 transition">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removerFotoTemp(idx) {
+            fotosTemp.splice(idx, 1);
+            renderPhotoPreview();
+        }
+
+        function removerEditFotoTemp(idx) {
+            editFotosTemp.splice(idx, 1);
+            renderEditPhotoPreview();
+        }
+
+        function abrirModalFoto(src) {
+            document.getElementById('modalFotoImg').src = src;
+            document.getElementById('modalFoto').classList.remove('hidden');
+        }
+
+        function fecharModalFoto() {
+            document.getElementById('modalFoto').classList.add('hidden');
+        }
+
+        // ==================== DADOS DA OBRA ====================
+        function carregarDadosObra() {
+            document.getElementById('obraNome').value = dadosObra.nome || '';
+            document.getElementById('obraContrato').value = dadosObra.contrato || '';
+            document.getElementById('obraEndereco').value = dadosObra.endereco || '';
+            document.getElementById('obraCliente').value = dadosObra.cliente || '';
+            document.getElementById('obraConstrutora').value = dadosObra.construtora || '';
+            document.getElementById('obraEngenheiro').value = dadosObra.engenheiro || '';
+            document.getElementById('obraCrea').value = dadosObra.crea || '';
+            document.getElementById('obraDataInicio').value = dadosObra.dataInicio || '';
+            document.getElementById('obraDataFim').value = dadosObra.dataFim || '';
+
+            // Assinaturas
+            if (!Array.isArray(dadosObra.assinaturas)) dadosObra.assinaturas = [];
+            renderAssinaturas();
+
+            if (dadosObra.logo) {
+                document.getElementById('logoPreview').src = dadosObra.logo;
+                document.getElementById('logoPreview').classList.remove('hidden');
+                document.getElementById('logoPlaceholder').classList.add('hidden');
+            }
+
+            document.getElementById('logoInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        dadosObra.logo = ev.target.result;
+                        document.getElementById('logoPreview').src = ev.target.result;
+                        document.getElementById('logoPreview').classList.remove('hidden');
+                        document.getElementById('logoPlaceholder').classList.add('hidden');
+                        updateHeaderObra();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // ==================== ASSINATURAS (PDF) ====================
+        function sanitizeStr(s) {
+            return (s || '').toString().trim();
+        }
+
+        function renderAssinaturas() {
+            const container = document.getElementById('assinaturasList');
+            if (!container) return;
+
+            const lista = Array.isArray(dadosObra.assinaturas) ? dadosObra.assinaturas : [];
+
+            if (lista.length === 0) {
+                container.innerHTML = `
+                    <div class="text-sm text-gray-500 bg-white border border-gray-200 rounded-xl p-4">
+                        Nenhuma assinatura cadastrada. Adicione abaixo (você pode cadastrar quantas quiser).
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = lista.map((a, idx) => {
+                const nome = sanitizeStr(a.nome);
+                const funcao = sanitizeStr(a.funcao);
+                const empresa = sanitizeStr(a.empresa);
+                const meta = [funcao, empresa].filter(Boolean).join(' • ');
+
+                return `
+                    <div class="bg-white border border-gray-200 rounded-2xl p-4 flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                            <p class="font-bold text-gray-800 truncate">${nome || '(Sem nome)'}</p>
+                            <p class="text-xs text-gray-500 mt-1">${meta || '—'}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="moverAssinatura(${idx}, -1)" class="btn-secondary text-xs py-2 px-3" title="Subir">⬆️</button>
+                            <button type="button" onclick="moverAssinatura(${idx}, 1)" class="btn-secondary text-xs py-2 px-3" title="Descer">⬇️</button>
+                            <button type="button" onclick="removerAssinatura(${idx})" class="text-red-600 text-xs font-semibold hover:underline" title="Remover">Remover</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function adicionarAssinatura() {
+            const nome = sanitizeStr(document.getElementById('assinaturaNome')?.value);
+            const funcao = sanitizeStr(document.getElementById('assinaturaFuncao')?.value);
+            const empresa = sanitizeStr(document.getElementById('assinaturaEmpresa')?.value);
+
+            if (!nome && !funcao && !empresa) {
+                showToast('Preencha pelo menos um campo para adicionar a assinatura.', 'error');
+                return;
+            }
+
+            if (!Array.isArray(dadosObra.assinaturas)) dadosObra.assinaturas = [];
+            dadosObra.assinaturas.push({ nome, funcao, empresa });
+
+            // limpar inputs
+            document.getElementById('assinaturaNome').value = '';
+            document.getElementById('assinaturaFuncao').value = '';
+            document.getElementById('assinaturaEmpresa').value = '';
+
+            saveData();
+            renderAssinaturas();
+            showToast('Assinatura adicionada!');
+        }
+
+        function removerAssinatura(index) {
+            if (!Array.isArray(dadosObra.assinaturas)) return;
+            dadosObra.assinaturas.splice(index, 1);
+            saveData();
+            renderAssinaturas();
+            showToast('Assinatura removida!');
+        }
+
+        function moverAssinatura(index, delta) {
+            if (!Array.isArray(dadosObra.assinaturas)) return;
+            const newIndex = index + delta;
+            if (newIndex < 0 || newIndex >= dadosObra.assinaturas.length) return;
+            const arr = dadosObra.assinaturas;
+            [arr[index], arr[newIndex]] = [arr[newIndex], arr[index]];
+            saveData();
+            renderAssinaturas();
+        }
+
+        function limparAssinaturas() {
+            if (!confirm('Remover todas as assinaturas cadastradas?')) return;
+            dadosObra.assinaturas = [];
+            saveData();
+            renderAssinaturas();
+            showToast('Assinaturas limpas!');
+        }
+
+        function removerLogo() {
+            dadosObra.logo = '';
+            document.getElementById('logoPreview').classList.add('hidden');
+            document.getElementById('logoPlaceholder').classList.remove('hidden');
+            document.getElementById('logoInput').value = '';
+            updateHeaderObra();
+            saveData();
+        }
+
+        document.getElementById('obraForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            dadosObra.nome = document.getElementById('obraNome').value;
+            dadosObra.contrato = document.getElementById('obraContrato').value;
+            dadosObra.endereco = document.getElementById('obraEndereco').value;
+            dadosObra.cliente = document.getElementById('obraCliente').value;
+            dadosObra.construtora = document.getElementById('obraConstrutora').value;
+            dadosObra.engenheiro = document.getElementById('obraEngenheiro').value;
+            dadosObra.crea = document.getElementById('obraCrea').value;
+            dadosObra.dataInicio = document.getElementById('obraDataInicio').value;
+            dadosObra.dataFim = document.getElementById('obraDataFim').value;
+
+            // assinaturas já são geridas dinamicamente (adicionar/remover/reordenar) e salvas automaticamente,
+            // mas garantimos o tipo
+            if (!Array.isArray(dadosObra.assinaturas)) dadosObra.assinaturas = [];
+
+            saveData();
+            updateHeaderObra();
+            renderAssinaturas();
+            showToast('Dados da obra salvos!');
+        });
+
+        // ==================== EQUIPE/FUNÇÕES ====================
+        function renderEquipeForm(containerId = 'equipePresente', values = {}) {
+            const container = document.getElementById(containerId);
+
+            container.innerHTML = funcoes.map(funcao => `
+                <div class="funcao-chip bg-gray-50 border-2 border-gray-200 rounded-xl p-3 hover:border-amber-300 transition-all">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 truncate">${funcao}</label>
+                    <input type="number"
+                           name="equipe_${funcao.replace(/\s+/g, '_')}"
+                           min="0"
+                           value="${values[funcao] || 0}"
+                           placeholder="0"
+                           class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-center font-bold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all">
+                </div>
+            `).join('');
+        }
+
+        function renderFuncoesList() {
+            const container = document.getElementById('funcoesList');
+            document.getElementById('totalFuncoes').textContent = `${funcoes.length} funções`;
+
+            container.innerHTML = funcoes.map((funcao, index) => `
+                <div class="funcao-chip group bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl p-4 flex items-center justify-between hover:border-amber-400 hover:shadow-md transition-all">
+                    <span class="font-semibold text-gray-700 truncate flex-1">${funcao}</span>
+                    <button onclick="excluirFuncao(${index})" class="opacity-0 group-hover:opacity-100 ml-2 p-1.5 text-red-500 hover:bg-red-100 rounded-lg transition-all" title="Excluir">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('addFuncaoForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('novaFuncao');
+            const novaFuncao = input.value.trim();
+
+            if (novaFuncao && !funcoes.includes(novaFuncao)) {
+                funcoes.push(novaFuncao);
+                funcoes.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+                saveData();
+                renderFuncoesList();
+                renderEquipeForm();
+                input.value = '';
+                showToast('Função adicionada!');
+            } else if (funcoes.includes(novaFuncao)) {
+                showToast('Esta função já existe!', 'error');
+            }
+        });
+
+        function excluirFuncao(index) {
+            if (confirm(`Excluir a função "${funcoes[index]}"?`)) {
+                funcoes.splice(index, 1);
+                saveData();
+                renderFuncoesList();
+                renderEquipeForm();
+                showToast('Função removida!');
+            }
+        }
+
+        // ==================== EQUIPAMENTOS ====================
+        function renderEquipamentosForm(containerId = 'equipamentosRegistro', values = {}) {
+            const container = document.getElementById(containerId);
+            const currentValues = containerId === 'equipamentosRegistro' ? equipamentosSelecionados : values;
+
+            container.innerHTML = equipamentos.map(equip => {
+                const isSelected = currentValues[equip] !== undefined && currentValues[equip] > 0;
+                const horas = currentValues[equip] || '';
+                return `
+                    <div class="equip-chip ${isSelected ? 'selected' : 'bg-gray-50'} border-2 ${isSelected ? 'border-emerald-500' : 'border-gray-200'} rounded-xl p-3 cursor-pointer transition-all"
+                         onclick="toggleEquipamento('${equip}', '${containerId}')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-semibold truncate ${isSelected ? 'text-white' : 'text-gray-700'}">${equip}</span>
+                            <span class="text-lg">${isSelected ? '✓' : '🚜'}</span>
+                        </div>
+                        <div class="flex items-center gap-1" onclick="event.stopPropagation()">
+                            <input type="number"
+                                   id="equip_${containerId}_${equip.replace(/\s+/g, '_')}"
+                                   min="0"
+                                   step="0.5"
+                                   value="${horas}"
+                                   placeholder="0"
+                                   onchange="updateEquipamentoHoras('${equip}', this.value, '${containerId}')"
+                                   class="w-full px-2 py-1 border-2 ${isSelected ? 'border-white/30 bg-white/20 text-white placeholder-white/50' : 'border-gray-200 bg-white'} rounded-lg text-center text-sm font-bold focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                            <span class="text-xs ${isSelected ? 'text-white/80' : 'text-gray-500'}">h</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleEquipamento(equip, containerId) {
+            if (containerId === 'equipamentosRegistro') {
+                if (equipamentosSelecionados[equip]) {
+                    delete equipamentosSelecionados[equip];
+                } else {
+                    equipamentosSelecionados[equip] = 1;
+                }
+                renderEquipamentosForm();
+            } else {
+                if (editEquipamentosSelecionados[equip]) {
+                    delete editEquipamentosSelecionados[equip];
+                } else {
+                    editEquipamentosSelecionados[equip] = 1;
+                }
+                renderEquipamentosForm('editEquipamentos', editEquipamentosSelecionados);
+            }
+        }
+
+        function updateEquipamentoHoras(equip, horas, containerId) {
+            const valor = parseFloat(horas) || 0;
+            if (containerId === 'equipamentosRegistro') {
+                if (valor > 0) {
+                    equipamentosSelecionados[equip] = valor;
+                } else {
+                    delete equipamentosSelecionados[equip];
+                }
+                renderEquipamentosForm();
+            } else {
+                if (valor > 0) {
+                    editEquipamentosSelecionados[equip] = valor;
+                } else {
+                    delete editEquipamentosSelecionados[equip];
+                }
+                renderEquipamentosForm('editEquipamentos', editEquipamentosSelecionados);
+            }
+        }
+
+        function renderEquipamentosList() {
+            const container = document.getElementById('equipamentosList');
+            document.getElementById('totalEquipamentos').textContent = `${equipamentos.length} equipamentos`;
+
+            container.innerHTML = equipamentos.map((equip, index) => `
+                <div class="equip-chip group bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl p-4 flex items-center justify-between hover:border-emerald-400 hover:shadow-md transition-all">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <span class="text-2xl">🚜</span>
+                        <span class="font-semibold text-gray-700 truncate">${equip}</span>
+                    </div>
+                    <button onclick="excluirEquipamento(${index})" class="opacity-0 group-hover:opacity-100 ml-2 p-1.5 text-red-500 hover:bg-red-100 rounded-lg transition-all" title="Excluir">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('addEquipamentoForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('novoEquipamento');
+            const novoEquip = input.value.trim();
+
+            if (novoEquip && !equipamentos.includes(novoEquip)) {
+                equipamentos.push(novoEquip);
+                equipamentos.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+                saveData();
+                renderEquipamentosList();
+                renderEquipamentosForm();
+                input.value = '';
+                showToast('Equipamento adicionado!');
+            } else if (equipamentos.includes(novoEquip)) {
+                showToast('Este equipamento já existe!', 'error');
+            }
+        });
+
+        function excluirEquipamento(index) {
+            if (confirm(`Excluir o equipamento "${equipamentos[index]}"?`)) {
+                equipamentos.splice(index, 1);
+                saveData();
+                renderEquipamentosList();
+                renderEquipamentosForm();
+                showToast('Equipamento removido!');
+            }
+        }
+
+        // ==================== REGISTROS ====================
+        document.getElementById('diarioForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const climaRadio = document.querySelector('input[name="clima"]:checked');
+
+            const equipePresente = {};
+            funcoes.forEach(funcao => {
+                const input = document.querySelector(`input[name="equipe_${funcao.replace(/\s+/g, '_')}"]`);
+                const qtd = parseInt(input?.value) || 0;
+                if (qtd > 0) equipePresente[funcao] = qtd;
+            });
+
+            const maxNumero = registros.reduce((max, r) => Math.max(max, r.numero ?? 0), -1);
+
+            const novoRegistro = {
+                id: Date.now(),
+                numero: maxNumero + 1,
+                data: document.getElementById('dataRegistro').value,
+                horaInicio: document.getElementById('horaInicio').value,
+                horaFim: document.getElementById('horaFim').value,
+                clima: climaRadio ? climaRadio.value : 'ensolarado',
+                equipe: equipePresente,
+                equipamentos: {...equipamentosSelecionados},
+                atividades: document.getElementById('atividades').value,
+                materiais: document.getElementById('materiais').value,
+                ocorrencias: document.getElementById('ocorrencias').value,
+                observacoes: document.getElementById('observacoes').value,
+                fotos: [...fotosTemp],
+                criadoEm: new Date().toISOString(),
+                isExemplo: false
+            };
+
+            registros.unshift(novoRegistro);
+            saveData();
+            limparFormulario();
+            updateNumeroDiario();
+            updateBtnDuplicar();
+            showToast('Registro salvo com sucesso!');
+            updateStats();
+            renderExportDiarioOptions();
+        });
+
+        function limparFormulario() {
+            document.getElementById('diarioForm').reset();
+            document.getElementById('dataRegistro').valueAsDate = new Date();
+            document.getElementById('horaInicio').value = '07:00';
+            document.getElementById('horaFim').value = '17:00';
+            document.querySelector('input[name="clima"][value="ensolarado"]').checked = true;
+            fotosTemp = [];
+            equipamentosSelecionados = {};
+            renderPhotoPreview();
+            renderEquipeForm();
+            renderEquipamentosForm();
+        }
+
+        // ==================== HISTÓRICO ====================
+        function calcularHorasTrabalhadas(horaInicio, horaFim) {
+            if (!horaInicio || !horaFim) return 0;
+            const [hi, mi] = horaInicio.split(':').map(Number);
+            const [hf, mf] = horaFim.split(':').map(Number);
+            const inicioMin = hi * 60 + mi;
+            const fimMin = hf * 60 + mf;
+            const diff = fimMin - inicioMin;
+            return diff > 0 ? (diff / 60).toFixed(1) : 0;
+        }
+
+        function setHistoricoList(lista, mode = 'all') {
+            historicoState.lista = Array.isArray(lista) ? [...lista] : [];
+            historicoState.mode = mode;
+            // preserva índice se possível, senão volta ao começo
+            if (historicoState.index >= historicoState.lista.length) historicoState.index = 0;
+        }
+
+        function historicoGoToIndex(index) {
+            const len = historicoState.lista.length;
+            if (len === 0) return;
+            historicoState.index = Math.max(0, Math.min(index, len - 1));
+            renderHistoricoCarousel();
+        }
+
+        function historicoPrev() {
+            historicoGoToIndex(historicoState.index - 1);
+        }
+
+        function historicoNext() {
+            historicoGoToIndex(historicoState.index + 1);
+        }
+
+        function renderHistoricoCarousel() {
+            const container = document.getElementById('historicoList');
+            const lista = historicoState.lista;
+
+            if (!lista || lista.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl shadow-xl p-12 text-center border border-gray-100">
+                        <div class="text-6xl mb-4">📋</div>
+                        <p class="text-gray-500 text-lg">Nenhum registro encontrado</p>
+                        <p class="text-gray-400 text-sm mt-2">Comece adicionando um novo registro</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const climaInfo = {
+                ensolarado: { icon: '☀️', label: 'Ensolarado', color: 'from-yellow-400 to-orange-500' },
+                nublado: { icon: '⛅', label: 'Nublado', color: 'from-gray-400 to-gray-600' },
+                chuvoso: { icon: '🌧️', label: 'Chuvoso', color: 'from-blue-400 to-blue-600' },
+                tempestade: { icon: '⛈️', label: 'Tempestade', color: 'from-purple-500 to-gray-700' }
+            };
+
+            const r = lista[historicoState.index];
+            const clima = climaInfo[r.clima] || climaInfo.ensolarado;
+            const numeroStr = String(r.numero ?? 0).padStart(4, '0');
+            const isExemplo = r.isExemplo ? '<span class="ml-2 bg-white/90 text-amber-600 px-2 py-0.5 rounded-full text-xs font-bold animate-pulse">📋 MODELO</span>' : '';
+            const horasTrab = calcularHorasTrabalhadas(r.horaInicio, r.horaFim);
+
+            const equipeHtml = Object.entries(r.equipe || {}).map(([funcao, qtd]) =>
+                `<span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                    <span class="font-bold">${qtd}x</span> ${funcao}
+                </span>`
+            ).join('') || '<span class="text-gray-400">Nenhuma equipe registrada</span>';
+
+            const equipamentosHtml = Object.entries(r.equipamentos || {}).map(([equip, horas]) =>
+                `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
+                    🚜 ${equip} <span class="font-bold">(${horas}h)</span>
+                </span>`
+            ).join('') || '';
+
+            const fotosHtml = (r.fotos && r.fotos.length > 0) ? `
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">📸 Fotos (${r.fotos.length})</p>
+                    <div class="flex flex-wrap gap-2">
+                        ${r.fotos.map(f => `<img src="${f.data}" alt="${f.name}" class="photo-thumb" onclick="abrirModalFoto('${f.data}')">`).join('')}
+                    </div>
+                </div>
+            ` : '';
+
+            const total = lista.length;
+            const pos = historicoState.index + 1;
+            const isFirst = historicoState.index === 0;
+            const isLast = historicoState.index === total - 1;
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div id="registro-${r.id}" class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                        <div class="bg-gradient-to-r ${clima.color} text-white px-6 py-4 flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <span class="text-4xl">${clima.icon}</span>
+                                <div>
+                                    <p class="text-white/80 text-sm font-medium">Diário #${numeroStr}${isExemplo}</p>
+                                    <p class="font-bold text-lg">${formatDate(r.data)}</p>
+                                    ${r.horaInicio && r.horaFim ? `<p class="text-white/80 text-xs">🕐 ${r.horaInicio} às ${r.horaFim} (${horasTrab}h)</p>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="duplicarRegistro(${r.id})" class="bg-white/20 hover:bg-white/30 p-3 rounded-xl transition" title="Duplicar">📋</button>
+                                <button onclick="exportarRegistroPDF(${r.id})" class="bg-white/20 hover:bg-white/30 p-3 rounded-xl transition" title="Exportar PDF">📄</button>
+                                <button onclick="abrirModalEditar(${r.id})" class="bg-white/20 hover:bg-white/30 p-3 rounded-xl transition" title="Editar">✏️</button>
+                                <button onclick="excluirRegistro(${r.id})" class="bg-white/20 hover:bg-red-500 p-3 rounded-xl transition" title="Excluir">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="p-6 space-y-5">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">👷 Equipe Presente (${Object.values(r.equipe || {}).reduce((a,b) => a+b, 0)} pessoas)</p>
+                                <div class="flex flex-wrap gap-2">${equipeHtml}</div>
+                            </div>
+                            ${Object.keys(r.equipamentos || {}).length > 0 ? `
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">🚜 Equipamentos Utilizados</p>
+                                <div class="flex flex-wrap gap-2">${equipamentosHtml}</div>
+                            </div>
+                            ` : ''}
+                            ${r.atividades ? `
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">📋 Atividades</p>
+                                <p class="text-gray-700 whitespace-pre-line bg-gray-50 p-4 rounded-xl">${r.atividades}</p>
+                            </div>
+                            ` : ''}
+                            ${r.materiais ? `
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">🧱 Materiais</p>
+                                <p class="text-gray-700 whitespace-pre-line bg-gray-50 p-4 rounded-xl">${r.materiais}</p>
+                            </div>
+                            ` : ''}
+                            ${r.ocorrencias ? `
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">⚠️ Ocorrências</p>
+                                <p class="text-gray-700 whitespace-pre-line bg-red-50 p-4 rounded-xl border border-red-200">${r.ocorrencias}</p>
+                            </div>
+                            ` : ''}
+                            ${r.observacoes ? `
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">📝 Observações</p>
+                                <p class="text-gray-700 whitespace-pre-line bg-gray-50 p-4 rounded-xl">${r.observacoes}</p>
+                            </div>
+                            ` : ''}
+                            ${fotosHtml}
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                        <div class="text-sm text-gray-600">
+                            <span class="font-semibold text-gray-800">${pos}</span> de <span class="font-semibold text-gray-800">${total}</span>
+                            <span class="text-gray-400">•</span>
+                            <span class="text-gray-500">Diário #${numeroStr}</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="historicoPrev()" ${isFirst ? 'disabled' : ''} class="btn-secondary text-sm py-2 px-4 ${isFirst ? 'opacity-50 cursor-not-allowed' : ''}">
+                                ← Anterior
+                            </button>
+                            <button onclick="historicoNext()" ${isLast ? 'disabled' : ''} class="btn-primary text-sm py-2 px-4 ${isLast ? 'opacity-50 cursor-not-allowed' : ''}">
+                                Próximo →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHistorico(filteredRegistros = null) {
+            // Mantém API antiga: se vier filtro, entra no modo filtered; senão usa registros
+            const lista = filteredRegistros ? filteredRegistros : registros;
+            setHistoricoList(lista, filteredRegistros ? 'filtered' : 'all');
+            renderHistoricoCarousel();
+        }
+
+        function filtrarHistorico() {
+            const search = document.getElementById('searchHistorico').value.toLowerCase();
+            const dataInicio = document.getElementById('filterDataInicio').value;
+            const dataFim = document.getElementById('filterDataFim').value;
+
+            const filtered = registros.filter(r => {
+                const matchSearch = !search ||
+                    r.atividades?.toLowerCase().includes(search) ||
+                    r.materiais?.toLowerCase().includes(search) ||
+                    r.ocorrencias?.toLowerCase().includes(search) ||
+                    r.observacoes?.toLowerCase().includes(search) ||
+                    Object.keys(r.equipe || {}).some(f => f.toLowerCase().includes(search)) ||
+                    Object.keys(r.equipamentos || {}).some(e => e.toLowerCase().includes(search));
+
+                const matchDataInicio = !dataInicio || r.data >= dataInicio;
+                const matchDataFim = !dataFim || r.data <= dataFim;
+
+                return matchSearch && matchDataInicio && matchDataFim;
+            });
+
+            historicoState.index = 0;
+            renderHistorico(filtered);
+        }
+
+        function limparFiltros() {
+            document.getElementById('searchHistorico').value = '';
+            document.getElementById('filterDataInicio').value = '';
+            document.getElementById('filterDataFim').value = '';
+            historicoState.index = 0;
+            renderHistorico();
+        }
+
+        document.getElementById('searchHistorico')?.addEventListener('input', filtrarHistorico);
+
+        // Enter para selecionar diário pelo número no Relatórios
+        document.addEventListener('keydown', (e) => {
+            const el = document.getElementById('exportDiarioNumero');
+            if (!el) return;
+            if (document.activeElement === el && e.key === 'Enter') {
+                e.preventDefault();
+                selecionarDiarioPorNumero();
+            }
+        });
+
+        function abrirModalEditar(id) {
+            const registro = registros.find(r => r.id === id);
+            if (!registro) return;
+
+            document.getElementById('editId').value = registro.id;
+            document.getElementById('editData').value = registro.data;
+            document.getElementById('editHoraInicio').value = registro.horaInicio || '07:00';
+            document.getElementById('editHoraFim').value = registro.horaFim || '17:00';
+            document.getElementById('editClima').value = registro.clima;
+            document.getElementById('editAtividades').value = registro.atividades || '';
+            document.getElementById('editMateriais').value = registro.materiais || '';
+            document.getElementById('editOcorrencias').value = registro.ocorrencias || '';
+            document.getElementById('editObservacoes').value = registro.observacoes || '';
+
+            editFotosTemp = [...(registro.fotos || [])];
+            editEquipamentosSelecionados = {...(registro.equipamentos || {})};
+
+            renderEditPhotoPreview();
+            renderEquipeForm('editEquipe', registro.equipe || {});
+            renderEquipamentosForm('editEquipamentos', editEquipamentosSelecionados);
+
+            document.getElementById('modalEditarRegistro').classList.remove('hidden');
+        }
+
+        function fecharModalEditar() {
+            document.getElementById('modalEditarRegistro').classList.add('hidden');
+        }
+
+        document.getElementById('editarRegistroForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('editId').value);
+            const index = registros.findIndex(r => r.id === id);
+
+            if (index !== -1) {
+                const equipeEditada = {};
+                funcoes.forEach(funcao => {
+                    const input = document.querySelector(`#editEquipe input[name="equipe_${funcao.replace(/\s+/g, '_')}"]`);
+                    const qtd = parseInt(input?.value) || 0;
+                    if (qtd > 0) equipeEditada[funcao] = qtd;
+                });
+
+                registros[index] = {
+                    ...registros[index],
+                    data: document.getElementById('editData').value,
+                    horaInicio: document.getElementById('editHoraInicio').value,
+                    horaFim: document.getElementById('editHoraFim').value,
+                    clima: document.getElementById('editClima').value,
+                    equipe: equipeEditada,
+                    equipamentos: {...editEquipamentosSelecionados},
+                    atividades: document.getElementById('editAtividades').value,
+                    materiais: document.getElementById('editMateriais').value,
+                    ocorrencias: document.getElementById('editOcorrencias').value,
+                    observacoes: document.getElementById('editObservacoes').value,
+                    fotos: [...editFotosTemp],
+                    atualizadoEm: new Date().toISOString(),
+                    isExemplo: false
+                };
+                saveData();
+
+                // Mantém o carrossel apontando para o mesmo id (se estiver visível no modo atual)
+                const editedId = registros[index].id;
+                if (historicoState.mode === 'filtered') {
+                    filtrarHistorico();
+                    const idxInFiltered = historicoState.lista.findIndex(r => r.id === editedId);
+                    if (idxInFiltered >= 0) historicoState.index = idxInFiltered;
+                } else {
+                    renderHistorico();
+                    const idxInAll = historicoState.lista.findIndex(r => r.id === editedId);
+                    if (idxInAll >= 0) historicoState.index = idxInAll;
+                }
+                renderHistoricoCarousel();
+
+                fecharModalEditar();
+                showToast('Registro atualizado!');
+                updateNumeroDiario();
+                updateStats();
+                renderExportDiarioOptions();
+            }
+        });
+
+        function excluirRegistro(id) {
+            if (confirm('Tem certeza que deseja excluir este registro?')) {
+                registros = registros.filter(r => r.id !== id);
+                saveData();
+
+                // Ajusta a navegação do carrossel
+                if (historicoState.index >= registros.length) historicoState.index = Math.max(0, registros.length - 1);
+
+                // Se estava em modo filtrado, reaplica o filtro atual; senão, mostra tudo
+                if (historicoState.mode === 'filtered') {
+                    filtrarHistorico();
+                } else {
+                    renderHistorico();
+                }
+
+                updateStats();
+                updateNumeroDiario();
+                updateBtnDuplicar();
+                renderExportDiarioOptions();
+                showToast('Registro excluído!', 'error');
+            }
+        }
+
+        // ==================== RELATÓRIOS ====================
+        function updateStats() {
+            document.getElementById('statRegistros').textContent = registros.length;
+            document.getElementById('statFuncoes').textContent = funcoes.length;
+            document.getElementById('statEquipamentos').textContent = equipamentos.length;
+            document.getElementById('statOcorrencias').textContent = registros.filter(r => r.ocorrencias && r.ocorrencias.trim()).length;
+
+            let totalHoras = 0;
+            registros.forEach(r => {
+                const horas = parseFloat(calcularHorasTrabalhadas(r.horaInicio, r.horaFim)) || 0;
+                totalHoras += horas;
+            });
+
+            const diasUnicos = new Set(registros.map(r => r.data)).size;
+            const mediaHoras = diasUnicos > 0 ? (totalHoras / diasUnicos).toFixed(1) : 0;
+
+            document.getElementById('statHorasTotais').textContent = totalHoras.toFixed(0) + 'h';
+            document.getElementById('statHorasMedia').textContent = mediaHoras + 'h';
+            document.getElementById('statDias').textContent = diasUnicos;
+        }
+
+        function limparPeriodoExport() {
+            document.getElementById('exportDataInicio').value = '';
+            document.getElementById('exportDataFim').value = '';
+        }
+
+        // ==================== EXPORTAR DIÁRIO ESPECÍFICO (por nº + data) ====================
+        function renderExportDiarioOptions() {
+            const select = document.getElementById('exportDiarioSelect');
+            if (!select) return;
+
+            const listaOrdenada = [...registros].sort((a, b) => {
+                // mais recente primeiro; se data igual, maior número primeiro
+                const d = (b.data || '').localeCompare(a.data || '');
+                if (d !== 0) return d;
+                return (b.numero ?? 0) - (a.numero ?? 0);
+            });
+
+            if (listaOrdenada.length === 0) {
+                select.innerHTML = `<option value="">Nenhum diário cadastrado</option>`;
+                select.disabled = true;
+                return;
+            }
+
+            select.disabled = false;
+
+            const currentSelected = select.value;
+
+            select.innerHTML = listaOrdenada.map(r => {
+                const numeroStr = String(r.numero ?? 0).padStart(4, '0');
+                const dataBr = formatDateSimple(r.data);
+                const labelModelo = r.isExemplo ? ' (MODELO)' : '';
+                // value = id do registro
+                return `<option value="${r.id}">Diário #${numeroStr} — ${dataBr}${labelModelo}</option>`;
+            }).join('');
+
+            // tenta preservar seleção anterior
+            if (currentSelected && Array.from(select.options).some(o => o.value === currentSelected)) {
+                select.value = currentSelected;
+            }
+        }
+
+        function exportarDiarioSelecionado() {
+            const select = document.getElementById('exportDiarioSelect');
+            if (!select || !select.value) {
+                showToast('Selecione um diário para exportar.', 'error');
+                return;
+            }
+
+            const id = Number(select.value);
+            const registro = registros.find(r => r.id === id);
+            if (!registro) {
+                showToast('Diário não encontrado.', 'error');
+                return;
+            }
+
+            exportarRegistroPDF(registro.id);
+        }
+
+        function selecionarDiarioPorNumero() {
+            const input = document.getElementById('exportDiarioNumero');
+            const select = document.getElementById('exportDiarioSelect');
+            if (!input || !select) return;
+
+            const raw = (input.value || '').trim();
+            if (!raw) {
+                showToast('Informe um número de diário (ex: 0007).', 'error');
+                return;
+            }
+
+            const numero = parseInt(raw, 10);
+            if (Number.isNaN(numero)) {
+                showToast('Número inválido.', 'error');
+                return;
+            }
+
+            // se houver repetidos (por algum motivo), pega o mais recente pela data
+            const candidatos = registros.filter(r => (r.numero ?? 0) === numero);
+            if (candidatos.length === 0) {
+                showToast(`Diário #${String(numero).padStart(4,'0')} não encontrado.`, 'error');
+                return;
+            }
+
+            candidatos.sort((a, b) => (b.data || '').localeCompare(a.data || ''));
+            const escolhido = candidatos[0];
+
+            // garante que options existem
+            renderExportDiarioOptions();
+            select.value = String(escolhido.id);
+
+            showToast(`Selecionado: Diário #${String(numero).padStart(4,'0')} (${formatDateSimple(escolhido.data)})`);
+        }
+
+        // ==================== EXPORTAÇÃO PDF ====================
+        function exportarRegistroPDF(id) {
+            const registro = registros.find(r => r.id === id);
+            if (!registro) return;
+
+            const numeroStr = String(registro.numero ?? 0).padStart(4, '0');
+            gerarPDFAprimorado([registro], `${numeroStr}_${registro.data}`);
+        }
+
+        function exportarPDF() {
+            if (registros.length === 0) {
+                showToast('Nenhum registro para exportar!', 'error');
+                return;
+            }
+
+            const dataInicio = document.getElementById('exportDataInicio').value;
+            const dataFim = document.getElementById('exportDataFim').value;
+
+            let listaExportar = [...registros];
+
+            if (dataInicio || dataFim) {
+                listaExportar = listaExportar.filter(r => {
+                    const matchInicio = !dataInicio || r.data >= dataInicio;
+                    const matchFim = !dataFim || r.data <= dataFim;
+                    return matchInicio && matchFim;
+                });
+            }
+
+            if (listaExportar.length === 0) {
+                showToast('Nenhum registro no período selecionado!', 'error');
+                return;
+            }
+
+            // Ordenar por data (sem afetar a ordem do histórico)
+            listaExportar.sort((a, b) => a.data.localeCompare(b.data));
+
+            const dataHoje = new Date().toISOString().split('T')[0];
+            const primeiroNum = String(listaExportar[0].numero ?? 0).padStart(4, '0');
+            const ultimoNum = String(listaExportar[listaExportar.length - 1].numero ?? 0).padStart(4, '0');
+
+            gerarPDFAprimorado(listaExportar, `diario_${primeiroNum}-${ultimoNum}_${dataHoje}`);
+        }
+
+        function gerarPDFAprimorado(lista, nomeArquivo) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const climaLabels = {
+                ensolarado: 'Ensolarado',
+                nublado: 'Nublado',
+                chuvoso: 'Chuvoso',
+                tempestade: 'Tempestade'
+            };
+
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const marginLeft = 15;
+            const marginRight = 15;
+            const contentWidth = pageWidth - marginLeft - marginRight;
+            let currentPage = 1;
+
+            function imageFormatFromDataUrl(dataUrl) {
+                if (!dataUrl) return 'PNG';
+                if (dataUrl.startsWith('data:image/jpeg')) return 'JPEG';
+                if (dataUrl.startsWith('data:image/jpg')) return 'JPEG';
+                return 'PNG';
+            }
+
+            function addHeader(y = 10) {
+                if (dadosObra.logo) {
+                    try {
+                        doc.addImage(dadosObra.logo, imageFormatFromDataUrl(dadosObra.logo), marginLeft, y, 30, 15);
+                    } catch (e) {}
+                }
+
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(234, 88, 12);
+                doc.text('DIÁRIO DE OBRA', dadosObra.logo ? marginLeft + 35 : marginLeft, y + 8);
+
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100, 100, 100);
+
+                let infoY = y + 2;
+                const infoX = pageWidth - marginRight;
+
+                if (dadosObra.nome) {
+                    doc.text(dadosObra.nome, infoX, infoY, { align: 'right' });
+                    infoY += 4;
+                }
+                if (dadosObra.contrato) {
+                    doc.text(`Contrato: ${dadosObra.contrato}`, infoX, infoY, { align: 'right' });
+                    infoY += 4;
+                }
+                if (dadosObra.cliente) {
+                    doc.text(`Cliente: ${dadosObra.cliente}`, infoX, infoY, { align: 'right' });
+                }
+
+                doc.setDrawColor(234, 88, 12);
+                doc.setLineWidth(0.5);
+                doc.line(marginLeft, y + 20, pageWidth - marginRight, y + 20);
+
+                return y + 25;
+            }
+
+            function assinaturaLabel(a) {
+                const nome = (a?.nome || '').toString().trim();
+                const funcao = (a?.funcao || '').toString().trim();
+                const empresa = (a?.empresa || '').toString().trim();
+                return { nome, funcao, empresa };
+            }
+
+            function drawAssinaturasGrid(startY, maxHeight) {
+                const listaAss = Array.isArray(dadosObra.assinaturas) ? dadosObra.assinaturas : [];
+                if (listaAss.length === 0) return { used: 0, fitAll: true };
+
+                // Layout: 2 colunas, N linhas
+                const cols = 2;
+                const gapX = 12;
+                const colWidth = (contentWidth - gapX) / cols;
+                const rowHeight = 18;
+
+                // Pré-cálculo: se não couber, não desenha nada
+                const rowsNeeded = Math.ceil(listaAss.length / cols);
+                const neededHeight = rowsNeeded * rowHeight;
+                if (neededHeight > maxHeight) {
+                    return { used: 0, fitAll: false };
+                }
+
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(120, 120, 120);
+
+                for (let i = 0; i < listaAss.length; i++) {
+                    const row = Math.floor(i / cols);
+                    const col = i % cols;
+                    const x = marginLeft + col * (colWidth + gapX);
+                    const y = startY + row * rowHeight;
+
+                    const { nome, funcao, empresa } = assinaturaLabel(listaAss[i]);
+
+                    // linha de assinatura
+                    doc.setDrawColor(120, 120, 120);
+                    doc.setLineWidth(0.2);
+                    doc.line(x, y + 8, x + colWidth, y + 8);
+
+                    doc.setFontSize(7);
+                    doc.text((nome || '_______________________________'), x, y + 12);
+
+                    doc.setFontSize(6);
+                    const meta = [funcao, empresa].filter(Boolean).join(' • ');
+                    doc.text(meta || 'Assinatura', x, y + 16);
+                }
+
+                return { used: neededHeight, fitAll: true };
+            }
+
+            function addAssinaturasPage() {
+                doc.addPage();
+                currentPage++;
+                let y = addHeader();
+
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.setTextColor(50, 50, 50);
+                doc.text('ASSINATURAS', marginLeft, y);
+                y += 8;
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(90, 90, 90);
+                doc.text('Campos configurados em: Dados da Obra → Assinaturas no PDF', marginLeft, y);
+                y += 8;
+
+                // desenha as assinaturas ocupando quase a página inteira
+                const maxHeight = pageHeight - y - 30;
+                drawAssinaturasGrid(y, maxHeight);
+
+                // rodapé da página de assinaturas
+                const footerY = pageHeight - 20;
+                doc.setDrawColor(200, 200, 200);
+                doc.setLineWidth(0.3);
+                doc.line(marginLeft, footerY, pageWidth - marginRight, footerY);
+
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(120, 120, 120);
+                if (dadosObra.construtora) {
+                    doc.text(dadosObra.construtora, pageWidth / 2, footerY + 5, { align: 'center' });
+                }
+                doc.text(`Página ${currentPage}`, pageWidth - marginRight, footerY + 5, { align: 'right' });
+            }
+
+            function addFooter(options = { includeAssinaturas: false }) {
+                const footerY = pageHeight - 20;
+
+                doc.setDrawColor(200, 200, 200);
+                doc.setLineWidth(0.3);
+                doc.line(marginLeft, footerY, pageWidth - marginRight, footerY);
+
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(120, 120, 120);
+
+                // Linha superior do rodapé
+                if (dadosObra.engenheiro) {
+                    doc.text(`${dadosObra.engenheiro} - ${dadosObra.crea || ''}`, marginLeft, footerY + 5);
+                }
+
+                if (dadosObra.construtora) {
+                    doc.text(dadosObra.construtora, pageWidth / 2, footerY + 5, { align: 'center' });
+                }
+
+                doc.text(`Página ${currentPage}`, pageWidth - marginRight, footerY + 5, { align: 'right' });
+
+                // Assinaturas: SOMENTE na última página (quando includeAssinaturas=true)
+                if (options && options.includeAssinaturas) {
+                    const hasAssinaturas = Array.isArray(dadosObra.assinaturas) && dadosObra.assinaturas.length > 0;
+                    if (hasAssinaturas) {
+                        const startY = footerY - 40; // área padrão para assinaturas
+                        const maxHeight = 38;
+                        const r = drawAssinaturasGrid(startY, maxHeight);
+                        if (!r.fitAll) {
+                            // não cabe no rodapé -> cria página dedicada no final
+                            addAssinaturasPage();
+                        }
+                    }
+                }
+            }
+
+            function checkNewPage(y, neededSpace = 30) {
+                if (y > pageHeight - 40 - neededSpace) {
+                    addFooter({ includeAssinaturas: false });
+                    doc.addPage();
+                    currentPage++;
+                    return addHeader();
+                }
+                return y;
+            }
+
+            let y = addHeader();
+
+            if (lista.length > 1) {
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(50, 50, 50);
+                doc.text(`Período: ${formatDateSimple(lista[0].data)} a ${formatDateSimple(lista[lista.length - 1].data)} | Total: ${lista.length} registros`, marginLeft, y);
+                y += 10;
+            }
+
+            lista.forEach((r, idx) => {
+                y = checkNewPage(y, 60);
+
+                const numeroStr = String(r.numero ?? 0).padStart(4, '0');
+                const horasTrab = calcularHorasTrabalhadas(r.horaInicio, r.horaFim);
+
+                doc.setFillColor(254, 243, 199);
+                doc.roundedRect(marginLeft, y - 5, contentWidth, 14, 2, 2, 'F');
+
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(180, 83, 9);
+                doc.text(`Diário #${numeroStr}`, marginLeft + 5, y + 3);
+
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`${formatDateSimple(r.data)} | ${climaLabels[r.clima] || 'N/A'}`, marginLeft + 45, y + 3);
+
+                const totalPessoas = Object.values(r.equipe || {}).reduce((a, b) => a + b, 0);
+                let infoExtra = `${totalPessoas} pessoas`;
+                if (r.horaInicio && r.horaFim) {
+                    infoExtra = `${r.horaInicio}-${r.horaFim} (${horasTrab}h) | ${infoExtra}`;
+                }
+                doc.text(infoExtra, pageWidth - marginRight - 5, y + 3, { align: 'right' });
+
+                y += 15;
+
+                // Equipe
+                y = checkNewPage(y, 20);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(59, 130, 246);
+                doc.text('EQUIPE PRESENTE:', marginLeft, y);
+                y += 5;
+
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(50, 50, 50);
+                const equipeText = Object.entries(r.equipe || {}).map(([f, q]) => `${q}x ${f}`).join('  |  ') || 'Nenhuma';
+                const equipeLines = doc.splitTextToSize(equipeText, contentWidth);
+                equipeLines.forEach(line => {
+                    y = checkNewPage(y, 5);
+                    doc.text(line, marginLeft, y);
+                    y += 4;
+                });
+                y += 3;
+
+                // Equipamentos
+                if (Object.keys(r.equipamentos || {}).length > 0) {
+                    y = checkNewPage(y, 20);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(16, 185, 129);
+                    doc.text('EQUIPAMENTOS UTILIZADOS:', marginLeft, y);
+                    y += 5;
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(50, 50, 50);
+                    const equipText = Object.entries(r.equipamentos || {}).map(([e, h]) => `${e} (${h}h)`).join('  |  ');
+                    const equipLines = doc.splitTextToSize(equipText, contentWidth);
+                    equipLines.forEach(line => {
+                        y = checkNewPage(y, 5);
+                        doc.text(line, marginLeft, y);
+                        y += 4;
+                    });
+                    y += 3;
+                }
+
+                // Atividades
+                if (r.atividades) {
+                    y = checkNewPage(y, 20);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(34, 197, 94);
+                    doc.text('ATIVIDADES REALIZADAS:', marginLeft, y);
+                    y += 5;
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(50, 50, 50);
+                    const atividadesLines = doc.splitTextToSize(r.atividades, contentWidth);
+                    atividadesLines.forEach(line => {
+                        y = checkNewPage(y, 5);
+                        doc.text(line, marginLeft, y);
+                        y += 4;
+                    });
+                    y += 3;
+                }
+
+                // Materiais
+                if (r.materiais) {
+                    y = checkNewPage(y, 20);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(168, 85, 247);
+                    doc.text('MATERIAIS UTILIZADOS:', marginLeft, y);
+                    y += 5;
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(50, 50, 50);
+                    const materiaisLines = doc.splitTextToSize(r.materiais, contentWidth);
+                    materiaisLines.forEach(line => {
+                        y = checkNewPage(y, 5);
+                        doc.text(line, marginLeft, y);
+                        y += 4;
+                    });
+                    y += 3;
+                }
+
+                // Ocorrências
+                if (r.ocorrencias) {
+                    y = checkNewPage(y, 20);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(239, 68, 68);
+                    doc.text('⚠ OCORRÊNCIAS:', marginLeft, y);
+                    y += 5;
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(50, 50, 50);
+                    const ocorrenciasLines = doc.splitTextToSize(r.ocorrencias, contentWidth);
+                    ocorrenciasLines.forEach(line => {
+                        y = checkNewPage(y, 5);
+                        doc.text(line, marginLeft, y);
+                        y += 4;
+                    });
+                    y += 3;
+                }
+
+                // Observações
+                if (r.observacoes) {
+                    y = checkNewPage(y, 20);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(107, 114, 128);
+                    doc.text('OBSERVAÇÕES:', marginLeft, y);
+                    y += 5;
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(50, 50, 50);
+                    const obsLines = doc.splitTextToSize(r.observacoes, contentWidth);
+                    obsLines.forEach(line => {
+                        y = checkNewPage(y, 5);
+                        doc.text(line, marginLeft, y);
+                        y += 4;
+                    });
+                    y += 3;
+                }
+
+                if (idx < lista.length - 1) {
+                    y += 5;
+                    doc.setDrawColor(220, 220, 220);
+                    doc.setLineWidth(0.3);
+                    doc.line(marginLeft, y, pageWidth - marginRight, y);
+                    y += 10;
+                }
+            });
+
+            // Rodapé final: inclui assinaturas (se configuradas)
+            addFooter({ includeAssinaturas: true });
+            doc.save(`${nomeArquivo}.pdf`);
+            showToast('PDF exportado com sucesso!');
+        }
+
+        function exportarJSON() {
+            const data = {
+                registros,
+                funcoes,
+                equipamentos,
+                dadosObra,
+                exportadoEm: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `diario-obra-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Backup JSON exportado!');
+        }
+function importarJSON() {
+            const input = document.getElementById('importJSONInput');
+            const file = input.files[0];
+            
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validação básica
+                    if (!data.registros || !Array.isArray(data.registros)) {
+                        throw new Error('Arquivo JSON inválido - faltam registros');
+                    }
+                    
+                    // Confirmar antes de sobrescrever
+                    const msg = `Importar backup?\n\n` +
+                        `- ${data.registros?.length || 0} registros\n` +
+                        `- ${data.funcoes?.length || 0} funções\n` +
+                        `- ${data.equipamentos?.length || 0} equipamentos\n\n` +
+                        `⚠️ ATENÇÃO: Isso substituirá todos os dados atuais!`;
+                    
+                    if (!confirm(msg)) {
+                        input.value = '';
+                        return;
+                    }
+                    
+                    // Importar dados
+                    registros = Array.isArray(data.registros) ? data.registros : [];
+                    funcoes = Array.isArray(data.funcoes) ? data.funcoes : [...funcoesDefault];
+                    equipamentos = Array.isArray(data.equipamentos) ? data.equipamentos : [...equipamentosDefault];
+                    dadosObra = (data.dadosObra && typeof data.dadosObra === 'object') ? data.dadosObra : {...obraExemplo};
+                    
+                    // Normalização para compatibilidade
+                    if (!Array.isArray(dadosObra.assinaturas)) {
+                        dadosObra.assinaturas = [];
+                    }
+                    
+                    saveData();
+                    
+                    // Atualizar interface
+                    renderFuncoesList();
+                    renderEquipamentosList();
+                    renderEquipeForm();
+                    renderEquipamentosForm();
+                    carregarDadosObra();
+                    updateHeaderObra();
+                    renderHistorico();
+                    updateStats();
+                    updateNumeroDiario();
+                    updateBtnDuplicar();
+                    renderExportDiarioOptions();
+                    
+                    showToast('✅ Backup importado com sucesso!');
+                    input.value = '';
+                    
+                } catch (error) {
+                    console.error('Erro ao importar JSON:', error);
+                    showToast('❌ Erro ao importar arquivo: ' + error.message, 'error');
+                    input.value = '';
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Event listener para o input de importação
+        document.addEventListener('DOMContentLoaded', () => {
+            const importInput = document.getElementById('importJSONInput');
+            if (importInput) {
+                importInput.addEventListener('change', importarJSON);
+            }
+        });
+        // Utilitários
+        function formatDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        function formatDateSimple(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        // Fechar modais ao clicar fora
+        document.getElementById('modalEditarRegistro').addEventListener('click', (e) => {
+            if (e.target.id === 'modalEditarRegistro') fecharModalEditar();
+        });
+        document.getElementById('modalFoto').addEventListener('click', (e) => {
+            if (e.target.id === 'modalFoto') fecharModalFoto();
+        });
+
+        // Tecla ESC para fechar modais
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                fecharModalEditar();
+                fecharModalFoto();
+                fecharWelcome(true);
+            }
+        });
+
+        // Navegação por teclado no Histórico (←/→)
+        document.addEventListener('keydown', (e) => {
+            const historicoVisible = !document.getElementById('section-historico')?.classList.contains('hidden');
+            if (!historicoVisible) return;
+            // não interferir quando estiver digitando em inputs/textareas
+            const tag = (document.activeElement?.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                historicoPrev();
+            }
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                historicoNext();
+            }
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+    
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+</body>
+</html>
