@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Instalações de Gás | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
+            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', yellow: '#ffea00' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ffea00, #ffaa00); border-radius: 4px; }
+    
+    .text-glow { text-shadow: 0 0 20px rgba(255, 234, 0, 0.5); }
+    
+    .gradient-border {
+      position: relative;
+      background: #12121a;
+      border-radius: 16px;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ffea00, #ffaa00, #ffea00);
+      background-size: 300% 300%;
+      animation: gradientMove 8s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 234, 0, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(255, 234, 0, 0.6); }
+    }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      border-color: #ffea00;
+      box-shadow: 0 0 15px rgba(255, 234, 0, 0.2);
+      outline: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ffea00 0%, #ffaa00 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 234, 0, 0.4);
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      border-color: #ffea00;
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-100">
+  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-yellow to-orange-500 flex items-center justify-center font-bold text-dark-900 text-xl">
+          ⛽
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold text-white">Instalações de Gás</h1>
+          <p class="text-xs text-gray-500">GLP / Gás Natural</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-1 space-y-6">
+        <div class="gradient-border p-6">
+          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+            <span class="text-neon-yellow">●</span> Parâmetros
+          </h2>
+          
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Tipo de Gás</label>
+              <select id="tipoGas" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+                <option value="GLP">GLP (Gás Liquefeito de Petróleo)</option>
+                <option value="GN">GN (Gás Natural)</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Unidades Habitacionais (Aptos)</label>
+              <input type="number" id="unidades" value="10" min="1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+            
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5">
+              <h4 class="text-sm font-medium text-gray-300 mb-3">Equipamentos por Unidade</h4>
+              <div class="space-y-3">
+                <label class="flex items-center justify-between">
+                  <span class="text-sm text-gray-400">Fogão 4 Bocas com Forno</span>
+                  <input type="number" id="fogao4" value="1" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700">
+                </label>
+                <label class="flex items-center justify-between">
+                  <span class="text-sm text-gray-400">Fogão 6 Bocas com Forno</span>
+                  <input type="number" id="fogao6" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700">
+                </label>
+                <label class="flex items-center justify-between">
+                  <span class="text-sm text-gray-400">Aquecedor de Passagem 15L/min</span>
+                  <input type="number" id="aquecedor15" value="1" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700">
+                </label>
+                <label class="flex items-center justify-between">
+                  <span class="text-sm text-gray-400">Aquecedor de Passagem 22L/min</span>
+                  <input type="number" id="aquecedor22" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700">
+                </label>
+              </div>
+            </div>
+
+            <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 mt-4 shadow-lg shadow-yellow-500/30">
+              Calcular Consumo e Central
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 space-y-6">
+        <div id="resultadoSection" class="gradient-border p-8 text-center opacity-50 transition-opacity duration-500">
+          <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Potência Total Simultânea</div>
+          <div id="potenciaTotal" class="text-5xl md:text-6xl font-bold text-neon-yellow text-glow mb-2">0</div>
+          <div class="text-xl text-gray-300 mb-4">kcal/h</div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Vazão Máxima (<span id="unidadeVazao">kg/h</span>)</div>
+              <div id="vazaoMax" class="text-xl font-semibold text-neon-yellow">0</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Fator Simultaneidade</div>
+              <div id="fatorSimul" class="text-xl font-semibold text-neon-yellow">0%</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Potência Instalada</div>
+              <div id="potInstalada" class="text-xl font-semibold text-neon-yellow">0 kcal/h</div>
+            </div>
+            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Bateria Sugerida (GLP)</div>
+              <div id="bateriaSugerida" class="text-xl font-semibold text-neon-yellow">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gradient-border p-6">
+          <h3 class="text-lg font-semibold mb-4 text-white">📝 Memorial de Cálculo</h3>
+          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
+    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    // Potências típicas (kcal/min) -> kcal/h (multiplica por 60)
+    // Ref: NBR 15526 e NBR 13523
+    const EQUIPAMENTOS = {
+      fogao4: { nome: "Fogão 4 Bocas", pot: 6900 },
+      fogao6: { nome: "Fogão 6 Bocas", pot: 11200 },
+      aquecedor15: { nome: "Aquecedor 15 L/min", pot: 21500 },
+      aquecedor22: { nome: "Aquecedor 22 L/min", pot: 32000 }
+    };
+
+    // Poder calorífico inferior
+    const PCI = {
+      GLP: 11100, // kcal/kg
+      GN: 8600    // kcal/m³
+    };
+
+    function calcularGas() {
+      const tipoGas = $('tipoGas').value;
+      const unidades = parseInt($('unidades').value) || 1;
+      
+      let potInstaladaApto = 0;
+      let eqList = [];
+
+      ['fogao4', 'fogao6', 'aquecedor15', 'aquecedor22'].forEach(key => {
+        let qtd = parseInt($(key).value) || 0;
+        if (qtd > 0) {
+          potInstaladaApto += EQUIPAMENTOS[key].pot * qtd;
+          eqList.push(`${qtd}x ${EQUIPAMENTOS[key].nome}`);
+        }
+      });
+
+      const potInstaladaTotal = potInstaladaApto * unidades;
+
+      // Fator de Simultaneidade (F) - NBR 15526
+      // Fórmula genérica aproximada para N equipamentos/aparelhos (ou tabela)
+      // Aqui vamos usar um Fator simplificado baseado no número de apartamentos
+      let f = 1;
+      if (unidades >= 2 && unidades <= 4) f = 0.65;
+      else if (unidades > 4 && unidades <= 10) f = 0.45;
+      else if (unidades > 10 && unidades <= 20) f = 0.35;
+      else if (unidades > 20 && unidades <= 50) f = 0.25;
+      else if (unidades > 50) f = 0.18;
+
+      const potSimultanea = potInstaladaTotal * f;
+      
+      const vazao = potSimultanea / PCI[tipoGas];
+      const unidadeMedida = tipoGas === 'GLP' ? 'kg/h' : 'm³/h';
+
+      // Dimensionar Bateria GLP (Se for o caso)
+      let bateria = "N/A (GN)";
+      if (tipoGas === 'GLP') {
+        // Capacidade de vaporização do P45 é aprox. 1.0 kg/h
+        // P190 é aprox. 3.5 kg/h (a 20ºC)
+        const capP45 = 1.0;
+        const capP190 = 3.5;
+        
+        let qtdP45 = Math.ceil(vazao / capP45);
+        let qtdP190 = Math.ceil(vazao / capP190);
+        
+        if (qtdP45 <= 6) {
+           bateria = `${qtdP45}x P45 em uso (+ ${qtdP45} reserva)`;
+        } else {
+           bateria = `${qtdP190}x P190 em uso (+ ${qtdP190} reserva)`;
+        }
+      }
+
+      // UI
+      $('resultadoSection').classList.remove('opacity-50');
+      $('resultadoSection').classList.add('pulse-glow');
+      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+
+      $('potenciaTotal').textContent = potSimultanea.toLocaleString('pt-BR', {maximumFractionDigits: 0});
+      $('unidadeVazao').textContent = unidadeMedida;
+      $('vazaoMax').textContent = vazao.toLocaleString('pt-BR', {maximumFractionDigits: 2});
+      $('fatorSimul').textContent = (f * 100).toFixed(0) + '%';
+      $('potInstalada').textContent = potInstaladaTotal.toLocaleString('pt-BR');
+      $('bateriaSugerida').textContent = bateria;
+
+      $('memorial').textContent = `MEMORIAL DE PRÉ-DIMENSIONAMENTO - GÁS (${tipoGas})
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. EQUIPAMENTOS POR UNIDADE (APARTAMENTO)
+${eqList.length ? eqList.join('\n') : 'Nenhum equipamento.'}
+Potência Instalada por Apto: ${potInstaladaApto.toLocaleString('pt-BR')} kcal/h
+
+2. EDIFICAÇÃO
+Total de Unidades: ${unidades}
+Potência Instalada Total: ${potInstaladaTotal.toLocaleString('pt-BR')} kcal/h
+
+3. SIMULTANEIDADE
+Fator Adotado: ${f} (${(f*100).toFixed(1)}%)
+Potência Adotada Total: ${potSimultanea.toLocaleString('pt-BR')} kcal/h
+
+4. CONSUMO / VAZÃO
+Poder Calorífico (${tipoGas}): ${PCI[tipoGas]} kcal/${tipoGas==='GLP'?'kg':'m³'}
+Vazão Máxima Provável: ${vazao.toFixed(2)} ${unidadeMedida}
+
+5. CENTRAL GLP (NBR 13523)
+Sugestão de Bateria: ${bateria}
+(Considera 100% reserva: x cilindros em uso + x reserva)
+
+Nota: Valores estimativos. É obrigatória a elaboração de projeto executivo para aprovação em concessionária/bombeiros.`;
+    }
+
+    $('btnCalcular').addEventListener('click', calcularGas);
+    $('btnReset').addEventListener('click', () => location.reload());
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if ($('year')) $('year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
