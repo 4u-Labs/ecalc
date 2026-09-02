@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Calculadora de Alvenaria | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    
+    :root {
+      --primary: #06b6d4;
+      --secondary: #8b5cf6;
+      --dark: #0f172a;
+      --darker: #020617;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1e1b4b 100%);
+      min-height: 100vh;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glow {
+      box-shadow: 0 0 40px rgba(6, 182, 212, 0.15);
+    }
+    
+    .glow-text {
+      text-shadow: 0 0 30px rgba(6, 182, 212, 0.5);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .tipo-btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .tipo-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .tipo-btn.active {
+      background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+      transform: scale(1.02);
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+    }
+    
+    .result-card {
+      animation: slideUp 0.5s ease-out forwards;
+      opacity: 0;
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .result-card:nth-child(1) { animation-delay: 0.1s; }
+    .result-card:nth-child(2) { animation-delay: 0.2s; }
+    .result-card:nth-child(3) { animation-delay: 0.3s; }
+    .result-card:nth-child(4) { animation-delay: 0.4s; }
+    
+    .stat-value {
+      background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .progress-bar {
+      transition: width 0.8s ease-out;
+    }
+    
+    .pulse-dot {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .block-visual {
+      perspective: 500px;
+    }
+    
+    .block-3d {
+      transform: rotateX(10deg) rotateY(-15deg);
+      transform-style: preserve-3d;
+    }
+    
+    @media print {
+      body { background: white !important; }
+      .no-print { display: none !important; }
+      .glass { background: white; border: 1px solid #ddd; }
+      .gradient-text, .stat-value { color: #06b6d4; -webkit-text-fill-color: #06b6d4; }
+    }
+    
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      z-index: 50;
+    }
+    
+    .tab-btn.active {
+      border-bottom: 2px solid #06b6d4;
+      color: #06b6d4;
+    }
+    
+    /* Fix dropdown/select contrast */
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2306b6d4' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+    
+    select option {
+      background-color: #1e293b;
+      color: #f1f5f9;
+      padding: 12px;
+    }
+    
+    select option:hover,
+    select option:focus,
+    select option:checked {
+      background-color: #0f172a;
+      color: #06b6d4;
+    }
+    
+    /* For Firefox */
+    select:-moz-focusring {
+      color: transparent;
+      text-shadow: 0 0 0 #fff;
+    }
+    
+    /* Webkit browsers - style the dropdown */
+    select::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    select::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    
+    select::-webkit-scrollbar-thumb {
+      background: #06b6d4;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="text-gray-100">
+  <!-- Header -->
+  <header class="no-print sticky top-0 z-50 glass border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-xl">
+          🧱
+        </div>
+        <div>
+          <h1 class="text-lg font-bold gradient-text">Calculadora de Alvenaria</h1>
+          <p class="text-xs text-gray-500">Ferramentas de Engenharia</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="window.print()" class="p-2 rounded-lg hover:bg-white/10 transition tooltip" data-tip="Imprimir">
+          🖨️
+        </button>
+        <button onclick="exportarPDF()" class="p-2 rounded-lg hover:bg-white/10 transition tooltip" data-tip="Compartilhar">
+          📤
+        </button>
+        <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-white/10 transition tooltip" data-tip="Tema">
+          🌙
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Quick Stats -->
+    <div id="quickStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="glass rounded-2xl p-4 glow">
+        <div class="text-sm text-gray-400 mb-1">Blocos</div>
+        <div class="text-2xl font-bold stat-value" id="statBlocos">0</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-sm text-gray-400 mb-1">Argamassa</div>
+        <div class="text-2xl font-bold stat-value" id="statArgamassa">0</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-sm text-gray-400 mb-1">Custo Total</div>
+        <div class="text-2xl font-bold stat-value" id="statCusto">R$ 0</div>
+      </div>
+      <div class="glass rounded-2xl p-4">
+        <div class="text-sm text-gray-400 mb-1">Prazo</div>
+        <div class="text-2xl font-bold stat-value" id="statPrazo">0 dias</div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="no-print flex flex-wrap gap-3 justify-center mb-8">
+      <button id="btnCalcular" class="px-8 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 font-semibold hover:opacity-90 transition transform hover:scale-105 flex items-center gap-2">
+        <span>⚡</span> Calcular
+      </button>
+      <button id="btnComparar" class="px-6 py-3 rounded-xl glass border border-cyan-500/30 hover:bg-cyan-500/10 transition flex items-center gap-2">
+        <span>📊</span> Comparar Blocos
+      </button>
+      <button id="btnReset" class="px-6 py-3 rounded-xl glass border border-white/20 hover:bg-white/5 transition flex items-center gap-2">
+        <span>🔄</span> Limpar
+      </button>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Left Column - Inputs -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Block Type Selection -->
+        <section class="glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">🧱</span> Tipo de Bloco
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="tiposBlocos">
+            <button class="tipo-btn active p-4 rounded-xl glass border-2 border-cyan-500/30 text-left" data-tipo="ceramico-6">
+              <div class="text-2xl mb-2">🧱</div>
+              <div class="font-medium">Cerâmico 6 furos</div>
+              <div class="text-xs text-gray-400">9×19×19 cm</div>
+            </button>
+            <button class="tipo-btn p-4 rounded-xl glass border-2 border-white/10 text-left" data-tipo="ceramico-8">
+              <div class="text-2xl mb-2">🧱</div>
+              <div class="font-medium">Cerâmico 8 furos</div>
+              <div class="text-xs text-gray-400">11.5×19×19 cm</div>
+            </button>
+            <button class="tipo-btn p-4 rounded-xl glass border-2 border-white/10 text-left" data-tipo="concreto-10">
+              <div class="text-2xl mb-2">🏗️</div>
+              <div class="font-medium">Concreto 10cm</div>
+              <div class="text-xs text-gray-400">9×19×39 cm</div>
+            </button>
+            <button class="tipo-btn p-4 rounded-xl glass border-2 border-white/10 text-left" data-tipo="concreto-15">
+              <div class="text-2xl mb-2">🏗️</div>
+              <div class="font-medium">Concreto 15cm</div>
+              <div class="text-xs text-gray-400">14×19×39 cm</div>
+            </button>
+            <button class="tipo-btn p-4 rounded-xl glass border-2 border-white/10 text-left" data-tipo="concreto-20">
+              <div class="text-2xl mb-2">🏗️</div>
+              <div class="font-medium">Concreto 20cm</div>
+              <div class="text-xs text-gray-400">19×19×39 cm</div>
+            </button>
+            <button class="tipo-btn p-4 rounded-xl glass border-2 border-white/10 text-left" data-tipo="estrutural">
+              <div class="text-2xl mb-2">🏛️</div>
+              <div class="font-medium">Estrutural</div>
+              <div class="text-xs text-gray-400">14×19×39 cm</div>
+            </button>
+          </div>
+        </section>
+
+        <!-- Dimensions -->
+        <section class="glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📐</span> Dimensões da Parede
+          </h2>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Área (m²)</label>
+              <input type="number" id="area" value="20" step="0.01" 
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-lg font-medium">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">ou Comprimento (m)</label>
+              <input type="number" id="comprimento" placeholder="Opcional" step="0.01"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">× Altura (m)</label>
+              <input type="number" id="altura" placeholder="Opcional" step="0.01"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+            </div>
+          </div>
+          
+          <div class="grid md:grid-cols-3 gap-4 mt-4">
+            <div class="tooltip" data-tip="Espaço entre blocos (padrão: 1cm)">
+              <label class="block text-sm text-gray-400 mb-2">Junta (cm) ℹ️</label>
+              <input type="number" id="junta" value="1.0" step="0.1"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+            </div>
+            <div class="tooltip" data-tip="Quebras e desperdício">
+              <label class="block text-sm text-gray-400 mb-2">Perda (%) ℹ️</label>
+              <input type="number" id="perda" value="10" step="1"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+            </div>
+            <div class="tooltip" data-tip="Portas, janelas, vãos">
+              <label class="block text-sm text-gray-400 mb-2">Aberturas (m²) ℹ️</label>
+              <input type="number" id="aberturas" value="0" step="0.01"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+            </div>
+          </div>
+          
+          <div class="mt-4 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-start gap-3">
+            <span class="text-cyan-400 text-xl">💡</span>
+            <p class="text-sm text-cyan-300">
+              <strong>Dica:</strong> Perda típica é de 10% para cerâmicos e 5% para blocos de concreto.
+            </p>
+          </div>
+        </section>
+
+        <!-- Mortar & Prices -->
+        <section class="glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">🪣</span> Argamassa & Preços
+          </h2>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Tipo de Argamassa</label>
+              <select id="tipo-argamassa" 
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+                <option value="industrializada">Industrializada (saco)</option>
+                <option value="1:4">Traço 1:4 (cimento:areia)</option>
+                <option value="1:6">Traço 1:6 (cimento:areia)</option>
+                <option value="1:2:8">Traço 1:2:8 (cimento:cal:areia)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Preço Bloco (R$/un)</label>
+              <input type="number" id="preco-bloco" value="1.85" step="0.01"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Preço Argamassa (R$/saco)</label>
+              <input type="number" id="preco-argamassa" value="24.00" step="0.01"
+                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column - Block Info & Visual -->
+      <div class="space-y-6">
+        <!-- Block Visualization -->
+        <section class="glass rounded-2xl p-6 block-visual">
+          <h3 class="text-sm font-medium text-gray-400 mb-4">Visualização do Bloco</h3>
+          <div id="blocoVisual" class="flex justify-center">
+            <div class="block-3d relative">
+              <div class="w-32 h-24 rounded-lg bg-gradient-to-br from-orange-600 to-orange-800 border-2 border-orange-500/50 flex items-center justify-center">
+                <div class="grid grid-cols-3 gap-1">
+                  <div class="w-3 h-8 bg-orange-900/80 rounded"></div>
+                  <div class="w-3 h-8 bg-orange-900/80 rounded"></div>
+                  <div class="w-3 h-8 bg-orange-900/80 rounded"></div>
+                </div>
+              </div>
+              <div class="absolute -bottom-6 left-0 right-0 text-center text-xs text-gray-400" id="blocoDimensoes">
+                9 × 19 × 19 cm
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 space-y-3" id="blocoSpecs">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-400">Rendimento</span>
+              <span class="font-medium text-cyan-400" id="specRendimento">13.5 un/m²</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-400">Argamassa/m²</span>
+              <span class="font-medium" id="specArgamassa">0.008 m³</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-400">Perda Padrão</span>
+              <span class="font-medium" id="specPerda">10%</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cost Chart -->
+        <section class="glass rounded-2xl p-6">
+          <h3 class="text-sm font-medium text-gray-400 mb-4">Composição do Custo</h3>
+          <div id="costChart" class="space-y-4">
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span>Blocos</span>
+                <span id="chartBlocos">R$ 0</span>
+              </div>
+              <div class="h-3 bg-white/10 rounded-full overflow-hidden">
+                <div id="barBlocos" class="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 progress-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span>Argamassa</span>
+                <span id="chartArgamassa">R$ 0</span>
+              </div>
+              <div class="h-3 bg-white/10 rounded-full overflow-hidden">
+                <div id="barArgamassa" class="h-full bg-gradient-to-r from-violet-500 to-violet-400 progress-bar" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-white/10 flex justify-between">
+            <span class="font-medium">Total</span>
+            <span class="font-bold text-lg gradient-text" id="chartTotal">R$ 0,00</span>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <section id="resultados" class="mt-8 space-y-6">
+      <!-- Results will be injected here -->
+    </section>
+
+    <!-- Comparison Modal -->
+    <div id="modalComparar" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+      <div class="glass rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-auto p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold gradient-text">📊 Comparativo de Blocos</h2>
+          <button onclick="fecharModal()" class="p-2 hover:bg-white/10 rounded-lg">✕</button>
+        </div>
+        <div id="comparativoConteudo" class="overflow-x-auto">
+          <!-- Comparison table will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- References -->
+    <section class="glass rounded-2xl p-6 mt-8">
+      <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <span class="text-cyan-400">📚</span> Referências Normativas
+      </h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-white/5">
+          <div class="font-medium text-cyan-400">NBR 6136:2016</div>
+          <div class="text-sm text-gray-400">Blocos Vazados de Concreto Simples</div>
+        </div>
+        <div class="p-4 rounded-xl bg-white/5">
+          <div class="font-medium text-cyan-400">NBR 15270:2017</div>
+          <div class="text-sm text-gray-400">Componentes Cerâmicos - Blocos e Tijolos</div>
+        </div>
+        <div class="p-4 rounded-xl bg-white/5">
+          <div class="font-medium text-cyan-400">NBR 13281:2005</div>
+          <div class="text-sm text-gray-400">Argamassa para Assentamento</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="no-print text-center py-8 text-gray-500 text-sm">
+    &copy; <span id="ano"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia
+  </footer>
+
+  <script>
+    // ===== DATA =====
+    const especificacoesBlocos = {
+      'ceramico-6': { nome: 'Cerâmico 6 furos', largura: 9, comprimento: 19, altura: 19, rendimento: 13.5, argamassaM3: 0.008, perdaPadrao: 10, cor: 'orange' },
+      'ceramico-8': { nome: 'Cerâmico 8 furos', largura: 11.5, comprimento: 19, altura: 19, rendimento: 13.5, argamassaM3: 0.009, perdaPadrao: 10, cor: 'orange' },
+      'concreto-10': { nome: 'Concreto 10cm', largura: 9, comprimento: 19, altura: 39, rendimento: 12.5, argamassaM3: 0.007, perdaPadrao: 5, cor: 'gray' },
+      'concreto-15': { nome: 'Concreto 15cm', largura: 14, comprimento: 19, altura: 39, rendimento: 12.5, argamassaM3: 0.010, perdaPadrao: 5, cor: 'gray' },
+      'concreto-20': { nome: 'Concreto 20cm', largura: 19, comprimento: 19, altura: 39, rendimento: 12.5, argamassaM3: 0.013, perdaPadrao: 5, cor: 'gray' },
+      'estrutural': { nome: 'Estrutural', largura: 14, comprimento: 19, altura: 39, rendimento: 12.5, argamassaM3: 0.010, perdaPadrao: 5, cor: 'slate' }
+    };
+
+    const consumoArgamassa = {
+      'industrializada': 1400,
+      '1:4': 1400,
+      '1:6': 1350,
+      '1:2:8': 1300
+    };
+
+    let tipoAtual = 'ceramico-6';
+    let ultimoResultado = null;
+
+    // ===== INITIALIZATION =====
+    document.addEventListener('DOMContentLoaded', () => {
+      if (document.getElementById('ano')) document.getElementById('ano').textContent = new Date().getFullYear();
+      carregarDados();
+      setupEventListeners();
+      calcular();
+    });
+
+    function setupEventListeners() {
+      // Block type selection
+      document.querySelectorAll('.tipo-btn').forEach(btn => {
+        btn.addEventListener('click', () => selecionarTipo(btn.dataset.tipo));
+      });
+
+      // Calculate button
+      document.getElementById('btnCalcular').addEventListener('click', () => {
+        calcular();
+        salvarDados();
+      });
+
+      // Reset button
+      document.getElementById('btnReset').addEventListener('click', resetar);
+
+      // Compare button
+      document.getElementById('btnComparar').addEventListener('click', abrirComparativo);
+
+      // Auto-calculate on input change
+      const inputs = ['area', 'comprimento', 'altura', 'junta', 'perda', 'aberturas', 'tipo-argamassa', 'preco-bloco', 'preco-argamassa'];
+      inputs.forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', debounce(calcular, 300));
+        el.addEventListener('change', calcular);
+      });
+
+      // Close modal on backdrop click
+      document.getElementById('modalComparar').addEventListener('click', (e) => {
+        if (e.target.id === 'modalComparar') fecharModal();
+      });
+    }
+
+    // ===== UTILITY FUNCTIONS =====
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    }
+
+    function salvarDados() {
+      const dados = {
+        tipoAtual,
+        area: document.getElementById('area').value,
+        comprimento: document.getElementById('comprimento').value,
+        altura: document.getElementById('altura').value,
+        junta: document.getElementById('junta').value,
+        perda: document.getElementById('perda').value,
+        aberturas: document.getElementById('aberturas').value,
+        tipoArgamassa: document.getElementById('tipo-argamassa').value,
+        precoBloco: document.getElementById('preco-bloco').value,
+        precoArgamassa: document.getElementById('preco-argamassa').value
+      };
+      localStorage.setItem('alvenaria-calc', JSON.stringify(dados));
+    }
+
+    function carregarDados() {
+      const dados = JSON.parse(localStorage.getItem('alvenaria-calc'));
+      if (!dados) return;
+
+      if (dados.tipoAtual) selecionarTipo(dados.tipoAtual, false);
+      if (dados.area) document.getElementById('area').value = dados.area;
+      if (dados.comprimento) document.getElementById('comprimento').value = dados.comprimento;
+      if (dados.altura) document.getElementById('altura').value = dados.altura;
+      if (dados.junta) document.getElementById('junta').value = dados.junta;
+      if (dados.perda) document.getElementById('perda').value = dados.perda;
+      if (dados.aberturas) document.getElementById('aberturas').value = dados.aberturas;
+      if (dados.tipoArgamassa) document.getElementById('tipo-argamassa').value = dados.tipoArgamassa;
+      if (dados.precoBloco) document.getElementById('preco-bloco').value = dados.precoBloco;
+      if (dados.precoArgamassa) document.getElementById('preco-argamassa').value = dados.precoArgamassa;
+    }
+
+    // ===== BLOCK SELECTION =====
+    function selecionarTipo(tipo, calcular_auto = true) {
+      tipoAtual = tipo;
+      
+      document.querySelectorAll('.tipo-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.classList.remove('border-cyan-500/30');
+        btn.classList.add('border-white/10');
+      });
+      
+      const activeBtn = document.querySelector(`.tipo-btn[data-tipo="${tipo}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.classList.remove('border-white/10');
+        activeBtn.classList.add('border-cyan-500/30');
+      }
+
+      const bloco = especificacoesBlocos[tipo];
+      document.getElementById('perda').value = bloco.perdaPadrao;
+      
+      atualizarVisualizacaoBloco(bloco);
+      
+      if (calcular_auto) calcular();
+    }
+
+    function atualizarVisualizacaoBloco(bloco) {
+      document.getElementById('blocoDimensoes').textContent = 
+        `${bloco.largura} × ${bloco.comprimento} × ${bloco.altura} cm`;
+      document.getElementById('specRendimento').textContent = `${bloco.rendimento} un/m²`;
+      document.getElementById('specArgamassa').textContent = `${bloco.argamassaM3} m³`;
+      document.getElementById('specPerda').textContent = `${bloco.perdaPadrao}%`;
+
+      // Update block visual color
+      const blocoEl = document.querySelector('.block-3d > div');
+      if (bloco.cor === 'gray') {
+        blocoEl.className = 'w-32 h-24 rounded-lg bg-gradient-to-br from-gray-500 to-gray-700 border-2 border-gray-400/50 flex items-center justify-center';
+      } else if (bloco.cor === 'slate') {
+        blocoEl.className = 'w-32 h-24 rounded-lg bg-gradient-to-br from-slate-500 to-slate-700 border-2 border-slate-400/50 flex items-center justify-center';
+      } else {
+        blocoEl.className = 'w-32 h-24 rounded-lg bg-gradient-to-br from-orange-600 to-orange-800 border-2 border-orange-500/50 flex items-center justify-center';
+      }
+    }
+
+    // ===== CALCULATION =====
+    function calcular() {
+      let area = parseFloat(document.getElementById('area').value);
+      const comprimento = parseFloat(document.getElementById('comprimento').value);
+      const altura = parseFloat(document.getElementById('altura').value);
+      const aberturas = parseFloat(document.getElementById('aberturas').value) || 0;
+
+      if (comprimento && altura) {
+        area = comprimento * altura;
+        document.getElementById('area').value = area.toFixed(2);
+      }
+
+      if (!area || area <= 0) {
+        limparResultados();
+        return;
+      }
+
+      const areaLiquida = area - aberturas;
+      if (areaLiquida <= 0) {
+        mostrarErro('Área líquida não pode ser zero ou negativa!');
+        return;
+      }
+
+      const espessuraJunta = parseFloat(document.getElementById('junta').value);
+      const perdaPercentual = parseFloat(document.getElementById('perda').value);
+      const tipoArgamassa = document.getElementById('tipo-argamassa').value;
+      const precoBloco = parseFloat(document.getElementById('preco-bloco').value);
+      const precoArgamassa = parseFloat(document.getElementById('preco-argamassa').value);
+
+      const bloco = especificacoesBlocos[tipoAtual];
+      const qtdBlocosSemPerda = areaLiquida * bloco.rendimento;
+      const qtdBlocosComPerda = qtdBlocosSemPerda * (1 + perdaPercentual / 100);
+      const volumeArgamassaM3 = areaLiquida * bloco.argamassaM3;
+      const massaArgamassaKg = volumeArgamassaM3 * consumoArgamassa[tipoArgamassa];
+      const qtdSacosArgamassa = massaArgamassaKg / 20;
+
+      const custoBlocos = qtdBlocosComPerda * precoBloco;
+      const custoArgamassa = qtdSacosArgamassa * precoArgamassa;
+      const custoTotal = custoBlocos + custoArgamassa;
+      const custoM2 = custoTotal / areaLiquida;
+
+      const produtividadeDia = 8;
+      const diasObra = Math.ceil(areaLiquida / produtividadeDia);
+
+      ultimoResultado = {
+        area, areaLiquida, aberturas, bloco, qtdBlocosSemPerda, qtdBlocosComPerda,
+        perdaPercentual, volumeArgamassaM3, massaArgamassaKg, qtdSacosArgamassa,
+        tipoArgamassa, custoBlocos, custoArgamassa, custoTotal, custoM2,
+        produtividadeDia, diasObra, precoBloco, precoArgamassa
+      };
+
+      atualizarUI(ultimoResultado);
+      salvarDados();
+    }
+
+    function atualizarUI(dados) {
+      // Quick stats
+      document.getElementById('statBlocos').textContent = Math.ceil(dados.qtdBlocosComPerda);
+      document.getElementById('statArgamassa').textContent = Math.ceil(dados.qtdSacosArgamassa) + ' sacos';
+      document.getElementById('statCusto').textContent = formatCurrency(dados.custoTotal);
+      document.getElementById('statPrazo').textContent = dados.diasObra + ' dias';
+
+      // Cost chart
+      const total = dados.custoBlocos + dados.custoArgamassa;
+      const percBlocos = (dados.custoBlocos / total) * 100;
+      const percArgamassa = (dados.custoArgamassa / total) * 100;
+
+      document.getElementById('chartBlocos').textContent = formatCurrency(dados.custoBlocos);
+      document.getElementById('chartArgamassa').textContent = formatCurrency(dados.custoArgamassa);
+      document.getElementById('chartTotal').textContent = formatCurrency(total);
+      
+      setTimeout(() => {
+        document.getElementById('barBlocos').style.width = percBlocos + '%';
+        document.getElementById('barArgamassa').style.width = percArgamassa + '%';
+      }, 100);
+
+      // Detailed results
+      gerarResultadoDetalhado(dados);
+    }
+
+    function gerarResultadoDetalhado(dados) {
+      const { area, areaLiquida, aberturas, bloco, qtdBlocosSemPerda, qtdBlocosComPerda,
+              perdaPercentual, volumeArgamassaM3, massaArgamassaKg, qtdSacosArgamassa,
+              tipoArgamassa, custoBlocos, custoArgamassa, custoTotal, custoM2,
+              produtividadeDia, diasObra } = dados;
+
+      let html = `
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="result-card glass rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">📦</span>
+              Quantitativo de Blocos
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Tipo</span>
+                <span class="font-medium">${bloco.nome}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Dimensões</span>
+                <span>${bloco.largura} × ${bloco.comprimento} × ${bloco.altura} cm</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Qtd. Teórica</span>
+                <span>${Math.ceil(qtdBlocosSemPerda)} un</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Perda (${perdaPercentual}%)</span>
+                <span class="text-orange-400">+${Math.ceil(qtdBlocosComPerda - qtdBlocosSemPerda)} un</span>
+              </div>
+              <div class="flex justify-between py-2 bg-cyan-500/10 rounded-lg px-3 -mx-3">
+                <span class="font-medium">Total</span>
+                <span class="font-bold text-cyan-400">${Math.ceil(qtdBlocosComPerda)} unidades</span>
+              </div>
+              <div class="flex justify-between py-2 text-sm text-gray-400">
+                <span>Em milheiros</span>
+                <span>${(qtdBlocosComPerda / 1000).toFixed(2)} mil</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-card glass rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">🪣</span>
+              Argamassa de Assentamento
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Tipo</span>
+                <span class="font-medium">${getNomeArgamassa(tipoArgamassa)}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Volume</span>
+                <span>${volumeArgamassaM3.toFixed(3)} m³</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Massa</span>
+                <span>${massaArgamassaKg.toFixed(1)} kg</span>
+              </div>
+              <div class="flex justify-between py-2 bg-violet-500/10 rounded-lg px-3 -mx-3">
+                <span class="font-medium">Sacos 20kg</span>
+                <span class="font-bold text-violet-400">${Math.ceil(qtdSacosArgamassa)} unidades</span>
+              </div>
+            </div>
+            ${tipoArgamassa !== 'industrializada' ? gerarComposicaoTraco(tipoArgamassa, volumeArgamassaM3) : ''}
+          </div>
+
+          <div class="result-card glass rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">💰</span>
+              Análise de Custos
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Blocos</span>
+                <span>${formatCurrency(custoBlocos)}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Argamassa</span>
+                <span>${formatCurrency(custoArgamassa)}</span>
+              </div>
+              <div class="flex justify-between py-2 bg-green-500/10 rounded-lg px-3 -mx-3">
+                <span class="font-medium">Total</span>
+                <span class="font-bold text-green-400">${formatCurrency(custoTotal)}</span>
+              </div>
+              <div class="flex justify-between py-2 text-sm">
+                <span class="text-gray-400">Custo por m²</span>
+                <span class="text-green-400">${formatCurrency(custoM2)}/m²</span>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">*Valores não incluem mão de obra</p>
+          </div>
+
+          <div class="result-card glass rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">👷</span>
+              Produtividade Estimada
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Área Líquida</span>
+                <span>${areaLiquida.toFixed(2)} m²</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-gray-400">Produtividade</span>
+                <span>${produtividadeDia} m²/pedreiro/dia</span>
+              </div>
+              <div class="flex justify-between py-2 bg-amber-500/10 rounded-lg px-3 -mx-3">
+                <span class="font-medium">Prazo Estimado</span>
+                <span class="font-bold text-amber-400">${diasObra} dias úteis</span>
+              </div>
+              <div class="flex justify-between py-2 text-sm text-gray-400">
+                <span>Equipe</span>
+                <span>1 pedreiro + 1 servente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">📋</span>
+            Recomendações Técnicas
+          </h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <ul class="space-y-2">
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> Umedecer os blocos antes do assentamento</li>
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> Espessura da junta: 10mm (±2mm)</li>
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> Prumo e nível a cada 3 fiadas</li>
+            </ul>
+            <ul class="space-y-2">
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> Amarração entre paredes: mín. 3 blocos</li>
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> Cura da argamassa: mínimo 7 dias</li>
+              <li class="flex items-start gap-2"><span class="text-cyan-400">✓</span> Armazenamento: local coberto e seco</li>
+            </ul>
+          </div>
+        </div>
+      `;
+
+      if (aberturas > 0) {
+        html += `
+          <div class="mt-6 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center gap-3">
+            <span class="text-2xl">ℹ️</span>
+            <p class="text-cyan-300">
+              <strong>Aberturas:</strong> ${aberturas.toFixed(2)} m² descontados (portas, janelas, vãos)
+            </p>
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="result-card glass rounded-2xl p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📝</span> Memorial de Cálculo
+          </h3>
+          <pre class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE ALVENARIA
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. DADOS DE ENTRADA
+Bloco Utilizado: ${bloco.nome} (${bloco.largura}x${bloco.comprimento}x${bloco.altura} cm)
+Área Bruta: ${area.toFixed(2)} m²
+Aberturas (Vãos): ${aberturas.toFixed(2)} m²
+Área Líquida: ${areaLiquida.toFixed(2)} m²
+Perda Estimada: ${perdaPercentual}%
+
+2. CÁLCULO DE BLOCOS
+Rendimento do Bloco: ${bloco.rendimento} un/m²
+Quantidade Teórica = Área Líquida × Rendimento
+Quantidade Teórica = ${areaLiquida.toFixed(2)} × ${bloco.rendimento} = ${qtdBlocosSemPerda.toFixed(2)} un
+Quantidade com Perda (${perdaPercentual}%) = ${qtdBlocosComPerda.toFixed(2)} un
+Total a Comprar = ${Math.ceil(qtdBlocosComPerda)} unidades
+
+3. CÁLCULO DE ARGAMASSA
+Tipo de Argamassa: ${getNomeArgamassa(tipoArgamassa)}
+Consumo Médio: ${bloco.argamassaM3} m³/m²
+Volume de Argamassa = Área Líquida × Consumo Médio
+Volume de Argamassa = ${areaLiquida.toFixed(2)} × ${bloco.argamassaM3} = ${volumeArgamassaM3.toFixed(3)} m³
+Massa Estimada = ${massaArgamassaKg.toFixed(1)} kg
+Sacos de 20kg necessários = ${Math.ceil(qtdSacosArgamassa)} sacos
+
+4. ESTIMATIVA DE CUSTOS E PRAZO
+Custo de Blocos: ${formatCurrency(custoBlocos)}
+Custo de Argamassa: ${formatCurrency(custoArgamassa)}
+Custo Total de Material: ${formatCurrency(custoTotal)}
+Custo por m²: ${formatCurrency(custoM2)}/m²
+
+Prazo Estimado (1 pedreiro + 1 servente): ${diasObra} dias úteis (considerando produtividade de ${produtividadeDia} m²/dia)</pre>
+        </div>
+      `;
+
+      document.getElementById('resultados').innerHTML = html;
+    }
+
+    function getNomeArgamassa(tipo) {
+      const nomes = {
+        'industrializada': 'Industrializada',
+        '1:4': 'Traço 1:4',
+        '1:6': 'Traço 1:6',
+        '1:2:8': 'Traço 1:2:8'
+      };
+      return nomes[tipo] || tipo;
+    }
+
+    function gerarComposicaoTraco(traco, volumeM3) {
+      let composicao = {};
+      switch(traco) {
+        case '1:4': composicao = { cimento: 360, areia: 1.0 }; break;
+        case '1:6': composicao = { cimento: 280, areia: 1.0 }; break;
+        case '1:2:8': composicao = { cimento: 220, cal: 75, areia: 1.0 }; break;
+      }
+
+      const cimentoTotal = composicao.cimento * volumeM3;
+      const areiaTotal = composicao.areia * volumeM3;
+      const sacosCimento = cimentoTotal / 50;
+
+      let html = `
+        <div class="mt-4 pt-4 border-t border-white/10">
+          <p class="text-sm text-gray-400 mb-2">Composição do traço:</p>
+          <div class="text-sm space-y-1">
+            <div class="flex justify-between">
+              <span>Cimento</span>
+              <span>${cimentoTotal.toFixed(1)} kg (${Math.ceil(sacosCimento)} sacos)</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Areia</span>
+              <span>${areiaTotal.toFixed(3)} m³</span>
+            </div>
+      `;
+
+      if (composicao.cal) {
+        const calTotal = composicao.cal * volumeM3;
+        const sacosCal = calTotal / 20;
+        html += `
+            <div class="flex justify-between">
+              <span>Cal</span>
+              <span>${calTotal.toFixed(1)} kg (${Math.ceil(sacosCal)} sacos)</span>
+            </div>
+        `;
+      }
+
+      html += `</div></div>`;
+      return html;
+    }
+
+    // ===== COMPARISON =====
+    function abrirComparativo() {
+      const area = parseFloat(document.getElementById('area').value) || 20;
+      const aberturas = parseFloat(document.getElementById('aberturas').value) || 0;
+      const areaLiquida = area - aberturas;
+      const precoBloco = parseFloat(document.getElementById('preco-bloco').value);
+      const precoArgamassa = parseFloat(document.getElementById('preco-argamassa').value);
+      const perdaPercentual = parseFloat(document.getElementById('perda').value);
+
+      let html = `
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-white/10">
+              <th class="text-left py-3 px-2">Tipo</th>
+              <th class="text-center py-3 px-2">Dimensões</th>
+              <th class="text-center py-3 px-2">Blocos</th>
+              <th class="text-center py-3 px-2">Argamassa</th>
+              <th class="text-center py-3 px-2">Custo Est.</th>
+              <th class="text-center py-3 px-2">R$/m²</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      Object.entries(especificacoesBlocos).forEach(([key, bloco]) => {
+        const qtdBlocos = Math.ceil(areaLiquida * bloco.rendimento * (1 + bloco.perdaPadrao / 100));
+        const volumeArg = areaLiquida * bloco.argamassaM3;
+        const sacos = Math.ceil((volumeArg * 1400) / 20);
+        const custo = (qtdBlocos * precoBloco) + (sacos * precoArgamassa);
+        const custoM2 = custo / areaLiquida;
+
+        const isActive = key === tipoAtual;
+
+        html += `
+          <tr class="border-b border-white/5 ${isActive ? 'bg-cyan-500/10' : 'hover:bg-white/5'}">
+            <td class="py-3 px-2 font-medium ${isActive ? 'text-cyan-400' : ''}">${bloco.nome}</td>
+            <td class="text-center py-3 px-2 text-gray-400">${bloco.largura}×${bloco.comprimento}×${bloco.altura}</td>
+            <td class="text-center py-3 px-2">${qtdBlocos} un</td>
+            <td class="text-center py-3 px-2">${sacos} sacos</td>
+            <td class="text-center py-3 px-2 font-medium">${formatCurrency(custo)}</td>
+            <td class="text-center py-3 px-2 ${isActive ? 'text-cyan-400 font-bold' : ''}">${formatCurrency(custoM2)}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>
+        <p class="text-xs text-gray-500 mt-4">*Cálculo para ${areaLiquida.toFixed(2)} m² de parede</p>
+      `;
+
+      document.getElementById('comparativoConteudo').innerHTML = html;
+      document.getElementById('modalComparar').classList.remove('hidden');
+      document.getElementById('modalComparar').classList.add('flex');
+    }
+
+    function fecharModal() {
+      document.getElementById('modalComparar').classList.add('hidden');
+      document.getElementById('modalComparar').classList.remove('flex');
+    }
+
+    // ===== RESET & ERROR =====
+    function resetar() {
+      document.getElementById('area').value = '20';
+      document.getElementById('comprimento').value = '';
+      document.getElementById('altura').value = '';
+      document.getElementById('junta').value = '1.0';
+      document.getElementById('perda').value = '10';
+      document.getElementById('aberturas').value = '0';
+      document.getElementById('tipo-argamassa').value = 'industrializada';
+      document.getElementById('preco-bloco').value = '1.85';
+      document.getElementById('preco-argamassa').value = '24.00';
+      
+      selecionarTipo('ceramico-6');
+      localStorage.removeItem('alvenaria-calc');
+    }
+
+    function limparResultados() {
+      document.getElementById('statBlocos').textContent = '0';
+      document.getElementById('statArgamassa').textContent = '0';
+      document.getElementById('statCusto').textContent = 'R$ 0';
+      document.getElementById('statPrazo').textContent = '0 dias';
+      document.getElementById('barBlocos').style.width = '0%';
+      document.getElementById('barArgamassa').style.width = '0%';
+      document.getElementById('chartBlocos').textContent = 'R$ 0';
+      document.getElementById('chartArgamassa').textContent = 'R$ 0';
+      document.getElementById('chartTotal').textContent = 'R$ 0,00';
+      document.getElementById('resultados').innerHTML = '';
+    }
+
+    function mostrarErro(msg) {
+      document.getElementById('resultados').innerHTML = `
+        <div class="glass rounded-2xl p-6 border border-red-500/30 bg-red-500/10">
+          <div class="flex items-center gap-3 text-red-400">
+            <span class="text-2xl">⚠️</span>
+            <span class="font-medium">${msg}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // ===== EXPORT =====
+    function exportarPDF() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Cálculo de Alvenaria',
+          text: ultimoResultado ? 
+            `Blocos: ${Math.ceil(ultimoResultado.qtdBlocosComPerda)} | Argamassa: ${Math.ceil(ultimoResultado.qtdSacosArgamassa)} sacos | Custo: ${formatCurrency(ultimoResultado.custoTotal)}` :
+            'Calculadora de Alvenaria',
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        window.print();
+      }
+    }
+
+    function toggleDarkMode() {
+      // Future implementation for light/dark mode toggle
+      alert('Modo claro em desenvolvimento! 🌙');
+    }
+  </script>
+</body>
+</html>
