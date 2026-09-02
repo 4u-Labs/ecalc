@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Acabamentos e Revestimentos | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
+            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', pink: '#ff00aa' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ff00aa, #8b1bf7); border-radius: 4px; }
+    
+    .text-glow { text-shadow: 0 0 20px rgba(255, 0, 170, 0.5); }
+    
+    .gradient-border {
+      position: relative;
+      background: #12121a;
+      border-radius: 16px;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ff00aa, #8b1bf7, #ff00aa);
+      background-size: 300% 300%;
+      animation: gradientMove 8s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 170, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(255, 0, 170, 0.6); }
+    }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      border-color: #ff00aa;
+      box-shadow: 0 0 15px rgba(255, 0, 170, 0.2);
+      outline: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff00aa 0%, #8b1bf7 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 0, 170, 0.4);
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      border-color: #ff00aa;
+    }
+    
+    .hidden-section { display: none; }
+  </style>
+</head>
+<body class="font-sans text-gray-100">
+  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-pink to-neon-purple flex items-center justify-center font-bold text-dark-900 text-xl">
+          🎨
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold text-white">Acabamentos</h1>
+          <p class="text-xs text-gray-500">Pintura, Pisos, Rejunte e Drywall</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-1 space-y-6">
+        <div class="gradient-border p-6">
+          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+            <span class="text-neon-pink">●</span> Tipo de Serviço
+          </h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2">Selecione o Módulo</label>
+              <select id="moduloSelecionado" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700 font-medium">
+                <option value="pintura">Pintura e Massa</option>
+                <option value="piso">Pisos e Porcelanatos (Argamassa/Rejunte)</option>
+                <option value="drywall">Parede de Drywall</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Módulo Pintura -->
+        <div id="secPintura" class="gradient-border p-6 module-section">
+          <h2 class="text-lg font-semibold mb-4 text-white">Medidas (Pintura)</h2>
+          <div class="space-y-4">
+            <div><label class="block text-sm text-gray-400 mb-1">Área Bruta da Parede (m²)</label><input type="number" id="p_area" value="50" step="0.5" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+            <div><label class="block text-sm text-gray-400 mb-1">Área de Vãos/Janelas (m²) - Desconto</label><input type="number" id="p_vaos" value="5" step="0.5" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Demãos Desejadas</label>
+              <select id="p_demaos" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700">
+                <option value="1">1 Demão</option>
+                <option value="2" selected>2 Demãos</option>
+                <option value="3">3 Demãos</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Rendimento Médio Tinta (m²/L por demão)</label>
+              <input type="number" id="p_rend" value="10" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700" title="Ex: Tinta Acrílica Rende ~10m²/L">
+            </div>
+          </div>
+        </div>
+
+        <!-- Módulo Piso -->
+        <div id="secPiso" class="gradient-border p-6 module-section hidden-section">
+          <h2 class="text-lg font-semibold mb-4 text-white">Medidas (Piso Cerâmico)</h2>
+          <div class="space-y-4">
+            <div><label class="block text-sm text-gray-400 mb-1">Área do Chão (m²)</label><input type="number" id="pi_area" value="30" step="0.5" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="block text-sm text-gray-400 mb-1">Peça Comp. (cm)</label><input type="number" id="pi_l" value="60" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+              <div><label class="block text-sm text-gray-400 mb-1">Peça Larg. (cm)</label><input type="number" id="pi_w" value="60" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+            </div>
+            <div><label class="block text-sm text-gray-400 mb-1">Espessura do Rejunte (mm)</label><input type="number" id="pi_rejunte" value="2" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+            <div><label class="block text-sm text-gray-400 mb-1">Perda / Recortes (%)</label><input type="number" id="pi_perda" value="10" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+          </div>
+        </div>
+
+        <!-- Módulo Drywall -->
+        <div id="secDrywall" class="gradient-border p-6 module-section hidden-section">
+          <h2 class="text-lg font-semibold mb-4 text-white">Medidas (Drywall)</h2>
+          <div class="space-y-4">
+            <div><label class="block text-sm text-gray-400 mb-1">Largura da Parede (m)</label><input type="number" id="d_largura" value="4" step="0.1" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+            <div><label class="block text-sm text-gray-400 mb-1">Altura / Pé-direito (m)</label><input type="number" id="d_altura" value="2.8" step="0.1" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Tipo de Face</label>
+              <select id="d_faces" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700">
+                <option value="2">Duas Faces (Parede Divisória)</option>
+                <option value="1">Uma Face (Revestimento Parede)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 shadow-lg shadow-pink-500/30">
+          Gerar Quantitativos
+        </button>
+      </div>
+
+      <div class="lg:col-span-2 space-y-6">
+        <div id="resultadoSection" class="gradient-border p-8 opacity-50 transition-opacity duration-500">
+          <div class="text-gray-400 mb-4 text-sm uppercase tracking-wider text-center font-bold">Resumo de Materiais</div>
+          
+          <div id="gridResultados" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <!-- Gerado via JS -->
+          </div>
+        </div>
+
+        <div class="gradient-border p-6">
+          <h3 class="text-lg font-semibold mb-4 text-white">📝 Relatório Detalhado</h3>
+          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
+    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    // Mudar Módulo Visível
+    $('moduloSelecionado').addEventListener('change', (e) => {
+      document.querySelectorAll('.module-section').forEach(el => el.classList.add('hidden-section'));
+      if (e.target.value === 'pintura') $('secPintura').classList.remove('hidden-section');
+      if (e.target.value === 'piso') $('secPiso').classList.remove('hidden-section');
+      if (e.target.value === 'drywall') $('secDrywall').classList.remove('hidden-section');
+    });
+
+    function addCard(titulo, valor, unidade) {
+      return `
+        <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover text-center">
+          <div class="text-xs text-gray-500 mb-1">${titulo}</div>
+          <div class="text-xl font-semibold text-neon-pink">${valor} <span class="text-sm text-gray-400">${unidade}</span></div>
+        </div>
+      `;
+    }
+
+    function calcPintura() {
+      const aBruta = parseFloat($('p_area').value) || 0;
+      const aVaos = parseFloat($('p_vaos').value) || 0;
+      const demaos = parseInt($('p_demaos').value) || 2;
+      const rendLt = parseFloat($('p_rend').value) || 10;
+
+      const areaLiquida = Math.max(0, aBruta - aVaos);
+      const m2Totais = areaLiquida * demaos;
+      const litros = m2Totais / rendLt;
+      
+      const latas18 = Math.floor(litros / 18);
+      const galoes36 = Math.ceil((litros % 18) / 3.6);
+
+      // Massa Corrida (1 kg rende aprox 1 a 1.5 m² em 2 demãos)
+      const massaKg = areaLiquida * 1.2; // Estimativa média
+
+      $('gridResultados').innerHTML = 
+        addCard("Área Líquida", areaLiquida.toFixed(1), "m²") +
+        addCard("Total a Pintar (C/ Demãos)", m2Totais.toFixed(1), "m²") +
+        addCard("Tinta Necessária", litros.toFixed(1), "Litros") +
+        addCard("Latas Grandes (18L)", latas18, "unid.") +
+        addCard("Galões (3.6L)", galoes36, "unid.") +
+        addCard("Massa Corrida Estimada", massaKg.toFixed(1), "kg");
+
+      $('memorial').textContent = `MÓDULO: PINTURA E MASSA CORRIDA
+Área Bruta: ${aBruta.toFixed(2)} m²
+Área de Vãos (Desconto): ${aVaos.toFixed(2)} m²
+Área Líquida: ${areaLiquida.toFixed(2)} m²
+
+Demãos: ${demaos}
+Rendimento Adotado: ${rendLt} m²/L por demão
+Total de Litros: ${litros.toFixed(2)} L
+Embalagens Sugeridas: ${latas18} Latas de 18L + ${galoes36} Galões de 3.6L.
+
+Massa Corrida (Estimativa conservadora de 1.2kg/m²): ${massaKg.toFixed(2)} kg.`;
+    }
+
+    function calcPiso() {
+      const area = parseFloat($('pi_area').value) || 0;
+      const cCm = parseFloat($('pi_l').value) || 60;
+      const lCm = parseFloat($('pi_w').value) || 60;
+      const espRejunte = parseFloat($('pi_rejunte').value) || 2;
+      const perda = parseFloat($('pi_perda').value) || 10;
+
+      const areaTotalComPerda = area * (1 + perda/100);
+      const areaPecaM2 = (cCm/100) * (lCm/100);
+      const numPecas = Math.ceil(areaTotalComPerda / areaPecaM2);
+
+      // Argamassa (Aprox 5 kg/m² para peças normais, até 8 kg/m² para peças grandes com dupla colagem)
+      let argamassaM2 = (cCm >= 60 || lCm >= 60) ? 7.5 : 5.0; 
+      const argamassaKg = area * argamassaM2;
+      const sacos20 = Math.ceil(argamassaKg / 20);
+
+      // Rejunte (Fórmula padrão da indústria)
+      // Kg/m² = ((A+B)/(A*B)) * C * D * 1.58
+      // Onde A e B em mm, C espessura da peça (adotar 8mm), D junta em mm
+      const aMm = cCm * 10;
+      const bMm = lCm * 10;
+      const espPecaMm = 8;
+      const coef = 1.58;
+      
+      const rejunteM2 = ((aMm + bMm) / (aMm * bMm)) * espPecaMm * espRejunte * coef;
+      const rejunteKgTotal = areaTotalComPerda * rejunteM2;
+
+      $('gridResultados').innerHTML = 
+        addCard("Área (com perda)", areaTotalComPerda.toFixed(1), "m²") +
+        addCard("Qtd. de Peças Cerâmicas", numPecas, "unid.") +
+        addCard("Argamassa Colante (AC)", argamassaKg.toFixed(1), "kg") +
+        addCard("Sacos de Argamassa (20kg)", sacos20, "sacos") +
+        addCard("Rejuntamento", rejunteKgTotal.toFixed(1), "kg");
+
+      $('memorial').textContent = `MÓDULO: PISO E PORCELANATO
+Área do Chão: ${area.toFixed(2)} m²
+Perda/Recorte: ${perda}% -> Total p/ Compra: ${areaTotalComPerda.toFixed(2)} m²
+Tamanho da Peça: ${cCm}cm x ${lCm}cm (${areaPecaM2.toFixed(3)} m²/peça)
+Quantidade de Peças: ${numPecas} peças inteiras
+
+Argamassa:
+Consumo adotado: ${argamassaM2} kg/m² (Dupla colagem considerada para peças >=60cm)
+Total: ${sacos20} sacos de 20kg.
+
+Rejunte:
+Junta de assentamento: ${espRejunte} mm
+Consumo estimado: ${rejunteKgTotal.toFixed(2)} kg.`;
+    }
+
+    function calcDrywall() {
+      const l = parseFloat($('d_largura').value) || 0;
+      const h = parseFloat($('d_altura').value) || 0;
+      const faces = parseInt($('d_faces').value) || 2;
+      
+      const areaM2 = l * h;
+      // Parâmetros de consumo por m² (Tabela Gypsum/Knauf genérica para parede padrão 600mm)
+      // Chapas (Standard 1.20 x 2.40m = 2.88m²)
+      const m2Chapa = 2.88;
+      let qtdChapas = Math.ceil((areaM2 * faces) / m2Chapa * 1.05); // 5% perda
+      
+      // Montantes (aprox 2 a 3 por m) e Guias
+      // Simplificado: Guias (sup + inf) = l * 2. Montantes a cada 60cm = (l/0.6 + 1) * h
+      const mLinearGuia = l * 2 * 1.1; // 10% perda
+      const guias3m = Math.ceil(mLinearGuia / 3);
+      
+      const mLinearMontante = (Math.ceil(l / 0.6) + 1) * h;
+      const montantes3m = Math.ceil(mLinearMontante / 3 * 1.05);
+
+      const parafusosChapa = Math.ceil(areaM2 * faces * 15); // ~15 por m²
+      const massaDrywall = Math.ceil(areaM2 * faces * 0.3); // 0.3kg/m²
+      const fitaTelada = Math.ceil(areaM2 * faces * 1.5); // 1.5m/m²
+
+      $('gridResultados').innerHTML = 
+        addCard("Área da Parede", areaM2.toFixed(1), "m²") +
+        addCard("Chapas (1.20x2.40m)", qtdChapas, "unid.") +
+        addCard("Montantes (3m)", montantes3m, "unid.") +
+        addCard("Guias (3m)", guias3m, "unid.") +
+        addCard("Parafusos p/ Chapa (Trombeta)", parafusosChapa, "unid.") +
+        addCard("Massa p/ Juntas", massaDrywall, "kg") +
+        addCard("Fita para Juntas", fitaTelada, "metros");
+
+      $('memorial').textContent = `MÓDULO: DRYWALL
+Dimensões da Parede: L=${l.toFixed(2)}m x H=${h.toFixed(2)}m
+Área Frontal: ${areaM2.toFixed(2)} m²
+Número de Faces a chapear: ${faces}
+Espaçamento entre montantes adotado: 600 mm
+
+LISTA DE MATERIAIS
+- Chapas ST 12.5mm (1.20x2.40m): ${qtdChapas} peças (Incluso 5% perda)
+- Perfis Montantes de 90mm (3m): ${montantes3m} peças
+- Perfis Guias de 90mm (3m): ${guias3m} peças
+- Parafusos TA25 (Metal/Chapa): ${parafusosChapa} unidades
+- Fita telada/papel microperfurado: ${fitaTelada} m
+- Massa para tratamento de juntas: ${massaDrywall} kg`;
+    }
+
+    function calcular() {
+      $('resultadoSection').classList.remove('opacity-50');
+      $('resultadoSection').classList.add('pulse-glow');
+      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+
+      const mod = $('moduloSelecionado').value;
+      if (mod === 'pintura') calcPintura();
+      else if (mod === 'piso') calcPiso();
+      else if (mod === 'drywall') calcDrywall();
+    }
+
+    $('btnCalcular').addEventListener('click', calcular);
+    $('btnReset').addEventListener('click', () => location.reload());
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if ($('year')) $('year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
