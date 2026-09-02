@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Dosagem de Concreto | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      min-height: 100vh;
+    }
+    
+    .glass {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .glass-dark {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .glow-primary {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    .glow-accent {
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+    }
+    
+    .input-field {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .input-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+      outline: none;
+    }
+    
+    .input-field:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-accent:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(6, 182, 212, 0.4);
+    }
+    
+    .btn-outline {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent);
+    }
+    
+    .section-card {
+      transition: all 0.3s ease;
+    }
+    
+    .section-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+    
+    .result-box {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+    
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .tooltip:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .toast {
+      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+    
+    .pulse-dot {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: scale(1.02);
+      border-color: var(--accent);
+    }
+    
+    .progress-ring {
+      transition: stroke-dashoffset 0.5s ease;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(6, 182, 212, 0.5);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(6, 182, 212, 0.7);
+    }
+    
+    .tab-active {
+      background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
+      color: white;
+    }
+    
+    .comparison-highlight {
+      animation: highlightPulse 1s ease;
+    }
+    
+    @keyframes highlightPulse {
+      0%, 100% { background: transparent; }
+      50% { background: rgba(6, 182, 212, 0.2); }
+    }
+
+    .eco-badge {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+  </style>
+</head>
+<body class="text-gray-100">
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+  
+  <!-- Header -->
+  <header class="glass-dark sticky top-0 z-40 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center font-bold text-lg">
+            🏗️
+          </div>
+          <div>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              Dosagem de Concreto
+            </h1>
+            <p class="text-xs text-gray-400">Calculadora Avançada v7.0</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <button onclick="toggleAutoCalc()" id="autoCalcBtn" class="btn-outline px-3 py-2 rounded-lg text-sm flex items-center gap-2">
+            <span id="autoCalcIcon" class="w-2 h-2 rounded-full bg-gray-500"></span>
+            <span class="hidden sm:inline">Auto-cálculo</span>
+          </button>
+          <button onclick="toggleTheme()" class="btn-outline p-2 rounded-lg">
+            <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap justify-center gap-3 mb-8">
+      <button onclick="calcular()" class="btn-primary px-6 py-3 rounded-xl font-semibold text-white flex items-center gap-2 shadow-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        </svg>
+        Calcular
+      </button>
+      <button onclick="salvarCalculo()" class="btn-accent px-4 py-3 rounded-xl font-semibold text-white flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+        </svg>
+        Salvar
+      </button>
+      <button onclick="exportarExcel()" class="btn-outline px-4 py-3 rounded-xl font-medium flex items-center gap-2">
+        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        </svg>
+        Excel
+      </button>
+      <button onclick="exportarPDF()" class="btn-outline px-4 py-3 rounded-xl font-medium flex items-center gap-2">
+        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        </svg>
+        PDF
+      </button>
+      <button onclick="restaurarPadroes()" class="btn-outline px-4 py-3 rounded-xl font-medium flex items-center gap-2">
+        <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Reset
+      </button>
+    </div>
+
+    <!-- Quick Stats -->
+    <div id="quickStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 hidden">
+      <div class="stat-card rounded-xl p-4 text-center">
+        <div class="text-3xl font-bold text-cyan-400" id="statFck">--</div>
+        <div class="text-xs text-gray-400 mt-1">fck (MPa)</div>
+      </div>
+      <div class="stat-card rounded-xl p-4 text-center">
+        <div class="text-3xl font-bold text-green-400" id="statAC">--</div>
+        <div class="text-xs text-gray-400 mt-1">Relação a/c</div>
+      </div>
+      <div class="stat-card rounded-xl p-4 text-center">
+        <div class="text-3xl font-bold text-yellow-400" id="statCusto">--</div>
+        <div class="text-xs text-gray-400 mt-1">R$/m³</div>
+      </div>
+      <div class="stat-card rounded-xl p-4 text-center">
+        <div class="text-3xl font-bold text-purple-400" id="statCO2">--</div>
+        <div class="text-xs text-gray-400 mt-1">kg CO₂/m³</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex flex-wrap gap-2 mb-6">
+      <button onclick="showTab('config')" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="config">
+        ⚙️ Configuração
+      </button>
+      <button onclick="showTab('resultado')" class="tab-btn btn-outline px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="resultado">
+        📊 Resultado
+      </button>
+      <button onclick="showTab('graficos')" class="tab-btn btn-outline px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="graficos">
+        📈 Gráficos
+      </button>
+      <button onclick="showTab('historico')" class="tab-btn btn-outline px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="historico">
+        📁 Histórico
+      </button>
+      <button onclick="showTab('comparacao')" class="tab-btn btn-outline px-4 py-2 rounded-lg text-sm font-medium transition-all" data-tab="comparacao">
+        ⚖️ Comparar
+      </button>
+    </div>
+
+    <!-- Tab: Configuração -->
+    <div id="tabConfig" class="tab-content">
+      <div class="grid lg:grid-cols-2 gap-6">
+        <!-- Dados Básicos -->
+        <section class="section-card glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">📐</span>
+            Dados Básicos
+          </h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Método</label>
+              <select id="metodo" class="input-field w-full px-3 py-2 rounded-lg text-white">
+                <option value="ACI" selected>ACI 211.1</option>
+                <option value="IPT">IPT/EPUSP</option>
+                <option value="NBR">NBR 12655</option>
+                <option value="ABCP">ABCP</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1 tooltip" data-tooltip="Resistência característica aos 28 dias">fck (MPa) ℹ️</label>
+              <input type="number" id="fck" value="25" class="input-field w-full px-3 py-2 rounded-lg text-white" min="10" max="100">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1 tooltip" data-tooltip="Abatimento do tronco de cone">Slump (mm) ℹ️</label>
+              <input type="number" id="slump" value="80" class="input-field w-full px-3 py-2 rounded-lg text-white" min="20" max="250">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Dmáx (mm)</label>
+              <select id="dmax" class="input-field w-full px-3 py-2 rounded-lg text-white">
+                <option>9.5</option>
+                <option>12.5</option>
+                <option selected>19</option>
+                <option>25</option>
+                <option>37.5</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Volume (m³)</label>
+              <input type="number" id="volume" value="1" class="input-field w-full px-3 py-2 rounded-lg text-white" min="0.1" step="0.1">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Ar incorporado?</label>
+              <select id="ar" class="input-field w-full px-3 py-2 rounded-lg text-white">
+                <option value="false" selected>Não</option>
+                <option value="true">Sim (4-6%)</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- NBR Durability Options -->
+          <div id="durabilidade" class="mt-4 hidden">
+            <div class="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20">
+              <label class="block text-sm text-gray-400 mb-2">Classe de Agressividade Ambiental</label>
+              <select id="classeExpo" class="input-field w-full px-3 py-2 rounded-lg text-white">
+                <option value="I" selected>I - Fraca (rural/submersa)</option>
+                <option value="II">II - Moderada (urbana)</option>
+                <option value="III">III - Forte (marinha/industrial)</option>
+                <option value="IV">IV - Muito Forte (respingos de maré)</option>
+              </select>
+              <p id="regrasNBR" class="text-xs text-cyan-400 mt-2"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Materiais -->
+        <section class="section-card glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400">🪨</span>
+            Materiais
+          </h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Tipo de Cimento</label>
+              <select id="cimentoTipo" class="input-field w-full px-3 py-2 rounded-lg text-white">
+                <option value="CP-II" selected>CP-II (3150 kg/m³)</option>
+                <option value="CP-III">CP-III (3000 kg/m³)</option>
+                <option value="CP-IV">CP-IV (3050 kg/m³)</option>
+                <option value="CP-V">CP-V ARI (3150 kg/m³)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1 tooltip" data-tooltip="Módulo de finura da areia (2.2 a 3.2)">MF Areia ℹ️</label>
+              <input type="number" id="mfAreia" value="2.6" step="0.1" class="input-field w-full px-3 py-2 rounded-lg text-white" min="2.0" max="3.5">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Umidade Areia (%)</label>
+              <input type="number" id="umidAreia" value="2" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Absorção Areia (%)</label>
+              <input type="number" id="absorAreia" value="1" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Umidade Brita (%)</label>
+              <input type="number" id="umidBrita" value="0.5" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Absorção Brita (%)</label>
+              <input type="number" id="absorBrita" value="0.8" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+          </div>
+        </section>
+
+        <!-- Adições & Aditivos -->
+        <section class="section-card glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">🧪</span>
+            Adições & Aditivos
+          </h2>
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-1 tooltip" data-tooltip="Aumenta resistência e durabilidade">Sílica (%) ℹ️</label>
+              <input type="number" id="silica" value="0" class="input-field w-full px-3 py-2 rounded-lg text-white" min="0" max="15">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1 tooltip" data-tooltip="Reduz calor de hidratação">Cinza (%) ℹ️</label>
+              <input type="number" id="cinza" value="0" class="input-field w-full px-3 py-2 rounded-lg text-white" min="0" max="35">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1 tooltip" data-tooltip="Melhora durabilidade">Escória (%) ℹ️</label>
+              <input type="number" id="escoria" value="0" class="input-field w-full px-3 py-2 rounded-lg text-white" min="0" max="70">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Redução Plastificante (%)</label>
+              <input type="number" id="plastRed" value="0" class="input-field w-full px-3 py-2 rounded-lg text-white" min="0" max="15">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Redução Superplast. (%)</label>
+              <input type="number" id="superplastRed" value="10" class="input-field w-full px-3 py-2 rounded-lg text-white" min="0" max="40">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Dosagem Plastif. (% cim)</label>
+              <input type="number" id="plastDosePctCem" value="0.3" step="0.1" class="input-field w-full px-3 py-2 rounded-lg text-white" min="0" max="2">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Dosagem Superpl. (% cim)</label>
+              <input type="number" id="superplastDosePctCem" value="1.0" step="0.1" class="input-field w-full px-3 py-2 rounded-lg text-white" min="0" max="3">
+            </div>
+          </div>
+        </section>
+
+        <!-- Custos -->
+        <section class="section-card glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-400">💰</span>
+            Custos (R$)
+          </h2>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Cimento/kg</label>
+              <input type="number" id="precoCem" value="1.15" step="0.01" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Sílica/kg</label>
+              <input type="number" id="precoSilica" value="3.50" step="0.01" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Cinza/kg</label>
+              <input type="number" id="precoCinza" value="0.40" step="0.01" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Escória/kg</label>
+              <input type="number" id="precoEscoria" value="0.35" step="0.01" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Areia/m³</label>
+              <input type="number" id="precoAreia" value="165" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Brita/m³</label>
+              <input type="number" id="precoBrita" value="210" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Água/m³</label>
+              <input type="number" id="precoAgua" value="8" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Plastif./kg</label>
+              <input type="number" id="precoPlast" value="12" step="0.1" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Superplast./kg</label>
+              <input type="number" id="precoSuperplast" value="22" step="0.1" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Frete/m³</label>
+              <input type="number" id="frete" value="40" step="0.1" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">BDI (%)</label>
+              <input type="number" id="bdi" value="10" step="0.1" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Lucro (%)</label>
+              <input type="number" id="lucro" value="15" step="0.1" class="input-field w-full px-3 py-2 rounded-lg text-white">
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Tab: Resultado -->
+    <div id="tabResultado" class="tab-content hidden">
+      <div class="glass rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400">📋</span>
+            Resultado do Cálculo
+          </h2>
+          <div id="ecoIndicator" class="hidden">
+            <span class="eco-badge px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+              🌱 <span id="ecoScore">--</span>
+            </span>
+          </div>
+        </div>
+        <pre id="resultado" class="result-box rounded-xl p-6 text-sm mono overflow-x-auto min-h-[300px] text-gray-300"></pre>
+      </div>
+      
+      <!-- Materials Cards -->
+      <div id="materialsCards" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 hidden">
+        <!-- Cards will be inserted by JS -->
+      </div>
+    </div>
+
+    <!-- Tab: Gráficos -->
+    <div id="tabGraficos" class="tab-content hidden">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="glass rounded-2xl p-4">
+          <h3 class="text-sm font-medium text-gray-400 mb-2">Curva de Abrams</h3>
+          <div id="graficoCurva" class="h-80"></div>
+        </div>
+        <div class="glass rounded-2xl p-4">
+          <h3 class="text-sm font-medium text-gray-400 mb-2">Composição Volumétrica</h3>
+          <div id="graficoPieVol" class="h-80"></div>
+        </div>
+        <div class="glass rounded-2xl p-4">
+          <h3 class="text-sm font-medium text-gray-400 mb-2">Distribuição de Custos</h3>
+          <div id="graficoPieCusto" class="h-80"></div>
+        </div>
+        <div class="glass rounded-2xl p-4">
+          <h3 class="text-sm font-medium text-gray-400 mb-2">Custos por Material</h3>
+          <div id="graficoBarrasCusto" class="h-80"></div>
+        </div>
+        <div class="glass rounded-2xl p-4 md:col-span-2">
+          <h3 class="text-sm font-medium text-gray-400 mb-2">Emissões de CO₂ por Componente</h3>
+          <div id="graficoCO2" class="h-80"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Histórico -->
+    <div id="tabHistorico" class="tab-content hidden">
+      <div class="glass rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">Cálculos Salvos</h2>
+          <button onclick="limparHistorico()" class="text-red-400 text-sm hover:text-red-300">Limpar tudo</button>
+        </div>
+        <div id="listaHistorico" class="space-y-3">
+          <p class="text-gray-500 text-center py-8">Nenhum cálculo salvo ainda</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Comparação -->
+    <div id="tabComparacao" class="tab-content hidden">
+      <div class="glass rounded-2xl p-6">
+        <h2 class="text-lg font-semibold mb-4">Comparar Dosagens</h2>
+        <p class="text-gray-400 text-sm mb-4">Selecione até 3 cálculos salvos para comparar:</p>
+        <div id="selectorComparacao" class="flex flex-wrap gap-2 mb-6">
+          <!-- Filled by JS -->
+        </div>
+        <div id="tabelaComparacao" class="overflow-x-auto">
+          <p class="text-gray-500 text-center py-8">Selecione cálculos para comparar</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="glass-dark mt-12 py-6 text-center text-gray-500 text-sm border-t border-white/5">
+    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    <p class="text-xs mt-1">Dosagem de Concreto v7.0 | ACI • IPT • NBR • ABCP</p>
+  </footer>
+
+  <script>
+    // ===== CONSTANTES E CONFIGURAÇÕES =====
+    const DENSIDADES = {
+      "CP-II": 3150, "CP-III": 3000, "CP-IV": 3050, "CP-V": 3150,
+      areia: 2650, brita: 2650, silica: 2200, cinza: 2300, escoria: 2900, agua: 1000
+    };
+
+    // Fatores de emissão CO2 (kg CO2 / kg material)
+    const CO2_FATORES = {
+      cimento: 0.89,
+      silica: 0.02,
+      cinza: 0.01,
+      escoria: 0.05,
+      areia: 0.005,
+      brita: 0.008,
+      agua: 0.0003,
+      aditivos: 0.5
+    };
+
+    const LIMITES_NBR = {
+      "I":  { acMax: 0.65, cemMin: 260 },
+      "II": { acMax: 0.60, cemMin: 280 },
+      "III":{ acMax: 0.55, cemMin: 320 },
+      "IV": { acMax: 0.45, cemMin: 360 }
+    };
+
+    let autoCalc = false;
+    let calculoAtual = null;
+    let historico = JSON.parse(localStorage.getItem('dosagem_historico') || '[]');
+
+    // ===== UTILITÁRIOS =====
+    const fmtBRL = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+    const fmtNum = (v, dec=2) => isNaN(v) ? "-" : Number(v).toFixed(dec);
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        info: 'bg-blue-600',
+        warning: 'bg-yellow-600'
+      };
+      const toast = document.createElement('div');
+      toast.className = `toast ${colors[type]} px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('tab-active');
+        el.classList.add('btn-outline');
+      });
+      
+      const tabEl = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+      if (tabEl) tabEl.classList.remove('hidden');
+      
+      const btn = document.querySelector(`[data-tab="${tab}"]`);
+      if (btn) {
+        btn.classList.add('tab-active');
+        btn.classList.remove('btn-outline');
+      }
+      
+      if (tab === 'historico') renderHistorico();
+      if (tab === 'comparacao') renderSelectorComparacao();
+    }
+
+    function toggleAutoCalc() {
+      autoCalc = !autoCalc;
+      const icon = document.getElementById('autoCalcIcon');
+      icon.className = `w-2 h-2 rounded-full ${autoCalc ? 'bg-green-400 pulse-dot' : 'bg-gray-500'}`;
+      showToast(autoCalc ? 'Auto-cálculo ativado' : 'Auto-cálculo desativado', 'info');
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-theme');
+      showToast('Tema alternado', 'info');
+    }
+
+    // ===== MÉTODOS DE CÁLCULO =====
+    function calcularAC_ACI(fck) {
+      // ACI 211.1 simplificado
+      return Math.max(0.30, Math.min(0.75, 0.68 - 0.0086 * fck));
+    }
+
+    function calcularAC_IPT(fck) {
+      // IPT/EPUSP
+      return Math.max(0.35, Math.min(0.70, 0.65 - 0.008 * fck));
+    }
+
+    function calcularAC_NBR(fck, classeExpo) {
+      let acBase = 0.68 - 0.0086 * fck;
+      const limite = LIMITES_NBR[classeExpo];
+      return Math.min(acBase, limite?.acMax || 0.65);
+    }
+
+    function calcularAC_ABCP(fck) {
+      // ABCP simplificado
+      const fcj = fck + 1.65 * 4; // desvio padrão 4 MPa
+      return Math.max(0.35, Math.min(0.70, 1.5 / (fcj / 10 + 0.5)));
+    }
+
+    function estimarAgua(slump, dmax, arIncorporado) {
+      const tabelaAgua = {
+        "9.5":  {20:185, 40:195, 60:200, 80:210, 100:215, 120:220, 150:225, 180:230},
+        "12.5": {20:180, 40:190, 60:195, 80:205, 100:210, 120:215, 150:220, 180:225},
+        "19":   {20:170, 40:180, 60:185, 80:195, 100:200, 120:205, 150:210, 180:215},
+        "25":   {20:165, 40:175, 60:180, 80:190, 100:195, 120:200, 150:205, 180:210},
+        "37.5": {20:155, 40:165, 60:170, 80:180, 100:185, 120:190, 150:195, 180:200}
+      };
+      
+      const slumps = [20, 40, 60, 80, 100, 120, 150, 180];
+      let slumpKey = slumps.reduce((prev, curr) => 
+        Math.abs(curr - slump) < Math.abs(prev - slump) ? curr : prev
+      );
+      
+      let agua = tabelaAgua[dmax]?.[slumpKey] || 195;
+      if (arIncorporado === "true" || arIncorporado === true) {
+        agua *= 0.92;
+      }
+      return agua;
+    }
+
+    function calcularVolumeAgregados(dmax, mfAreia) {
+      const tabela = {
+        "9.5":  {2.4: 0.50, 2.6: 0.48, 2.8: 0.46, 3.0: 0.44},
+        "12.5": {2.4: 0.59, 2.6: 0.57, 2.8: 0.55, 3.0: 0.53},
+        "19":   {2.4: 0.66, 2.6: 0.64, 2.8: 0.62, 3.0: 0.60},
+        "25":   {2.4: 0.71, 2.6: 0.69, 2.8: 0.67, 3.0: 0.65},
+        "37.5": {2.4: 0.75, 2.6: 0.73, 2.8: 0.71, 3.0: 0.69}
+      };
+      
+      const mfKeys = [2.4, 2.6, 2.8, 3.0];
+      let mfKey = mfKeys.reduce((prev, curr) => 
+        Math.abs(curr - mfAreia) < Math.abs(prev - mfAreia) ? curr : prev
+      );
+      
+      return tabela[dmax]?.[mfKey] || 0.64;
+    }
+
+    // ===== CÁLCULO PRINCIPAL =====
+    function calcular() {
+      try {
+        // Coleta de dados
+        const metodo = document.getElementById("metodo").value;
+        const fck = parseFloat(document.getElementById("fck").value) || 25;
+        const slump = parseFloat(document.getElementById("slump").value) || 80;
+        const dmax = document.getElementById("dmax").value;
+        const volume = parseFloat(document.getElementById("volume").value) || 1;
+        const ar = document.getElementById("ar").value;
+        const mfAreia = parseFloat(document.getElementById("mfAreia").value) || 2.6;
+        const cimentoTipo = document.getElementById("cimentoTipo").value;
+        
+        const umidAreia = parseFloat(document.getElementById("umidAreia").value) || 0;
+        const absorAreia = parseFloat(document.getElementById("absorAreia").value) || 0;
+        const umidBrita = parseFloat(document.getElementById("umidBrita").value) || 0;
+        const absorBrita = parseFloat(document.getElementById("absorBrita").value) || 0;
+        
+        const silica = parseFloat(document.getElementById("silica").value) || 0;
+        const cinza = parseFloat(document.getElementById("cinza").value) || 0;
+        const escoria = parseFloat(document.getElementById("escoria").value) || 0;
+        
+        const plastRed = parseFloat(document.getElementById("plastRed").value) || 0;
+        const superplastRed = parseFloat(document.getElementById("superplastRed").value) || 0;
+        const plastDosePctCem = parseFloat(document.getElementById("plastDosePctCem").value) || 0;
+        const superplastDosePctCem = parseFloat(document.getElementById("superplastDosePctCem").value) || 0;
+        
+        const precoCem = parseFloat(document.getElementById("precoCem").value) || 0.70;
+        const precoSilica = parseFloat(document.getElementById("precoSilica").value) || 3.50;
+        const precoCinza = parseFloat(document.getElementById("precoCinza").value) || 0.40;
+        const precoEscoria = parseFloat(document.getElementById("precoEscoria").value) || 0.35;
+        const precoAreia = parseFloat(document.getElementById("precoAreia").value) || 120;
+        const precoBrita = parseFloat(document.getElementById("precoBrita").value) || 160;
+        const precoAgua = parseFloat(document.getElementById("precoAgua").value) || 8;
+        const precoPlast = parseFloat(document.getElementById("precoPlast").value) || 12;
+        const precoSuperplast = parseFloat(document.getElementById("precoSuperplast").value) || 22;
+        const frete = parseFloat(document.getElementById("frete").value) || 40;
+        const bdi = parseFloat(document.getElementById("bdi").value) || 10;
+        const lucro = parseFloat(document.getElementById("lucro").value) || 15;
+
+        // Cálculo a/c por método
+        let ac, classeExpo = "I";
+        switch(metodo) {
+          case "ACI": ac = calcularAC_ACI(fck); break;
+          case "IPT": ac = calcularAC_IPT(fck); break;
+          case "NBR":
+            classeExpo = document.getElementById("classeExpo").value;
+            ac = calcularAC_NBR(fck, classeExpo);
+            const limite = LIMITES_NBR[classeExpo];
+            document.getElementById("regrasNBR").textContent = 
+              `Classe ${classeExpo}: a/c máx = ${limite.acMax} | Cimento mín = ${limite.cemMin} kg/m³`;
+            break;
+          case "ABCP": ac = calcularAC_ABCP(fck); break;
+          default: ac = calcularAC_ACI(fck);
+        }
+
+        // Água
+        let agua = estimarAgua(slump, dmax, ar);
+        const redTotal = Math.max(plastRed, superplastRed);
+        agua *= (1 - redTotal/100);
+
+        // Cimento e adições
+        let cimentoBase = agua / ac;
+        
+        // Verificar mínimo NBR
+        if (metodo === "NBR") {
+          const cemMin = LIMITES_NBR[classeExpo]?.cemMin || 260;
+          cimentoBase = Math.max(cimentoBase, cemMin);
+        }
+        
+        const totalAdicoes = silica + cinza + escoria;
+        const ligante = cimentoBase / (1 - totalAdicoes/100);
+        const cimento = ligante * (1 - totalAdicoes/100);
+        const silicaKg = ligante * (silica/100);
+        const cinzaKg = ligante * (cinza/100);
+        const escoriaKg = ligante * (escoria/100);
+
+        // Volumes
+        const densCim = DENSIDADES[cimentoTipo] || 3150;
+        const volCimento = cimento / densCim;
+        const volAgua = agua / 1000;
+        const volAdicoes = silicaKg/DENSIDADES.silica + cinzaKg/DENSIDADES.cinza + escoriaKg/DENSIDADES.escoria;
+        const volAr = ar === "true" ? 0.05 : 0.015;
+        const volAgregTotal = 1 - volCimento - volAgua - volAdicoes - volAr;
+        
+        const fracaoBrita = calcularVolumeAgregados(dmax, mfAreia);
+        const volBrita = volAgregTotal * fracaoBrita;
+        const volAreia = volAgregTotal * (1 - fracaoBrita);
+        
+        const brita = volBrita * DENSIDADES.brita;
+        const areia = volAreia * DENSIDADES.areia;
+
+        // Correção de umidade
+        const aguaAbsAreia = areia * (absorAreia/100);
+        const aguaAbsBrita = brita * (absorBrita/100);
+        const aguaSupAreia = areia * (umidAreia/100);
+        const aguaSupBrita = brita * (umidBrita/100);
+        const aguaEfetiva = agua - (aguaSupAreia - aguaAbsAreia) - (aguaSupBrita - aguaAbsBrita);
+        
+        const areiaUmida = areia * (1 + umidAreia/100);
+        const britaUmida = brita * (1 + umidBrita/100);
+
+        // Aditivos
+        const plastificante = cimento * (plastDosePctCem/100);
+        const superplastificante = cimento * (superplastDosePctCem/100);
+
+        // Traço
+        const traco = `1 : ${(areia/cimento).toFixed(2)} : ${(brita/cimento).toFixed(2)} : ${(aguaEfetiva/cimento).toFixed(2)}`;
+        const tracoM = ((areia + brita) / cimento).toFixed(2);
+
+        // Custos
+        const custoCimento = cimento * precoCem;
+        const custoSilica = silicaKg * precoSilica;
+        const custoCinza = cinzaKg * precoCinza;
+        const custoEscoria = escoriaKg * precoEscoria;
+        const custoAreia = (areia/1000) * precoAreia;
+        const custoBrita = (brita/1000) * precoBrita;
+        const custoAgua = (aguaEfetiva/1000) * precoAgua;
+        const custoPlast = plastificante * precoPlast;
+        const custoSuperplast = superplastificante * precoSuperplast;
+        
+        const custoMateriais = custoCimento + custoSilica + custoCinza + custoEscoria + 
+                              custoAreia + custoBrita + custoAgua + custoPlast + custoSuperplast;
+        const custoComFrete = custoMateriais + frete;
+        const custoComBDI = custoComFrete * (1 + bdi/100);
+        const custoFinal = custoComBDI * (1 + lucro/100);
+
+        // Cálculo CO2
+        const co2Cimento = cimento * CO2_FATORES.cimento;
+        const co2Silica = silicaKg * CO2_FATORES.silica;
+        const co2Cinza = cinzaKg * CO2_FATORES.cinza;
+        const co2Escoria = escoriaKg * CO2_FATORES.escoria;
+        const co2Areia = areia * CO2_FATORES.areia;
+        const co2Brita = brita * CO2_FATORES.brita;
+        const co2Agua = aguaEfetiva * CO2_FATORES.agua;
+        const co2Aditivos = (plastificante + superplastificante) * CO2_FATORES.aditivos;
+        const co2Total = co2Cimento + co2Silica + co2Cinza + co2Escoria + co2Areia + co2Brita + co2Agua + co2Aditivos;
+
+        // Score ecológico (0-100)
+        const co2Referencia = 400; // kg CO2 concreto convencional
+        const ecoScore = Math.max(0, Math.min(100, Math.round((1 - co2Total/co2Referencia) * 100 + 50)));
+
+        // Massa total
+        const massaTotal = cimento + silicaKg + cinzaKg + escoriaKg + areia + brita + aguaEfetiva;
+
+        // Resultados para volume especificado
+        const resultadoVol = {
+          cimento: cimento * volume,
+          silicaKg: silicaKg * volume,
+          cinzaKg: cinzaKg * volume,
+          escoriaKg: escoriaKg * volume,
+          areia: areia * volume,
+          brita: brita * volume,
+          aguaEfetiva: aguaEfetiva * volume,
+          areiaUmida: areiaUmida * volume,
+          britaUmida: britaUmida * volume,
+          plastificante: plastificante * volume,
+          superplastificante: superplastificante * volume,
+          custoTotal: custoFinal * volume
+        };
+
+        // Montar resultado
+        const resultado = `
+╔═══════════════════════════════════════════════════════════════════════╗
+║              DOSAGEM DE CONCRETO - ${metodo.padEnd(10)}                      ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║  📊 PARÂMETROS DE ENTRADA                                              ║
+║  ─────────────────────────────────────────────────────────────────────║
+║  fck = ${fck} MPa   │  Slump = ${slump} mm   │  Dmáx = ${dmax} mm              ║
+║  Cimento: ${cimentoTipo}  │  a/c = ${ac.toFixed(3)}                               ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║  🧱 CONSUMO POR m³ (massa seca)                                        ║
+║  ─────────────────────────────────────────────────────────────────────║
+║  Cimento ${cimentoTipo}:     ${fmtNum(cimento,1).padStart(8)} kg                          ║
+║  Sílica ativa:         ${fmtNum(silicaKg,1).padStart(8)} kg                          ║
+║  Cinza volante:        ${fmtNum(cinzaKg,1).padStart(8)} kg                          ║
+║  Escória:              ${fmtNum(escoriaKg,1).padStart(8)} kg                          ║
+║  Areia seca:           ${fmtNum(areia,1).padStart(8)} kg                          ║
+║  Brita seca:           ${fmtNum(brita,1).padStart(8)} kg                          ║
+║  Água efetiva:         ${fmtNum(aguaEfetiva,1).padStart(8)} L                           ║
+║  Plastificante:        ${fmtNum(plastificante,2).padStart(8)} kg                          ║
+║  Superplastificante:   ${fmtNum(superplastificante,2).padStart(8)} kg                          ║
+║  ─────────────────────────────────────────────────────────────────────║
+║  Massa total:          ${fmtNum(massaTotal,1).padStart(8)} kg/m³                       ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║  📐 TRAÇO UNITÁRIO                                                     ║
+║  ─────────────────────────────────────────────────────────────────────║
+║  ${traco}                                               ║
+║  m (agregados/cimento) = ${tracoM}                                       ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║  💧 MATERIAIS CORRIGIDOS (umidade)                                     ║
+║  ─────────────────────────────────────────────────────────────────────║
+║  Areia úmida:          ${fmtNum(areiaUmida,1).padStart(8)} kg                          ║
+║  Brita úmida:          ${fmtNum(britaUmida,1).padStart(8)} kg                          ║
+║  Água a adicionar:     ${fmtNum(aguaEfetiva,1).padStart(8)} L                           ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║  💰 ANÁLISE DE CUSTOS (por m³)                                         ║
+║  ─────────────────────────────────────────────────────────────────────║
+║  Cimento:              ${fmtBRL(custoCimento).padStart(12)}                         ║
+║  Adições minerais:     ${fmtBRL(custoSilica + custoCinza + custoEscoria).padStart(12)}                         ║
+║  Agregados:            ${fmtBRL(custoAreia + custoBrita).padStart(12)}                         ║
+║  Água:                 ${fmtBRL(custoAgua).padStart(12)}                         ║
+║  Aditivos:             ${fmtBRL(custoPlast + custoSuperplast).padStart(12)}                         ║
+║  ─────────────────────────────────────────────────────────────────────║
+║  Subtotal materiais:   ${fmtBRL(custoMateriais).padStart(12)}                         ║
+║  + Frete:              ${fmtBRL(frete).padStart(12)}                         ║
+║  + BDI (${bdi}%):           ${fmtBRL(custoComBDI - custoComFrete).padStart(12)}                         ║
+║  + Lucro (${lucro}%):         ${fmtBRL(custoFinal - custoComBDI).padStart(12)}                         ║
+║  ═════════════════════════════════════════════════════════════════════║
+║  💵 CUSTO FINAL:       ${fmtBRL(custoFinal).padStart(12)} /m³                       ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║  🌱 SUSTENTABILIDADE                                                   ║
+║  ─────────────────────────────────────────────────────────────────────║
+║  Emissão CO₂:          ${fmtNum(co2Total,1).padStart(8)} kg/m³                       ║
+║  Score Ecológico:      ${ecoScore.toString().padStart(8)}/100                          ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║  📦 PARA ${volume} m³                                                       ║
+║  ─────────────────────────────────────────────────────────────────────║
+║  Cimento:              ${fmtNum(resultadoVol.cimento,1).padStart(8)} kg                          ║
+║  Areia úmida:          ${fmtNum(resultadoVol.areiaUmida,1).padStart(8)} kg                          ║
+║  Brita úmida:          ${fmtNum(resultadoVol.britaUmida,1).padStart(8)} kg                          ║
+║  Água:                 ${fmtNum(resultadoVol.aguaEfetiva,1).padStart(8)} L                           ║
+║  Custo total:          ${fmtBRL(resultadoVol.custoTotal).padStart(12)}                         ║
+╚═══════════════════════════════════════════════════════════════════════╝
+`;
+
+        document.getElementById("resultado").textContent = resultado;
+
+        // Atualizar Quick Stats
+        document.getElementById('quickStats').classList.remove('hidden');
+        document.getElementById('statFck').textContent = fck;
+        document.getElementById('statAC').textContent = ac.toFixed(3);
+        document.getElementById('statCusto').textContent = fmtNum(custoFinal, 0);
+        document.getElementById('statCO2').textContent = fmtNum(co2Total, 0);
+
+        // Eco indicator
+        document.getElementById('ecoIndicator').classList.remove('hidden');
+        document.getElementById('ecoScore').textContent = `${ecoScore}/100`;
+
+        // Salvar cálculo atual
+        calculoAtual = {
+          timestamp: new Date().toISOString(),
+          metodo, fck, slump, dmax, ac,
+          cimento, silicaKg, cinzaKg, escoriaKg, areia, brita, aguaEfetiva,
+          areiaUmida, britaUmida, plastificante, superplastificante,
+          traco, custoFinal, co2Total, ecoScore,
+          custoCimento, custoSilica, custoCinza, custoEscoria,
+          custoAreia, custoBrita, custoAgua, custoPlast, custoSuperplast
+        };
+
+        // Gráficos
+        desenharGraficos({
+          cimento, silicaKg, cinzaKg, escoriaKg, areia, brita, aguaEfetiva,
+          custoCimento, custoSilica, custoCinza, custoEscoria,
+          custoAreia, custoBrita, custoAgua, custoPlast, custoSuperplast,
+          co2Cimento, co2Silica, co2Cinza, co2Escoria, co2Areia, co2Brita, co2Agua, co2Aditivos,
+          ac, fck, plastificante, superplastificante
+        });
+
+        // Materials cards
+        renderMaterialsCards(calculoAtual);
+
+        showToast('Cálculo realizado com sucesso!', 'success');
+        showTab('resultado');
+
+      } catch (error) {
+        document.getElementById("resultado").textContent = `❌ Erro no cálculo: ${error.message}`;
+        showToast('Erro no cálculo: ' + error.message, 'error');
+        console.error(error);
+      }
+    }
+
+    // ===== GRÁFICOS =====
+    function desenharGraficos(dados) {
+      if (!window.Plotly) {
+        console.warn('Plotly não carregado');
+        return;
+      }
+
+      const layoutBase = {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(15,23,42,0.5)',
+        font: { color: '#e0e0e0', size: 11, family: 'Inter' },
+        margin: { t: 30, b: 40, l: 50, r: 20 }
+      };
+
+      const colors = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#ec4899'];
+
+      // Curva de Abrams
+      const acRange = [], fckRange = [];
+      for (let a = 0.35; a <= 0.75; a += 0.01) {
+        acRange.push(a.toFixed(2));
+        fckRange.push((90 / (1 + 6.5 * a)).toFixed(1));
+      }
+
+      Plotly.newPlot('graficoCurva', [
+        { x: acRange, y: fckRange, type: 'scatter', mode: 'lines', 
+          line: { color: '#06b6d4', width: 3 }, name: 'Curva de Abrams' },
+        { x: [dados.ac], y: [dados.fck], type: 'scatter', mode: 'markers',
+          marker: { color: '#ef4444', size: 14, symbol: 'diamond' }, name: 'Ponto atual' }
+      ], {
+        ...layoutBase,
+        xaxis: { title: 'Relação a/c', gridcolor: 'rgba(255,255,255,0.1)' },
+        yaxis: { title: 'fck (MPa)', gridcolor: 'rgba(255,255,255,0.1)' },
+        showlegend: true,
+        legend: { x: 0.7, y: 0.95 }
+      }, { displayModeBar: false, responsive: true });
+
+      // Composição volumétrica
+      const densCim = 3150;
+      const labelsVol = ['Cimento', 'Adições', 'Areia', 'Brita', 'Água', 'Ar'];
+      const valoresVol = [
+        dados.cimento / densCim,
+        (dados.silicaKg/2200 + dados.cinzaKg/2300 + dados.escoriaKg/2900),
+        dados.areia / 2650,
+        dados.brita / 2650,
+        dados.aguaEfetiva / 1000,
+        0.02
+      ];
+
+      Plotly.newPlot('graficoPieVol', [{
+        labels: labelsVol, values: valoresVol, type: 'pie',
+        marker: { colors },
+        textinfo: 'label+percent', hole: 0.4,
+        textfont: { size: 11 }
+      }], { ...layoutBase }, { displayModeBar: false, responsive: true });
+
+      // Custos pie
+      const labelsCusto = ['Cimento', 'Adições', 'Areia', 'Brita', 'Água', 'Aditivos'];
+      const valoresCusto = [
+        dados.custoCimento,
+        dados.custoSilica + dados.custoCinza + dados.custoEscoria,
+        dados.custoAreia, dados.custoBrita, dados.custoAgua,
+        dados.custoPlast + dados.custoSuperplast
+      ];
+
+      Plotly.newPlot('graficoPieCusto', [{
+        labels: labelsCusto, values: valoresCusto, type: 'pie',
+        marker: { colors },
+        textinfo: 'label+percent', hole: 0.4
+      }], { ...layoutBase }, { displayModeBar: false, responsive: true });
+
+      // Custos barras
+      Plotly.newPlot('graficoBarrasCusto', [{
+        x: labelsCusto, y: valoresCusto, type: 'bar',
+        marker: { color: colors, borderRadius: 4 },
+        text: valoresCusto.map(v => fmtBRL(v)),
+        textposition: 'outside', textfont: { size: 10 }
+      }], {
+        ...layoutBase,
+        yaxis: { title: 'R$', gridcolor: 'rgba(255,255,255,0.1)' },
+        xaxis: { tickangle: -45 }
+      }, { displayModeBar: false, responsive: true });
+
+      // CO2
+      const labelsCO2 = ['Cimento', 'Adições', 'Areia', 'Brita', 'Água', 'Aditivos'];
+      const valoresCO2 = [
+        dados.co2Cimento,
+        dados.co2Silica + dados.co2Cinza + dados.co2Escoria,
+        dados.co2Areia, dados.co2Brita, dados.co2Agua, dados.co2Aditivos
+      ];
+
+      Plotly.newPlot('graficoCO2', [{
+        x: labelsCO2, y: valoresCO2, type: 'bar',
+        marker: { 
+          color: valoresCO2.map((v, i) => i === 0 ? '#ef4444' : '#10b981'),
+          borderRadius: 4 
+        },
+        text: valoresCO2.map(v => fmtNum(v, 1) + ' kg'),
+        textposition: 'outside'
+      }], {
+        ...layoutBase,
+        yaxis: { title: 'kg CO₂', gridcolor: 'rgba(255,255,255,0.1)' },
+        xaxis: { tickangle: -45 }
+      }, { displayModeBar: false, responsive: true });
+    }
+
+    // ===== MATERIALS CARDS =====
+    function renderMaterialsCards(calc) {
+      const container = document.getElementById('materialsCards');
+      container.classList.remove('hidden');
+      container.innerHTML = `
+        <div class="stat-card rounded-xl p-4">
+          <div class="text-2xl mb-1">🧱</div>
+          <div class="text-lg font-bold text-cyan-400">${fmtNum(calc.cimento, 1)} kg</div>
+          <div class="text-xs text-gray-400">Cimento</div>
+        </div>
+        <div class="stat-card rounded-xl p-4">
+          <div class="text-2xl mb-1">🏖️</div>
+          <div class="text-lg font-bold text-yellow-400">${fmtNum(calc.areiaUmida, 1)} kg</div>
+          <div class="text-xs text-gray-400">Areia úmida</div>
+        </div>
+        <div class="stat-card rounded-xl p-4">
+          <div class="text-2xl mb-1">🪨</div>
+          <div class="text-lg font-bold text-green-400">${fmtNum(calc.britaUmida, 1)} kg</div>
+          <div class="text-xs text-gray-400">Brita úmida</div>
+        </div>
+        <div class="stat-card rounded-xl p-4">
+          <div class="text-2xl mb-1">💧</div>
+          <div class="text-lg font-bold text-blue-400">${fmtNum(calc.aguaEfetiva, 1)} L</div>
+          <div class="text-xs text-gray-400">Água</div>
+        </div>
+      `;
+    }
+
+    // ===== HISTÓRICO =====
+    function salvarCalculo() {
+      if (!calculoAtual) {
+        showToast('Faça um cálculo primeiro!', 'warning');
+        return;
+      }
+      
+      const nome = prompt('Nome para este cálculo:', `fck${calculoAtual.fck}_${calculoAtual.metodo}`);
+      if (!nome) return;
+      
+      calculoAtual.nome = nome;
+      historico.unshift({...calculoAtual});
+      if (historico.length > 20) historico.pop();
+      
+      localStorage.setItem('dosagem_historico', JSON.stringify(historico));
+      showToast('Cálculo salvo!', 'success');
+      renderHistorico();
+    }
+
+    function renderHistorico() {
+      const container = document.getElementById('listaHistorico');
+      
+      if (historico.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum cálculo salvo ainda</p>';
+        return;
+      }
+      
+      container.innerHTML = historico.map((calc, i) => `
+        <div class="glass rounded-lg p-4 flex items-center justify-between">
+          <div>
+            <div class="font-medium">${calc.nome || 'Sem nome'}</div>
+            <div class="text-sm text-gray-400">
+              ${calc.metodo} | fck ${calc.fck} MPa | a/c ${calc.ac?.toFixed(3) || '-'} | ${fmtBRL(calc.custoFinal)}/m³
+            </div>
+            <div class="text-xs text-gray-500">${new Date(calc.timestamp).toLocaleString('pt-BR')}</div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="carregarCalculo(${i})" class="btn-outline px-3 py-1 rounded text-sm">Carregar</button>
+            <button onclick="excluirCalculo(${i})" class="text-red-400 hover:text-red-300 px-2">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function carregarCalculo(index) {
+      const calc = historico[index];
+      if (!calc) return;
+      
+      // Preencher campos (simplificado - principais campos)
+      document.getElementById('metodo').value = calc.metodo;
+      document.getElementById('fck').value = calc.fck;
+      document.getElementById('slump').value = calc.slump;
+      document.getElementById('dmax').value = calc.dmax;
+      
+      showToast('Configuração carregada! Clique em Calcular.', 'info');
+      showTab('config');
+    }
+
+    function excluirCalculo(index) {
+      if (!confirm('Excluir este cálculo?')) return;
+      historico.splice(index, 1);
+      localStorage.setItem('dosagem_historico', JSON.stringify(historico));
+      renderHistorico();
+      showToast('Cálculo excluído', 'info');
+    }
+
+    function limparHistorico() {
+      if (!confirm('Limpar todo o histórico?')) return;
+      historico = [];
+      localStorage.removeItem('dosagem_historico');
+      renderHistorico();
+      showToast('Histórico limpo', 'info');
+    }
+
+    // ===== COMPARAÇÃO =====
+    function renderSelectorComparacao() {
+      const container = document.getElementById('selectorComparacao');
+      
+      if (historico.length === 0) {
+        container.innerHTML = '<p class="text-gray-500">Salve alguns cálculos primeiro</p>';
+        return;
+      }
+      
+      container.innerHTML = historico.map((calc, i) => `
+        <label class="flex items-center gap-2 glass px-3 py-2 rounded-lg cursor-pointer hover:bg-white/5">
+          <input type="checkbox" class="compare-check" data-index="${i}" onchange="atualizarComparacao()">
+          <span class="text-sm">${calc.nome || `Cálculo ${i+1}`}</span>
+        </label>
+      `).join('');
+    }
+
+    function atualizarComparacao() {
+      const checks = document.querySelectorAll('.compare-check:checked');
+      const indices = Array.from(checks).map(c => parseInt(c.dataset.index));
+      
+      if (indices.length < 2) {
+        document.getElementById('tabelaComparacao').innerHTML = 
+          '<p class="text-gray-500 text-center py-8">Selecione pelo menos 2 cálculos</p>';
+        return;
+      }
+      
+      const calcs = indices.slice(0, 3).map(i => historico[i]);
+      
+      const rows = [
+        ['Parâmetro', ...calcs.map(c => c.nome || '-')],
+        ['Método', ...calcs.map(c => c.metodo)],
+        ['fck (MPa)', ...calcs.map(c => c.fck)],
+        ['a/c', ...calcs.map(c => c.ac?.toFixed(3))],
+        ['Cimento (kg)', ...calcs.map(c => fmtNum(c.cimento, 1))],
+        ['Areia (kg)', ...calcs.map(c => fmtNum(c.areia, 1))],
+        ['Brita (kg)', ...calcs.map(c => fmtNum(c.brita, 1))],
+        ['Água (L)', ...calcs.map(c => fmtNum(c.aguaEfetiva, 1))],
+        ['Custo (R$/m³)', ...calcs.map(c => fmtBRL(c.custoFinal))],
+        ['CO₂ (kg/m³)', ...calcs.map(c => fmtNum(c.co2Total, 1))],
+        ['Eco Score', ...calcs.map(c => c.ecoScore + '/100')]
+      ];
+      
+      document.getElementById('tabelaComparacao').innerHTML = `
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-white/10">
+              ${rows[0].map(h => `<th class="py-2 px-3 text-left font-medium text-cyan-400">${h}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.slice(1).map(row => `
+              <tr class="border-b border-white/5 hover:bg-white/5">
+                ${row.map((cell, i) => `<td class="py-2 px-3 ${i === 0 ? 'text-gray-400' : ''}">${cell}</td>`).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // ===== EXPORTAÇÃO =====
+    async function exportarExcel() {
+      if (!window.XLSX) {
+        showToast('Biblioteca XLSX não carregada', 'error');
+        return;
+      }
+      
+      const resultado = document.getElementById("resultado").textContent;
+      const linhas = resultado.split('\n').map(l => [l]);
+      const ws = XLSX.utils.aoa_to_sheet(linhas);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Dosagem");
+      
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dosagem_concreto_${new Date().toISOString().slice(0,10)}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('Excel exportado!', 'success');
+    }
+
+    async function exportarPDF() {
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        showToast('Biblioteca jsPDF não carregada', 'error');
+        return;
+      }
+      
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const margin = 40;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('Dosagem de Concreto v7.0', margin, 40);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(new Date().toLocaleString('pt-BR'), margin, 56);
+      
+      const resultado = document.getElementById("resultado").textContent;
+      const linhas = resultado.split('\n');
+      
+      let y = 80;
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(8);
+      
+      for (const linha of linhas) {
+        if (y > 780) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(linha, margin, y);
+        y += 10;
+      }
+      
+      doc.save(`dosagem_concreto_${new Date().toISOString().slice(0,10)}.pdf`);
+      showToast('PDF exportado!', 'success');
+    }
+
+    // ===== RESTAURAR PADRÕES =====
+    function restaurarPadroes() {
+      if (!confirm("Restaurar todos os valores padrão?")) return;
+      
+      const defaults = {
+        metodo: "ACI", fck: 25, slump: 80, dmax: "19", volume: 1, ar: "false",
+        mfAreia: 2.6, cimentoTipo: "CP-II",
+        umidAreia: 2, absorAreia: 1, umidBrita: 0.5, absorBrita: 0.8,
+        silica: 0, cinza: 0, escoria: 0,
+        plastRed: 0, superplastRed: 10, plastDosePctCem: 0.3, superplastDosePctCem: 1.0,
+        precoCem: 1.15, precoSilica: 3.50, precoCinza: 0.40, precoEscoria: 0.35,
+        precoAreia: 165, precoBrita: 210, precoAgua: 8, precoPlast: 12, precoSuperplast: 22,
+        frete: 40, bdi: 10, lucro: 15
+      };
+      
+      Object.entries(defaults).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+      });
+      
+      document.getElementById("resultado").textContent = "";
+      document.getElementById('quickStats').classList.add('hidden');
+      document.getElementById('ecoIndicator').classList.add('hidden');
+      document.getElementById('materialsCards').classList.add('hidden');
+      
+      showToast('Valores restaurados!', 'success');
+    }
+
+    // ===== EVENTOS =====
+    document.getElementById("metodo").addEventListener("change", function() {
+      const durabilidade = document.getElementById("durabilidade");
+      durabilidade.classList.toggle('hidden', this.value !== "NBR");
+    });
+
+    // Auto-calc on change
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', () => {
+        if (autoCalc) calcular();
+      });
+    });
+
+    // Init
+    document.getElementById('year').textContent = new Date().getFullYear();
+    renderHistorico();
+  </script>
+</body>
+</html>
