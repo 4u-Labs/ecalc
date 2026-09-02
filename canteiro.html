@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Dimensionamento de Canteiro (NR 18) | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --primary: #00ffff;
+      --primary-dark: #00cccc;
+      --secondary: #7c3aed;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg-dark: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card-hover: #1a1a25;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --border-color: rgba(0, 255, 255, 0.2);
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(ellipse at top, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(124, 58, 237, 0.05) 0%, transparent 50%);
+    }
+    
+    /* Header */
+    .header {
+      background: rgba(18, 18, 26, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    
+    .logo-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .logo-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    /* Main Container */
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    /* Page Title */
+    .page-title {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .page-title h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    
+    .page-title p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      border-color: rgba(0, 255, 255, 0.4);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    
+    .card-icon.primary { background: rgba(0, 255, 255, 0.15); color: var(--primary); }
+    .card-icon.secondary { background: rgba(124, 58, 237, 0.15); color: var(--secondary); }
+    .card-icon.success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .card-icon.warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .card-icon.danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .card-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.15);
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    
+    .form-select option {
+      background: var(--bg-card);
+    }
+    
+    /* Checkbox Toggle */
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .toggle-container:hover {
+      border-color: var(--primary);
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      transition: all 0.3s ease;
+    }
+    
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: all 0.3s ease;
+    }
+    
+    .toggle-container input:checked + .toggle-switch {
+      background: var(--primary);
+    }
+    
+    .toggle-container input:checked + .toggle-switch::after {
+      left: calc(100% - 25px);
+    }
+    
+    .toggle-container input {
+      display: none;
+    }
+    
+    .toggle-label {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #000;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(124, 58, 237, 0.2);
+      color: var(--secondary);
+      border: 1px solid var(--secondary);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(124, 58, 237, 0.3);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .btn-success {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+    
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    
+    /* Grid Layout */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+    
+    /* Stats Cards */
+    .stat-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+    }
+    
+    .stat-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+    
+    /* Result Sections */
+    .result-section {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .result-header i {
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+    
+    .result-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    /* Alerts */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border-left: 4px solid;
+    }
+    
+    .alert-info {
+      background: rgba(0, 255, 255, 0.08);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .alert-warning {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+    
+    .alert-success {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: var(--success);
+      color: var(--success);
+    }
+    
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    
+    .alert i {
+      font-size: 1.2rem;
+      margin-top: 2px;
+    }
+    
+    /* Container Suggestion */
+    .container-suggestion {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .container-item {
+      background: rgba(124, 58, 237, 0.1);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    .container-item i {
+      font-size: 2rem;
+      color: var(--secondary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .container-qty {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    
+    .container-type {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    /* Total Cost Display */
+    .total-cost {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(124, 58, 237, 0.15));
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    
+    .total-cost-label {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .total-cost-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin: 1rem 0;
+    }
+    
+    /* Checklist */
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .checklist li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+    
+    .checklist .check {
+      color: var(--success);
+    }
+    
+    .checklist .warning {
+      color: var(--warning);
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlideIn 0.3s ease;
+    }
+    
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .modal-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .modal-close {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    /* Price Item */
+    .price-item {
+      display: grid;
+      grid-template-columns: 1fr 150px;
+      gap: 15px;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+    }
+    
+    .price-label {
+      font-weight: 500;
+    }
+    
+    .price-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    
+    .price-input {
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--primary);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: right;
+    }
+    
+    .price-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 1.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .category-header:first-child {
+      margin-top: 0;
+    }
+    
+    /* Tab Navigation */
+    .tabs {
+      display: flex;
+      gap: 5px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .tab.active {
+      background: var(--primary);
+      color: #000;
+    }
+    
+    .tab:hover:not(.active) {
+      color: var(--text-primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      cursor: help;
+    }
+    
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .tooltip:hover::after {
+      opacity: 1;
+      visibility: visible;
+      bottom: calc(100% + 10px);
+    }
+    
+    /* Print Styles */
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+      }
+      
+      .header, .action-buttons, .btn, .no-print {
+        display: none !important;
+      }
+      
+      .card {
+        break-inside: avoid;
+        border: 1px solid #ddd;
+        box-shadow: none;
+      }
+      
+      .stat-value, .total-cost-value {
+        color: #000 !important;
+        -webkit-text-fill-color: #000 !important;
+      }
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border-color);
+      margin-top: 3rem;
+    }
+    
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .slide-up {
+      animation: slideUp 0.5s ease;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Progress Bar */
+    .progress-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    
+    /* Hidden */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-hard-hat"></i>
+        </div>
+        <span class="logo-text">Canteiro NR18</span>
+      </a>
+      <div class="header-actions">
+        <button class="btn btn-icon btn-outline tooltip" data-tooltip="Tema" onclick="toggleTheme()">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="btn btn-icon btn-outline tooltip" data-tooltip="Ajuda" onclick="showHelp()">
+          <i class="fas fa-question"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Page Title -->
+    <div class="page-title fade-in">
+      <h1><i class="fas fa-building"></i> Dimensionamento de Canteiro</h1>
+      <p>Calculadora completa baseada na NR 18 - Áreas de Vivência</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons slide-up">
+      <button class="btn btn-primary" id="btnCalcular">
+        <i class="fas fa-calculator"></i> Calcular
+      </button>
+      <button class="btn btn-secondary" id="btnConfigurarPrecos">
+        <i class="fas fa-cog"></i> Configurar Preços
+      </button>
+      <button class="btn btn-outline" id="btnExportar">
+        <i class="fas fa-file-pdf"></i> Exportar PDF
+      </button>
+      <button class="btn btn-outline" id="btnReset">
+        <i class="fas fa-redo"></i> Limpar
+      </button>
+    </div>
+
+    <!-- Input Section -->
+    <div class="grid-2">
+      <div class="card slide-up">
+        <div class="card-header">
+          <div class="card-icon primary">
+            <i class="fas fa-users"></i>
+          </div>
+          <div>
+            <h2 class="card-title">Dados do Canteiro</h2>
+            <p class="card-subtitle">Informações básicas da obra</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-user-hard-hat"></i> Número de Funcionários (Turno)
+          </label>
+          <input type="number" class="form-control" id="num-funcionarios" value="25" min="1">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-clock"></i> Jornada de Trabalho
+          </label>
+          <select class="form-select" id="jornada">
+            <option value="8">8 horas/dia</option>
+            <option value="10">10 horas/dia</option>
+            <option value="12">12 horas/dia</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-venus-mars"></i> Proporção Feminina (%)
+          </label>
+          <input type="number" class="form-control" id="proporcao-feminina" value="0" min="0" max="100">
+          <small style="color: var(--text-secondary);">Para dimensionar instalações separadas</small>
+        </div>
+
+        <label class="toggle-container">
+          <input type="checkbox" id="incluir-alojamento">
+          <span class="toggle-switch"></span>
+          <span class="toggle-label">Incluir Alojamento</span>
+        </label>
+
+        <div id="alojamento-opcoes" class="hidden" style="margin-top: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Nº de Funcionários Alojados</label>
+            <input type="number" class="form-control" id="num-alojados" value="10" min="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo de Cama</label>
+            <select class="form-select" id="tipo-cama">
+              <option value="simples">Simples (3.0 m²/pessoa)</option>
+              <option value="beliche">Beliche (4.5 m²/pessoa)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card slide-up">
+        <div class="card-header">
+          <div class="card-icon secondary">
+            <i class="fas fa-cogs"></i>
+          </div>
+          <div>
+            <h2 class="card-title">Configurações Adicionais</h2>
+            <p class="card-subtitle">Opções extras de dimensionamento</p>
+          </div>
+        </div>
+
+        <label class="toggle-container" style="margin-bottom: 1rem;">
+          <input type="checkbox" id="incluir-cozinha" checked>
+          <span class="toggle-switch"></span>
+          <span class="toggle-label">Incluir Cozinha no Canteiro</span>
+        </label>
+
+        <label class="toggle-container" style="margin-bottom: 1rem;">
+          <input type="checkbox" id="incluir-lavanderia">
+          <span class="toggle-switch"></span>
+          <span class="toggle-label">Incluir Área de Lavanderia</span>
+        </label>
+
+        <label class="toggle-container" style="margin-bottom: 1rem;">
+          <input type="checkbox" id="pcd" checked>
+          <span class="toggle-switch"></span>
+          <span class="toggle-label">Prever Acessibilidade (PCD)</span>
+        </label>
+
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i>
+          <div>
+            <strong>Norma NR 18:</strong> Os cálculos seguem os requisitos mínimos do 
+            <strong>Anexo I da NR 18</strong> para áreas de vivência em canteiros de obras.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultado"></div>
+
+    <!-- References -->
+    <div class="card no-print">
+      <div class="card-header">
+        <div class="card-icon warning">
+          <i class="fas fa-book"></i>
+        </div>
+        <div>
+          <h2 class="card-title">Referências Normativas</h2>
+          <p class="card-subtitle">Bases legais para o dimensionamento</p>
+        </div>
+      </div>
+
+      <ul class="checklist">
+        <li>
+          <i class="fas fa-check-circle check"></i>
+          <span><strong>NR 18</strong> - Condições e Meio Ambiente de Trabalho na Indústria da Construção</span>
+        </li>
+        <li>
+          <i class="fas fa-check-circle check"></i>
+          <span><strong>Anexo I (NR 18)</strong> - Áreas de Vivência</span>
+        </li>
+        <li>
+          <i class="fas fa-check-circle check"></i>
+          <span><strong>NBR 12284</strong> - Áreas de vivência em canteiros de obras</span>
+        </li>
+        <li>
+          <i class="fas fa-check-circle check"></i>
+          <span><strong>NBR 9050</strong> - Acessibilidade em edificações</span>
+        </li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- Modal de Preços -->
+  <div id="modalPrecos" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fas fa-tags"></i> Configurar Preços de Instalação
+        </h3>
+        <button class="modal-close" onclick="fecharModalPrecos()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="category-header">
+          <i class="fas fa-toilet"></i> Instalações Sanitárias (por Unidade)
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Vaso Sanitário</div>
+            <div class="price-desc">Custo unitário (material + instalação)</div>
+          </div>
+          <input type="number" id="preco-vaso" class="price-input" step="50" min="0" value="450">
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Mictório</div>
+            <div class="price-desc">Custo unitário (material + instalação)</div>
+          </div>
+          <input type="number" id="preco-mictorio" class="price-input" step="50" min="0" value="300">
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Lavatório</div>
+            <div class="price-desc">Custo unitário (material + instalação)</div>
+          </div>
+          <input type="number" id="preco-lavatorio" class="price-input" step="50" min="0" value="250">
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Chuveiro</div>
+            <div class="price-desc">Custo unitário (material + instalação)</div>
+          </div>
+          <input type="number" id="preco-chuveiro" class="price-input" step="50" min="0" value="350">
+        </div>
+
+        <div class="category-header">
+          <i class="fas fa-ruler-combined"></i> Áreas de Vivência (por m²)
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Vestiário (m²)</div>
+            <div class="price-desc">Custo por m² (container/barracão)</div>
+          </div>
+          <input type="number" id="preco-m2-vestiario" class="price-input" step="10" min="0" value="200">
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Refeitório (m²)</div>
+            <div class="price-desc">Custo por m² (container/barracão)</div>
+          </div>
+          <input type="number" id="preco-m2-refeitorio" class="price-input" step="10" min="0" value="250">
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Cozinha (m²)</div>
+            <div class="price-desc">Custo por m² (instalação completa)</div>
+          </div>
+          <input type="number" id="preco-m2-cozinha" class="price-input" step="10" min="0" value="350">
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Alojamento (m²)</div>
+            <div class="price-desc">Custo por m² (container/barracão)</div>
+          </div>
+          <input type="number" id="preco-m2-alojamento" class="price-input" step="10" min="0" value="300">
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Ambulatório (m²)</div>
+            <div class="price-desc">Custo por m² (instalação)</div>
+          </div>
+          <input type="number" id="preco-m2-ambulatorio" class="price-input" step="10" min="0" value="400">
+        </div>
+
+        <div class="category-header">
+          <i class="fas fa-box"></i> Outros Custos
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Assento Refeitório</div>
+            <div class="price-desc">Custo unitário (mesa + banco)</div>
+          </div>
+          <input type="number" id="preco-assento" class="price-input" step="10" min="0" value="80">
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Bebedouro</div>
+            <div class="price-desc">Custo unitário (bebedouro industrial)</div>
+          </div>
+          <input type="number" id="preco-bebedouro" class="price-input" step="50" min="0" value="800">
+        </div>
+        <div class="price-item">
+          <div>
+            <div class="price-label">Armário Individual</div>
+            <div class="price-desc">Custo unitário (armário metálico)</div>
+          </div>
+          <input type="number" id="preco-armario" class="price-input" step="10" min="0" value="150">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="restaurarPrecosCanteiro()">
+          <i class="fas fa-undo"></i> Restaurar Padrão
+        </button>
+        <button class="btn btn-primary" onclick="salvarPrecosCanteiro()">
+          <i class="fas fa-save"></i> Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Ajuda -->
+  <div id="modalAjuda" class="modal-overlay">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fas fa-question-circle"></i> Como Utilizar
+        </h3>
+        <button class="modal-close" onclick="closeHelp()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('tab-uso')">Uso</button>
+          <button class="tab" onclick="showTab('tab-norma')">Norma</button>
+          <button class="tab" onclick="showTab('tab-formulas')">Fórmulas</button>
+        </div>
+
+        <div id="tab-uso" class="tab-content active">
+          <h4 style="color: var(--primary); margin-bottom: 1rem;">Passo a Passo</h4>
+          <ol style="padding-left: 1.5rem; line-height: 2;">
+            <li>Informe o número de funcionários do turno mais numeroso</li>
+            <li>Selecione a jornada de trabalho</li>
+            <li>Defina a proporção feminina para instalações separadas</li>
+            <li>Ative o alojamento se houver pernoite na obra</li>
+            <li>Configure opções adicionais conforme necessidade</li>
+            <li>Clique em <strong>Calcular</strong></li>
+            <li>Ajuste os preços em <strong>Configurar Preços</strong> se necessário</li>
+          </ol>
+        </div>
+
+        <div id="tab-norma" class="tab-content">
+          <h4 style="color: var(--primary); margin-bottom: 1rem;">Requisitos NR 18</h4>
+          <ul class="checklist">
+            <li><i class="fas fa-check check"></i> 1 vaso sanitário para cada 20 trabalhadores</li>
+            <li><i class="fas fa-check check"></i> 1 mictório para cada 20 trabalhadores</li>
+            <li><i class="fas fa-check check"></i> 1 lavatório para cada 10 trabalhadores</li>
+            <li><i class="fas fa-check check"></i> 1 chuveiro para cada 10 trabalhadores</li>
+            <li><i class="fas fa-check check"></i> 1,50 m² de vestiário por trabalhador</li>
+            <li><i class="fas fa-check check"></i> 1,00 m² de refeitório por usuário</li>
+            <li><i class="fas fa-check check"></i> Ambulatório obrigatório a partir de 50 funcionários</li>
+          </ul>
+        </div>
+
+        <div id="tab-formulas" class="tab-content">
+          <h4 style="color: var(--primary); margin-bottom: 1rem;">Fórmulas de Cálculo</h4>
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+            <code style="color: var(--primary);">Vasos = ⌈N / 20⌉</code><br>
+            <small style="color: var(--text-secondary);">N = número de funcionários</small>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+            <code style="color: var(--primary);">Área Vestiário = N × 1,50 m²</code>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+            <code style="color: var(--primary);">Assentos Refeitório = ⌈N / 3⌉</code><br>
+            <small style="color: var(--text-secondary);">Considerando 3 turnos de refeição</small>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px;">
+            <code style="color: var(--primary);">Bebedouros = ⌈N / 25⌉</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <script>
+    // ==================== CONFIGURAÇÕES ====================
+    const precosCanteiroPadrao = {
+      precoVaso: 450,
+      precoMictorio: 300,
+      precoLavatorio: 250,
+      precoChuveiro: 350,
+      precoAssento: 80,
+      precoBebedouro: 800,
+      precoArmario: 150,
+      precoM2Vestiario: 200,
+      precoM2Refeitorio: 250,
+      precoM2Cozinha: 350,
+      precoM2Alojamento: 300,
+      precoM2Ambulatorio: 400
+    };
+
+    let precosCanteiro = JSON.parse(localStorage.getItem('precosCanteiro')) || { ...precosCanteiroPadrao };
+
+    // Parâmetros NR 18
+    const NORMA = {
+      VASO_POR_TRABALHADOR: 20,
+      MICTORIO_POR_TRABALHADOR: 20,
+      LAVATORIO_POR_TRABALHADOR: 10,
+      CHUVEIRO_POR_TRABALHADOR: 10,
+      BEBEDOURO_POR_TRABALHADOR: 25,
+      AREA_VESTIARIO_POR_TRABALHADOR: 1.5,
+      AREA_REFEITORIO_POR_USUARIO: 1.0,
+      AREA_COZINHA_MIN: 6.0,
+      AREA_COZINHA_POR_USUARIO: 0.3,
+      USUARIOS_REFEITORIO_TURNO: 3,
+      AREA_ALOJAMENTO_SIMPLES: 3.0,
+      AREA_ALOJAMENTO_BELICHE: 4.5,
+      SANITARIO_ALOJAMENTO_POR_PESSOA: 10,
+      MIN_FUNCIONARIOS_AMBULATORIO: 50,
+      AREA_MIN_AMBULATORIO: 6.0,
+      AREA_LAVANDERIA_MIN: 4.0,
+      AREA_LAVANDERIA_POR_PESSOA: 0.5
+    };
+
+    // Container padrão (6x2.4m = 14.4m²)
+    const CONTAINER_PADRAO = 14.4;
+
+    // ==================== FUNÇÕES PRINCIPAIS ====================
+    function calcular() {
+      const numFuncionarios = parseInt(document.getElementById('num-funcionarios').value) || 0;
+      const jornada = parseInt(document.getElementById('jornada').value);
+      const proporcaoFeminina = parseInt(document.getElementById('proporcao-feminina').value) || 0;
+      const incluirAlojamento = document.getElementById('incluir-alojamento').checked;
+      const incluirCozinha = document.getElementById('incluir-cozinha').checked;
+      const incluirLavanderia = document.getElementById('incluir-lavanderia').checked;
+      const pcd = document.getElementById('pcd').checked;
+      const numAlojados = parseInt(document.getElementById('num-alojados').value) || 0;
+      const tipoCama = document.getElementById('tipo-cama').value;
+
+      if (numFuncionarios <= 0) {
+        document.getElementById('resultado').innerHTML = `
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Por favor, informe o número de funcionários para calcular.</span>
+          </div>
+        `;
+        return;
+      }
+
+      // Cálculo de funcionários por gênero
+      const funcFeminino = Math.ceil(numFuncionarios * proporcaoFeminina / 100);
+      const funcMasculino = numFuncionarios - funcFeminino;
+
+      // Instalações Sanitárias (separadas por gênero se necessário)
+      const calcSanitarios = (qtd) => ({
+        vasos: Math.ceil(qtd / NORMA.VASO_POR_TRABALHADOR),
+        mictorios: Math.ceil(qtd / NORMA.MICTORIO_POR_TRABALHADOR),
+        lavatorios: Math.ceil(qtd / NORMA.LAVATORIO_POR_TRABALHADOR),
+        chuveiros: Math.ceil(qtd / NORMA.CHUVEIRO_POR_TRABALHADOR)
+      });
+
+      const sanitariosMasc = calcSanitarios(funcMasculino);
+      const sanitariosFem = funcFeminino > 0 ? calcSanitarios(funcFeminino) : null;
+
+      // Totais
+      const totalVasos = sanitariosMasc.vasos + (sanitariosFem?.vasos || 0);
+      const totalMictorios = sanitariosMasc.mictorios;
+      const totalLavatorios = sanitariosMasc.lavatorios + (sanitariosFem?.lavatorios || 0);
+      const totalChuveiros = sanitariosMasc.chuveiros + (sanitariosFem?.chuveiros || 0);
+
+      // Acessibilidade PCD
+      const sanitariosPCD = pcd ? { vasos: 1, lavatorios: 1 } : { vasos: 0, lavatorios: 0 };
+
+      // Custos sanitários
+      const custoSanitarios = 
+        (totalVasos + sanitariosPCD.vasos) * precosCanteiro.precoVaso +
+        totalMictorios * precosCanteiro.precoMictorio +
+        (totalLavatorios + sanitariosPCD.lavatorios) * precosCanteiro.precoLavatorio +
+        totalChuveiros * precosCanteiro.precoChuveiro;
+
+      // Vestiário
+      const areaVestiarioMasc = funcMasculino * NORMA.AREA_VESTIARIO_POR_TRABALHADOR;
+      const areaVestiarioFem = funcFeminino * NORMA.AREA_VESTIARIO_POR_TRABALHADOR;
+      const areaVestiarioTotal = areaVestiarioMasc + areaVestiarioFem;
+      const custoVestiario = areaVestiarioTotal * precosCanteiro.precoM2Vestiario;
+      const custoArmarios = numFuncionarios * precosCanteiro.precoArmario;
+
+      // Refeitório
+      const assentosRefeitorio = Math.ceil(numFuncionarios / NORMA.USUARIOS_REFEITORIO_TURNO);
+      const areaRefeitorio = assentosRefeitorio * NORMA.AREA_REFEITORIO_POR_USUARIO;
+      const custoRefeitorio = 
+        areaRefeitorio * precosCanteiro.precoM2Refeitorio +
+        assentosRefeitorio * precosCanteiro.precoAssento;
+
+      // Bebedouros
+      const bebedouros = Math.ceil(numFuncionarios / NORMA.BEBEDOURO_POR_TRABALHADOR);
+      const custoBebedouros = bebedouros * precosCanteiro.precoBebedouro;
+
+      // Cozinha
+      let areaCozinha = 0, custoCozinha = 0;
+      if (incluirCozinha) {
+        areaCozinha = Math.max(
+          NORMA.AREA_COZINHA_MIN,
+          assentosRefeitorio * NORMA.AREA_COZINHA_POR_USUARIO
+        );
+        custoCozinha = areaCozinha * precosCanteiro.precoM2Cozinha;
+      }
+
+      // Ambulatório
+      const necessitaAmbulatorio = numFuncionarios >= NORMA.MIN_FUNCIONARIOS_AMBULATORIO;
+      const areaAmbulatorio = necessitaAmbulatorio ? NORMA.AREA_MIN_AMBULATORIO : 0;
+      const custoAmbulatorio = areaAmbulatorio * precosCanteiro.precoM2Ambulatorio;
+
+      // Lavanderia
+      let areaLavanderia = 0, custoLavanderia = 0;
+      if (incluirLavanderia && incluirAlojamento) {
+        areaLavanderia = Math.max(
+          NORMA.AREA_LAVANDERIA_MIN,
+          numAlojados * NORMA.AREA_LAVANDERIA_POR_PESSOA
+        );
+        custoLavanderia = areaLavanderia * precosCanteiro.precoM2Alojamento;
+      }
+
+      // Alojamento
+      let dadosAlojamento = null;
+      if (incluirAlojamento && numAlojados > 0) {
+        const areaPorPessoa = tipoCama === 'beliche' 
+          ? NORMA.AREA_ALOJAMENTO_BELICHE 
+          : NORMA.AREA_ALOJAMENTO_SIMPLES;
+        const areaAlojamento = numAlojados * areaPorPessoa;
+        const vasosAlojamento = Math.ceil(numAlojados / NORMA.SANITARIO_ALOJAMENTO_POR_PESSOA);
+        const lavatoriosAlojamento = Math.ceil(numAlojados / NORMA.SANITARIO_ALOJAMENTO_POR_PESSOA);
+        const chuveirosAlojamento = Math.ceil(numAlojados / NORMA.SANITARIO_ALOJAMENTO_POR_PESSOA);
+
+        const custoSanitariosAloj = 
+          vasosAlojamento * precosCanteiro.precoVaso +
+          lavatoriosAlojamento * precosCanteiro.precoLavatorio +
+          chuveirosAlojamento * precosCanteiro.precoChuveiro;
+        const custoAreaAloj = areaAlojamento * precosCanteiro.precoM2Alojamento;
+
+        dadosAlojamento = {
+          numAlojados,
+          tipoCama,
+          areaAlojamento,
+          vasosAlojamento,
+          lavatoriosAlojamento,
+          chuveirosAlojamento,
+          custoTotal: custoAreaAloj + custoSanitariosAloj
+        };
+      }
+
+      // Área Total
+      let areaTotal = areaVestiarioTotal + areaRefeitorio + areaAmbulatorio + areaCozinha + areaLavanderia;
+      if (dadosAlojamento) areaTotal += dadosAlojamento.areaAlojamento;
+
+      // Containers sugeridos
+      const containersVestiario = Math.ceil(areaVestiarioTotal / CONTAINER_PADRAO);
+      const containersRefeitorio = Math.ceil((areaRefeitorio + areaCozinha) / CONTAINER_PADRAO);
+      const containersAlojamento = dadosAlojamento ? Math.ceil(dadosAlojamento.areaAlojamento / CONTAINER_PADRAO) : 0;
+      const containersAmbulatorio = necessitaAmbulatorio ? 1 : 0;
+
+      // Custo Total
+      let custoTotalGeral = 
+        custoSanitarios + custoVestiario + custoArmarios + custoRefeitorio + 
+        custoBebedouros + custoCozinha + custoAmbulatorio + custoLavanderia;
+      if (dadosAlojamento) custoTotalGeral += dadosAlojamento.custoTotal;
+
+      // Gerar resultado
+      gerarResultado({
+        numFuncionarios,
+        funcMasculino,
+        funcFeminino,
+        sanitariosMasc,
+        sanitariosFem,
+        sanitariosPCD,
+        totalVasos: totalVasos + sanitariosPCD.vasos,
+        totalMictorios,
+        totalLavatorios: totalLavatorios + sanitariosPCD.lavatorios,
+        totalChuveiros,
+        custoSanitarios,
+        vestiario: { 
+          areaMasc: areaVestiarioMasc, 
+          areaFem: areaVestiarioFem, 
+          areaTotal: areaVestiarioTotal, 
+          custo: custoVestiario + custoArmarios 
+        },
+        refeitorio: { area: areaRefeitorio, assentos: assentosRefeitorio, custo: custoRefeitorio },
+        bebedouros: { qtd: bebedouros, custo: custoBebedouros },
+        cozinha: incluirCozinha ? { area: areaCozinha, custo: custoCozinha } : null,
+        ambulatorio: { necessario: necessitaAmbulatorio, area: areaAmbulatorio, custo: custoAmbulatorio },
+        lavanderia: incluirLavanderia && incluirAlojamento ? { area: areaLavanderia, custo: custoLavanderia } : null,
+        alojamento: dadosAlojamento,
+        areaTotal,
+        containers: {
+          vestiario: containersVestiario,
+          refeitorio: containersRefeitorio,
+          alojamento: containersAlojamento,
+          ambulatorio: containersAmbulatorio,
+          total: containersVestiario + containersRefeitorio + containersAlojamento + containersAmbulatorio
+        },
+        custoTotalGeral,
+        pcd
+      });
+    }
+
+    function gerarResultado(dados) {
+      const formatCurrency = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      const formatNumber = (val) => val.toFixed(2).replace('.', ',');
+
+      let html = `
+        <!-- Resumo Geral -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div class="card-icon success">
+              <i class="fas fa-chart-pie"></i>
+            </div>
+            <div>
+              <h2 class="card-title">Resumo do Dimensionamento</h2>
+              <p class="card-subtitle">${dados.numFuncionarios} funcionários no turno</p>
+            </div>
+          </div>
+
+          <div class="grid-4" style="margin-bottom: 1.5rem;">
+            <div class="stat-card">
+              <div class="stat-icon">👷</div>
+              <div class="stat-value">${dados.numFuncionarios}</div>
+              <div class="stat-label">Funcionários</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📐</div>
+              <div class="stat-value">${formatNumber(dados.areaTotal)}</div>
+              <div class="stat-label">Área Total (m²)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📦</div>
+              <div class="stat-value">${dados.containers.total}</div>
+              <div class="stat-label">Containers 6m</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">💰</div>
+              <div class="stat-value" style="font-size: 1.3rem;">${formatCurrency(dados.custoTotalGeral)}</div>
+              <div class="stat-label">Investimento Est.</div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <canvas id="chartCustos"></canvas>
+          </div>
+        </div>
+
+        <!-- Instalações Sanitárias -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div class="card-icon primary">
+              <i class="fas fa-restroom"></i>
+            </div>
+            <div>
+              <h2 class="card-title">Instalações Sanitárias</h2>
+              <p class="card-subtitle">Uso diário - separado por gênero</p>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom: 1rem;">
+            <div class="result-section">
+              <div class="result-header">
+                <i class="fas fa-male"></i>
+                <h3>Masculino (${dados.funcMasculino} func.)</h3>
+              </div>
+              <div class="grid-2">
+                <div class="stat-card">
+                  <div class="stat-value">${dados.sanitariosMasc.vasos}</div>
+                  <div class="stat-label">Vasos</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">${dados.sanitariosMasc.mictorios}</div>
+                  <div class="stat-label">Mictórios</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">${dados.sanitariosMasc.lavatorios}</div>
+                  <div class="stat-label">Lavatórios</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">${dados.sanitariosMasc.chuveiros}</div>
+                  <div class="stat-label">Chuveiros</div>
+                </div>
+              </div>
+            </div>
+
+            ${dados.sanitariosFem ? `
+            <div class="result-section">
+              <div class="result-header">
+                <i class="fas fa-female"></i>
+                <h3>Feminino (${dados.funcFeminino} func.)</h3>
+              </div>
+              <div class="grid-2">
+                <div class="stat-card">
+                  <div class="stat-value">${dados.sanitariosFem.vasos}</div>
+                  <div class="stat-label">Vasos</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">${dados.sanitariosFem.lavatorios}</div>
+                  <div class="stat-label">Lavatórios</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">${dados.sanitariosFem.chuveiros}</div>
+                  <div class="stat-label">Chuveiros</div>
+                </div>
+              </div>
+            </div>
+            ` : `
+            <div class="result-section" style="display: flex; align-items: center; justify-content: center;">
+              <div style="text-align: center; color: var(--text-secondary);">
+                <i class="fas fa-female" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                <p>Nenhuma funcionária</p>
+              </div>
+            </div>
+            `}
+          </div>
+
+          ${dados.pcd ? `
+          <div class="alert alert-success">
+            <i class="fas fa-wheelchair"></i>
+            <div>
+              <strong>Acessibilidade PCD:</strong> +${dados.sanitariosPCD.vasos} vaso e 
+              +${dados.sanitariosPCD.lavatorios} lavatório acessíveis incluídos.
+            </div>
+          </div>
+          ` : ''}
+
+          <div class="alert alert-info">
+            <i class="fas fa-dollar-sign"></i>
+            <div><strong>Custo Estimado:</strong> ${formatCurrency(dados.custoSanitarios)}</div>
+          </div>
+        </div>
+
+        <!-- Vestiário e Refeitório -->
+        <div class="grid-2">
+          <div class="card fade-in">
+            <div class="card-header">
+              <div class="card-icon secondary">
+                <i class="fas fa-tshirt"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Vestiário</h2>
+                <p class="card-subtitle">Área mínima obrigatória</p>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              ${dados.funcFeminino > 0 ? `
+              <div class="stat-card">
+                <div class="stat-icon">👔</div>
+                <div class="stat-value">${formatNumber(dados.vestiario.areaMasc)}</div>
+                <div class="stat-label">Masculino (m²)</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">👗</div>
+                <div class="stat-value">${formatNumber(dados.vestiario.areaFem)}</div>
+                <div class="stat-label">Feminino (m²)</div>
+              </div>
+              ` : `
+              <div class="stat-card">
+                <div class="stat-icon">📐</div>
+                <div class="stat-value">${formatNumber(dados.vestiario.areaTotal)}</div>
+                <div class="stat-label">Área Total (m²)</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">🗄️</div>
+                <div class="stat-value">${dados.numFuncionarios}</div>
+                <div class="stat-label">Armários</div>
+              </div>
+              `}
+            </div>
+
+            <div class="alert alert-info" style="margin-top: 1rem;">
+              <i class="fas fa-info-circle"></i>
+              <div>Base: ${NORMA.AREA_VESTIARIO_POR_TRABALHADOR} m²/funcionário</div>
+            </div>
+
+            <div class="alert alert-success">
+              <i class="fas fa-dollar-sign"></i>
+              <div><strong>Custo:</strong> ${formatCurrency(dados.vestiario.custo)}</div>
+            </div>
+          </div>
+
+          <div class="card fade-in">
+            <div class="card-header">
+              <div class="card-icon warning">
+                <i class="fas fa-utensils"></i>
+              </div>
+              <div>
+                <h2 class="card-title">Refeitório</h2>
+                <p class="card-subtitle">Área para refeições</p>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="stat-card">
+                <div class="stat-icon">📐</div>
+                <div class="stat-value">${formatNumber(dados.refeitorio.area)}</div>
+                <div class="stat-label">Área (m²)</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">🪑</div>
+                <div class="stat-value">${dados.refeitorio.assentos}</div>
+                <div class="stat-label">Assentos</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">🚰</div>
+                <div class="stat-value">${dados.bebedouros.qtd}</div>
+                <div class="stat-label">Bebedouros</div>
+              </div>
+              ${dados.cozinha ? `
+              <div class="stat-card">
+                <div class="stat-icon">🍳</div>
+                <div class="stat-value">${formatNumber(dados.cozinha.area)}</div>
+                <div class="stat-label">Cozinha (m²)</div>
+              </div>
+              ` : ''}
+            </div>
+
+            <div class="alert alert-info" style="margin-top: 1rem;">
+              <i class="fas fa-info-circle"></i>
+              <div>Turno de refeição: 1/3 dos funcionários</div>
+            </div>
+
+            <div class="alert alert-success">
+              <i class="fas fa-dollar-sign"></i>
+              <div><strong>Custo:</strong> ${formatCurrency(dados.refeitorio.custo + dados.bebedouros.custo + (dados.cozinha?.custo || 0))}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ambulatório -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div class="card-icon danger">
+              <i class="fas fa-first-aid"></i>
+            </div>
+            <div>
+              <h2 class="card-title">Ambulatório</h2>
+              <p class="card-subtitle">Posto de atendimento médico</p>
+            </div>
+          </div>
+
+          ${dados.ambulatorio.necessario ? `
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+              <strong>Obrigatório!</strong> A obra possui ${dados.numFuncionarios} funcionários 
+              (limite: ${NORMA.MIN_FUNCIONARIOS_AMBULATORIO}+)
+            </div>
+          </div>
+          <div class="grid-3">
+            <div class="stat-card">
+              <div class="stat-icon">📐</div>
+              <div class="stat-value">${formatNumber(dados.ambulatorio.area)}</div>
+              <div class="stat-label">Área Mín. (m²)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🩺</div>
+              <div class="stat-value">1</div>
+              <div class="stat-label">Maca</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">💊</div>
+              <div class="stat-value">1</div>
+              <div class="stat-label">Kit Primeiros Socorros</div>
+            </div>
+          </div>
+          <div class="alert alert-success" style="margin-top: 1rem;">
+            <i class="fas fa-dollar-sign"></i>
+            <div><strong>Custo:</strong> ${formatCurrency(dados.ambulatorio.custo)}</div>
+          </div>
+          ` : `
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <div>
+              <strong>Não obrigatório</strong> - A obra possui menos de ${NORMA.MIN_FUNCIONARIOS_AMBULATORIO} funcionários.
+              Manter kit de primeiros socorros disponível.
+            </div>
+          </div>
+          `}
+        </div>
+
+        ${dados.alojamento ? `
+        <!-- Alojamento -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div class="card-icon primary">
+              <i class="fas fa-bed"></i>
+            </div>
+            <div>
+              <h2 class="card-title">Alojamento</h2>
+              <p class="card-subtitle">${dados.alojamento.numAlojados} funcionários alojados</p>
+            </div>
+          </div>
+
+          <div class="grid-4">
+            <div class="stat-card">
+              <div class="stat-icon">📐</div>
+              <div class="stat-value">${formatNumber(dados.alojamento.areaAlojamento)}</div>
+              <div class="stat-label">Área (m²)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🛏️</div>
+              <div class="stat-value">${dados.alojamento.tipoCama === 'beliche' ? 'Beliche' : 'Simples'}</div>
+              <div class="stat-label">Tipo Cama</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🚿</div>
+              <div class="stat-value">${dados.alojamento.chuveirosAlojamento}</div>
+              <div class="stat-label">Chuveiros</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🚽</div>
+              <div class="stat-value">${dados.alojamento.vasosAlojamento}</div>
+              <div class="stat-label">Vasos</div>
+            </div>
+          </div>
+
+          ${dados.lavanderia ? `
+          <div class="alert alert-info" style="margin-top: 1rem;">
+            <i class="fas fa-soap"></i>
+            <div><strong>Lavanderia:</strong> ${formatNumber(dados.lavanderia.area)} m² - ${formatCurrency(dados.lavanderia.custo)}</div>
+          </div>
+          ` : ''}
+
+          <div class="alert alert-success" style="margin-top: 1rem;">
+            <i class="fas fa-dollar-sign"></i>
+            <div><strong>Custo Total Alojamento:</strong> ${formatCurrency(dados.alojamento.custoTotal + (dados.lavanderia?.custo || 0))}</div>
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- Sugestão de Containers -->
+        <div class="card fade-in">
+          <div class="card-header">
+            <div class="card-icon secondary">
+              <i class="fas fa-box"></i>
+            </div>
+            <div>
+              <h2 class="card-title">Sugestão de Containers</h2>
+              <p class="card-subtitle">Módulos padrão 6,0m x 2,4m (14,4 m²)</p>
+            </div>
+          </div>
+
+          <div class="container-suggestion">
+            <div class="container-item">
+              <i class="fas fa-tshirt"></i>
+              <div class="container-qty">${dados.containers.vestiario}</div>
+              <div class="container-type">Vestiário</div>
+            </div>
+            <div class="container-item">
+              <i class="fas fa-utensils"></i>
+              <div class="container-qty">${dados.containers.refeitorio}</div>
+              <div class="container-type">Refeitório/Cozinha</div>
+            </div>
+            ${dados.containers.alojamento > 0 ? `
+            <div class="container-item">
+              <i class="fas fa-bed"></i>
+              <div class="container-qty">${dados.containers.alojamento}</div>
+              <div class="container-type">Alojamento</div>
+            </div>
+            ` : ''}
+            ${dados.containers.ambulatorio > 0 ? `
+            <div class="container-item">
+              <i class="fas fa-first-aid"></i>
+              <div class="container-qty">${dados.containers.ambulatorio}</div>
+              <div class="container-type">Ambulatório</div>
+            </div>
+            ` : ''}
+          </div>
+
+          <div class="alert alert-info" style="margin-top: 1rem;">
+            <i class="fas fa-info-circle"></i>
+            <div>Total estimado: <strong>${dados.containers.total} containers</strong> de 6 metros</div>
+          </div>
+        </div>
+
+        <!-- Custo Total -->
+        <div class="total-cost fade-in">
+          <div class="total-cost-label">💰 Investimento Total Estimado</div>
+          <div class="total-cost-value">${formatCurrency(dados.custoTotalGeral)}</div>
+          <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem;">
+            *Valores aproximados para estimativa inicial de custos
+          </p>
+        </div>
+      `;
+
+      document.getElementById('resultado').innerHTML = html;
+
+      // Criar gráfico
+      setTimeout(() => {
+        criarGraficoCustos(dados);
+      }, 100);
+    }
+
+    function criarGraficoCustos(dados) {
+      const ctx = document.getElementById('chartCustos');
+      if (!ctx) return;
+
+      const labels = ['Sanitários', 'Vestiário', 'Refeitório'];
+      const values = [dados.custoSanitarios, dados.vestiario.custo, dados.refeitorio.custo + dados.bebedouros.custo];
+      const colors = ['#00ffff', '#7c3aed', '#f59e0b'];
+
+      if (dados.cozinha) {
+        labels.push('Cozinha');
+        values.push(dados.cozinha.custo);
+        colors.push('#10b981');
+      }
+
+      if (dados.ambulatorio.necessario) {
+        labels.push('Ambulatório');
+        values.push(dados.ambulatorio.custo);
+        colors.push('#ef4444');
+      }
+
+      if (dados.alojamento) {
+        labels.push('Alojamento');
+        values.push(dados.alojamento.custoTotal);
+        colors.push('#ec4899');
+      }
+
+      if (dados.lavanderia) {
+        labels.push('Lavanderia');
+        values.push(dados.lavanderia.custo);
+        colors.push('#06b6d4');
+      }
+
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: colors,
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                color: '#fff',
+                padding: 15,
+                font: { size: 12 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // ==================== MODAIS ====================
+    function abrirModalPrecos() {
+      document.getElementById('preco-vaso').value = precosCanteiro.precoVaso;
+      document.getElementById('preco-mictorio').value = precosCanteiro.precoMictorio;
+      document.getElementById('preco-lavatorio').value = precosCanteiro.precoLavatorio;
+      document.getElementById('preco-chuveiro').value = precosCanteiro.precoChuveiro;
+      document.getElementById('preco-assento').value = precosCanteiro.precoAssento;
+      document.getElementById('preco-bebedouro').value = precosCanteiro.precoBebedouro;
+      document.getElementById('preco-armario').value = precosCanteiro.precoArmario;
+      document.getElementById('preco-m2-vestiario').value = precosCanteiro.precoM2Vestiario;
+      document.getElementById('preco-m2-refeitorio').value = precosCanteiro.precoM2Refeitorio;
+      document.getElementById('preco-m2-cozinha').value = precosCanteiro.precoM2Cozinha;
+      document.getElementById('preco-m2-alojamento').value = precosCanteiro.precoM2Alojamento;
+      document.getElementById('preco-m2-ambulatorio').value = precosCanteiro.precoM2Ambulatorio;
+      document.getElementById('modalPrecos').classList.add('active');
+    }
+
+    function fecharModalPrecos() {
+      document.getElementById('modalPrecos').classList.remove('active');
+    }
+
+    function salvarPrecosCanteiro() {
+      precosCanteiro = {
+        precoVaso: parseFloat(document.getElementById('preco-vaso').value) || 0,
+        precoMictorio: parseFloat(document.getElementById('preco-mictorio').value) || 0,
+        precoLavatorio: parseFloat(document.getElementById('preco-lavatorio').value) || 0,
+        precoChuveiro: parseFloat(document.getElementById('preco-chuveiro').value) || 0,
+        precoAssento: parseFloat(document.getElementById('preco-assento').value) || 0,
+        precoBebedouro: parseFloat(document.getElementById('preco-bebedouro').value) || 0,
+        precoArmario: parseFloat(document.getElementById('preco-armario').value) || 0,
+        precoM2Vestiario: parseFloat(document.getElementById('preco-m2-vestiario').value) || 0,
+        precoM2Refeitorio: parseFloat(document.getElementById('preco-m2-refeitorio').value) || 0,
+        precoM2Cozinha: parseFloat(document.getElementById('preco-m2-cozinha').value) || 0,
+        precoM2Alojamento: parseFloat(document.getElementById('preco-m2-alojamento').value) || 0,
+        precoM2Ambulatorio: parseFloat(document.getElementById('preco-m2-ambulatorio').value) || 0
+      };
+      localStorage.setItem('precosCanteiro', JSON.stringify(precosCanteiro));
+      calcular();
+      fecharModalPrecos();
+
+      // Feedback visual
+      const btn = document.getElementById('btnConfigurarPrecos');
+      btn.innerHTML = '<i class="fas fa-check"></i> Salvo!';
+      btn.style.background = 'rgba(16, 185, 129, 0.2)';
+      btn.style.borderColor = 'var(--success)';
+      btn.style.color = 'var(--success)';
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-cog"></i> Configurar Preços';
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }, 2000);
+    }
+
+    function restaurarPrecosCanteiro() {
+      if (confirm('Restaurar todos os preços para o padrão?')) {
+        precosCanteiro = { ...precosCanteiroPadrao };
+        localStorage.setItem('precosCanteiro', JSON.stringify(precosCanteiro));
+        abrirModalPrecos();
+        calcular();
+      }
+    }
+
+    function showHelp() {
+      document.getElementById('modalAjuda').classList.add('active');
+    }
+
+    function closeHelp() {
+      document.getElementById('modalAjuda').classList.remove('active');
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function toggleTheme() {
+      // Placeholder para tema claro/escuro
+      alert('Funcionalidade de tema em desenvolvimento!');
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    document.getElementById('btnCalcular').addEventListener('click', calcular);
+    document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+    document.getElementById('btnReset').addEventListener('click', () => {
+      document.getElementById('num-funcionarios').value = '25';
+      document.getElementById('jornada').value = '8';
+      document.getElementById('proporcao-feminina').value = '0';
+      document.getElementById('incluir-alojamento').checked = false;
+      document.getElementById('incluir-cozinha').checked = true;
+      document.getElementById('incluir-lavanderia').checked = false;
+      document.getElementById('pcd').checked = true;
+      document.getElementById('num-alojados').value = '10';
+      document.getElementById('tipo-cama').value = 'simples';
+      document.getElementById('alojamento-opcoes').classList.add('hidden');
+      document.getElementById('resultado').innerHTML = '';
+    });
+
+    document.getElementById('btnExportar').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Auto-calculate on input change
+    const inputIds = ['num-funcionarios', 'jornada', 'proporcao-feminina', 'incluir-alojamento', 
+                      'incluir-cozinha', 'incluir-lavanderia', 'pcd', 'num-alojados', 'tipo-cama'];
+    inputIds.forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', calcular);
+      el.addEventListener('change', calcular);
+    });
+
+    // Toggle alojamento options
+    document.getElementById('incluir-alojamento').addEventListener('change', (e) => {
+      document.getElementById('alojamento-opcoes').classList.toggle('hidden', !e.target.checked);
+    });
+
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+    });
+
+    // Close modals on ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+      }
+    });
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Initial calculation
+    window.addEventListener('load', calcular);
+  </script>
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
