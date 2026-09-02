@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo de Lajes - NBR 6118:2014</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+        }
+        
+        .dark { color-scheme: dark; }
+        
+        .gradient-bg { 
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%); 
+        }
+        
+        .card-shadow { 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .input-focus:focus { 
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+        }
+        
+        .dark .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 50;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: width 0.5s ease;
+        }
+        
+        .progress-bar.warning {
+            background: linear-gradient(90deg, #eab308, #ca8a04);
+        }
+        
+        .progress-bar.danger {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: toastIn 0.3s ease-out;
+        }
+        
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .toast.success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .toast.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .print-break { page-break-before: always; }
+            body { background: white !important; }
+        }
+        
+        /* Number input arrows */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+            height: 30px;
+        }
+        
+        /* Range slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+        }
+        
+        .dark input[type="range"] {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 min-h-screen transition-colors duration-300">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-4 md:py-6 shadow-2xl sticky top-0 z-50 no-print">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                        <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg md:text-2xl font-bold tracking-tight">Cálculo de Lajes</h1>
+                        <p class="text-blue-200 text-xs md:text-sm">NBR 6118:2014 • Método de Marcus</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 md:gap-3">
+                    <!-- Dark Mode Toggle -->
+                    <button onclick="toggleDarkMode()" class="p-2 md:p-2.5 bg-white/10 hover:bg-white/20 rounded-lg transition-all" title="Alternar tema">
+                        <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                    <!-- Print Button -->
+                    <button onclick="window.print()" class="hidden md:flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        <span>Imprimir</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Quick Stats Bar -->
+    <div id="quickStats" class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-3 sticky top-[72px] md:top-[88px] z-40 no-print hidden">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between gap-4 overflow-x-auto pb-1">
+                <div class="flex items-center gap-2 min-w-max">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Laje:</span>
+                    <span id="statDims" class="text-sm font-semibold text-slate-700 dark:text-slate-200">3.00 × 4.00 m</span>
+                </div>
+                <div class="flex items-center gap-2 min-w-max">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Carga:</span>
+                    <span id="statCarga" class="text-sm font-semibold text-slate-700 dark:text-slate-200">— kN/m²</span>
+                </div>
+                <div class="flex items-center gap-2 min-w-max">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Mx:</span>
+                    <span id="statMx" class="text-sm font-semibold text-blue-600">— kN.m/m</span>
+                </div>
+                <div class="flex items-center gap-2 min-w-max">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">As,x:</span>
+                    <span id="statAsx" class="text-sm font-semibold text-green-600">— cm²/m</span>
+                </div>
+                <div id="statStatus" class="flex items-center gap-1 min-w-max">
+                    <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                    <span class="text-xs text-slate-500">Aguardando</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-6 md:py-8">
+        <div class="grid lg:grid-cols-12 gap-6 md:gap-8">
+            <!-- Formulário de Entrada -->
+            <div class="lg:col-span-4 no-print">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-5 md:p-6 sticky top-32">
+                    <!-- Tabs -->
+                    <div class="flex gap-2 mb-6 bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
+                        <button onclick="switchTab('geometria')" id="tabGeometria" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all tab-active">
+                            📐 Geometria
+                        </button>
+                        <button onclick="switchTab('materiais')" id="tabMateriais" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-600">
+                            🧱 Materiais
+                        </button>
+                        <button onclick="switchTab('cargas')" id="tabCargas" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-600">
+                            ⚖️ Cargas
+                        </button>
+                    </div>
+
+                    <!-- Tab Content: Geometria -->
+                    <div id="contentGeometria" class="space-y-4">
+                        <!-- Tipo de Laje -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                Tipo de Laje
+                                <span class="tooltip ml-1 text-blue-500 cursor-help" data-tip="Escolha o sistema estrutural da laje">ⓘ</span>
+                            </label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setTipoLaje('macica')" id="btnMacica" class="p-3 rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-center transition-all">
+                                    <div class="text-2xl mb-1">▬</div>
+                                    <div class="text-xs font-medium text-slate-700 dark:text-slate-200">Maciça</div>
+                                </button>
+                                <button onclick="setTipoLaje('nervurada')" id="btnNervurada" class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 text-center transition-all">
+                                    <div class="text-2xl mb-1">⊓⊓⊓</div>
+                                    <div class="text-xs font-medium text-slate-700 dark:text-slate-200">Nervurada</div>
+                                </button>
+                                <button onclick="setTipoLaje('premoldada')" id="btnPremoldada" class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 text-center transition-all">
+                                    <div class="text-2xl mb-1">⊏⊐⊏⊐</div>
+                                    <div class="text-xs font-medium text-slate-700 dark:text-slate-200">Pré-mold.</div>
+                                </button>
+                            </div>
+                            <input type="hidden" id="tipoLaje" value="macica">
+                        </div>
+
+                        <!-- Condição de Apoio -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Condição de Apoio</label>
+                            <select id="condicaoApoio" onchange="atualizarDiagrama(); calcularPreview()" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200">
+                                <option value="1">Tipo 1 - 4 bordas apoiadas</option>
+                                <option value="2">Tipo 2 - 3 apoiadas, 1 engastada</option>
+                                <option value="3">Tipo 3 - 2 opostas apoiadas, 2 engastadas</option>
+                                <option value="4">Tipo 4 - 2 adjacentes apoiadas, 2 engastadas</option>
+                                <option value="5">Tipo 5 - 1 apoiada, 3 engastadas</option>
+                                <option value="6">Tipo 6 - 4 bordas engastadas</option>
+                            </select>
+                        </div>
+
+                        <!-- Dimensões com Slider -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                    Lx <span class="text-slate-400 font-normal">(menor)</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="number" id="lx" value="3.0" step="0.1" min="1" max="8" 
+                                        class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200"
+                                        oninput="atualizarDiagrama(); calcularPreview()">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">m</span>
+                                </div>
+                                <input type="range" id="lxRange" min="1" max="8" step="0.1" value="3.0" 
+                                    class="w-full mt-2" oninput="document.getElementById('lx').value = this.value; atualizarDiagrama(); calcularPreview()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                    Ly <span class="text-slate-400 font-normal">(maior)</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="number" id="ly" value="4.0" step="0.1" min="1" max="10" 
+                                        class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200"
+                                        oninput="atualizarDiagrama(); calcularPreview()">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">m</span>
+                                </div>
+                                <input type="range" id="lyRange" min="1" max="10" step="0.1" value="4.0" 
+                                    class="w-full mt-2" oninput="document.getElementById('ly').value = this.value; atualizarDiagrama(); calcularPreview()">
+                            </div>
+                        </div>
+
+                        <!-- Espessura -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                Espessura (h)
+                                <span class="ml-2 text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full">mín. 7cm</span>
+                            </label>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="espessuraRange" min="7" max="25" step="1" value="10" 
+                                    class="flex-1" oninput="document.getElementById('espessura').value = this.value; calcularPreview()">
+                                <div class="relative w-24">
+                                    <input type="number" id="espessura" value="10" step="1" min="7" max="30" 
+                                        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg input-focus focus:outline-none transition text-center text-slate-700 dark:text-slate-200"
+                                        oninput="document.getElementById('espessuraRange').value = this.value; calcularPreview()">
+                                    <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">cm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content: Materiais -->
+                    <div id="contentMateriais" class="space-y-4 hidden">
+                        <!-- Concreto -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                Classe do Concreto (fck)
+                            </label>
+                            <div class="grid grid-cols-5 gap-2">
+                                <button onclick="setFck(20)" class="fck-btn p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200" data-fck="20">C20</button>
+                                <button onclick="setFck(25)" class="fck-btn p-2 rounded-lg border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-sm font-medium transition text-slate-700 dark:text-slate-200" data-fck="25">C25</button>
+                                <button onclick="setFck(30)" class="fck-btn p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200" data-fck="30">C30</button>
+                                <button onclick="setFck(35)" class="fck-btn p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200" data-fck="35">C35</button>
+                                <button onclick="setFck(40)" class="fck-btn p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200" data-fck="40">C40</button>
+                            </div>
+                            <input type="hidden" id="fck" value="25">
+                        </div>
+
+                        <!-- Aço -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                Categoria do Aço
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="setAco(500)" id="btnCa50" class="p-4 rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 transition-all">
+                                    <div class="text-lg font-bold text-slate-700 dark:text-slate-200">CA-50</div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">fyk = 500 MPa</div>
+                                </button>
+                                <button onclick="setAco(600)" id="btnCa60" class="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 transition-all">
+                                    <div class="text-lg font-bold text-slate-700 dark:text-slate-200">CA-60</div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">fyk = 600 MPa</div>
+                                </button>
+                            </div>
+                            <input type="hidden" id="aco" value="500">
+                        </div>
+
+                        <!-- Cobrimento -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                Cobrimento Nominal
+                            </label>
+                            <select id="cobrimento" onchange="calcularPreview()" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200">
+                                <option value="2.0">2.0 cm - CAA I (interno seco)</option>
+                                <option value="2.5" selected>2.5 cm - CAA II (urbano)</option>
+                                <option value="3.0">3.0 cm - CAA III (marinho)</option>
+                                <option value="4.0">4.0 cm - CAA IV (industrial)</option>
+                            </select>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Conforme Tabela 7.2 da NBR 6118</p>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content: Cargas -->
+                    <div id="contentCargas" class="space-y-4 hidden">
+                        <!-- Carga Permanente -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                Carga Permanente Adicional
+                                <span class="tooltip ml-1 text-blue-500 cursor-help" data-tip="Revestimento, contrapiso, paredes, etc.">ⓘ</span>
+                            </label>
+                            <div class="relative">
+                                <input type="number" id="cargaPermanente" value="1.5" step="0.1" min="0" max="10"
+                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200"
+                                    oninput="calcularPreview()">
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">kN/m²</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <button onclick="document.getElementById('cargaPermanente').value=1.0; calcularPreview()" class="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300">Leve (1.0)</button>
+                                <button onclick="document.getElementById('cargaPermanente').value=1.5; calcularPreview()" class="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300">Normal (1.5)</button>
+                                <button onclick="document.getElementById('cargaPermanente').value=2.5; calcularPreview()" class="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300">Pesada (2.5)</button>
+                            </div>
+                        </div>
+
+                        <!-- Carga Acidental -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                Carga Acidental (uso)
+                            </label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setCargaAcidental(1.5)" class="carga-btn p-3 rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-left transition-all" data-carga="1.5">
+                                    <div class="font-bold text-slate-700 dark:text-slate-200">🏠 Residencial</div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">1.5 kN/m²</div>
+                                </button>
+                                <button onclick="setCargaAcidental(2.0)" class="carga-btn p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-left hover:border-blue-300 transition-all" data-carga="2.0">
+                                    <div class="font-bold text-slate-700 dark:text-slate-200">🏢 Escritório</div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">2.0 kN/m²</div>
+                                </button>
+                                <button onclick="setCargaAcidental(3.0)" class="carga-btn p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-left hover:border-blue-300 transition-all" data-carga="3.0">
+                                    <div class="font-bold text-slate-700 dark:text-slate-200">🏪 Comercial</div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">3.0 kN/m²</div>
+                                </button>
+                                <button onclick="setCargaAcidental(5.0)" class="carga-btn p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-left hover:border-blue-300 transition-all" data-carga="5.0">
+                                    <div class="font-bold text-slate-700 dark:text-slate-200">🚗 Garagem</div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400">5.0 kN/m²</div>
+                                </button>
+                            </div>
+                            <input type="hidden" id="cargaAcidental" value="1.5">
+                        </div>
+                    </div>
+
+                    <!-- Botão Calcular -->
+                    <button onclick="calcular()" class="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 shadow-lg hover:shadow-xl pulse-glow">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        CALCULAR LAJE
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resultados -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- Diagrama da Laje -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-5 md:p-6 animate-fade-in">
+                    <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                        <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"></path>
+                            </svg>
+                        </div>
+                        Esquema Estrutural
+                    </h2>
+                    <div class="flex justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-700 dark:to-slate-600 rounded-xl p-4">
+                        <svg id="diagramaLaje" viewBox="0 0 400 300" class="w-full max-w-lg"></svg>
+                    </div>
+                    <div class="flex justify-center gap-8 mt-4 text-sm">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-1 bg-slate-400 rounded"></div>
+                            <span class="text-slate-600 dark:text-slate-300">Apoio Simples</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-4 bg-gradient-to-b from-slate-700 to-slate-500 rounded-sm"></div>
+                            <span class="text-slate-600 dark:text-slate-300">Engaste</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resultados do Cálculo -->
+                <div id="resultados">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-700 dark:to-slate-600 rounded-2xl p-8 md:p-12 text-center animate-fade-in">
+                        <div class="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                            <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-700 dark:text-slate-200 mb-2">Pronto para Calcular</h3>
+                        <p class="text-slate-500 dark:text-slate-400">Configure os parâmetros ao lado e clique em "Calcular Laje"</p>
+                        <div class="mt-6 flex flex-wrap justify-center gap-3">
+                            <span class="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-xs text-slate-600 dark:text-slate-300 shadow">✓ Momentos fletores</span>
+                            <span class="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-xs text-slate-600 dark:text-slate-300 shadow">✓ Armaduras</span>
+                            <span class="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-xs text-slate-600 dark:text-slate-300 shadow">✓ Verificações</span>
+                            <span class="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-xs text-slate-600 dark:text-slate-300 shadow">✓ Quantitativos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <script>
+        // Coeficientes de Marcus
+        const coeficientesMarcus = {
+            1: { 0.50: [14.1, 75.6, 0, 0], 0.55: [18.3, 73.8, 0, 0], 0.60: [23.0, 71.8, 0, 0], 0.65: [28.2, 69.5, 0, 0], 0.70: [33.9, 67.0, 0, 0], 0.75: [40.0, 64.3, 0, 0], 0.80: [46.4, 61.4, 0, 0], 0.85: [53.1, 58.4, 0, 0], 0.90: [59.9, 55.2, 0, 0], 0.95: [66.9, 52.0, 0, 0], 1.00: [73.9, 48.7, 0, 0] },
+            2: { 0.50: [10.0, 61.0, 21.5, 0], 0.55: [13.5, 60.5, 26.0, 0], 0.60: [17.5, 59.5, 31.0, 0], 0.65: [22.0, 58.0, 36.5, 0], 0.70: [27.0, 56.5, 42.0, 0], 0.75: [32.5, 54.5, 48.0, 0], 0.80: [38.5, 52.5, 54.0, 0], 0.85: [44.5, 50.0, 60.5, 0], 0.90: [51.0, 47.5, 67.0, 0], 0.95: [57.5, 45.0, 73.5, 0], 1.00: [64.0, 42.5, 80.0, 0] },
+            3: { 0.50: [8.0, 55.0, 18.0, 0], 0.55: [11.0, 55.0, 22.0, 0], 0.60: [14.5, 54.5, 27.0, 0], 0.65: [18.5, 53.5, 32.0, 0], 0.70: [23.0, 52.5, 37.5, 0], 0.75: [28.0, 51.0, 43.5, 0], 0.80: [33.5, 49.5, 49.5, 0], 0.85: [39.5, 47.5, 56.0, 0], 0.90: [45.5, 45.5, 62.5, 0], 0.95: [52.0, 43.5, 69.0, 0], 1.00: [58.5, 41.0, 76.0, 0] },
+            4: { 0.50: [6.5, 47.0, 14.5, 75.0], 0.55: [9.0, 48.0, 18.0, 72.0], 0.60: [12.0, 48.5, 22.0, 69.0], 0.65: [15.5, 48.5, 26.5, 66.0], 0.70: [19.5, 48.0, 31.5, 62.5], 0.75: [24.0, 47.5, 37.0, 59.0], 0.80: [29.0, 46.5, 42.5, 55.5], 0.85: [34.5, 45.0, 48.5, 52.0], 0.90: [40.0, 43.5, 54.5, 48.5], 0.95: [46.0, 41.5, 61.0, 45.0], 1.00: [52.0, 39.5, 67.5, 41.5] },
+            5: { 0.50: [5.5, 40.0, 12.0, 64.0], 0.55: [7.5, 41.5, 15.0, 62.0], 0.60: [10.0, 42.5, 18.5, 60.0], 0.65: [13.0, 43.0, 22.5, 57.5], 0.70: [16.5, 43.5, 27.0, 55.0], 0.75: [20.5, 43.5, 32.0, 52.5], 0.80: [25.0, 43.0, 37.5, 50.0], 0.85: [30.0, 42.5, 43.0, 47.0], 0.90: [35.5, 41.5, 49.0, 44.0], 0.95: [41.0, 40.0, 55.0, 41.0], 1.00: [47.0, 38.5, 61.0, 38.0] },
+            6: { 0.50: [4.5, 33.0, 10.0, 54.0], 0.55: [6.0, 35.0, 12.5, 53.0], 0.60: [8.0, 36.5, 15.5, 52.0], 0.65: [10.5, 37.5, 19.0, 50.5], 0.70: [13.5, 38.5, 23.0, 49.0], 0.75: [17.0, 39.0, 27.5, 47.0], 0.80: [21.0, 39.0, 32.5, 45.0], 0.85: [25.5, 39.0, 38.0, 43.0], 0.90: [30.5, 38.5, 43.5, 40.5], 0.95: [35.5, 37.5, 49.5, 38.0], 1.00: [41.0, 36.5, 55.5, 35.5] }
+        };
+
+        // State
+        let calculoRealizado = false;
+        let ultimoResultado = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            atualizarDiagrama();
+            checkDarkMode();
+        });
+
+        // Dark Mode
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+        }
+
+        function checkDarkMode() {
+            if (localStorage.getItem('darkMode') === 'true' || 
+                (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('darkMode'))) {
+                document.documentElement.classList.add('dark');
+            }
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            const tabs = ['Geometria', 'Materiais', 'Cargas'];
+            tabs.forEach(t => {
+                document.getElementById('tab' + t).classList.remove('tab-active');
+                document.getElementById('tab' + t).classList.add('text-slate-600', 'dark:text-slate-300');
+                document.getElementById('content' + t).classList.add('hidden');
+            });
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('tab-active');
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('text-slate-600', 'dark:text-slate-300');
+            document.getElementById('content' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+        }
+
+        // Set functions
+        function setTipoLaje(tipo) {
+            document.getElementById('tipoLaje').value = tipo;
+            ['macica', 'nervurada', 'premoldada'].forEach(t => {
+                const btn = document.getElementById('btn' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (t === tipo) {
+                    btn.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                    btn.classList.remove('border-slate-200', 'dark:border-slate-600');
+                } else {
+                    btn.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                    btn.classList.add('border-slate-200', 'dark:border-slate-600');
+                }
+            });
+            
+            const esp = document.getElementById('espessura');
+            const espRange = document.getElementById('espessuraRange');
+            if (tipo === 'macica') { esp.min = 7; espRange.min = 7; }
+            else if (tipo === 'nervurada') { esp.min = 10; espRange.min = 10; }
+            else { esp.min = 8; espRange.min = 8; }
+            calcularPreview();
+        }
+
+        function setFck(valor) {
+            document.getElementById('fck').value = valor;
+            document.querySelectorAll('.fck-btn').forEach(btn => {
+                if (parseInt(btn.dataset.fck) === valor) {
+                    btn.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                    btn.classList.remove('border-slate-200', 'dark:border-slate-600');
+                } else {
+                    btn.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                    btn.classList.add('border-slate-200', 'dark:border-slate-600');
+                }
+            });
+            calcularPreview();
+        }
+
+        function setAco(valor) {
+            document.getElementById('aco').value = valor;
+            if (valor === 500) {
+                document.getElementById('btnCa50').classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                document.getElementById('btnCa50').classList.remove('border-slate-200', 'dark:border-slate-600');
+                document.getElementById('btnCa60').classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                document.getElementById('btnCa60').classList.add('border-slate-200', 'dark:border-slate-600');
+            } else {
+                document.getElementById('btnCa60').classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                document.getElementById('btnCa60').classList.remove('border-slate-200', 'dark:border-slate-600');
+                document.getElementById('btnCa50').classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                document.getElementById('btnCa50').classList.add('border-slate-200', 'dark:border-slate-600');
+            }
+            calcularPreview();
+        }
+
+        function setCargaAcidental(valor) {
+            document.getElementById('cargaAcidental').value = valor;
+            document.querySelectorAll('.carga-btn').forEach(btn => {
+                if (parseFloat(btn.dataset.carga) === valor) {
+                    btn.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                    btn.classList.remove('border-slate-200', 'dark:border-slate-600');
+                } else {
+                    btn.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                    btn.classList.add('border-slate-200', 'dark:border-slate-600');
+                }
+            });
+            calcularPreview();
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Diagram update
+        function atualizarDiagrama() {
+            const tipo = parseInt(document.getElementById('condicaoApoio').value);
+            const lx = parseFloat(document.getElementById('lx').value) || 3;
+            const ly = parseFloat(document.getElementById('ly').value) || 4;
+            
+            const svg = document.getElementById('diagramaLaje');
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            const apoios = {
+                1: { top: 'apoio', right: 'apoio', bottom: 'apoio', left: 'apoio' },
+                2: { top: 'apoio', right: 'apoio', bottom: 'engaste', left: 'apoio' },
+                3: { top: 'apoio', right: 'engaste', bottom: 'apoio', left: 'engaste' },
+                4: { top: 'apoio', right: 'engaste', bottom: 'engaste', left: 'apoio' },
+                5: { top: 'apoio', right: 'engaste', bottom: 'engaste', left: 'engaste' },
+                6: { top: 'engaste', right: 'engaste', bottom: 'engaste', left: 'engaste' }
+            };
+
+            const config = apoios[tipo];
+            const fillColor = isDark ? '#334155' : '#e0e7ff';
+            const strokeColor = isDark ? '#60a5fa' : '#4f46e5';
+            const textColor = isDark ? '#93c5fd' : '#1e40af';
+            const hatchColor = isDark ? '#94a3b8' : '#374151';
+            const apoioColor = isDark ? '#64748b' : '#9ca3af';
+            
+            svg.innerHTML = `
+                <defs>
+                    <pattern id="hatch" patternUnits="userSpaceOnUse" width="8" height="8">
+                        <path d="M-2,2 l4,-4 M0,8 l8,-8 M6,10 l4,-4" stroke="${hatchColor}" stroke-width="1.5"/>
+                    </pattern>
+                    <linearGradient id="lajeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:${isDark ? '#475569' : '#c7d2fe'}"/>
+                        <stop offset="100%" style="stop-color:${isDark ? '#334155' : '#e0e7ff'}"/>
+                    </linearGradient>
+                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+                    </filter>
+                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                        <path d="M0,0 L10,5 L0,10 Z" fill="${textColor}"/>
+                    </marker>
+                </defs>
+                
+                <!-- Laje -->
+                <rect x="80" y="60" width="240" height="180" rx="4" fill="url(#lajeGradient)" stroke="${strokeColor}" stroke-width="2" filter="url(#shadow)"/>
+                
+                <!-- Apoios -->
+                ${config.top === 'engaste' ? 
+                    `<rect x="70" y="46" width="260" height="14" fill="url(#hatch)" stroke="${hatchColor}" stroke-width="1" rx="2"/>` :
+                    `<line x1="80" y1="60" x2="320" y2="60" stroke="${apoioColor}" stroke-width="5" stroke-linecap="round"/>`
+                }
+                ${config.bottom === 'engaste' ? 
+                    `<rect x="70" y="240" width="260" height="14" fill="url(#hatch)" stroke="${hatchColor}" stroke-width="1" rx="2"/>` :
+                    `<line x1="80" y1="240" x2="320" y2="240" stroke="${apoioColor}" stroke-width="5" stroke-linecap="round"/>`
+                }
+                ${config.left === 'engaste' ? 
+                    `<rect x="66" y="50" width="14" height="200" fill="url(#hatch)" stroke="${hatchColor}" stroke-width="1" rx="2"/>` :
+                    `<line x1="80" y1="60" x2="80" y2="240" stroke="${apoioColor}" stroke-width="5" stroke-linecap="round"/>`
+                }
+                ${config.right === 'engaste' ? 
+                    `<rect x="320" y="50" width="14" height="200" fill="url(#hatch)" stroke="${hatchColor}" stroke-width="1" rx="2"/>` :
+                    `<line x1="320" y1="60" x2="320" y2="240" stroke="${apoioColor}" stroke-width="5" stroke-linecap="round"/>`
+                }
+                
+                <!-- Dimensões -->
+                <line x1="80" y1="275" x2="320" y2="275" stroke="${textColor}" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+                <text x="200" y="295" text-anchor="middle" font-size="13" font-weight="600" fill="${textColor}">Lx = ${lx.toFixed(2)} m</text>
+                
+                <line x1="355" y1="60" x2="355" y2="240" stroke="${textColor}" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+                <text x="375" y="155" text-anchor="middle" font-size="13" font-weight="600" fill="${textColor}" transform="rotate(90, 375, 155)">Ly = ${ly.toFixed(2)} m</text>
+                
+                <!-- Centro -->
+                <text x="200" y="140" text-anchor="middle" font-size="16" font-weight="700" fill="${strokeColor}">LAJE</text>
+                <text x="200" y="162" text-anchor="middle" font-size="12" fill="${isDark ? '#94a3b8' : '#6366f1'}">Tipo ${tipo}</text>
+                <text x="200" y="180" text-anchor="middle" font-size="11" fill="${isDark ? '#64748b' : '#9ca3af'}">λ = ${(lx/ly).toFixed(3)}</text>
+            `;
+
+            // Sync range sliders
+            document.getElementById('lxRange').value = lx;
+            document.getElementById('lyRange').value = ly;
+        }
+
+        function interpolarCoeficientes(lambda, tipo) {
+            const tabela = coeficientesMarcus[tipo];
+            const lambdas = Object.keys(tabela).map(Number).sort((a, b) => a - b);
+            
+            if (lambda <= lambdas[0]) return tabela[lambdas[0]];
+            if (lambda >= lambdas[lambdas.length - 1]) return tabela[lambdas[lambdas.length - 1]];
+            
+            for (let i = 0; i < lambdas.length - 1; i++) {
+                if (lambda >= lambdas[i] && lambda <= lambdas[i + 1]) {
+                    const l1 = lambdas[i], l2 = lambdas[i + 1];
+                    const c1 = tabela[l1], c2 = tabela[l2];
+                    const t = (lambda - l1) / (l2 - l1);
+                    return c1.map((v, idx) => v + t * (c2[idx] - v));
+                }
+            }
+            return tabela[1.00];
+        }
+
+        function calcularPreview() {
+            // Quick preview calculation for stats bar
+            const lx = parseFloat(document.getElementById('lx').value) || 3;
+            const ly = parseFloat(document.getElementById('ly').value) || 4;
+            const h = parseFloat(document.getElementById('espessura').value) / 100;
+            const gPermanente = parseFloat(document.getElementById('cargaPermanente').value) || 1.5;
+            const qAcidental = parseFloat(document.getElementById('cargaAcidental').value) || 1.5;
+            
+            const g0 = 25 * h;
+            const pd = 1.4 * (g0 + gPermanente) + 1.4 * qAcidental;
+            
+            document.getElementById('statDims').textContent = `${lx.toFixed(2)} × ${ly.toFixed(2)} m`;
+            document.getElementById('statCarga').textContent = `${pd.toFixed(1)} kN/m²`;
+            
+            document.getElementById('quickStats').classList.remove('hidden');
+        }
+
+        function calcular() {
+            const tipoLaje = document.getElementById('tipoLaje').value;
+            const condicaoApoio = parseInt(document.getElementById('condicaoApoio').value);
+            const lx = parseFloat(document.getElementById('lx').value);
+            const ly = parseFloat(document.getElementById('ly').value);
+            const h = parseFloat(document.getElementById('espessura').value) / 100;
+            const fck = parseFloat(document.getElementById('fck').value);
+            const fyk = parseFloat(document.getElementById('aco').value);
+            const gPermanente = parseFloat(document.getElementById('cargaPermanente').value);
+            const qAcidental = parseFloat(document.getElementById('cargaAcidental').value);
+            const cobrimento = parseFloat(document.getElementById('cobrimento').value) / 100;
+
+            // Validações
+            if (lx > ly) {
+                showToast('Lx deve ser menor ou igual a Ly!', 'error');
+                return;
+            }
+
+            if (lx / ly < 0.5) {
+                showToast('Laje armada em uma direção (λ < 0.5) - considerar viga', 'warning');
+            }
+
+            // Constantes
+            const gammaC = 1.4, gammaS = 1.15, gammaG = 1.4, gammaQ = 1.4;
+            const fcd = fck / gammaC, fyd = fyk / gammaS;
+            const Ecs = 5600 * Math.sqrt(fck);
+
+            // Cargas
+            const g0 = 25 * h;
+            const gTotal = g0 + gPermanente;
+            const pd = gammaG * gTotal + gammaQ * qAcidental;
+            const pServ = gTotal + qAcidental;
+
+            // Coeficientes
+            const lambda = lx / ly;
+            const coefs = interpolarCoeficientes(lambda, condicaoApoio);
+            const [kx, ky, kxn, kyn] = coefs.map(c => c / 1000);
+
+            // Momentos
+            const mx = kx * pd * lx * lx;
+            const my = ky * pd * lx * lx;
+            const mxn = kxn * pd * lx * lx;
+            const myn = kyn * pd * lx * lx;
+            
+            // Orçamento 2025
+            const precoConcreto = 480; // R$/m³
+            const precoAco = 9.80;    // R$/kg
+            const precoFormaSlab = 95; // R$/m²
+            const precoMaoObraSlab = 85; // R$/m²
+            
+            let custoMaterial = 0;
+            let custoMaoObraExec = areaLaje * precoMaoObraSlab;
+            
+            if (tipoLaje === 'macica') {
+                custoMaterial = (volumeConcreto * precoConcreto) + (pesoAcoTotal/1000 * precoAco) + (areaLaje * precoFormaSlab);
+            } else if (tipoLaje === 'nervurada') {
+                custoMaterial = (volumeConcreto * precoConcreto) + (pesoAcoTotal/1000 * precoAco) + (areaLaje * 45) + (areaLaje * 35); // Estimativa EPS + Formas leves
+            } else {
+                custoMaterial = (areaLaje * 65) + (volumeConcreto * precoConcreto) + (pesoAcoTotal/1000 * precoAco); // Estimativa Vigotas + Capa
+            }
+            
+            const custoTotalEstimado = custoMaterial + custoMaoObraExec;
+
+            // Altura útil
+            const d = h - cobrimento - 0.004;
+
+            // Armadura
+            function calcularArmadura(M, d, fcd, fyd) {
+                const Md = Math.abs(M);
+                const kmd = Md / (1 * d * d * fcd * 1000);
+                if (kmd > 0.251) return { As: -1, msg: 'Seção insuficiente' };
+                const kz = 0.5 * (1 + Math.sqrt(1 - 2 * kmd));
+                const As = (Md / (kz * d * fyd * 1000)) * 10000;
+                return { As, kmd, z: kz * d };
+            }
+
+            const rhoMin = 0.15 / 100;
+            const AsMin = rhoMin * 100 * (d * 100);
+
+            const armX = calcularArmadura(mx, d, fcd, fyd);
+            const armY = calcularArmadura(my, d, fcd, fyd);
+            const armXn = calcularArmadura(mxn, d, fcd, fyd);
+            const armYn = calcularArmadura(myn, d, fcd, fyd);
+
+            const AsX = Math.max(armX.As, AsMin);
+            const AsY = Math.max(armY.As, AsMin);
+            const AsXn = mxn > 0 ? Math.max(armXn.As, AsMin) : 0;
+            const AsYn = myn > 0 ? Math.max(armYn.As, AsMin) : 0;
+
+            // Flecha
+            const Ic = (1 * Math.pow(h, 3)) / 12;
+            const flechaImediata = (0.013 * pServ * Math.pow(lx, 4)) / (Ecs * 1000 * Ic) * 1000;
+            const flechaTotal = flechaImediata * 2.5;
+            const flechaLimite = (lx * 1000) / 250;
+
+            // Espessura mínima
+            const hMin = tipoLaje === 'macica' ? 7 : (tipoLaje === 'nervurada' ? 10 : 8);
+
+            // Bitolas
+            function sugerirBitolas(As) {
+                const bitolas = [
+                    { phi: 5.0, area: 0.196 }, { phi: 6.3, area: 0.312 },
+                    { phi: 8.0, area: 0.503 }, { phi: 10.0, area: 0.785 },
+                    { phi: 12.5, area: 1.227 }
+                ];
+                for (const b of bitolas) {
+                    const n = Math.ceil(As / b.area);
+                    const esp = Math.floor(100 / n);
+                    if (esp >= 10 && esp <= 30) {
+                        return { phi: b.phi, espacamento: esp, nBarras: n, areaReal: n * b.area };
+                    }
+                }
+                return { phi: 8, espacamento: 15, nBarras: 7, areaReal: 3.52 };
+            }
+
+            const sugX = sugerirBitolas(AsX);
+            const sugY = sugerirBitolas(AsY);
+            const sugXn = AsXn > 0 ? sugerirBitolas(AsXn) : null;
+            const sugYn = AsYn > 0 ? sugerirBitolas(AsYn) : null;
+
+            // Quantitativos
+            const areaLaje = lx * ly;
+            const volumeConcreto = areaLaje * h;
+            const pesoAcoX = (AsX / 10000) * lx * 7850 * (ly / (sugX.espacamento / 100));
+            const pesoAcoY = (AsY / 10000) * ly * 7850 * (lx / (sugY.espacamento / 100));
+            const pesoAcoTotal = pesoAcoX + pesoAcoY;
+
+            // Verificações
+            const verif = {
+                espessura: h * 100 >= hMin,
+                flecha: flechaTotal <= flechaLimite,
+                armaduraX: armX.As > 0,
+                armaduraY: armY.As > 0
+            };
+            const todasOk = Object.values(verif).every(v => v);
+
+            // Update quick stats
+            document.getElementById('statMx').textContent = `${mx.toFixed(2)} kN.m/m`;
+            document.getElementById('statAsx').textContent = `${AsX.toFixed(2)} cm²/m`;
+            document.getElementById('statStatus').innerHTML = todasOk ? 
+                '<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span><span class="text-xs text-green-600 font-medium">OK</span>' :
+                '<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span><span class="text-xs text-red-600 font-medium">Verificar</span>';
+
+            // Render results
+            document.getElementById('resultados').innerHTML = `
+                <!-- Status Banner -->
+                <div class="animate-slide-up ${todasOk ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-amber-500 to-orange-500'} rounded-2xl p-6 text-white mb-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                                ${todasOk ? 
+                                    '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' :
+                                    '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>'
+                                }
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold">${todasOk ? 'Dimensionamento OK!' : 'Verificar Dimensionamento'}</h3>
+                                <p class="text-white/80 text-sm">Laje ${tipoLaje} ${lx.toFixed(2)} × ${ly.toFixed(2)} m | Tipo ${condicaoApoio}</p>
+                            </div>
+                        </div>
+                        <div class="text-right hidden md:block">
+                            <div class="text-3xl font-bold">${AsX.toFixed(2)}</div>
+                            <div class="text-sm text-white/80">cm²/m (As,x)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Summary Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 card-shadow animate-fade-in" style="animation-delay: 0.1s">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">Momento Mx</div>
+                        <div class="text-2xl font-bold text-blue-600">${mx.toFixed(2)}</div>
+                        <div class="text-xs text-slate-400">kN.m/m</div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 card-shadow animate-fade-in" style="animation-delay: 0.2s">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">Momento My</div>
+                        <div class="text-2xl font-bold text-purple-600">${my.toFixed(2)}</div>
+                        <div class="text-xs text-slate-400">kN.m/m</div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 card-shadow animate-fade-in" style="animation-delay: 0.3s">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">Armadura As,x</div>
+                        <div class="text-2xl font-bold text-green-600">${AsX.toFixed(2)}</div>
+                        <div class="text-xs text-slate-400">cm²/m</div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 card-shadow animate-fade-in" style="animation-delay: 0.4s">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">Armadura As,y</div>
+                        <div class="text-2xl font-bold text-emerald-600">${AsY.toFixed(2)}</div>
+                        <div class="text-xs text-slate-400">cm²/m</div>
+                    </div>
+                </div>
+
+                <!-- Detailed Results -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Cargas -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 animate-fade-in">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                            <span class="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center text-orange-600 dark:text-orange-400">⚖️</span>
+                            Carregamentos
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between py-2 border-b border-slate-100 dark:border-slate-700">
+                                <span class="text-slate-600 dark:text-slate-300">Peso próprio (g₀)</span>
+                                <span class="font-semibold text-slate-800 dark:text-slate-200">${g0.toFixed(2)} kN/m²</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-slate-100 dark:border-slate-700">
+                                <span class="text-slate-600 dark:text-slate-300">Carga permanente</span>
+                                <span class="font-semibold text-slate-800 dark:text-slate-200">${gPermanente.toFixed(2)} kN/m²</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-slate-100 dark:border-slate-700">
+                                <span class="text-slate-600 dark:text-slate-300">Carga acidental</span>
+                                <span class="font-semibold text-slate-800 dark:text-slate-200">${qAcidental.toFixed(2)} kN/m²</span>
+                            </div>
+                            <div class="flex justify-between py-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg px-3 -mx-3">
+                                <span class="font-semibold text-blue-700 dark:text-blue-300">Carga de cálculo (p<sub>d</sub>)</span>
+                                <span class="font-bold text-blue-700 dark:text-blue-300">${pd.toFixed(2)} kN/m²</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Verificações -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 animate-fade-in">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                            <span class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center text-green-600 dark:text-green-400">✓</span>
+                            Verificações NBR 6118
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-slate-600 dark:text-slate-300">Espessura mínima (h ≥ ${hMin}cm)</span>
+                                <span class="${verif.espessura ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} px-3 py-1 rounded-full text-sm font-medium">
+                                    ${verif.espessura ? '✓ OK' : '✗ Falha'}
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-slate-600 dark:text-slate-300">Flecha (f ≤ L/250)</span>
+                                <span class="${verif.flecha ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} px-3 py-1 rounded-full text-sm font-medium">
+                                    ${verif.flecha ? '✓ OK' : '✗ Falha'}
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-slate-600 dark:text-slate-300">Dimensionamento flexão</span>
+                                <span class="${verif.armaduraX && verif.armaduraY ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} px-3 py-1 rounded-full text-sm font-medium">
+                                    ${verif.armaduraX && verif.armaduraY ? '✓ OK' : '✗ Falha'}
+                                </span>
+                            </div>
+                            <div class="mt-4 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                                <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Utilização da flecha</div>
+                                <div class="h-3 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                                    <div class="h-full progress-bar ${flechaTotal/flechaLimite > 1 ? 'danger' : flechaTotal/flechaLimite > 0.8 ? 'warning' : ''}" style="width: ${Math.min(flechaTotal/flechaLimite*100, 100)}%"></div>
+                                </div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">${((flechaTotal/flechaLimite)*100).toFixed(1)}% (${flechaTotal.toFixed(2)} / ${flechaLimite.toFixed(2)} mm)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Armaduras -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 mt-6 animate-fade-in">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400">🔩</span>
+                        Armaduras Calculadas
+                        <span class="ml-auto text-xs px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 rounded-full">As,min = ${AsMin.toFixed(2)} cm²/m</span>
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-700">
+                                    <th class="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-200 rounded-l-lg">Armadura</th>
+                                    <th class="px-4 py-3 text-center font-semibold text-slate-700 dark:text-slate-200">Calculado</th>
+                                    <th class="px-4 py-3 text-center font-semibold text-slate-700 dark:text-slate-200">Adotado</th>
+                                    <th class="px-4 py-3 text-center font-semibold text-slate-700 dark:text-slate-200 rounded-r-lg">Detalhamento</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                                <tr>
+                                    <td class="px-4 py-4 font-medium text-slate-800 dark:text-slate-200">As,x <span class="text-blue-500">(positiva)</span></td>
+                                    <td class="px-4 py-4 text-center text-slate-600 dark:text-slate-300">${armX.As.toFixed(2)} cm²/m</td>
+                                    <td class="px-4 py-4 text-center font-bold text-blue-600">${AsX.toFixed(2)} cm²/m</td>
+                                    <td class="px-4 py-4 text-center">
+                                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full font-medium">
+                                            φ${sugX.phi} c/${sugX.espacamento}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-4 font-medium text-slate-800 dark:text-slate-200">As,y <span class="text-purple-500">(positiva)</span></td>
+                                    <td class="px-4 py-4 text-center text-slate-600 dark:text-slate-300">${armY.As.toFixed(2)} cm²/m</td>
+                                    <td class="px-4 py-4 text-center font-bold text-purple-600">${AsY.toFixed(2)} cm²/m</td>
+                                    <td class="px-4 py-4 text-center">
+                                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full font-medium">
+                                            φ${sugY.phi} c/${sugY.espacamento}
+                                        </span>
+                                    </td>
+                                </tr>
+                                ${AsXn > 0 ? `
+                                <tr class="bg-red-50/50 dark:bg-red-900/20">
+                                    <td class="px-4 py-4 font-medium text-slate-800 dark:text-slate-200">As',x <span class="text-red-500">(negativa)</span></td>
+                                    <td class="px-4 py-4 text-center text-slate-600 dark:text-slate-300">${armXn.As.toFixed(2)} cm²/m</td>
+                                    <td class="px-4 py-4 text-center font-bold text-red-600">${AsXn.toFixed(2)} cm²/m</td>
+                                    <td class="px-4 py-4 text-center">
+                                        <span class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full font-medium">
+                                            φ${sugXn.phi} c/${sugXn.espacamento}
+                                        </span>
+                                    </td>
+                                </tr>
+                                ` : ''}
+                                ${AsYn > 0 ? `
+                                <tr class="bg-red-50/50 dark:bg-red-900/20">
+                                    <td class="px-4 py-4 font-medium text-slate-800 dark:text-slate-200">As',y <span class="text-red-500">(negativa)</span></td>
+                                    <td class="px-4 py-4 text-center text-slate-600 dark:text-slate-300">${armYn.As.toFixed(2)} cm²/m</td>
+                                    <td class="px-4 py-4 text-center font-bold text-red-600">${AsYn.toFixed(2)} cm²/m</td>
+                                    <td class="px-4 py-4 text-center">
+                                        <span class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full font-medium">
+                                            φ${sugYn.phi} c/${sugYn.espacamento}
+                                        </span>
+                                    </td>
+                                </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quantitativos -->
+                <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 mt-6 text-white animate-fade-in shadow-lg">
+                    <h3 class="font-bold mb-4 flex items-center gap-2 text-lg">
+                        <span class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">📦</span>
+                        Quantitativos Estimados
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur border border-white/10">
+                            <div class="text-white/70 text-sm">Área da Laje</div>
+                            <div class="text-2xl font-bold">${areaLaje.toFixed(2)}</div>
+                            <div class="text-white/60 text-xs">m²</div>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur border border-white/10">
+                            <div class="text-white/70 text-sm">Volume Concreto</div>
+                            <div class="text-2xl font-bold">${volumeConcreto.toFixed(2)}</div>
+                            <div class="text-white/60 text-xs">m³</div>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur border border-white/10">
+                            <div class="text-white/70 text-sm">Peso Aço (est.)</div>
+                            <div class="text-2xl font-bold">${(pesoAcoTotal/1000).toFixed(1)}</div>
+                            <div class="text-white/60 text-xs">kg</div>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur border border-white/10">
+                            <div class="text-white/70 text-sm">Taxa de Aço</div>
+                            <div class="text-2xl font-bold">${((pesoAcoTotal/1000)/(volumeConcreto*1000)*1000).toFixed(1)}</div>
+                            <div class="text-white/60 text-xs">kg/m³</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orçamento Estimado -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 mt-6 animate-fade-in border-2 border-emerald-500/20">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                             <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                             </div>
+                             Orçamento Preliminar 2025
+                        </h3>
+                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold uppercase tracking-wider">Referência SINAPI</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
+                            <div class="text-slate-500 dark:text-slate-400 text-xs uppercase font-bold mb-1">Materiais</div>
+                            <div class="text-2xl font-bold text-slate-800 dark:text-slate-100">R$ ${custoMaterial.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
+                            <div class="text-slate-500 dark:text-slate-400 text-xs uppercase font-bold mb-1">Mão de Obra</div>
+                            <div class="text-2xl font-bold text-slate-800 dark:text-slate-100">R$ ${custoMaoObraExec.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                        </div>
+                        <div class="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
+                            <div class="text-emerald-600 dark:text-emerald-400 text-xs uppercase font-bold mb-1">Custo Total</div>
+                            <div class="text-2xl font-extrabold text-emerald-700 dark:text-emerald-300">R$ ${custoTotalEstimado.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-4 text-center italic">* Valores baseados em médias nacionais. Não substituem cotações locais reais.</p>
+                </div>
+
+                <!-- Dados Técnicos -->
+                <div class="grid md:grid-cols-2 gap-6 mt-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 animate-fade-in">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4">📐 Geometria</h3>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">Lx (menor vão)</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">${lx.toFixed(2)} m</div>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">Ly (maior vão)</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">${ly.toFixed(2)} m</div>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">Espessura (h)</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">${(h*100).toFixed(1)} cm</div>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">Altura útil (d)</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">${(d*100).toFixed(2)} cm</div>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">Relação λ</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">${lambda.toFixed(3)}</div>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">Cobrimento</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">${(cobrimento*100).toFixed(1)} cm</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 animate-fade-in">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4">🧱 Materiais</h3>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">Concreto</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">C${fck}</div>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">fcd</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">${fcd.toFixed(2)} MPa</div>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">Aço</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">CA-${fyk === 500 ? '50' : '60'}</div>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
+                                <div class="text-slate-500 dark:text-slate-400">fyd</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">${fyd.toFixed(2)} MPa</div>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 col-span-2">
+                                <div class="text-slate-500 dark:text-slate-400">Ecs (módulo secante)</div>
+                                <div class="font-bold text-slate-800 dark:text-slate-200">${(Ecs/1000).toFixed(1)} GPa</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notas -->
+                <div class="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-6 mt-6 animate-fade-in">
+                    <h3 class="font-bold text-amber-800 dark:text-amber-200 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Observações Importantes
+                    </h3>
+                    <ul class="text-sm text-amber-900 dark:text-amber-100 space-y-2">
+                        <li>• Cálculo baseado na NBR 6118:2014 e tabelas de Marcus para lajes retangulares</li>
+                        <li>• Armadura negativa: estender a 0,25 do vão a partir do apoio engastado</li>
+                        <li>• Espaçamento máximo: s ≤ min(2h, 20cm) para armadura principal</li>
+                        <li>• Armadura de distribuição: mínimo 20% da armadura principal ou As,min</li>
+                        <li>• <strong>Este cálculo é auxiliar</strong> - o projeto deve ser assinado por engenheiro habilitado</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 mt-6 animate-fade-in">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                        <span class="text-cyan-400">📝</span> Memorial de Cálculo
+                    </h3>
+                    <pre class="font-mono text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE LAJE MACIÇA
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS GERAIS
+Vão Lx: ${lx.toFixed(2)} m
+Vão Ly: ${ly.toFixed(2)} m
+Condição de Apoio: Tipo ${condicaoApoio}
+Espessura Adotada (h): ${(h*100).toFixed(1)} cm
+Altura Útil (d): ${(d*100).toFixed(2)} cm
+Cobrimento: ${(cobrimento*100).toFixed(1)} cm
+Fck: ${fck} MPa
+Aço: CA-${fyk === 500 ? '50' : '60'}
+
+2. CARREGAMENTOS (kN/m²)
+Peso Próprio: ${g0.toFixed(2)}
+Revestimento: ${(gPermanente - g0).toFixed(2)}
+Carga Acidental: ${qAcidental.toFixed(2)}
+Carga Total Cálculo (pd): ${pd.toFixed(2)}
+
+3. ESFORÇOS SOLICITANTES (kN.m/m)
+Momento Mx (Positivo): ${mx.toFixed(2)}
+Momento My (Positivo): ${my.toFixed(2)}
+Momento X (Negativo): ${mxn.toFixed(2)}
+Momento Y (Negativo): ${myn.toFixed(2)}
+
+4. DIMENSIONAMENTO DA ARMADURA (cm²/m)
+As,min: ${AsMin.toFixed(2)}
+Armadura Positiva X (Calculada / Adotada): ${armX.As.toFixed(2)} / ${AsX.toFixed(2)}
+Armadura Positiva Y (Calculada / Adotada): ${armY.As.toFixed(2)} / ${AsY.toFixed(2)}
+Armadura Negativa X: ${AsXn.toFixed(2)}
+Armadura Negativa Y: ${AsYn.toFixed(2)}</pre>
+                </div>
+            `;
+
+            calculoRealizado = true;
+            showToast('Cálculo realizado com sucesso!', todasOk ? 'success' : 'warning');
+            
+            document.getElementById('resultados').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+
+    <!-- Footer -->
+    
+    
+
+    
+
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
