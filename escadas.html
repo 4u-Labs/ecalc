@@ -1,0 +1,2662 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Calculadora de Escadas Pro | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00ffff',
+            secondary: '#8b5cf6',
+            dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a25', 600: '#252532' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%);
+      min-height: 100vh;
+    }
+    
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00ffff, #8b5cf6); border-radius: 4px; }
+    
+    /* Animações */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.6); }
+    }
+    
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .animate-fade-in { animation: fadeInUp 0.5s ease-out forwards; }
+    .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    .glass-card {
+      background: rgba(18, 18, 26, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+      border-color: rgba(0, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .gradient-border {
+      position: relative;
+    }
+    
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, #00ffff, #8b5cf6, #00ffff);
+      background-size: 200% 200%;
+      animation: gradient-shift 3s ease infinite;
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .gradient-border:hover::before { opacity: 1; }
+    
+    .input-field {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    
+    .input-field:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+    
+    .input-field:hover { border-color: rgba(0, 255, 255, 0.4); }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #00ffff, #00cccc);
+      color: #000;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      color: #00ffff;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(0, 255, 255, 0.1);
+      border-color: #00ffff;
+    }
+    
+    .spec-card {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .spec-card:hover {
+      transform: scale(1.02);
+      border-color: rgba(0, 255, 255, 0.5);
+    }
+    
+    .alert-success { background: rgba(0, 255, 0, 0.1); border-left: 4px solid #00ff00; color: #00ff00; }
+    .alert-warning { background: rgba(255, 165, 0, 0.1); border-left: 4px solid #ffa500; color: #ffa500; }
+    .alert-danger { background: rgba(255, 0, 0, 0.1); border-left: 4px solid #ff4444; color: #ff4444; }
+    
+    .diagram-canvas {
+      background: radial-gradient(circle at center, rgba(0, 255, 255, 0.03) 0%, transparent 70%);
+    }
+    
+    .stair-type-btn {
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .stair-type-btn.active {
+      border-color: #00ffff;
+      background: rgba(0, 255, 255, 0.1);
+    }
+    
+    .stair-type-btn:hover:not(.active) {
+      background: rgba(0, 255, 255, 0.05);
+    }
+    
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a25;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      z-index: 100;
+    }
+    
+    .tooltip:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .progress-ring {
+      transform: rotate(-90deg);
+    }
+    
+    .tab-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(139, 92, 246, 0.2));
+      border-bottom: 2px solid #00ffff;
+    }
+    
+    .modal-overlay {
+      backdrop-filter: blur(8px);
+    }
+    
+    /* Print styles */
+    @media print {
+      body { background: white; color: black; }
+      .no-print { display: none !important; }
+      .glass-card { background: white; border: 1px solid #ccc; }
+    }
+    
+    /* Responsivo */
+    @media (max-width: 768px) {
+      .specs-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    
+    @media (max-width: 480px) {
+      .specs-grid { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-200">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 glass-card border-b border-cyan-500/20 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center font-bold text-black text-xl">
+            🪜
+          </div>
+          <div>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              Calculadora de Escadas Pro
+            </h1>
+            <p class="text-xs text-gray-500">Dimensionamento conforme NBR 9050 e NBR 9077</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Alternar tema">
+            <span id="themeIcon">🌙</span>
+          </button>
+          <button onclick="toggleHelp()" class="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Ajuda">
+            ❓
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Ações Principais -->
+    <div class="flex flex-wrap gap-3 justify-center mb-8 no-print animate-fade-in">
+      <button id="btnCalcular" class="btn-primary px-8 py-3 rounded-xl font-semibold flex items-center gap-2 animate-pulse-glow">
+        <span>⚡</span> Calcular
+      </button>
+      <button id="btnConfigurarPrecos" class="btn-secondary px-6 py-3 rounded-xl flex items-center gap-2">
+        <span>⚙️</span> Preços
+      </button>
+      <button id="btnHistorico" class="btn-secondary px-6 py-3 rounded-xl flex items-center gap-2">
+        <span>📋</span> Histórico
+      </button>
+      <button id="btnExcel" class="btn-secondary px-6 py-3 rounded-xl flex items-center gap-2">
+        <span>📊</span> Excel
+      </button>
+      <button id="btnPDF" class="btn-secondary px-6 py-3 rounded-xl flex items-center gap-2">
+        <span>📄</span> PDF
+      </button>
+      <button id="btnReset" class="btn-secondary px-6 py-3 rounded-xl flex items-center gap-2 hover:!border-red-500 hover:!text-red-500">
+        <span>🗑️</span> Limpar
+      </button>
+    </div>
+
+    <!-- Tipo de Escada -->
+    <section class="glass-card rounded-2xl p-6 mb-6 animate-fade-in" style="animation-delay: 0.1s">
+      <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span>📐</span> Tipo de Escada
+      </h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <button class="stair-type-btn active p-4 rounded-xl text-center" data-type="reta" onclick="selectStairType(this)">
+          <div class="text-3xl mb-2">📏</div>
+          <div class="font-medium">Reta</div>
+          <div class="text-xs text-gray-500">Lance único</div>
+        </button>
+        <button class="stair-type-btn p-4 rounded-xl text-center" data-type="L" onclick="selectStairType(this)">
+          <div class="text-3xl mb-2">↪️</div>
+          <div class="font-medium">Em L</div>
+          <div class="text-xs text-gray-500">Com patamar 90°</div>
+        </button>
+        <button class="stair-type-btn p-4 rounded-xl text-center" data-type="U" onclick="selectStairType(this)">
+          <div class="text-3xl mb-2">🔄</div>
+          <div class="font-medium">Em U</div>
+          <div class="text-xs text-gray-500">Retorno 180°</div>
+        </button>
+        <button class="stair-type-btn p-4 rounded-xl text-center" data-type="caracol" onclick="selectStairType(this)">
+          <div class="text-3xl mb-2">🌀</div>
+          <div class="font-medium">Caracol</div>
+          <div class="text-xs text-gray-500">Helicoidal</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Dados de Entrada -->
+    <section class="glass-card rounded-2xl p-6 mb-6 animate-fade-in" style="animation-delay: 0.2s">
+      <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span>📝</span> Dados do Projeto
+      </h2>
+      
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="space-y-2">
+          <label class="text-sm text-gray-400 flex items-center gap-2">
+            Pé-direito / Altura total (m)
+            <span class="tooltip" data-tip="Altura total a ser vencida pela escada">ℹ️</span>
+          </label>
+          <input type="number" id="altura" step="0.01" value="3.00" 
+            class="input-field w-full px-4 py-3 rounded-xl text-lg font-medium"/>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="text-sm text-gray-400 flex items-center gap-2">
+            Comprimento disponível (m)
+            <span class="text-xs text-gray-600">(opcional)</span>
+          </label>
+          <input type="number" id="comprimento" step="0.01" value="4.50" 
+            class="input-field w-full px-4 py-3 rounded-xl text-lg font-medium"/>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="text-sm text-gray-400 flex items-center gap-2">
+            Largura da escada (m)
+            <span class="tooltip" data-tip="Largura útil do degrau">ℹ️</span>
+          </label>
+          <input type="number" id="largura" step="0.01" value="1.20" 
+            class="input-field w-full px-4 py-3 rounded-xl text-lg font-medium"/>
+        </div>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-6 mt-6">
+        <div class="space-y-2">
+          <label class="text-sm text-gray-400">Tipo de uso</label>
+          <select id="tipoUso" class="input-field w-full px-4 py-3 rounded-xl">
+            <option value="residencial" selected>🏠 Residencial</option>
+            <option value="coletivo">🏢 Coletivo (escritórios, lojas)</option>
+            <option value="publico">🏛️ Público (escolas, hospitais)</option>
+            <option value="emergencia">🚨 Emergência / Escape</option>
+          </select>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="text-sm text-gray-400 flex items-center gap-2">
+            Altura do espelho (cm)
+            <span class="text-xs text-gray-600">(auto)</span>
+          </label>
+          <input type="number" id="espelhoDesejado" step="0.1" placeholder="Calcular automaticamente"
+            class="input-field w-full px-4 py-3 rounded-xl"/>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="text-sm text-gray-400 flex items-center gap-2">
+            Largura do piso (cm)
+            <span class="text-xs text-gray-600">(auto)</span>
+          </label>
+          <input type="number" id="pisoDesejado" step="0.1" placeholder="Calcular automaticamente"
+            class="input-field w-full px-4 py-3 rounded-xl"/>
+        </div>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-6 mt-6">
+        <div class="space-y-2">
+          <label class="text-sm text-gray-400">Espessura da laje (cm)</label>
+          <input type="number" id="espessuraLaje" step="0.1" value="12" 
+            class="input-field w-full px-4 py-3 rounded-xl"/>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="text-sm text-gray-400">Patamar intermediário?</label>
+          <select id="patamar" class="input-field w-full px-4 py-3 rounded-xl">
+            <option value="false" selected>Não</option>
+            <option value="true">Sim</option>
+          </select>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="text-sm text-gray-400">Comprimento do patamar (m)</label>
+          <input type="number" id="comprimentoPatamar" step="0.01" value="1.20" disabled
+            class="input-field w-full px-4 py-3 rounded-xl disabled:opacity-50"/>
+        </div>
+      </div>
+
+      <!-- Opções para Caracol -->
+      <div id="opcoesCaracol" class="hidden mt-6 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30">
+        <h3 class="text-purple-400 font-medium mb-4">🌀 Configurações da Escada Caracol</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Diâmetro externo (m)</label>
+            <input type="number" id="diametroExterno" step="0.01" value="2.00" 
+              class="input-field w-full px-4 py-3 rounded-xl"/>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Diâmetro do poste central (cm)</label>
+            <input type="number" id="diametroPoste" step="1" value="15" 
+              class="input-field w-full px-4 py-3 rounded-xl"/>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-400">Rotação total (graus)</label>
+            <input type="number" id="rotacaoTotal" step="1" value="360" 
+              class="input-field w-full px-4 py-3 rounded-xl"/>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resultado Principal -->
+    <section class="glass-card rounded-2xl p-6 mb-6 animate-fade-in" style="animation-delay: 0.3s">
+      <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span>📊</span> Resultado do Dimensionamento
+      </h2>
+      
+      <div id="alertas" class="space-y-2 mb-6"></div>
+      
+      <!-- Score de Conformidade -->
+      <div id="scoreContainer" class="hidden mb-6">
+        <div class="flex items-center justify-center gap-8 p-6 rounded-xl bg-gradient-to-r from-cyan-500/10 to-purple-500/10">
+          <div class="relative">
+            <svg class="progress-ring w-32 h-32">
+              <circle cx="64" cy="64" r="56" stroke="#1a1a25" stroke-width="8" fill="none"/>
+              <circle id="progressCircle" cx="64" cy="64" r="56" stroke="url(#gradient)" stroke-width="8" 
+                fill="none" stroke-linecap="round" stroke-dasharray="351.86" stroke-dashoffset="351.86"/>
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#00ffff"/>
+                  <stop offset="100%" stop-color="#8b5cf6"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span id="scoreValue" class="text-3xl font-bold text-white">0%</span>
+            </div>
+          </div>
+          <div>
+            <div id="scoreLabel" class="text-xl font-semibold text-gray-300">Conformidade</div>
+            <div id="scoreDesc" class="text-sm text-gray-500">Calcule para ver o resultado</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="specs-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="spec-card p-4 rounded-xl text-center">
+          <div class="text-xs text-gray-500 mb-1">Nº de Degraus</div>
+          <div id="numDegraus" class="text-2xl font-bold text-cyan-400">-</div>
+        </div>
+        <div class="spec-card p-4 rounded-xl text-center">
+          <div class="text-xs text-gray-500 mb-1">Altura Espelho</div>
+          <div id="alturaEspelho" class="text-2xl font-bold text-cyan-400">- cm</div>
+        </div>
+        <div class="spec-card p-4 rounded-xl text-center">
+          <div class="text-xs text-gray-500 mb-1">Largura Piso</div>
+          <div id="larguraPiso" class="text-2xl font-bold text-cyan-400">- cm</div>
+        </div>
+        <div class="spec-card p-4 rounded-xl text-center">
+          <div class="text-xs text-gray-500 mb-1">Fórmula Blondel</div>
+          <div id="blondel" class="text-2xl font-bold text-cyan-400">-</div>
+        </div>
+        <div class="spec-card p-4 rounded-xl text-center">
+          <div class="text-xs text-gray-500 mb-1">Comprimento Total</div>
+          <div id="comprimentoTotal" class="text-2xl font-bold text-cyan-400">- m</div>
+        </div>
+        <div class="spec-card p-4 rounded-xl text-center">
+          <div class="text-xs text-gray-500 mb-1">Inclinação</div>
+          <div id="inclinacao" class="text-2xl font-bold text-cyan-400">- °</div>
+        </div>
+      </div>
+      
+      </div>
+      
+      <div id="memorialContainer" class="hidden mt-6">
+        <div class="result-card glass rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-cyan-400">📝</span> Memorial de Cálculo
+          </h3>
+          <pre id="resultado" class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabs de Visualização -->
+    <section class="glass-card rounded-2xl overflow-hidden mb-6 animate-fade-in" style="animation-delay: 0.4s">
+      <div class="flex border-b border-gray-700/50 no-print">
+        <button class="tab-btn active flex-1 px-6 py-4 text-center font-medium" data-tab="diagrama" onclick="switchTab(this)">
+          📐 Diagrama 2D
+        </button>
+        <button class="tab-btn flex-1 px-6 py-4 text-center font-medium" data-tab="3d" onclick="switchTab(this)">
+          🎮 Vista 3D
+        </button>
+        <button class="tab-btn flex-1 px-6 py-4 text-center font-medium" data-tab="detalhes" onclick="switchTab(this)">
+          📋 Detalhes
+        </button>
+      </div>
+      
+      <div class="p-6">
+        <!-- Diagrama 2D -->
+        <div id="tab-diagrama" class="tab-content">
+          <div class="diagram-canvas rounded-xl p-4 border border-gray-700/30">
+            <canvas id="diagramaCanvas" width="900" height="450" class="w-full"></canvas>
+          </div>
+          <div id="legendaDiagrama" class="flex flex-wrap justify-center gap-4 mt-4 text-sm text-gray-500">
+            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-cyan-400 rounded"></span> Degraus</span>
+            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-purple-500 rounded"></span> Patamar</span>
+            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-orange-400 rounded"></span> Dimensões</span>
+            <span class="flex items-center gap-2"><span class="w-4 h-4 bg-green-400 rounded"></span> Direção</span>
+          </div>
+          <div id="tipoDiagramaInfo" class="text-center mt-2 text-xs text-gray-600">
+            Selecione o tipo de escada e clique em Calcular para ver o diagrama específico
+          </div>
+        </div>
+        
+        <!-- Vista 3D -->
+        <div id="tab-3d" class="tab-content hidden">
+          <div id="view3d" class="rounded-xl border border-gray-700/30 h-96 flex items-center justify-center">
+            <canvas id="canvas3d" width="800" height="400" class="w-full h-full"></canvas>
+          </div>
+          <div class="flex justify-center gap-4 mt-4">
+            <button onclick="rotate3D(-15)" class="btn-secondary px-4 py-2 rounded-lg">⬅️ Girar</button>
+            <button onclick="rotate3D(15)" class="btn-secondary px-4 py-2 rounded-lg">Girar ➡️</button>
+            <button onclick="reset3DView()" class="btn-secondary px-4 py-2 rounded-lg">🔄 Reset</button>
+          </div>
+        </div>
+        
+        <!-- Detalhes Técnicos -->
+        <div id="tab-detalhes" class="tab-content hidden">
+          <pre id="analiseNormas" class="p-4 rounded-xl bg-black/40 text-sm font-mono text-gray-400 overflow-x-auto min-h-[200px]">
+Clique em "Calcular" para ver a análise de conformidade com as normas.
+          </pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Materiais e Custos -->
+    <section class="glass-card rounded-2xl p-6 mb-6 animate-fade-in" style="animation-delay: 0.5s">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-cyan-400 flex items-center gap-2">
+          <span>🧱</span> Estimativa de Materiais e Custos
+        </h2>
+        <div id="custoTotal" class="text-xl font-bold text-green-400">-</div>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full" id="tabelaMateriais">
+          <thead>
+            <tr class="border-b border-gray-700/50">
+              <th class="text-left py-3 px-4 text-gray-500 font-medium">Material</th>
+              <th class="text-center py-3 px-4 text-gray-500 font-medium">Unidade</th>
+              <th class="text-center py-3 px-4 text-gray-500 font-medium">Quantidade</th>
+              <th class="text-left py-3 px-4 text-gray-500 font-medium">Observações</th>
+              <th class="text-right py-3 px-4 text-gray-500 font-medium">Custo</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-700/30"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Gráficos -->
+    <section class="grid md:grid-cols-2 gap-6 mb-6">
+      <div class="glass-card rounded-2xl p-6 animate-fade-in" style="animation-delay: 0.6s">
+        <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+          <span>📈</span> Índice de Conforto
+        </h2>
+        <div id="graficoConforto" class="h-80"></div>
+      </div>
+      
+      <div class="glass-card rounded-2xl p-6 animate-fade-in" style="animation-delay: 0.7s">
+        <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+          <span>📊</span> Comparação com Normas
+        </h2>
+        <div id="graficoLimites" class="h-80"></div>
+      </div>
+    </section>
+
+    <!-- Recomendações -->
+    <section id="recomendacoes" class="glass-card rounded-2xl p-6 mb-6 hidden animate-fade-in">
+      <h2 class="text-lg font-semibold text-cyan-400 mb-4 flex items-center gap-2">
+        <span>💡</span> Recomendações Personalizadas
+      </h2>
+      <div id="listaRecomendacoes" class="space-y-3"></div>
+    </section>
+  </main>
+
+  <!-- Modal de Preços -->
+  <div id="modalPrecos" class="fixed inset-0 bg-black/80 modal-overlay z-50 hidden items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-gray-700/50">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-cyan-400">⚙️ Configurar Preços</h3>
+          <button onclick="fecharModalPrecos()" class="text-2xl hover:text-white transition-colors">&times;</button>
+        </div>
+      </div>
+      
+      <div class="p-6 space-y-6">
+        <div>
+          <h4 class="text-purple-400 font-medium mb-3">Materiais Estruturais</h4>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-black/20">
+              <div>
+                <div class="font-medium">Concreto (m³)</div>
+                <div class="text-xs text-gray-500">Estrutural fck ≥ 25 MPa</div>
+              </div>
+              <input type="number" id="preco-concreto" step="0.01" min="0" value="450.00" 
+                class="input-field w-32 px-3 py-2 rounded-lg text-right"/>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-black/20">
+              <div>
+                <div class="font-medium">Aço CA-50 (kg)</div>
+                <div class="text-xs text-gray-500">Vergalhão para armação</div>
+              </div>
+              <input type="number" id="preco-aco" step="0.01" min="0" value="6.50" 
+                class="input-field w-32 px-3 py-2 rounded-lg text-right"/>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-black/20">
+              <div>
+                <div class="font-medium">Forma madeira (m²)</div>
+                <div class="text-xs text-gray-500">Compensado 18mm</div>
+              </div>
+              <input type="number" id="preco-forma" step="0.01" min="0" value="85.00" 
+                class="input-field w-32 px-3 py-2 rounded-lg text-right"/>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-purple-400 font-medium mb-3">Acabamentos</h4>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-black/20">
+              <div>
+                <div class="font-medium">Revestimento piso (m²)</div>
+                <div class="text-xs text-gray-500">Material antiderrapante</div>
+              </div>
+              <input type="number" id="preco-piso" step="0.01" min="0" value="120.00" 
+                class="input-field w-32 px-3 py-2 rounded-lg text-right"/>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-black/20">
+              <div>
+                <div class="font-medium">Revestimento espelho (m²)</div>
+                <div class="text-xs text-gray-500">Acabamento parede</div>
+              </div>
+              <input type="number" id="preco-espelho-rev" step="0.01" min="0" value="65.00" 
+                class="input-field w-32 px-3 py-2 rounded-lg text-right"/>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-purple-400 font-medium mb-3">Acessórios</h4>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-black/20">
+              <div>
+                <div class="font-medium">Corrimão (m)</div>
+                <div class="text-xs text-gray-500">Aço inox ou madeira</div>
+              </div>
+              <input type="number" id="preco-corrimao" step="0.01" min="0" value="180.00" 
+                class="input-field w-32 px-3 py-2 rounded-lg text-right"/>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-black/20">
+              <div>
+                <div class="font-medium">Guarda-corpo (m)</div>
+                <div class="text-xs text-gray-500">Sistema completo</div>
+              </div>
+              <input type="number" id="preco-guarda" step="0.01" min="0" value="320.00" 
+                class="input-field w-32 px-3 py-2 rounded-lg text-right"/>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-6 border-t border-gray-700/50 flex gap-3 justify-end">
+        <button onclick="restaurarPrecosEscadas()" class="btn-secondary px-6 py-2 rounded-lg">
+          Restaurar Padrão
+        </button>
+        <button onclick="salvarPrecosEscadas()" class="btn-primary px-6 py-2 rounded-lg">
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Histórico -->
+  <div id="modalHistorico" class="fixed inset-0 bg-black/80 modal-overlay z-50 hidden items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-gray-700/50">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-cyan-400">📋 Histórico de Cálculos</h3>
+          <button onclick="fecharModalHistorico()" class="text-2xl hover:text-white transition-colors">&times;</button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <div id="listaHistorico" class="space-y-3">
+          <p class="text-gray-500 text-center py-8">Nenhum cálculo salvo ainda.</p>
+        </div>
+      </div>
+      
+      <div class="p-6 border-t border-gray-700/50 flex gap-3 justify-end">
+        <button onclick="limparHistorico()" class="btn-secondary px-6 py-2 rounded-lg text-red-400 border-red-400/30 hover:bg-red-500/10">
+          🗑️ Limpar Histórico
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Ajuda -->
+  <div id="modalAjuda" class="fixed inset-0 bg-black/80 modal-overlay z-50 hidden items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-gray-700/50">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-cyan-400">❓ Guia de Uso</h3>
+          <button onclick="toggleHelp()" class="text-2xl hover:text-white transition-colors">&times;</button>
+        </div>
+      </div>
+      
+      <div class="p-6 space-y-6 text-gray-300">
+        <div>
+          <h4 class="text-purple-400 font-semibold mb-2">🎯 Como usar</h4>
+          <p class="text-sm">1. Selecione o tipo de escada desejado<br>
+          2. Informe as dimensões do projeto<br>
+          3. Clique em "Calcular" para obter o dimensionamento<br>
+          4. Analise os resultados e ajuste conforme necessário</p>
+        </div>
+        
+        <div>
+          <h4 class="text-purple-400 font-semibold mb-2">📐 Fórmula de Blondel</h4>
+          <p class="text-sm">A fórmula <code class="bg-black/40 px-2 py-1 rounded">2E + P = 63~64 cm</code> garante o conforto da escada, onde E é a altura do espelho e P é a largura do piso.</p>
+        </div>
+        
+        <div>
+          <h4 class="text-purple-400 font-semibold mb-2">📋 Normas Aplicáveis</h4>
+          <ul class="text-sm space-y-1">
+            <li>• <strong>NBR 9050</strong>: Acessibilidade a edificações</li>
+            <li>• <strong>NBR 9077</strong>: Saídas de emergência em edifícios</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-purple-400 font-semibold mb-2">💡 Dicas</h4>
+          <ul class="text-sm space-y-1">
+            <li>• Espelho ideal: 16-18 cm</li>
+            <li>• Piso mínimo: 25-28 cm (depende do uso)</li>
+            <li>• Inclinação máxima: 32-42° (depende do uso)</li>
+            <li>• Máximo 16 degraus por lance sem patamar</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-6 text-gray-600 text-sm border-t border-gray-800 no-print">
+    &copy; <span id="ano"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia | 
+    Calculadora de Escadas Pro v2.0
+  </footer>
+
+  <script>
+    // ==================== CONFIGURAÇÕES ====================
+    const fmtNum = (v, dec = 2) => (isNaN(v) ? "-" : Number(v).toFixed(dec));
+    const fmtBRL = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    
+    const precosEscadasPadrao = {
+      concreto: 480.00, aco: 9.80, forma: 95.00,
+      piso: 140.00, espelhoRev: 75.00,
+      corrimao: 210.00, guarda: 380.00
+    };
+    
+    let precosEscadas = JSON.parse(localStorage.getItem('precosEscadas')) || { ...precosEscadasPadrao };
+    let historicoCalclos = JSON.parse(localStorage.getItem('historicoEscadas')) || [];
+    let tipoEscadaSelecionado = 'reta';
+    let rotacao3D = 30;
+    let ultimoCalculo = null;
+    
+    const limites = {
+      residencial: { espelhoMin: 16, espelhoMax: 18, pisoMin: 25, pisoMax: 32, larguraMin: 80, blondelMin: 63, blondelMax: 64, inclinacaoMax: 42 },
+      coletivo: { espelhoMin: 16, espelhoMax: 18, pisoMin: 27, pisoMax: 32, larguraMin: 120, blondelMin: 63, blondelMax: 64, inclinacaoMax: 35 },
+      publico: { espelhoMin: 16, espelhoMax: 18, pisoMin: 28, pisoMax: 32, larguraMin: 150, blondelMin: 63, blondelMax: 64, inclinacaoMax: 32 },
+      emergencia: { espelhoMin: 16, espelhoMax: 18, pisoMin: 27, pisoMax: 32, larguraMin: 120, blondelMin: 63, blondelMax: 64, inclinacaoMax: 35 }
+    };
+
+    // ==================== TIPO DE ESCADA ====================
+    function selectStairType(btn) {
+      document.querySelectorAll('.stair-type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      tipoEscadaSelecionado = btn.dataset.type;
+      
+      const opcoesCaracol = document.getElementById('opcoesCaracol');
+      opcoesCaracol.classList.toggle('hidden', tipoEscadaSelecionado !== 'caracol');
+      
+      // Auto-ajustar patamar para L e U
+      if (tipoEscadaSelecionado === 'L' || tipoEscadaSelecionado === 'U') {
+        document.getElementById('patamar').value = 'true';
+        document.getElementById('comprimentoPatamar').disabled = false;
+      }
+      
+      // Atualizar informações do diagrama
+      atualizarInfoDiagrama();
+    }
+    
+    function atualizarInfoDiagrama() {
+      const info = document.getElementById('tipoDiagramaInfo');
+      const legendas = {
+        'reta': '📏 Vista Lateral - Mostra a inclinação e proporções dos degraus',
+        'L': '↪️ Vista Superior (Planta) - Mostra os dois lances com curva de 90°',
+        'U': '🔄 Vista Superior (Planta) - Mostra os dois lances paralelos com retorno de 180°',
+        'caracol': '🌀 Vista Superior (Planta) - Mostra a distribuição circular dos degraus'
+      };
+      info.textContent = legendas[tipoEscadaSelecionado] || 'Clique em Calcular para ver o diagrama';
+    }
+
+    // ==================== TABS ====================
+    function switchTab(btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+    }
+
+    // ==================== CÁLCULO PRINCIPAL ====================
+    function calcular() {
+      try {
+        const altura = parseFloat(document.getElementById("altura").value) || 0;
+        const comprimentoDisp = parseFloat(document.getElementById("comprimento").value) || 0;
+        const largura = parseFloat(document.getElementById("largura").value) || 0;
+        const tipoUso = document.getElementById("tipoUso").value;
+        const espelhoDesejado = parseFloat(document.getElementById("espelhoDesejado").value) || null;
+        const pisoDesejado = parseFloat(document.getElementById("pisoDesejado").value) || null;
+        const espessuraLaje = parseFloat(document.getElementById("espessuraLaje").value) || 12;
+        const temPatamar = document.getElementById("patamar").value === "true";
+        const comprimentoPatamar = temPatamar ? parseFloat(document.getElementById("comprimentoPatamar").value) || 1.2 : 0;
+
+        if (altura <= 0) {
+          showToast('Por favor, informe a altura total da escada.', 'error');
+          return;
+        }
+
+        const lim = limites[tipoUso];
+        const alturaM = altura * 100;
+        
+        let numDegraus, espelho, piso;
+
+        // Cálculo específico para caracol
+        if (tipoEscadaSelecionado === 'caracol') {
+          return calcularCaracol();
+        }
+
+        // Cálculo padrão
+        if (espelhoDesejado) {
+          numDegraus = Math.ceil(alturaM / espelhoDesejado);
+          espelho = alturaM / numDegraus;
+        } else {
+          const espelhoIdeal = (lim.espelhoMin + lim.espelhoMax) / 2;
+          numDegraus = Math.round(alturaM / espelhoIdeal);
+          espelho = alturaM / numDegraus;
+        }
+
+        if (pisoDesejado) {
+          piso = pisoDesejado;
+        } else {
+          piso = 63.5 - (2 * espelho);
+          if (piso < lim.pisoMin) piso = lim.pisoMin;
+          if (piso > lim.pisoMax) piso = lim.pisoMax;
+        }
+
+        const blondel = 2 * espelho + piso;
+        const blondelOK = blondel >= lim.blondelMin && blondel <= lim.blondelMax;
+        const comprimentoDegraus = (numDegraus - 1) * (piso / 100);
+        const comprimentoTotal = comprimentoDegraus + comprimentoPatamar;
+        const inclinacao = Math.atan(espelho / piso) * (180 / Math.PI);
+        const inclinacaoOK = inclinacao <= lim.inclinacaoMax;
+        const larguraCm = largura * 100;
+        const larguraOK = larguraCm >= lim.larguraMin;
+        const espelhoOK = espelho >= lim.espelhoMin && espelho <= lim.espelhoMax;
+        const pisoOK = piso >= lim.pisoMin && piso <= lim.pisoMax;
+        const comprimentoOK = !comprimentoDisp || comprimentoTotal <= comprimentoDisp;
+
+        // Score de conformidade
+        let score = 0;
+        let maxScore = 6;
+        if (espelhoOK) score++;
+        if (pisoOK) score++;
+        if (blondelOK) score++;
+        if (larguraOK) score++;
+        if (inclinacaoOK) score++;
+        if (comprimentoOK) score++;
+        const scorePercent = Math.round((score / maxScore) * 100);
+
+        // Alertas
+        let alertas = [];
+        if (score === maxScore) {
+          alertas.push({ tipo: 'success', msg: '✓ Escada conforme normas NBR 9050 e NBR 9077! Dimensionamento aprovado.' });
+        } else {
+          if (!espelhoOK) alertas.push({ tipo: 'danger', msg: `✗ Espelho fora da norma! Deve estar entre ${lim.espelhoMin}-${lim.espelhoMax}cm. Atual: ${fmtNum(espelho, 1)}cm` });
+          if (!pisoOK) alertas.push({ tipo: 'danger', msg: `✗ Piso fora da norma! Deve estar entre ${lim.pisoMin}-${lim.pisoMax}cm. Atual: ${fmtNum(piso, 1)}cm` });
+          if (!blondelOK) alertas.push({ tipo: 'warning', msg: `⚠ Blondel não ideal! ${fmtNum(blondel, 1)}cm (ideal: 63-64cm)` });
+          if (!larguraOK) alertas.push({ tipo: 'danger', msg: `✗ Largura insuficiente! Mínimo: ${lim.larguraMin}cm` });
+          if (!inclinacaoOK) alertas.push({ tipo: 'danger', msg: `✗ Inclinação excessiva! Máx: ${lim.inclinacaoMax}° (atual: ${fmtNum(inclinacao, 1)}°)` });
+          if (!comprimentoOK) alertas.push({ tipo: 'warning', msg: `⚠ Comprimento excede o disponível!` });
+        }
+
+        renderAlertas(alertas);
+        updateScore(scorePercent, score, maxScore);
+
+        // Atualizar displays
+        document.getElementById("numDegraus").textContent = numDegraus;
+        document.getElementById("alturaEspelho").textContent = `${fmtNum(espelho, 1)} cm`;
+        document.getElementById("larguraPiso").textContent = `${fmtNum(piso, 1)} cm`;
+        document.getElementById("blondel").textContent = fmtNum(blondel, 1);
+        document.getElementById("comprimentoTotal").textContent = `${fmtNum(comprimentoTotal, 2)} m`;
+        document.getElementById("inclinacao").textContent = `${fmtNum(inclinacao, 1)}°`;
+
+        // Resultado detalhado
+        const tipoLabel = { residencial: 'RESIDENCIAL', coletivo: 'COLETIVO', publico: 'PÚBLICO', emergencia: 'EMERGÊNCIA' };
+        let resultado = `
+╔═══════════════════════════════════════════════════════════════════╗
+║          DIMENSIONAMENTO DE ESCADA - ${tipoLabel[tipoUso].padEnd(20)}        ║
+╠═══════════════════════════════════════════════════════════════════╣
+║  TIPO: ${tipoEscadaSelecionado.toUpperCase().padEnd(58)}║
+╠═══════════════════════════════════════════════════════════════════╣
+║  DADOS DE ENTRADA:                                                ║
+║  • Altura total: ${fmtNum(altura, 2).padEnd(10)} m (${fmtNum(alturaM, 0).padStart(5)} cm)                      ║
+║  • Largura: ${fmtNum(largura, 2).padEnd(10)} m (${fmtNum(larguraCm, 0).padStart(5)} cm)                      ║
+║  • Patamar: ${(temPatamar ? 'Sim (' + fmtNum(comprimentoPatamar, 2) + 'm)' : 'Não').padEnd(48)}║
+╠═══════════════════════════════════════════════════════════════════╣
+║  DIMENSIONAMENTO:                                                 ║
+║  • Nº de degraus: ${String(numDegraus).padEnd(8)} ${espelhoOK && pisoOK ? '✓ OK' : '⚠ VERIFICAR'}                           ║
+║  • Espelho: ${fmtNum(espelho, 2).padEnd(10)} cm    ${espelhoOK ? '✓' : '✗'}                                 ║
+║  • Piso: ${fmtNum(piso, 2).padEnd(13)} cm    ${pisoOK ? '✓' : '✗'}                                 ║
+║  • Blondel: ${fmtNum(blondel, 2).padEnd(10)} cm    ${blondelOK ? '✓' : '⚠'}                                 ║
+║  • Comprimento: ${fmtNum(comprimentoTotal, 2).padEnd(7)} m     ${comprimentoOK ? '✓' : '⚠'}                                 ║
+║  • Inclinação: ${fmtNum(inclinacao, 2).padEnd(8)} °     ${inclinacaoOK ? '✓' : '✗'}                                 ║
+╠═══════════════════════════════════════════════════════════════════╣
+║  CONFORMIDADE: ${scorePercent}% (${score}/${maxScore} critérios)                                ║
+╚═══════════════════════════════════════════════════════════════════╝`;
+
+        document.getElementById("resultado").textContent = resultado;
+        document.getElementById("memorialContainer").classList.remove('hidden');
+
+        // Análise de normas
+        let analise = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    VERIFICAÇÃO NBR 9050 (Acessibilidade)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • Espelho entre 16-18 cm ............... ${espelhoOK ? '✓ CONFORME' : '✗ NÃO CONFORME'}
+  • Piso mínimo de ${lim.pisoMin} cm .................. ${pisoOK ? '✓ CONFORME' : '✗ NÃO CONFORME'}
+  • Largura mínima de ${lim.larguraMin} cm ............. ${larguraOK ? '✓ CONFORME' : '✗ NÃO CONFORME'}
+  • Espelhos e pisos uniformes ........... ${espelhoOK && pisoOK ? '✓ SIM' : '⚠ VERIFICAR'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    VERIFICAÇÃO NBR 9077 (Emergência)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • Inclinação máx ${lim.inclinacaoMax}° ................... ${inclinacaoOK ? '✓ CONFORME' : '✗ NÃO CONFORME'}
+  • Degraus por lance ≤ 16 ............... ${numDegraus <= 16 ? '✓ OK' : '⚠ Recomenda-se patamar'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    FÓRMULA DE BLONDEL (Conforto)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • 2E + P = 2×${fmtNum(espelho, 1)} + ${fmtNum(piso, 1)} = ${fmtNum(blondel, 1)} cm
+  • Faixa ideal: 63-64 cm | Aceitável: 61-65 cm
+  • Status: ${blondelOK ? '✓ IDEAL' : blondel >= 61 && blondel <= 65 ? '⚠ ACEITÁVEL' : '✗ REVISAR'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    GEOMETRIA E MÉTRICAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • Desenvolvimento horizontal: ${fmtNum(comprimentoDegraus, 2)} m
+  • Comprimento real do lance: ${fmtNum(Math.sqrt(Math.pow(altura, 2) + Math.pow(comprimentoDegraus, 2)), 2)} m
+  • Área aproximada da escada: ${fmtNum(Math.sqrt(Math.pow(altura, 2) + Math.pow(comprimentoDegraus, 2)) * largura, 2)} m²
+  • Razão espelho/piso: ${fmtNum(espelho / piso, 3)}
+  • Classificação: ${inclinacao < 30 ? 'Escada confortável (suave)' : inclinacao < 35 ? 'Escada normal' : 'Escada íngreme'}
+`;
+
+        document.getElementById("analiseNormas").textContent = analise;
+
+        // Recomendações
+        gerarRecomendacoes(espelhoOK, pisoOK, blondelOK, larguraOK, inclinacaoOK, numDegraus, lim, espelho, piso);
+
+        // Materiais e gráficos
+        calcularMateriais(numDegraus, piso / 100, espelho / 100, largura, altura, espessuraLaje / 100, temPatamar, comprimentoPatamar, largura);
+        desenharDiagrama(numDegraus, piso / 100, espelho / 100, altura, temPatamar, comprimentoPatamar);
+        desenhar3D(numDegraus, piso / 100, espelho / 100, largura, altura);
+        desenharGraficos(espelho, piso, blondel, inclinacao, lim);
+
+        // Salvar no histórico
+        ultimoCalculo = {
+          data: new Date().toLocaleString(),
+          tipo: tipoEscadaSelecionado,
+          altura, largura, numDegraus, espelho: fmtNum(espelho, 1), piso: fmtNum(piso, 1),
+          score: scorePercent
+        };
+        salvarNoHistorico(ultimoCalculo);
+
+        showToast('Cálculo realizado com sucesso!', 'success');
+
+      } catch (error) {
+        showToast(`Erro no cálculo: ${error.message}`, 'error');
+        console.error(error);
+      }
+    }
+
+    // ==================== CÁLCULO CARACOL ====================
+    function calcularCaracol() {
+      const altura = parseFloat(document.getElementById("altura").value) || 0;
+      const diametroExt = parseFloat(document.getElementById("diametroExterno").value) || 2.0;
+      const diametroPoste = parseFloat(document.getElementById("diametroPoste").value) || 15;
+      const rotacaoTotal = parseFloat(document.getElementById("rotacaoTotal").value) || 360;
+      const tipoUso = document.getElementById("tipoUso").value;
+      const lim = limites[tipoUso];
+
+      const alturaM = altura * 100;
+      const raioExt = (diametroExt * 100) / 2;
+      const raioInt = diametroPoste / 2;
+      const raioMedio = (raioExt + raioInt) / 2;
+
+      // Calcular número de degraus
+      const espelhoIdeal = 17;
+      const numDegraus = Math.round(alturaM / espelhoIdeal);
+      const espelho = alturaM / numDegraus;
+
+      // Piso no raio médio
+      const circunferenciaMedio = 2 * Math.PI * raioMedio;
+      const anguloPerDegrau = rotacaoTotal / numDegraus;
+      const pisoMedio = (circunferenciaMedio * anguloPerDegrau) / 360;
+
+      const blondel = 2 * espelho + pisoMedio;
+      const espelhoOK = espelho >= lim.espelhoMin && espelho <= lim.espelhoMax;
+      const pisoOK = pisoMedio >= 25; // Mínimo para caracol
+      const blondelOK = blondel >= 60 && blondel <= 66;
+
+      let score = 0;
+      if (espelhoOK) score++;
+      if (pisoOK) score++;
+      if (blondelOK) score++;
+      if (diametroExt >= 1.5) score++;
+      const scorePercent = Math.round((score / 4) * 100);
+
+      let alertas = [];
+      if (score === 4) {
+        alertas.push({ tipo: 'success', msg: '✓ Escada caracol dimensionada corretamente!' });
+      } else {
+        if (!espelhoOK) alertas.push({ tipo: 'danger', msg: `✗ Espelho fora da norma: ${fmtNum(espelho, 1)}cm` });
+        if (!pisoOK) alertas.push({ tipo: 'danger', msg: `✗ Piso insuficiente no raio médio: ${fmtNum(pisoMedio, 1)}cm (mín 25cm)` });
+        if (diametroExt < 1.5) alertas.push({ tipo: 'warning', msg: `⚠ Diâmetro pequeno. Mínimo recomendado: 1.50m` });
+      }
+
+      renderAlertas(alertas);
+      updateScore(scorePercent, score, 4);
+
+      document.getElementById("numDegraus").textContent = numDegraus;
+      document.getElementById("alturaEspelho").textContent = `${fmtNum(espelho, 1)} cm`;
+      document.getElementById("larguraPiso").textContent = `${fmtNum(pisoMedio, 1)} cm*`;
+      document.getElementById("blondel").textContent = fmtNum(blondel, 1);
+      document.getElementById("comprimentoTotal").textContent = `Ø ${fmtNum(diametroExt, 2)} m`;
+      document.getElementById("inclinacao").textContent = `${fmtNum(rotacaoTotal, 0)}°`;
+
+      desenharCaracol(numDegraus, raioExt, raioInt, espelho, rotacaoTotal, altura);
+      
+      showToast('Cálculo de caracol realizado!', 'success');
+    }
+
+    // ==================== SCORE E ALERTAS ====================
+    function updateScore(percent, score, max) {
+      document.getElementById('scoreContainer').classList.remove('hidden');
+      
+      const circle = document.getElementById('progressCircle');
+      const circumference = 2 * Math.PI * 56;
+      const offset = circumference - (percent / 100) * circumference;
+      
+      circle.style.transition = 'stroke-dashoffset 1s ease-out';
+      circle.style.strokeDashoffset = offset;
+      
+      document.getElementById('scoreValue').textContent = percent + '%';
+      document.getElementById('scoreLabel').textContent = `${score}/${max} Critérios`;
+      
+      const desc = percent === 100 ? 'Excelente! Totalmente conforme.' :
+                   percent >= 80 ? 'Bom! Pequenos ajustes necessários.' :
+                   percent >= 60 ? 'Regular. Revise os pontos críticos.' :
+                   'Atenção! Revisão necessária.';
+      document.getElementById('scoreDesc').textContent = desc;
+    }
+
+    function renderAlertas(alertas) {
+      const container = document.getElementById("alertas");
+      container.innerHTML = alertas.map(a => 
+        `<div class="alert-${a.tipo} p-3 rounded-lg text-sm">${a.msg}</div>`
+      ).join('');
+    }
+
+    function gerarRecomendacoes(espelhoOK, pisoOK, blondelOK, larguraOK, inclinacaoOK, numDegraus, lim, espelho, piso) {
+      const container = document.getElementById('listaRecomendacoes');
+      const section = document.getElementById('recomendacoes');
+      const recs = [];
+
+      if (numDegraus > 16) {
+        recs.push({ icon: '📐', title: 'Adicionar patamar', desc: `Com ${numDegraus} degraus, recomenda-se patamar intermediário para descanso.` });
+      }
+      if (!espelhoOK) {
+        recs.push({ icon: '📏', title: 'Ajustar espelho', desc: `Espelho de ${fmtNum(espelho, 1)}cm. Ideal: ${lim.espelhoMin}-${lim.espelhoMax}cm.` });
+      }
+      if (!pisoOK) {
+        recs.push({ icon: '👣', title: 'Ajustar piso', desc: `Piso de ${fmtNum(piso, 1)}cm. Mínimo: ${lim.pisoMin}cm.` });
+      }
+      if (!blondelOK) {
+        recs.push({ icon: '⚖️', title: 'Equilibrar proporções', desc: 'Ajuste espelho e piso para Blondel entre 63-64cm.' });
+      }
+      if (!larguraOK) {
+        recs.push({ icon: '↔️', title: 'Aumentar largura', desc: `Largura insuficiente. Mínimo para este uso: ${lim.larguraMin}cm.` });
+      }
+      if (!inclinacaoOK) {
+        recs.push({ icon: '📐', title: 'Reduzir inclinação', desc: `Inclinação muito alta. Máximo: ${lim.inclinacaoMax}°.` });
+      }
+
+      if (recs.length > 0) {
+        section.classList.remove('hidden');
+        container.innerHTML = recs.map(r => `
+          <div class="flex gap-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
+            <span class="text-2xl">${r.icon}</span>
+            <div>
+              <div class="font-medium text-yellow-400">${r.title}</div>
+              <div class="text-sm text-gray-400">${r.desc}</div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        section.classList.add('hidden');
+      }
+    }
+
+    // ==================== DIAGRAMA 2D - DISPATCHER ====================
+    function desenharDiagrama(numDegraus, piso, espelho, altura, temPatamar, comprPatamar) {
+      const largura = parseFloat(document.getElementById("largura").value) || 1.2;
+      
+      switch(tipoEscadaSelecionado) {
+        case 'L':
+          desenharEscadaL(numDegraus, piso, espelho, altura, comprPatamar, largura);
+          break;
+        case 'U':
+          desenharEscadaU(numDegraus, piso, espelho, altura, comprPatamar, largura);
+          break;
+        case 'caracol':
+          // Caracol é desenhado separadamente
+          break;
+        default:
+          desenharEscadaReta(numDegraus, piso, espelho, altura, temPatamar, comprPatamar);
+      }
+    }
+
+    // ==================== ESCADA RETA (Vista Lateral) ====================
+    function desenharEscadaReta(numDegraus, piso, espelho, altura, temPatamar, comprPatamar) {
+      const canvas = document.getElementById("diagramaCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      desenharGrid(ctx, w, h);
+
+      const comprTotal = (numDegraus - 1) * piso + comprPatamar;
+      const margem = 80;
+      const escalaX = (w - margem * 2) / comprTotal;
+      const escalaY = (h - margem * 2) / altura;
+      const escala = Math.min(escalaX, escalaY) * 0.9;
+      const offsetX = margem;
+      const offsetY = h - margem;
+
+      // Título
+      ctx.fillStyle = '#00ffff';
+      ctx.font = 'bold 14px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('📏 ESCADA RETA - Vista Lateral', w / 2, 25);
+
+      // Desenhar degraus
+      for (let i = 0; i < numDegraus; i++) {
+        const x = offsetX + (i * piso * escala);
+        const y = offsetY - (i * espelho * escala);
+        const dw = piso * escala;
+        const dh = espelho * escala;
+
+        // Gradiente para degrau
+        const grad = ctx.createLinearGradient(x, y - dh, x, y);
+        grad.addColorStop(0, 'rgba(0, 255, 255, 0.3)');
+        grad.addColorStop(1, 'rgba(0, 255, 255, 0.1)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, y - dh, dw, dh);
+
+        // Borda do degrau
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y - dh, dw, dh);
+
+        // Número do degrau
+        if (i % 2 === 0 || numDegraus <= 10) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.font = '10px Inter';
+          ctx.textAlign = 'center';
+          ctx.fillText(i + 1, x + dw / 2, y - dh / 2 + 4);
+        }
+      }
+
+      // Patamar
+      if (temPatamar) {
+        const xPat = offsetX + (Math.floor(numDegraus / 2) * piso * escala);
+        const yPat = offsetY - (Math.floor(numDegraus / 2) * espelho * escala);
+        ctx.fillStyle = 'rgba(139, 92, 246, 0.3)';
+        ctx.fillRect(xPat, yPat - 8, comprPatamar * escala, 8);
+        ctx.strokeStyle = '#8b5cf6';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(xPat, yPat - 8, comprPatamar * escala, 8);
+        
+        ctx.fillStyle = '#8b5cf6';
+        ctx.font = '10px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('PATAMAR', xPat + (comprPatamar * escala) / 2, yPat - 15);
+      }
+
+      // Linha de inclinação
+      ctx.strokeStyle = 'rgba(255, 165, 0, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([10, 5]);
+      ctx.beginPath();
+      ctx.moveTo(offsetX, offsetY);
+      ctx.lineTo(offsetX + (numDegraus - 1) * piso * escala, offsetY - (numDegraus - 1) * espelho * escala);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Dimensões - Altura
+      desenharCotaVertical(ctx, offsetX - 40, offsetY, offsetY - altura * escala, `${fmtNum(altura, 2)} m`, '#ff6b6b');
+
+      // Dimensões - Comprimento
+      desenharCotaHorizontal(ctx, offsetX, offsetX + comprTotal * escala, offsetY + 40, `${fmtNum(comprTotal, 2)} m`, '#ffa500');
+
+      // Info
+      ctx.fillStyle = '#888';
+      ctx.font = '11px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${numDegraus} degraus | Espelho: ${fmtNum(espelho * 100, 1)}cm | Piso: ${fmtNum(piso * 100, 1)}cm`, offsetX, h - 15);
+    }
+
+    // ==================== ESCADA EM L (Vista Superior/Planta) ====================
+    function desenharEscadaL(numDegraus, piso, espelho, altura, comprPatamar, largura) {
+      const canvas = document.getElementById("diagramaCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      desenharGrid(ctx, w, h);
+
+      const degrausPorLance = Math.floor(numDegraus / 2);
+      const degrausLance1 = degrausPorLance;
+      const degrausLance2 = numDegraus - degrausPorLance;
+
+      const comprLance1 = degrausLance1 * piso;
+      const comprLance2 = degrausLance2 * piso;
+      const tamanhoTotal = Math.max(comprLance1 + comprPatamar, comprLance2 + comprPatamar) + largura;
+
+      const margem = 60;
+      const escala = Math.min((w - margem * 2) / tamanhoTotal, (h - margem * 2) / tamanhoTotal) * 0.85;
+      const offsetX = margem + 50;
+      const offsetY = margem + 50;
+
+      // Título
+      ctx.fillStyle = '#00ffff';
+      ctx.font = 'bold 14px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('↪️ ESCADA EM L - Vista Superior (Planta Baixa)', w / 2, 25);
+
+      // Lance 1 (horizontal, da esquerda para direita)
+      for (let i = 0; i < degrausLance1; i++) {
+        const x = offsetX + i * piso * escala;
+        const y = offsetY;
+        const dw = piso * escala;
+        const dh = largura * escala;
+
+        const grad = ctx.createLinearGradient(x, y, x + dw, y);
+        grad.addColorStop(0, `rgba(0, 255, 255, ${0.15 + i * 0.03})`);
+        grad.addColorStop(1, `rgba(0, 255, 255, ${0.25 + i * 0.03})`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, y, dw, dh);
+
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(x, y, dw, dh);
+
+        // Número do degrau
+        ctx.fillStyle = '#fff';
+        ctx.font = '10px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(i + 1, x + dw / 2, y + dh / 2 + 4);
+      }
+
+      // Patamar (canto em L)
+      const patX = offsetX + degrausLance1 * piso * escala;
+      const patY = offsetY;
+      const patSize = Math.max(largura, comprPatamar) * escala;
+
+      ctx.fillStyle = 'rgba(139, 92, 246, 0.4)';
+      ctx.fillRect(patX, patY, patSize, patSize);
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(patX, patY, patSize, patSize);
+
+      // Indicador de rotação 90°
+      ctx.strokeStyle = '#ffa500';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(patX + patSize / 2, patY + patSize / 2, patSize / 3, -Math.PI / 2, 0);
+      ctx.stroke();
+      ctx.fillStyle = '#ffa500';
+      ctx.beginPath();
+      ctx.moveTo(patX + patSize / 2 + patSize / 3, patY + patSize / 2);
+      ctx.lineTo(patX + patSize / 2 + patSize / 3 - 8, patY + patSize / 2 - 5);
+      ctx.lineTo(patX + patSize / 2 + patSize / 3 - 8, patY + patSize / 2 + 5);
+      ctx.fill();
+
+      ctx.fillStyle = '#8b5cf6';
+      ctx.font = 'bold 11px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('90°', patX + patSize / 2, patY + patSize / 2 + 4);
+
+      // Lance 2 (vertical, de cima para baixo)
+      for (let i = 0; i < degrausLance2; i++) {
+        const x = patX;
+        const y = patY + patSize + i * piso * escala;
+        const dw = largura * escala;
+        const dh = piso * escala;
+
+        const grad = ctx.createLinearGradient(x, y, x, y + dh);
+        grad.addColorStop(0, `rgba(0, 200, 200, ${0.15 + i * 0.03})`);
+        grad.addColorStop(1, `rgba(0, 200, 200, ${0.25 + i * 0.03})`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, y, dw, dh);
+
+        ctx.strokeStyle = '#00cccc';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(x, y, dw, dh);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = '10px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(degrausLance1 + i + 1, x + dw / 2, y + dh / 2 + 4);
+      }
+
+      // Setas de direção
+      desenharSetaDirecao(ctx, offsetX + 20, offsetY + largura * escala / 2, 0, '#00ff00');
+      desenharSetaDirecao(ctx, patX + largura * escala / 2, patY + patSize + 20, Math.PI / 2, '#00ff00');
+
+      // Labels
+      ctx.fillStyle = '#00ff00';
+      ctx.font = '10px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText('SUBIDA →', offsetX, offsetY - 10);
+      ctx.save();
+      ctx.translate(patX + largura * escala + 15, patY + patSize + 30);
+      ctx.rotate(Math.PI / 2);
+      ctx.fillText('SUBIDA →', 0, 0);
+      ctx.restore();
+
+      // Cotas
+      desenharCotaHorizontal(ctx, offsetX, patX + patSize, h - 40, `${fmtNum(comprLance1 + comprPatamar, 2)} m`, '#ffa500');
+      desenharCotaVertical(ctx, w - 50, offsetY, patY + patSize + degrausLance2 * piso * escala, `${fmtNum(comprLance2 + comprPatamar, 2)} m`, '#ffa500');
+
+      // Info
+      ctx.fillStyle = '#888';
+      ctx.font = '11px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText(`Lance 1: ${degrausLance1} degraus | Patamar 90° | Lance 2: ${degrausLance2} degraus | Total: ${numDegraus}`, margem, h - 15);
+    }
+
+    // ==================== ESCADA EM U (Vista Superior/Planta) ====================
+    function desenharEscadaU(numDegraus, piso, espelho, altura, comprPatamar, largura) {
+      const canvas = document.getElementById("diagramaCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      desenharGrid(ctx, w, h);
+
+      const degrausPorLance = Math.floor(numDegraus / 2);
+      const degrausLance1 = degrausPorLance;
+      const degrausLance2 = numDegraus - degrausPorLance;
+
+      const comprLance = Math.max(degrausLance1, degrausLance2) * piso;
+      const larguraTotal = largura * 2 + comprPatamar;
+
+      const margem = 60;
+      const escala = Math.min((w - margem * 2) / larguraTotal, (h - margem * 2) / (comprLance + comprPatamar)) * 0.8;
+      const offsetX = (w - larguraTotal * escala) / 2;
+      const offsetY = margem + 40;
+
+      // Título
+      ctx.fillStyle = '#00ffff';
+      ctx.font = 'bold 14px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('🔄 ESCADA EM U - Vista Superior (Planta Baixa)', w / 2, 25);
+
+      // Lance 1 (esquerda, subindo)
+      for (let i = 0; i < degrausLance1; i++) {
+        const x = offsetX;
+        const y = offsetY + (degrausLance1 - 1 - i) * piso * escala;
+        const dw = largura * escala;
+        const dh = piso * escala;
+
+        const grad = ctx.createLinearGradient(x, y, x, y + dh);
+        grad.addColorStop(0, `rgba(0, 255, 255, ${0.15 + i * 0.02})`);
+        grad.addColorStop(1, `rgba(0, 255, 255, ${0.25 + i * 0.02})`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, y, dw, dh);
+
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(x, y, dw, dh);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = '10px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(i + 1, x + dw / 2, y + dh / 2 + 4);
+      }
+
+      // Patamar de retorno (180°)
+      const patX = offsetX;
+      const patY = offsetY + degrausLance1 * piso * escala;
+      const patW = larguraTotal * escala;
+      const patH = comprPatamar * escala;
+
+      ctx.fillStyle = 'rgba(139, 92, 246, 0.4)';
+      ctx.fillRect(patX, patY, patW, patH);
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(patX, patY, patW, patH);
+
+      // Indicador de rotação 180°
+      ctx.strokeStyle = '#ffa500';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(patX + patW / 2, patY + patH / 2, patH / 2.5, Math.PI, 0);
+      ctx.stroke();
+      ctx.fillStyle = '#ffa500';
+      ctx.beginPath();
+      ctx.moveTo(patX + patW / 2 + patH / 2.5, patY + patH / 2);
+      ctx.lineTo(patX + patW / 2 + patH / 2.5 - 8, patY + patH / 2 - 5);
+      ctx.lineTo(patX + patW / 2 + patH / 2.5 - 8, patY + patH / 2 + 5);
+      ctx.fill();
+
+      ctx.fillStyle = '#8b5cf6';
+      ctx.font = 'bold 12px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('180°', patX + patW / 2, patY + patH / 2 + 4);
+
+      // Lance 2 (direita, subindo - sentido oposto)
+      for (let i = 0; i < degrausLance2; i++) {
+        const x = offsetX + (largura + comprPatamar) * escala;
+        const y = patY + patH + i * piso * escala;
+        const dw = largura * escala;
+        const dh = piso * escala;
+
+        const grad = ctx.createLinearGradient(x, y, x, y + dh);
+        grad.addColorStop(0, `rgba(0, 200, 200, ${0.15 + i * 0.02})`);
+        grad.addColorStop(1, `rgba(0, 200, 200, ${0.25 + i * 0.02})`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, y, dw, dh);
+
+        ctx.strokeStyle = '#00cccc';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(x, y, dw, dh);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = '10px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(degrausLance1 + i + 1, x + dw / 2, y + dh / 2 + 4);
+      }
+
+      // Setas de direção
+      ctx.fillStyle = '#00ff00';
+      ctx.font = '10px Inter';
+
+      // Seta lance 1
+      ctx.textAlign = 'center';
+      ctx.save();
+      ctx.translate(offsetX - 15, offsetY + degrausLance1 * piso * escala / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('↑ SUBIDA', 0, 0);
+      ctx.restore();
+
+      // Seta lance 2
+      ctx.save();
+      ctx.translate(offsetX + larguraTotal * escala + 15, patY + patH + degrausLance2 * piso * escala / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.fillText('↑ SUBIDA', 0, 0);
+      ctx.restore();
+
+      // Área central (vazio entre lances)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.setLineDash([5, 5]);
+      ctx.strokeRect(offsetX + largura * escala, offsetY, comprPatamar * escala, degrausLance1 * piso * escala);
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.font = '10px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('VAZIO', offsetX + largura * escala + comprPatamar * escala / 2, offsetY + degrausLance1 * piso * escala / 2);
+
+      // Cotas
+      desenharCotaHorizontal(ctx, offsetX, offsetX + larguraTotal * escala, h - 30, `${fmtNum(larguraTotal, 2)} m`, '#ffa500');
+      desenharCotaVertical(ctx, offsetX - 50, offsetY, patY + patH + degrausLance2 * piso * escala, `${fmtNum(comprLance + comprPatamar, 2)} m`, '#ff6b6b');
+
+      // Info
+      ctx.fillStyle = '#888';
+      ctx.font = '11px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText(`Lance 1: ${degrausLance1} ↑ | Retorno 180° | Lance 2: ${degrausLance2} ↑ | Total: ${numDegraus} degraus`, margem, h - 10);
+    }
+
+    // ==================== FUNÇÕES AUXILIARES DE DESENHO ====================
+    function desenharGrid(ctx, w, h) {
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.05)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < w; i += 30) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, h);
+        ctx.stroke();
+      }
+      for (let i = 0; i < h; i += 30) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(w, i);
+        ctx.stroke();
+      }
+    }
+
+    function desenharCotaVertical(ctx, x, y1, y2, texto, cor) {
+      ctx.strokeStyle = cor;
+      ctx.fillStyle = cor;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(x, y1);
+      ctx.lineTo(x, y2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Setas
+      ctx.beginPath();
+      ctx.moveTo(x, y1);
+      ctx.lineTo(x - 5, y1 + 10);
+      ctx.lineTo(x + 5, y1 + 10);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(x, y2);
+      ctx.lineTo(x - 5, y2 - 10);
+      ctx.lineTo(x + 5, y2 - 10);
+      ctx.fill();
+
+      // Texto
+      ctx.font = 'bold 11px Inter';
+      ctx.textAlign = 'center';
+      ctx.save();
+      ctx.translate(x - 15, (y1 + y2) / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(texto, 0, 0);
+      ctx.restore();
+    }
+
+    function desenharCotaHorizontal(ctx, x1, x2, y, texto, cor) {
+      ctx.strokeStyle = cor;
+      ctx.fillStyle = cor;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(x1, y);
+      ctx.lineTo(x2, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Setas
+      ctx.beginPath();
+      ctx.moveTo(x1, y);
+      ctx.lineTo(x1 + 10, y - 5);
+      ctx.lineTo(x1 + 10, y + 5);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(x2, y);
+      ctx.lineTo(x2 - 10, y - 5);
+      ctx.lineTo(x2 - 10, y + 5);
+      ctx.fill();
+
+      // Texto
+      ctx.font = 'bold 11px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText(texto, (x1 + x2) / 2, y + 15);
+    }
+
+    function desenharSetaDirecao(ctx, x, y, angulo, cor) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angulo);
+      ctx.fillStyle = cor;
+      ctx.beginPath();
+      ctx.moveTo(15, 0);
+      ctx.lineTo(0, -6);
+      ctx.lineTo(0, 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ==================== DIAGRAMA CARACOL (Vista Superior) ====================
+    function desenharCaracol(numDegraus, raioExt, raioInt, espelho, rotacaoTotal, altura) {
+      const canvas = document.getElementById("diagramaCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      desenharGrid(ctx, w, h);
+
+      const centerX = w / 2;
+      const centerY = h / 2 + 20;
+      const scale = Math.min(w, h) / (raioExt * 3.5);
+
+      // Título
+      ctx.fillStyle = '#00ffff';
+      ctx.font = 'bold 14px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('🌀 ESCADA CARACOL - Vista Superior (Planta Baixa)', w / 2, 25);
+
+      // Círculo externo com gradiente
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.5)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, raioExt * scale, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Círculo interno (poste central)
+      const gradPoste = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, raioInt * scale);
+      gradPoste.addColorStop(0, 'rgba(139, 92, 246, 0.8)');
+      gradPoste.addColorStop(1, 'rgba(139, 92, 246, 0.3)');
+      ctx.fillStyle = gradPoste;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, raioInt * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Label do poste
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 10px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('POSTE', centerX, centerY + 4);
+
+      // Degraus
+      const anguloPerDegrau = (rotacaoTotal / numDegraus) * (Math.PI / 180);
+      for (let i = 0; i < numDegraus; i++) {
+        const angulo = i * anguloPerDegrau - Math.PI / 2;
+        const anguloFim = angulo + anguloPerDegrau;
+
+        // Área do degrau
+        ctx.beginPath();
+        ctx.moveTo(centerX + Math.cos(angulo) * raioInt * scale, centerY + Math.sin(angulo) * raioInt * scale);
+        ctx.lineTo(centerX + Math.cos(angulo) * raioExt * scale, centerY + Math.sin(angulo) * raioExt * scale);
+        ctx.arc(centerX, centerY, raioExt * scale, angulo, anguloFim);
+        ctx.lineTo(centerX + Math.cos(anguloFim) * raioInt * scale, centerY + Math.sin(anguloFim) * raioInt * scale);
+        ctx.arc(centerX, centerY, raioInt * scale, anguloFim, angulo, true);
+        ctx.closePath();
+
+        const gradDegrau = ctx.createRadialGradient(centerX, centerY, raioInt * scale, centerX, centerY, raioExt * scale);
+        gradDegrau.addColorStop(0, `rgba(0, 255, 255, ${0.1 + (i / numDegraus) * 0.15})`);
+        gradDegrau.addColorStop(1, `rgba(0, 255, 255, ${0.2 + (i / numDegraus) * 0.2})`);
+        ctx.fillStyle = gradDegrau;
+        ctx.fill();
+
+        // Borda do degrau
+        ctx.beginPath();
+        ctx.moveTo(centerX + Math.cos(angulo) * raioInt * scale, centerY + Math.sin(angulo) * raioInt * scale);
+        ctx.lineTo(centerX + Math.cos(angulo) * raioExt * scale, centerY + Math.sin(angulo) * raioExt * scale);
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Número do degrau (a cada 2 ou todos se poucos)
+        if (i % Math.max(1, Math.floor(numDegraus / 12)) === 0) {
+          const raioTexto = (raioExt + raioInt) / 2 * scale;
+          const anguloTexto = angulo + anguloPerDegrau / 2;
+          ctx.fillStyle = '#fff';
+          ctx.font = '9px Inter';
+          ctx.textAlign = 'center';
+          ctx.fillText(i + 1, centerX + Math.cos(anguloTexto) * raioTexto, centerY + Math.sin(anguloTexto) * raioTexto + 3);
+        }
+      }
+
+      // Seta de direção (sentido de subida)
+      const anguloSeta = (rotacaoTotal / 2) * (Math.PI / 180) - Math.PI / 2;
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, (raioExt + 15) * scale, -Math.PI / 2, anguloSeta);
+      ctx.stroke();
+
+      // Ponta da seta
+      ctx.fillStyle = '#00ff00';
+      const setaX = centerX + Math.cos(anguloSeta) * (raioExt + 15) * scale;
+      const setaY = centerY + Math.sin(anguloSeta) * (raioExt + 15) * scale;
+      ctx.beginPath();
+      ctx.moveTo(setaX, setaY);
+      ctx.lineTo(setaX - 10, setaY - 10);
+      ctx.lineTo(setaX + 5, setaY - 5);
+      ctx.fill();
+
+      ctx.fillStyle = '#00ff00';
+      ctx.font = '10px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText('SUBIDA', setaX + 10, setaY);
+
+      // Cotas
+      // Diâmetro externo
+      ctx.strokeStyle = '#ffa500';
+      ctx.fillStyle = '#ffa500';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(centerX - raioExt * scale, centerY);
+      ctx.lineTo(centerX + raioExt * scale, centerY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.font = 'bold 11px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Ø ${fmtNum(raioExt * 2 / 100, 2)} m`, centerX, centerY + raioExt * scale + 25);
+
+      // Raio útil (linha de passo)
+      const raioMedio = (raioExt + raioInt) / 2;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, raioMedio * scale, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = '9px Inter';
+      ctx.fillText('Linha de passo', centerX + raioMedio * scale + 5, centerY - 5);
+
+      // Info
+      ctx.fillStyle = '#888';
+      ctx.font = '11px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${numDegraus} degraus | Rotação: ${rotacaoTotal}° | Altura: ${fmtNum(altura, 2)}m | Poste: Ø${fmtNum(raioInt * 2, 0)}cm`, w / 2, h - 15);
+    }
+
+    // ==================== VISTA 3D ====================
+    function desenhar3D(numDegraus, piso, espelho, largura, altura) {
+      switch(tipoEscadaSelecionado) {
+        case 'L':
+          desenhar3D_L(numDegraus, piso, espelho, largura, altura);
+          break;
+        case 'U':
+          desenhar3D_U(numDegraus, piso, espelho, largura, altura);
+          break;
+        case 'caracol':
+          desenhar3D_Caracol(numDegraus, piso, espelho, largura, altura);
+          break;
+        default:
+          desenhar3D_Reta(numDegraus, piso, espelho, largura, altura);
+      }
+    }
+
+    function desenhar3D_Reta(numDegraus, piso, espelho, largura, altura) {
+      const canvas = document.getElementById("canvas3d");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const angle = rotacao3D * Math.PI / 180;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      
+      const scale = Math.min(w, h) / (Math.max(numDegraus * piso, altura, largura) * 4);
+      const centerX = w / 2;
+      const centerY = h * 0.7;
+
+      function project(x, y, z) {
+        const px = centerX + (x * cos - z * sin) * scale;
+        const py = centerY - y * scale * 0.8 + (x * sin + z * cos) * scale * 0.3;
+        return { x: px, y: py };
+      }
+
+      // Desenhar degraus
+      for (let i = 0; i < numDegraus; i++) {
+        const x = i * piso;
+        const y = i * espelho;
+
+        const corners = [
+          project(x, y, 0),
+          project(x + piso, y, 0),
+          project(x + piso, y, largura),
+          project(x, y, largura),
+          project(x, y + espelho, 0),
+          project(x + piso, y + espelho, 0),
+          project(x + piso, y + espelho, largura),
+          project(x, y + espelho, largura)
+        ];
+
+        // Face superior
+        ctx.beginPath();
+        ctx.moveTo(corners[4].x, corners[4].y);
+        ctx.lineTo(corners[5].x, corners[5].y);
+        ctx.lineTo(corners[6].x, corners[6].y);
+        ctx.lineTo(corners[7].x, corners[7].y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(0, 255, 255, ${0.3 + i * 0.03})`;
+        ctx.fill();
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Face frontal
+        ctx.beginPath();
+        ctx.moveTo(corners[0].x, corners[0].y);
+        ctx.lineTo(corners[1].x, corners[1].y);
+        ctx.lineTo(corners[5].x, corners[5].y);
+        ctx.lineTo(corners[4].x, corners[4].y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(0, 200, 200, ${0.2 + i * 0.02})`;
+        ctx.fill();
+        ctx.stroke();
+
+        // Face lateral
+        ctx.beginPath();
+        ctx.moveTo(corners[1].x, corners[1].y);
+        ctx.lineTo(corners[2].x, corners[2].y);
+        ctx.lineTo(corners[6].x, corners[6].y);
+        ctx.lineTo(corners[5].x, corners[5].y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(0, 150, 150, ${0.15 + i * 0.02})`;
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#00ffff';
+      ctx.font = 'bold 12px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText(`📏 ESCADA RETA - Vista 3D | Rotação: ${rotacao3D}°`, w / 2, 25);
+    }
+
+    function desenhar3D_L(numDegraus, piso, espelho, largura, altura) {
+      const canvas = document.getElementById("canvas3d");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const angle = rotacao3D * Math.PI / 180;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      
+      const degrausPorLance = Math.floor(numDegraus / 2);
+      const scale = Math.min(w, h) / (Math.max(degrausPorLance * piso * 2, altura, largura * 2) * 3);
+      const centerX = w / 2;
+      const centerY = h * 0.65;
+
+      function project(x, y, z) {
+        const px = centerX + (x * cos - z * sin) * scale;
+        const py = centerY - y * scale * 0.8 + (x * sin + z * cos) * scale * 0.3;
+        return { x: px, y: py };
+      }
+
+      // Lance 1 (horizontal)
+      for (let i = 0; i < degrausPorLance; i++) {
+        const x = i * piso;
+        const y = i * espelho;
+        const z = 0;
+
+        const corners = [
+          project(x, y, z), project(x + piso, y, z),
+          project(x + piso, y, z + largura), project(x, y, z + largura),
+          project(x, y + espelho, z), project(x + piso, y + espelho, z),
+          project(x + piso, y + espelho, z + largura), project(x, y + espelho, z + largura)
+        ];
+
+        ctx.beginPath();
+        ctx.moveTo(corners[4].x, corners[4].y);
+        ctx.lineTo(corners[5].x, corners[5].y);
+        ctx.lineTo(corners[6].x, corners[6].y);
+        ctx.lineTo(corners[7].x, corners[7].y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(0, 255, 255, ${0.25 + i * 0.03})`;
+        ctx.fill();
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Patamar
+      const patX = degrausPorLance * piso;
+      const patY = degrausPorLance * espelho;
+      const patSize = largura;
+      const patCorners = [
+        project(patX, patY, 0), project(patX + patSize, patY, 0),
+        project(patX + patSize, patY, patSize), project(patX, patY, patSize),
+        project(patX, patY + espelho/2, 0), project(patX + patSize, patY + espelho/2, 0),
+        project(patX + patSize, patY + espelho/2, patSize), project(patX, patY + espelho/2, patSize)
+      ];
+      
+      ctx.beginPath();
+      ctx.moveTo(patCorners[4].x, patCorners[4].y);
+      ctx.lineTo(patCorners[5].x, patCorners[5].y);
+      ctx.lineTo(patCorners[6].x, patCorners[6].y);
+      ctx.lineTo(patCorners[7].x, patCorners[7].y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(139, 92, 246, 0.4)';
+      ctx.fill();
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Lance 2 (perpendicular)
+      for (let i = 0; i < (numDegraus - degrausPorLance); i++) {
+        const x = patX + patSize;
+        const y = patY + espelho/2 + i * espelho;
+        const z = i * piso;
+
+        const corners = [
+          project(x, y, z), project(x, y, z + piso),
+          project(x - largura, y, z + piso), project(x - largura, y, z),
+          project(x, y + espelho, z), project(x, y + espelho, z + piso),
+          project(x - largura, y + espelho, z + piso), project(x - largura, y + espelho, z)
+        ];
+
+        ctx.beginPath();
+        ctx.moveTo(corners[4].x, corners[4].y);
+        ctx.lineTo(corners[5].x, corners[5].y);
+        ctx.lineTo(corners[6].x, corners[6].y);
+        ctx.lineTo(corners[7].x, corners[7].y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(0, 200, 200, ${0.25 + i * 0.03})`;
+        ctx.fill();
+        ctx.strokeStyle = '#00cccc';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#00ffff';
+      ctx.font = 'bold 12px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText(`↪️ ESCADA EM L - Vista 3D | Rotação: ${rotacao3D}°`, w / 2, 25);
+    }
+
+    function desenhar3D_U(numDegraus, piso, espelho, largura, altura) {
+      const canvas = document.getElementById("canvas3d");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const angle = rotacao3D * Math.PI / 180;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      
+      const degrausPorLance = Math.floor(numDegraus / 2);
+      const espacoEntrelances = largura * 0.5;
+      const scale = Math.min(w, h) / (Math.max(degrausPorLance * piso, altura, largura * 2 + espacoEntrelances) * 3.5);
+      const centerX = w / 2;
+      const centerY = h * 0.65;
+
+      function project(x, y, z) {
+        const px = centerX + (x * cos - z * sin) * scale;
+        const py = centerY - y * scale * 0.8 + (x * sin + z * cos) * scale * 0.3;
+        return { x: px, y: py };
+      }
+
+      // Lance 1
+      for (let i = 0; i < degrausPorLance; i++) {
+        const x = 0;
+        const y = i * espelho;
+        const z = i * piso;
+
+        const corners = [
+          project(x, y, z), project(x + largura, y, z),
+          project(x + largura, y, z + piso), project(x, y, z + piso),
+          project(x, y + espelho, z), project(x + largura, y + espelho, z),
+          project(x + largura, y + espelho, z + piso), project(x, y + espelho, z + piso)
+        ];
+
+        ctx.beginPath();
+        ctx.moveTo(corners[4].x, corners[4].y);
+        ctx.lineTo(corners[5].x, corners[5].y);
+        ctx.lineTo(corners[6].x, corners[6].y);
+        ctx.lineTo(corners[7].x, corners[7].y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(0, 255, 255, ${0.25 + i * 0.03})`;
+        ctx.fill();
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Patamar
+      const patY = degrausPorLance * espelho;
+      const patZ = degrausPorLance * piso;
+      ctx.beginPath();
+      const p1 = project(0, patY, patZ);
+      const p2 = project(largura * 2 + espacoEntrelances, patY, patZ);
+      const p3 = project(largura * 2 + espacoEntrelances, patY, patZ + largura);
+      const p4 = project(0, patY, patZ + largura);
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.lineTo(p4.x, p4.y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(139, 92, 246, 0.4)';
+      ctx.fill();
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Lance 2 (paralelo, sentido oposto)
+      for (let i = 0; i < (numDegraus - degrausPorLance); i++) {
+        const x = largura + espacoEntrelances;
+        const y = patY + i * espelho;
+        const z = patZ + largura - i * piso;
+
+        const corners = [
+          project(x, y, z), project(x + largura, y, z),
+          project(x + largura, y, z - piso), project(x, y, z - piso),
+          project(x, y + espelho, z), project(x + largura, y + espelho, z),
+          project(x + largura, y + espelho, z - piso), project(x, y + espelho, z - piso)
+        ];
+
+        ctx.beginPath();
+        ctx.moveTo(corners[4].x, corners[4].y);
+        ctx.lineTo(corners[5].x, corners[5].y);
+        ctx.lineTo(corners[6].x, corners[6].y);
+        ctx.lineTo(corners[7].x, corners[7].y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(0, 200, 200, ${0.25 + i * 0.03})`;
+        ctx.fill();
+        ctx.strokeStyle = '#00cccc';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#00ffff';
+      ctx.font = 'bold 12px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText(`🔄 ESCADA EM U - Vista 3D | Rotação: ${rotacao3D}°`, w / 2, 25);
+    }
+
+    function desenhar3D_Caracol(numDegraus, piso, espelho, largura, altura) {
+      const canvas = document.getElementById("canvas3d");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const diametroExt = parseFloat(document.getElementById("diametroExterno").value) || 2.0;
+      const diametroPoste = parseFloat(document.getElementById("diametroPoste").value) || 15;
+      const rotacaoTotal = parseFloat(document.getElementById("rotacaoTotal").value) || 360;
+
+      const raioExt = (diametroExt * 100) / 2;
+      const raioInt = diametroPoste / 2;
+
+      const angle = rotacao3D * Math.PI / 180;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      
+      const scale = Math.min(w, h) / (raioExt * 5);
+      const centerX = w / 2;
+      const centerY = h * 0.55;
+
+      function project(x, y, z) {
+        const px = centerX + (x * cos - z * sin) * scale;
+        const py = centerY - y * scale * 0.6 + (x * sin + z * cos) * scale * 0.25;
+        return { x: px, y: py };
+      }
+
+      // Poste central
+      const posteAltura = altura * 100;
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 8) {
+        const x1 = Math.cos(a) * raioInt;
+        const z1 = Math.sin(a) * raioInt;
+        const x2 = Math.cos(a + Math.PI / 8) * raioInt;
+        const z2 = Math.sin(a + Math.PI / 8) * raioInt;
+        
+        const p1 = project(x1, 0, z1);
+        const p2 = project(x2, 0, z2);
+        const p3 = project(x2, posteAltura, z2);
+        const p4 = project(x1, posteAltura, z1);
+        
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.lineTo(p3.x, p3.y);
+        ctx.lineTo(p4.x, p4.y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(139, 92, 246, ${0.3 + Math.cos(a) * 0.2})`;
+        ctx.fill();
+        ctx.strokeStyle = '#8b5cf6';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+
+      // Degraus
+      const anguloPerDegrau = (rotacaoTotal / numDegraus) * (Math.PI / 180);
+      const alturaPerDegrau = posteAltura / numDegraus;
+
+      for (let i = 0; i < numDegraus; i++) {
+        const angulo = i * anguloPerDegrau;
+        const anguloFim = angulo + anguloPerDegrau * 0.9;
+        const y = i * alturaPerDegrau;
+
+        // Pontos do degrau
+        const points = [];
+        for (let a = angulo; a <= anguloFim; a += (anguloFim - angulo) / 4) {
+          points.push(project(Math.cos(a) * raioInt, y, Math.sin(a) * raioInt));
+          points.push(project(Math.cos(a) * raioExt, y, Math.sin(a) * raioExt));
+        }
+
+        // Desenhar superfície do degrau
+        ctx.beginPath();
+        ctx.moveTo(project(Math.cos(angulo) * raioInt, y, Math.sin(angulo) * raioInt).x,
+                   project(Math.cos(angulo) * raioInt, y, Math.sin(angulo) * raioInt).y);
+        
+        for (let a = angulo; a <= anguloFim; a += (anguloFim - angulo) / 8) {
+          const p = project(Math.cos(a) * raioExt, y, Math.sin(a) * raioExt);
+          ctx.lineTo(p.x, p.y);
+        }
+        
+        for (let a = anguloFim; a >= angulo; a -= (anguloFim - angulo) / 8) {
+          const p = project(Math.cos(a) * raioInt, y, Math.sin(a) * raioInt);
+          ctx.lineTo(p.x, p.y);
+        }
+        
+        ctx.closePath();
+        ctx.fillStyle = `rgba(0, 255, 255, ${0.2 + (i / numDegraus) * 0.3})`;
+        ctx.fill();
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#00ffff';
+      ctx.font = 'bold 12px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText(`🌀 ESCADA CARACOL - Vista 3D | Rotação: ${rotacao3D}°`, w / 2, 25);
+    }
+
+    function rotate3D(delta) {
+      rotacao3D = (rotacao3D + delta + 360) % 360;
+      
+      const numDegrausText = document.getElementById("numDegraus").textContent;
+      if (numDegrausText && numDegrausText !== '-') {
+        desenhar3D(
+          parseInt(numDegrausText) || 10,
+          parseFloat(document.getElementById("larguraPiso").textContent) / 100 || 0.28,
+          parseFloat(document.getElementById("alturaEspelho").textContent) / 100 || 0.17,
+          parseFloat(document.getElementById("largura").value) || 1.2,
+          parseFloat(document.getElementById("altura").value) || 3.0
+        );
+      }
+    }
+
+    function reset3DView() {
+      rotacao3D = 30;
+      rotate3D(0);
+    }
+    
+    // Adicionar controle de arraste para rotação 3D
+    let isDragging = false;
+    let lastX = 0;
+    
+    function setup3DControls() {
+      const canvas3d = document.getElementById('canvas3d');
+      if (!canvas3d) return;
+      
+      canvas3d.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        lastX = e.clientX;
+        canvas3d.style.cursor = 'grabbing';
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+          const deltaX = e.clientX - lastX;
+          rotate3D(deltaX * 0.5);
+          lastX = e.clientX;
+        }
+      });
+      
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        canvas3d.style.cursor = 'grab';
+      });
+      
+      // Touch support para mobile
+      canvas3d.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        lastX = e.touches[0].clientX;
+      });
+      
+      document.addEventListener('touchmove', (e) => {
+        if (isDragging && e.touches.length > 0) {
+          const deltaX = e.touches[0].clientX - lastX;
+          rotate3D(deltaX * 0.5);
+          lastX = e.touches[0].clientX;
+        }
+      });
+      
+      document.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+      
+      canvas3d.style.cursor = 'grab';
+    }
+    
+    // Chamar setup quando DOM estiver pronto
+    setup3DControls();
+
+    // ==================== GRÁFICOS ====================
+    function desenharGraficos(espelho, piso, blondel, inclinacao, lim) {
+      if (!window.Plotly) return;
+
+      const layoutBase = {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(15,15,25,0.4)',
+        font: { color: '#9ca3af', size: 11, family: 'Inter' },
+        margin: { t: 40, b: 40, l: 50, r: 20 }
+      };
+
+      // Gráfico radar de conforto
+      Plotly.newPlot('graficoConforto', [{
+        type: 'scatterpolar',
+        r: [
+          Math.max(0, 100 - Math.abs(espelho - 17) * 15),
+          Math.max(0, 100 - Math.abs(piso - 28) * 5),
+          Math.max(0, 100 - Math.abs(blondel - 63.5) * 12),
+          Math.max(0, 100 - inclinacao * 1.5),
+          Math.max(0, 100 - Math.abs((espelho / piso) - 0.6) * 80)
+        ],
+        theta: ['Espelho', 'Piso', 'Blondel', 'Inclinação', 'Proporção'],
+        fill: 'toself',
+        fillcolor: 'rgba(0, 255, 255, 0.2)',
+        line: { color: '#00ffff', width: 2 },
+        marker: { color: '#00ffff', size: 8 }
+      }], {
+        ...layoutBase,
+        polar: {
+          radialaxis: { visible: true, range: [0, 100], gridcolor: 'rgba(255,255,255,0.1)', color: '#666' },
+          angularaxis: { gridcolor: 'rgba(255,255,255,0.1)', color: '#666' },
+          bgcolor: 'rgba(0,0,0,0)'
+        }
+      }, { displayModeBar: false, responsive: true });
+
+      // Gráfico de barras comparativo
+      Plotly.newPlot('graficoLimites', [{
+        x: ['Espelho', 'Piso', 'Blondel'],
+        y: [espelho, piso, blondel],
+        type: 'bar',
+        marker: { 
+          color: ['#00ffff', '#00ffff', '#00ffff'],
+          line: { color: '#00ffff', width: 2 }
+        },
+        name: 'Atual',
+        text: [`${fmtNum(espelho, 1)}cm`, `${fmtNum(piso, 1)}cm`, `${fmtNum(blondel, 1)}cm`],
+        textposition: 'outside',
+        textfont: { color: '#fff' }
+      }, {
+        x: ['Espelho', 'Piso', 'Blondel'],
+        y: [lim.espelhoMax, lim.pisoMax, lim.blondelMax],
+        type: 'scatter',
+        mode: 'markers',
+        marker: { color: '#ff6b6b', size: 12, symbol: 'line-ew-open', line: { width: 3 } },
+        name: 'Máximo'
+      }, {
+        x: ['Espelho', 'Piso', 'Blondel'],
+        y: [lim.espelhoMin, lim.pisoMin, lim.blondelMin],
+        type: 'scatter',
+        mode: 'markers',
+        marker: { color: '#ffa500', size: 12, symbol: 'line-ew-open', line: { width: 3 } },
+        name: 'Mínimo'
+      }], {
+        ...layoutBase,
+        barmode: 'group',
+        yaxis: { gridcolor: 'rgba(255,255,255,0.1)', title: 'cm' },
+        xaxis: { gridcolor: 'rgba(255,255,255,0.1)' },
+        legend: { orientation: 'h', y: -0.15 },
+        showlegend: true
+      }, { displayModeBar: false, responsive: true });
+    }
+
+    // ==================== MATERIAIS ====================
+    function calcularMateriais(numDegraus, piso, espelho, largura, altura, espessuraLaje, temPatamar, comprPatamar, largPatamar) {
+      const tbody = document.querySelector("#tabelaMateriais tbody");
+      tbody.innerHTML = "";
+
+      const areaLance = (numDegraus * piso * largura) / 2;
+      const volumeLance = areaLance * espessuraLaje;
+      const volumePatamar = temPatamar ? comprPatamar * largPatamar * espessuraLaje : 0;
+      const volumeTotal = volumeLance + volumePatamar;
+      const areaForma = (numDegraus * (piso + espelho) * largura) * 1.3;
+      const acoTotal = volumeTotal * 85;
+      const areaRevestPiso = numDegraus * piso * largura;
+      const areaRevestEspelho = numDegraus * espelho * largura;
+      const comprimentoRampa = Math.sqrt(Math.pow(altura, 2) + Math.pow((numDegraus - 1) * piso, 2));
+      const comprimentoCorrimao = comprimentoRampa * 2;
+      const comprimentoGuarda = comprimentoRampa;
+
+      const custoConcreto = volumeTotal * precosEscadas.concreto;
+      const custoAco = acoTotal * precosEscadas.aco;
+      const custoForma = areaForma * precosEscadas.forma;
+      const custoPiso = areaRevestPiso * precosEscadas.piso;
+      const custoEspelho = areaRevestEspelho * precosEscadas.espelhoRev;
+      const custoCorrimao = comprimentoCorrimao * precosEscadas.corrimao;
+      const custoGuarda = comprimentoGuarda * precosEscadas.guarda;
+      const custoTotal = custoConcreto + custoAco + custoForma + custoPiso + custoEspelho + custoCorrimao + custoGuarda;
+
+      const materiais = [
+        { mat: "🧱 Concreto", un: "m³", qtd: fmtNum(volumeTotal, 3), obs: "fck ≥ 25 MPa", custo: custoConcreto },
+        { mat: "🔩 Aço CA-50", un: "kg", qtd: fmtNum(acoTotal, 1), obs: "≈85 kg/m³", custo: custoAco },
+        { mat: "🪵 Forma", un: "m²", qtd: fmtNum(areaForma, 2), obs: "Compensado 18mm", custo: custoForma },
+        { mat: "🏁 Piso antiderrapante", un: "m²", qtd: fmtNum(areaRevestPiso, 2), obs: "Degraus", custo: custoPiso },
+        { mat: "🎨 Revestimento espelho", un: "m²", qtd: fmtNum(areaRevestEspelho, 2), obs: "Acabamento", custo: custoEspelho },
+        { mat: "🛡️ Corrimão", un: "m", qtd: fmtNum(comprimentoCorrimao, 2), obs: "Ambos lados", custo: custoCorrimao },
+        { mat: "🚧 Guarda-corpo", un: "m", qtd: fmtNum(comprimentoGuarda, 2), obs: "h > 1,10m", custo: custoGuarda }
+      ];
+
+      materiais.forEach(m => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-white/5 transition-colors";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-medium">${m.mat}</td>
+          <td class="py-3 px-4 text-center text-gray-500">${m.un}</td>
+          <td class="py-3 px-4 text-center text-cyan-400 font-mono">${m.qtd}</td>
+          <td class="py-3 px-4 text-gray-500 text-sm">${m.obs}</td>
+          <td class="py-3 px-4 text-right font-semibold text-green-400">${fmtBRL(m.custo)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('custoTotal').textContent = fmtBRL(custoTotal);
+    }
+
+    // ==================== HISTÓRICO ====================
+    function salvarNoHistorico(calc) {
+      historicoCalclos.unshift(calc);
+      if (historicoCalclos.length > 20) historicoCalclos.pop();
+      localStorage.setItem('historicoEscadas', JSON.stringify(historicoCalclos));
+    }
+
+    function abrirModalHistorico() {
+      const lista = document.getElementById('listaHistorico');
+      
+      if (historicoCalclos.length === 0) {
+        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum cálculo salvo ainda.</p>';
+      } else {
+        lista.innerHTML = historicoCalclos.map((h, i) => `
+          <div class="flex items-center justify-between p-4 rounded-xl bg-black/20 hover:bg-black/40 transition-colors">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
+                <span class="text-xl">${h.tipo === 'caracol' ? '🌀' : h.tipo === 'L' ? '↪️' : h.tipo === 'U' ? '🔄' : '📏'}</span>
+              </div>
+              <div>
+                <div class="font-medium">${h.numDegraus} degraus | ${h.tipo.toUpperCase()}</div>
+                <div class="text-sm text-gray-500">${h.data}</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-cyan-400 font-bold">${h.score}%</div>
+              <div class="text-xs text-gray-500">H: ${h.altura}m | L: ${h.largura}m</div>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      document.getElementById('modalHistorico').classList.remove('hidden');
+      document.getElementById('modalHistorico').classList.add('flex');
+    }
+
+    function fecharModalHistorico() {
+      document.getElementById('modalHistorico').classList.add('hidden');
+      document.getElementById('modalHistorico').classList.remove('flex');
+    }
+
+    function limparHistorico() {
+      if (confirm('Limpar todo o histórico de cálculos?')) {
+        historicoCalclos = [];
+        localStorage.removeItem('historicoEscadas');
+        abrirModalHistorico();
+        showToast('Histórico limpo!', 'success');
+      }
+    }
+
+    // ==================== PREÇOS ====================
+    function abrirModalPrecos() {
+      document.getElementById('preco-concreto').value = precosEscadas.concreto.toFixed(2);
+      document.getElementById('preco-aco').value = precosEscadas.aco.toFixed(2);
+      document.getElementById('preco-forma').value = precosEscadas.forma.toFixed(2);
+      document.getElementById('preco-piso').value = precosEscadas.piso.toFixed(2);
+      document.getElementById('preco-espelho-rev').value = precosEscadas.espelhoRev.toFixed(2);
+      document.getElementById('preco-corrimao').value = precosEscadas.corrimao.toFixed(2);
+      document.getElementById('preco-guarda').value = precosEscadas.guarda.toFixed(2);
+      
+      document.getElementById('modalPrecos').classList.remove('hidden');
+      document.getElementById('modalPrecos').classList.add('flex');
+    }
+
+    function fecharModalPrecos() {
+      document.getElementById('modalPrecos').classList.add('hidden');
+      document.getElementById('modalPrecos').classList.remove('flex');
+    }
+
+    function salvarPrecosEscadas() {
+      precosEscadas = {
+        concreto: parseFloat(document.getElementById('preco-concreto').value) || 0,
+        aco: parseFloat(document.getElementById('preco-aco').value) || 0,
+        forma: parseFloat(document.getElementById('preco-forma').value) || 0,
+        piso: parseFloat(document.getElementById('preco-piso').value) || 0,
+        espelhoRev: parseFloat(document.getElementById('preco-espelho-rev').value) || 0,
+        corrimao: parseFloat(document.getElementById('preco-corrimao').value) || 0,
+        guarda: parseFloat(document.getElementById('preco-guarda').value) || 0
+      };
+      
+      localStorage.setItem('precosEscadas', JSON.stringify(precosEscadas));
+      
+      if (ultimoCalculo) calcular();
+      
+      fecharModalPrecos();
+      showToast('Preços salvos com sucesso!', 'success');
+    }
+
+    function restaurarPrecosEscadas() {
+      if (confirm('Restaurar preços padrão?')) {
+        precosEscadas = { ...precosEscadasPadrao };
+        localStorage.setItem('precosEscadas', JSON.stringify(precosEscadas));
+        abrirModalPrecos();
+        showToast('Preços restaurados!', 'success');
+      }
+    }
+
+    // ==================== EXPORTAÇÃO ====================
+    async function exportarExcel() {
+      if (!window.XLSX) {
+        showToast('Biblioteca XLSX não carregada.', 'error');
+        return;
+      }
+
+      const resultado = document.getElementById("resultado").textContent;
+      const analise = document.getElementById("analiseNormas").textContent;
+      const linhas = (resultado + "\n\n" + analise).split('\n').map(l => [l]);
+      
+      const ws = XLSX.utils.aoa_to_sheet(linhas);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Escada");
+      
+      XLSX.writeFile(wb, `escada_${new Date().toISOString().slice(0,10)}.xlsx`);
+      showToast('Excel exportado!', 'success');
+    }
+
+    async function exportarPDF() {
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        showToast('Biblioteca jsPDF não carregada.', 'error');
+        return;
+      }
+
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const margin = 40;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.setTextColor(0, 200, 200);
+      doc.text('Calculadora de Escadas Pro', margin, 50);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Gerado em: ${new Date().toLocaleString()}`, margin, 70);
+
+      const resultado = document.getElementById("resultado").textContent;
+      const analise = document.getElementById("analiseNormas").textContent;
+      const texto = resultado + "\n" + analise;
+      const linhas = texto.split('\n');
+
+      let y = 100;
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(50);
+
+      for (const linha of linhas) {
+        if (y > 780) {
+          doc.addPage();
+          y = 40;
+        }
+        doc.text(linha.substring(0, 100), margin, y);
+        y += 11;
+      }
+
+      doc.save(`escada_${new Date().toISOString().slice(0,10)}.pdf`);
+      showToast('PDF exportado!', 'success');
+    }
+
+    // ==================== UTILIDADES ====================
+    function limpar() {
+      if (!confirm("Limpar todos os campos?")) return;
+      
+      document.getElementById("altura").value = "3.00";
+      document.getElementById("comprimento").value = "4.50";
+      document.getElementById("largura").value = "1.20";
+      document.getElementById("tipoUso").value = "residencial";
+      document.getElementById("espelhoDesejado").value = "";
+      document.getElementById("pisoDesejado").value = "";
+      document.getElementById("espessuraLaje").value = "12";
+      document.getElementById("patamar").value = "false";
+      document.getElementById("comprimentoPatamar").value = "1.20";
+      document.getElementById("comprimentoPatamar").disabled = true;
+      
+      document.getElementById("numDegraus").textContent = "-";
+      document.getElementById("alturaEspelho").textContent = "- cm";
+      document.getElementById("larguraPiso").textContent = "- cm";
+      document.getElementById("blondel").textContent = "-";
+      document.getElementById("comprimentoTotal").textContent = "- m";
+      document.getElementById("inclinacao").textContent = "- °";
+      document.getElementById("memorialContainer").classList.add('hidden');
+      document.getElementById("resultado").textContent = "";
+      document.getElementById("resultado").classList.add('hidden');
+      document.getElementById("analiseNormas").textContent = "Clique em \"Calcular\" para ver a análise.";
+      document.getElementById("scoreContainer").classList.add('hidden');
+      document.getElementById("recomendacoes").classList.add('hidden');
+      document.getElementById("custoTotal").textContent = "-";
+      document.querySelector("#tabelaMateriais tbody").innerHTML = "";
+      
+      const canvas = document.getElementById("diagramaCanvas");
+      canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+      const canvas3d = document.getElementById("canvas3d");
+      canvas3d.getContext("2d").clearRect(0, 0, canvas3d.width, canvas3d.height);
+      
+      ultimoCalculo = null;
+      showToast('Campos limpos!', 'success');
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-300 translate-y-20 opacity-0 ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 'bg-cyan-500'
+      } text-white font-medium`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.remove('translate-y-20', 'opacity-0');
+      }, 10);
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function toggleHelp() {
+      const modal = document.getElementById('modalAjuda');
+      modal.classList.toggle('hidden');
+      modal.classList.toggle('flex');
+    }
+
+    function toggleTheme() {
+      // Placeholder para futuro tema claro
+      showToast('Tema escuro ativado', 'info');
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    if (document.getElementById('ano')) document.getElementById('ano').textContent = new Date().getFullYear();
+    
+    document.getElementById('patamar').addEventListener('change', function() {
+      document.getElementById('comprimentoPatamar').disabled = this.value !== 'true';
+    });
+
+    document.getElementById("btnCalcular").addEventListener("click", calcular);
+    document.getElementById("btnConfigurarPrecos").addEventListener("click", abrirModalPrecos);
+    document.getElementById("btnHistorico").addEventListener("click", abrirModalHistorico);
+    document.getElementById("btnExcel").addEventListener("click", exportarExcel);
+    document.getElementById("btnPDF").addEventListener("click", exportarPDF);
+    document.getElementById("btnReset").addEventListener("click", limpar);
+
+    // Fechar modais ao clicar fora
+    ['modalPrecos', 'modalHistorico', 'modalAjuda'].forEach(id => {
+      document.getElementById(id).addEventListener('click', (e) => {
+        if (e.target.id === id) {
+          document.getElementById(id).classList.add('hidden');
+          document.getElementById(id).classList.remove('flex');
+        }
+      });
+    });
+
+    // Atalhos de teclado
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.target.matches('input, select, textarea')) {
+        calcular();
+      }
+      if (e.key === 'Escape') {
+        ['modalPrecos', 'modalHistorico', 'modalAjuda'].forEach(id => {
+          document.getElementById(id).classList.add('hidden');
+          document.getElementById(id).classList.remove('flex');
+        });
+      }
+    });
+
+    // Inicialização
+    atualizarInfoDiagrama();
+    desenharCanvasInicial();
+    
+    function desenharCanvasInicial() {
+      // Canvas 2D
+      const canvas = document.getElementById("diagramaCanvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      desenharGrid(ctx, canvas.width, canvas.height);
+      
+      ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+      ctx.font = 'bold 16px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('Clique em "Calcular" para gerar o diagrama', canvas.width / 2, canvas.height / 2 - 10);
+      ctx.font = '12px Inter';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.fillText('O diagrama será específico para o tipo de escada selecionado', canvas.width / 2, canvas.height / 2 + 15);
+      
+      // Canvas 3D
+      const canvas3d = document.getElementById("canvas3d");
+      const ctx3d = canvas3d.getContext("2d");
+      ctx3d.clearRect(0, 0, canvas3d.width, canvas3d.height);
+      
+      ctx3d.fillStyle = 'rgba(0, 255, 255, 0.5)';
+      ctx3d.font = 'bold 16px Inter';
+      ctx3d.textAlign = 'center';
+      ctx3d.fillText('Vista 3D aparecerá após o cálculo', canvas3d.width / 2, canvas3d.height / 2 - 10);
+      ctx3d.font = '12px Inter';
+      ctx3d.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx3d.fillText('Arraste para girar a visualização', canvas3d.width / 2, canvas3d.height / 2 + 15);
+    }
+    
+    // Calcular ao carregar se houver valores
+    if (document.getElementById('altura').value) {
+      // Auto-calcular após carregamento
+      setTimeout(calcular, 500);
+    }
+  </script>
+</body>
+</html>
