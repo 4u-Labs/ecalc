@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Conversor de Unidades | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0a0a1a 100%);
+      min-height: 100vh;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glass-hover:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(0, 255, 255, 0.3);
+    }
+    
+    .neon-glow {
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.15), 
+                  0 0 40px rgba(0, 255, 255, 0.1),
+                  inset 0 0 20px rgba(0, 255, 255, 0.05);
+    }
+    
+    .neon-text {
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5),
+                   0 0 20px rgba(0, 255, 255, 0.3);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(90deg, #00ffff, #8b5cf6, #00ffff);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientMove 3s ease infinite;
+    }
+    
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 200% center; }
+    }
+    
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.3); opacity: 0; }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .swap-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .swap-btn::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(0,255,255,0.3) 0%, transparent 70%);
+      animation: pulse-ring 2s ease-out infinite;
+      border-radius: 50%;
+    }
+    
+    .input-glow:focus {
+      box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.3),
+                  0 0 20px rgba(0, 255, 255, 0.2);
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 255, 255, 0.5);
+    }
+    
+    .tab-active {
+      background: linear-gradient(90deg, #00ffff 0%, #8b5cf6 100%) !important;
+      color: #000 !important;
+      border-color: transparent !important;
+    }
+    
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .toast {
+      animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(-20px); }
+    }
+    
+    .comparison-row {
+      transition: all 0.3s ease;
+    }
+    
+    .comparison-row:hover {
+      background: rgba(0, 255, 255, 0.05);
+    }
+    
+    .precision-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #00ffff;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+    
+    .precision-slider::-webkit-slider-runnable-track {
+      height: 4px;
+      background: linear-gradient(90deg, #00ffff, #8b5cf6);
+      border-radius: 2px;
+    }
+    
+    .favorite-star {
+      transition: all 0.2s ease;
+    }
+    
+    .favorite-star:hover {
+      transform: scale(1.2);
+    }
+    
+    .favorite-star.active {
+      color: #fbbf24;
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+    }
+    
+    @media (max-width: 768px) {
+      .conversor-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .swap-btn-container {
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+<body class="text-gray-100 scrollbar-thin">
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+  
+  <!-- Header -->
+  <header class="glass border-b border-white/10 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center text-xl">
+            ⚙️
+          </div>
+          <div>
+            <h1 class="text-xl font-bold gradient-text">Conversor de Unidades</h1>
+            <p class="text-xs text-gray-400">Ferramentas de Engenharia</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="btnFavoritos" class="p-2 rounded-lg glass glass-hover transition-all" title="Favoritos">
+            <span class="text-xl">⭐</span>
+          </button>
+          <button id="btnKeyboard" class="p-2 rounded-lg glass glass-hover transition-all hidden md:flex" title="Atalhos de Teclado">
+            <span class="text-xl">⌨️</span>
+          </button>
+          <button id="btnExport" class="p-2 rounded-lg glass glass-hover transition-all" title="Exportar Histórico">
+            <span class="text-xl">📥</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Search Bar -->
+    <div class="mb-6">
+      <div class="relative max-w-md mx-auto">
+        <input type="text" id="searchUnits" placeholder="🔍 Buscar unidades... (ex: metro, psi, celsius)" 
+               class="w-full px-4 py-3 rounded-xl glass border border-white/10 bg-transparent text-white placeholder-gray-500 input-glow focus:outline-none focus:border-cyan-400/50 transition-all">
+        <div id="searchResults" class="absolute top-full left-0 right-0 mt-2 glass rounded-xl overflow-hidden hidden z-30 max-h-64 overflow-y-auto scrollbar-thin"></div>
+      </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="flex flex-wrap gap-2 justify-center mb-8" id="categoriaTabs">
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400 tab-active" data-categoria="comprimento">
+        📏 Comprimento
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="area">
+        📐 Área
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="volume">
+        📦 Volume
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="massa">
+        ⚖️ Massa
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="pressao">
+        🔵 Pressão
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="forca">
+        💪 Força
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="momento">
+        🔄 Momento
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="tensao">
+        🔧 Tensão
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="temperatura">
+        🌡️ Temperatura
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="velocidade">
+        🚀 Velocidade
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="energia">
+        ⚡ Energia
+      </button>
+      <button class="categoria-tab px-4 py-2 rounded-lg glass border border-white/10 text-gray-300 font-medium transition-all hover:border-cyan-400/50 hover:text-cyan-400" data-categoria="potencia">
+        🔌 Potência
+      </button>
+    </div>
+
+    <!-- Main Converter -->
+    <section class="glass rounded-2xl p-6 mb-8 neon-glow">
+      <div class="flex items-center justify-between mb-6">
+        <h2 id="categoriaTitulo" class="text-2xl font-bold neon-text flex items-center gap-2">
+          📏 Comprimento
+        </h2>
+        <button id="btnFavoritarConversao" class="favorite-star text-2xl text-gray-500" title="Adicionar aos favoritos">
+          ☆
+        </button>
+      </div>
+      
+      <!-- Precision Control -->
+      <div class="flex items-center gap-4 mb-6 text-sm">
+        <span class="text-gray-400">Precisão:</span>
+        <input type="range" id="precisionSlider" min="2" max="12" value="6" class="precision-slider w-32 appearance-none bg-transparent cursor-pointer">
+        <span id="precisionValue" class="text-cyan-400 mono">6 casas</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 items-center conversor-grid">
+        <!-- Input Origin -->
+        <div class="glass rounded-xl p-5 border-2 border-cyan-400/30 hover:border-cyan-400/50 transition-all">
+          <label class="block text-sm text-gray-400 mb-2">De:</label>
+          <input type="number" id="valorOrigem" value="1" step="any" 
+                 class="w-full bg-transparent text-3xl font-bold text-cyan-400 text-center outline-none mono input-glow rounded-lg p-2">
+          <select id="unidadeOrigem" class="w-full mt-3 bg-gray-900/80 border border-white/10 rounded-lg px-3 py-2 text-white cursor-pointer focus:border-cyan-400/50 outline-none transition-all">
+          </select>
+        </div>
+
+        <!-- Swap Button -->
+        <div class="swap-btn-container flex justify-center">
+          <button id="btnSwap" class="swap-btn w-14 h-14 rounded-full glass border-2 border-cyan-400 text-cyan-400 text-2xl font-bold hover:bg-cyan-400 hover:text-black transition-all duration-300 hover:rotate-180 flex items-center justify-center" title="Inverter (Tecla: S)">
+            ⇄
+          </button>
+        </div>
+
+        <!-- Output Destination -->
+        <div class="glass rounded-xl p-5 border-2 border-purple-400/30 hover:border-purple-400/50 transition-all">
+          <label class="block text-sm text-gray-400 mb-2">Para:</label>
+          <input type="text" id="valorDestino" readonly 
+                 class="w-full bg-transparent text-3xl font-bold text-purple-400 text-center outline-none mono p-2" value="0">
+          <select id="unidadeDestino" class="w-full mt-3 bg-gray-900/80 border border-white/10 rounded-lg px-3 py-2 text-white cursor-pointer focus:border-purple-400/50 outline-none transition-all">
+          </select>
+        </div>
+      </div>
+
+      <!-- Formula Display -->
+      <div id="formulaDisplay" class="mt-6 text-center">
+        <div class="inline-block glass rounded-lg px-4 py-2">
+          <span class="text-gray-400">Fórmula: </span>
+          <span id="formulaText" class="mono text-cyan-400">1 m = 100 cm</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap justify-center gap-3 mt-6">
+        <button id="btnCopiar" class="px-5 py-2.5 rounded-lg glass border border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10 transition-all flex items-center gap-2">
+          📋 Copiar
+        </button>
+        <button id="btnLimpar" class="px-5 py-2.5 rounded-lg glass border border-white/20 text-gray-300 hover:bg-white/5 transition-all flex items-center gap-2">
+          🗑️ Limpar
+        </button>
+        <button id="btnCompare" class="px-5 py-2.5 rounded-lg glass border border-purple-400/50 text-purple-400 hover:bg-purple-400/10 transition-all flex items-center gap-2">
+          📊 Comparar Todas
+        </button>
+      </div>
+    </section>
+
+    <!-- Comparison Table (Hidden by default) -->
+    <section id="comparisonSection" class="glass rounded-2xl p-6 mb-8 hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          📊 Comparação de Unidades
+        </h2>
+        <button id="btnCloseComparison" class="text-gray-400 hover:text-white transition-all">✕</button>
+      </div>
+      <div class="overflow-x-auto scrollbar-thin">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-white/10">
+              <th class="text-left py-3 px-4 text-gray-400 font-medium">Unidade</th>
+              <th class="text-left py-3 px-4 text-gray-400 font-medium">Símbolo</th>
+              <th class="text-right py-3 px-4 text-gray-400 font-medium">Valor</th>
+              <th class="text-center py-3 px-4 text-gray-400 font-medium">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Quick Conversions -->
+    <section class="glass rounded-2xl p-6 mb-8">
+      <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+        ⚡ Conversões Rápidas
+      </h2>
+      <div id="conversoesRapidas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- Favorites Section -->
+    <section id="favoritosSection" class="glass rounded-2xl p-6 mb-8 hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          ⭐ Conversões Favoritas
+        </h2>
+        <button id="btnClearFavoritos" class="text-sm text-red-400 hover:text-red-300 transition-all">Limpar Todos</button>
+      </div>
+      <div id="favoritosList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- History -->
+    <section class="glass rounded-2xl p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          📜 Histórico Recente
+        </h2>
+        <button id="btnLimparHistorico" class="text-sm text-red-400 hover:text-red-300 transition-all">Limpar</button>
+      </div>
+      <div id="historico" class="space-y-2 max-h-64 overflow-y-auto scrollbar-thin"></div>
+    </section>
+
+    <!-- Reference Table -->
+    <section class="glass rounded-2xl p-6 mb-8">
+      <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+        📋 Tabela de Referência
+      </h2>
+      <div class="overflow-x-auto scrollbar-thin">
+        <table class="w-full" id="tabelaReferencia">
+          <thead>
+            <tr class="border-b border-white/10">
+              <th class="text-left py-3 px-4 text-gray-400 font-medium">Unidade</th>
+              <th class="text-left py-3 px-4 text-gray-400 font-medium">Símbolo</th>
+              <th class="text-left py-3 px-4 text-gray-400 font-medium">Equivalência</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Notes Section -->
+    <section class="glass rounded-2xl p-6">
+      <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+        📝 Observações Importantes
+      </h2>
+      <pre id="observacoes" class="mono text-sm text-gray-300 whitespace-pre-wrap"></pre>
+    </section>
+  </main>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div id="keyboardModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass rounded-2xl p-6 max-w-md w-full">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold text-white">⌨️ Atalhos de Teclado</h3>
+        <button id="btnCloseKeyboard" class="text-gray-400 hover:text-white text-2xl">×</button>
+      </div>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center py-2 border-b border-white/10">
+          <span class="text-gray-300">Inverter unidades</span>
+          <kbd class="px-3 py-1 rounded bg-gray-800 text-cyan-400 mono text-sm">S</kbd>
+        </div>
+        <div class="flex justify-between items-center py-2 border-b border-white/10">
+          <span class="text-gray-300">Copiar resultado</span>
+          <kbd class="px-3 py-1 rounded bg-gray-800 text-cyan-400 mono text-sm">C</kbd>
+        </div>
+        <div class="flex justify-between items-center py-2 border-b border-white/10">
+          <span class="text-gray-300">Limpar campos</span>
+          <kbd class="px-3 py-1 rounded bg-gray-800 text-cyan-400 mono text-sm">L</kbd>
+        </div>
+        <div class="flex justify-between items-center py-2 border-b border-white/10">
+          <span class="text-gray-300">Comparar todas</span>
+          <kbd class="px-3 py-1 rounded bg-gray-800 text-cyan-400 mono text-sm">T</kbd>
+        </div>
+        <div class="flex justify-between items-center py-2 border-b border-white/10">
+          <span class="text-gray-300">Focar no input</span>
+          <kbd class="px-3 py-1 rounded bg-gray-800 text-cyan-400 mono text-sm">F</kbd>
+        </div>
+        <div class="flex justify-between items-center py-2">
+          <span class="text-gray-300">Navegar categorias</span>
+          <div class="flex gap-1">
+            <kbd class="px-3 py-1 rounded bg-gray-800 text-cyan-400 mono text-sm">←</kbd>
+            <kbd class="px-3 py-1 rounded bg-gray-800 text-cyan-400 mono text-sm">→</kbd>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="glass border-t border-white/10 mt-8 py-6">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p class="text-gray-400">
+        &copy; <span id="ano"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a> – Ferramentas de Engenharia
+      </p>
+      <p class="text-gray-500 text-sm mt-2">
+        Desenvolvido com ❤️ para engenheiros
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // ==================== DATA ====================
+    const unidades = {
+      comprimento: {
+        nome: "Comprimento",
+        icone: "📏",
+        base: "m",
+        unidades: {
+          "km": { nome: "Quilômetro", fator: 1000, simbolo: "km" },
+          "hm": { nome: "Hectômetro", fator: 100, simbolo: "hm" },
+          "dam": { nome: "Decâmetro", fator: 10, simbolo: "dam" },
+          "m": { nome: "Metro", fator: 1, simbolo: "m" },
+          "dm": { nome: "Decímetro", fator: 0.1, simbolo: "dm" },
+          "cm": { nome: "Centímetro", fator: 0.01, simbolo: "cm" },
+          "mm": { nome: "Milímetro", fator: 0.001, simbolo: "mm" },
+          "µm": { nome: "Micrômetro", fator: 0.000001, simbolo: "µm" },
+          "nm": { nome: "Nanômetro", fator: 0.000000001, simbolo: "nm" },
+          "in": { nome: "Polegada", fator: 0.0254, simbolo: "in" },
+          "ft": { nome: "Pé", fator: 0.3048, simbolo: "ft" },
+          "yd": { nome: "Jarda", fator: 0.9144, simbolo: "yd" },
+          "mi": { nome: "Milha", fator: 1609.34, simbolo: "mi" },
+          "nmi": { nome: "Milha Náutica", fator: 1852, simbolo: "nmi" }
+        }
+      },
+      area: {
+        nome: "Área",
+        icone: "📐",
+        base: "m²",
+        unidades: {
+          "km²": { nome: "Quilômetro quadrado", fator: 1000000, simbolo: "km²" },
+          "ha": { nome: "Hectare", fator: 10000, simbolo: "ha" },
+          "m²": { nome: "Metro quadrado", fator: 1, simbolo: "m²" },
+          "dm²": { nome: "Decímetro quadrado", fator: 0.01, simbolo: "dm²" },
+          "cm²": { nome: "Centímetro quadrado", fator: 0.0001, simbolo: "cm²" },
+          "mm²": { nome: "Milímetro quadrado", fator: 0.000001, simbolo: "mm²" },
+          "in²": { nome: "Polegada quadrada", fator: 0.00064516, simbolo: "in²" },
+          "ft²": { nome: "Pé quadrado", fator: 0.092903, simbolo: "ft²" },
+          "yd²": { nome: "Jarda quadrada", fator: 0.836127, simbolo: "yd²" },
+          "acre": { nome: "Acre", fator: 4046.86, simbolo: "acre" },
+          "alq": { nome: "Alqueire Paulista", fator: 24200, simbolo: "alq" }
+        }
+      },
+      volume: {
+        nome: "Volume",
+        icone: "📦",
+        base: "m³",
+        unidades: {
+          "m³": { nome: "Metro cúbico", fator: 1, simbolo: "m³" },
+          "dm³": { nome: "Decímetro cúbico", fator: 0.001, simbolo: "dm³" },
+          "cm³": { nome: "Centímetro cúbico", fator: 0.000001, simbolo: "cm³" },
+          "mm³": { nome: "Milímetro cúbico", fator: 0.000000001, simbolo: "mm³" },
+          "L": { nome: "Litro", fator: 0.001, simbolo: "L" },
+          "mL": { nome: "Mililitro", fator: 0.000001, simbolo: "mL" },
+          "gal": { nome: "Galão (US)", fator: 0.00378541, simbolo: "gal" },
+          "qt": { nome: "Quarto (US)", fator: 0.000946353, simbolo: "qt" },
+          "pt": { nome: "Pinta (US)", fator: 0.000473176, simbolo: "pt" },
+          "in³": { nome: "Polegada cúbica", fator: 0.0000163871, simbolo: "in³" },
+          "ft³": { nome: "Pé cúbico", fator: 0.0283168, simbolo: "ft³" },
+          "yd³": { nome: "Jarda cúbica", fator: 0.764555, simbolo: "yd³" },
+          "bbl": { nome: "Barril (petróleo)", fator: 0.158987, simbolo: "bbl" }
+        }
+      },
+      massa: {
+        nome: "Massa",
+        icone: "⚖️",
+        base: "kg",
+        unidades: {
+          "t": { nome: "Tonelada métrica", fator: 1000, simbolo: "t" },
+          "kg": { nome: "Quilograma", fator: 1, simbolo: "kg" },
+          "hg": { nome: "Hectograma", fator: 0.1, simbolo: "hg" },
+          "dag": { nome: "Decagrama", fator: 0.01, simbolo: "dag" },
+          "g": { nome: "Grama", fator: 0.001, simbolo: "g" },
+          "dg": { nome: "Decigrama", fator: 0.0001, simbolo: "dg" },
+          "cg": { nome: "Centigrama", fator: 0.00001, simbolo: "cg" },
+          "mg": { nome: "Miligrama", fator: 0.000001, simbolo: "mg" },
+          "µg": { nome: "Micrograma", fator: 0.000000001, simbolo: "µg" },
+          "lb": { nome: "Libra", fator: 0.453592, simbolo: "lb" },
+          "oz": { nome: "Onça", fator: 0.0283495, simbolo: "oz" },
+          "ton": { nome: "Tonelada (US)", fator: 907.185, simbolo: "ton" },
+          "st": { nome: "Stone", fator: 6.35029, simbolo: "st" }
+        }
+      },
+      pressao: {
+        nome: "Pressão",
+        icone: "🔵",
+        base: "Pa",
+        unidades: {
+          "GPa": { nome: "Gigapascal", fator: 1000000000, simbolo: "GPa" },
+          "MPa": { nome: "Megapascal", fator: 1000000, simbolo: "MPa" },
+          "kPa": { nome: "Quilopascal", fator: 1000, simbolo: "kPa" },
+          "hPa": { nome: "Hectopascal", fator: 100, simbolo: "hPa" },
+          "Pa": { nome: "Pascal", fator: 1, simbolo: "Pa" },
+          "bar": { nome: "Bar", fator: 100000, simbolo: "bar" },
+          "mbar": { nome: "Milibar", fator: 100, simbolo: "mbar" },
+          "atm": { nome: "Atmosfera", fator: 101325, simbolo: "atm" },
+          "psi": { nome: "PSI", fator: 6894.76, simbolo: "psi" },
+          "ksi": { nome: "KSI", fator: 6894760, simbolo: "ksi" },
+          "kgf/cm²": { nome: "kgf/cm²", fator: 98066.5, simbolo: "kgf/cm²" },
+          "mmHg": { nome: "mmHg (Torr)", fator: 133.322, simbolo: "mmHg" },
+          "inHg": { nome: "inHg", fator: 3386.39, simbolo: "inHg" },
+          "mca": { nome: "Metro coluna d'água", fator: 9806.65, simbolo: "mca" }
+        }
+      },
+      forca: {
+        nome: "Força",
+        icone: "💪",
+        base: "N",
+        unidades: {
+          "MN": { nome: "Meganewton", fator: 1000000, simbolo: "MN" },
+          "kN": { nome: "Quilonewton", fator: 1000, simbolo: "kN" },
+          "N": { nome: "Newton", fator: 1, simbolo: "N" },
+          "daN": { nome: "Decanewton", fator: 10, simbolo: "daN" },
+          "mN": { nome: "Milinewton", fator: 0.001, simbolo: "mN" },
+          "kgf": { nome: "Quilograma-força", fator: 9.80665, simbolo: "kgf" },
+          "gf": { nome: "Grama-força", fator: 0.00980665, simbolo: "gf" },
+          "tf": { nome: "Tonelada-força", fator: 9806.65, simbolo: "tf" },
+          "lbf": { nome: "Libra-força", fator: 4.44822, simbolo: "lbf" },
+          "kip": { nome: "Kip (1000 lbf)", fator: 4448.22, simbolo: "kip" },
+          "dyn": { nome: "Dina", fator: 0.00001, simbolo: "dyn" }
+        }
+      },
+      momento: {
+        nome: "Momento / Torque",
+        icone: "🔄",
+        base: "N·m",
+        unidades: {
+          "MN·m": { nome: "Meganewton-metro", fator: 1000000, simbolo: "MN·m" },
+          "kN·m": { nome: "Quilonewton-metro", fator: 1000, simbolo: "kN·m" },
+          "N·m": { nome: "Newton-metro", fator: 1, simbolo: "N·m" },
+          "N·cm": { nome: "Newton-centímetro", fator: 0.01, simbolo: "N·cm" },
+          "N·mm": { nome: "Newton-milímetro", fator: 0.001, simbolo: "N·mm" },
+          "kgf·m": { nome: "Kgf-metro", fator: 9.80665, simbolo: "kgf·m" },
+          "kgf·cm": { nome: "Kgf-centímetro", fator: 0.0980665, simbolo: "kgf·cm" },
+          "tf·m": { nome: "Tf-metro", fator: 9806.65, simbolo: "tf·m" },
+          "lbf·ft": { nome: "Libra-pé", fator: 1.35582, simbolo: "lbf·ft" },
+          "lbf·in": { nome: "Libra-polegada", fator: 0.112985, simbolo: "lbf·in" },
+          "kip·ft": { nome: "Kip-pé", fator: 1355.82, simbolo: "kip·ft" }
+        }
+      },
+      tensao: {
+        nome: "Tensão (Mecânica)",
+        icone: "🔧",
+        base: "MPa",
+        unidades: {
+          "GPa": { nome: "Gigapascal", fator: 1000, simbolo: "GPa" },
+          "MPa": { nome: "Megapascal", fator: 1, simbolo: "MPa" },
+          "kPa": { nome: "Quilopascal", fator: 0.001, simbolo: "kPa" },
+          "Pa": { nome: "Pascal", fator: 0.000001, simbolo: "Pa" },
+          "N/mm²": { nome: "N/mm²", fator: 1, simbolo: "N/mm²" },
+          "N/m²": { nome: "N/m²", fator: 0.000001, simbolo: "N/m²" },
+          "kN/m²": { nome: "kN/m²", fator: 0.001, simbolo: "kN/m²" },
+          "kgf/cm²": { nome: "kgf/cm²", fator: 0.0980665, simbolo: "kgf/cm²" },
+          "kgf/mm²": { nome: "kgf/mm²", fator: 9.80665, simbolo: "kgf/mm²" },
+          "tf/m²": { nome: "tf/m²", fator: 0.00980665, simbolo: "tf/m²" },
+          "psi": { nome: "PSI", fator: 0.00689476, simbolo: "psi" },
+          "ksi": { nome: "KSI", fator: 6.89476, simbolo: "ksi" }
+        }
+      },
+      temperatura: {
+        nome: "Temperatura",
+        icone: "🌡️",
+        base: "°C",
+        especial: true,
+        unidades: {
+          "°C": { nome: "Celsius", simbolo: "°C" },
+          "°F": { nome: "Fahrenheit", simbolo: "°F" },
+          "K": { nome: "Kelvin", simbolo: "K" },
+          "°R": { nome: "Rankine", simbolo: "°R" }
+        }
+      },
+      velocidade: {
+        nome: "Velocidade",
+        icone: "🚀",
+        base: "m/s",
+        unidades: {
+          "m/s": { nome: "Metro por segundo", fator: 1, simbolo: "m/s" },
+          "km/h": { nome: "Quilômetro por hora", fator: 0.277778, simbolo: "km/h" },
+          "km/s": { nome: "Quilômetro por segundo", fator: 1000, simbolo: "km/s" },
+          "mph": { nome: "Milha por hora", fator: 0.44704, simbolo: "mph" },
+          "ft/s": { nome: "Pé por segundo", fator: 0.3048, simbolo: "ft/s" },
+          "kn": { nome: "Nó (knot)", fator: 0.514444, simbolo: "kn" },
+          "mach": { nome: "Mach", fator: 343, simbolo: "Ma" },
+          "c": { nome: "Velocidade da luz", fator: 299792458, simbolo: "c" }
+        }
+      },
+      energia: {
+        nome: "Energia",
+        icone: "⚡",
+        base: "J",
+        unidades: {
+          "MJ": { nome: "Megajoule", fator: 1000000, simbolo: "MJ" },
+          "kJ": { nome: "Quilojoule", fator: 1000, simbolo: "kJ" },
+          "J": { nome: "Joule", fator: 1, simbolo: "J" },
+          "mJ": { nome: "Milijoule", fator: 0.001, simbolo: "mJ" },
+          "Wh": { nome: "Watt-hora", fator: 3600, simbolo: "Wh" },
+          "kWh": { nome: "Quilowatt-hora", fator: 3600000, simbolo: "kWh" },
+          "MWh": { nome: "Megawatt-hora", fator: 3600000000, simbolo: "MWh" },
+          "cal": { nome: "Caloria", fator: 4.184, simbolo: "cal" },
+          "kcal": { nome: "Quilocaloria", fator: 4184, simbolo: "kcal" },
+          "BTU": { nome: "BTU", fator: 1055.06, simbolo: "BTU" },
+          "eV": { nome: "Elétron-volt", fator: 1.60218e-19, simbolo: "eV" },
+          "erg": { nome: "Erg", fator: 0.0000001, simbolo: "erg" }
+        }
+      },
+      potencia: {
+        nome: "Potência",
+        icone: "🔌",
+        base: "W",
+        unidades: {
+          "GW": { nome: "Gigawatt", fator: 1000000000, simbolo: "GW" },
+          "MW": { nome: "Megawatt", fator: 1000000, simbolo: "MW" },
+          "kW": { nome: "Quilowatt", fator: 1000, simbolo: "kW" },
+          "W": { nome: "Watt", fator: 1, simbolo: "W" },
+          "mW": { nome: "Miliwatt", fator: 0.001, simbolo: "mW" },
+          "hp": { nome: "Cavalo-vapor (mecânico)", fator: 745.7, simbolo: "hp" },
+          "cv": { nome: "Cavalo-vapor (métrico)", fator: 735.5, simbolo: "cv" },
+          "BTU/h": { nome: "BTU por hora", fator: 0.293071, simbolo: "BTU/h" },
+          "kcal/h": { nome: "Quilocaloria por hora", fator: 1.163, simbolo: "kcal/h" },
+          "ft·lbf/s": { nome: "Pé-libra por segundo", fator: 1.35582, simbolo: "ft·lbf/s" }
+        }
+      }
+    };
+
+    const conversoesRapidas = {
+      comprimento: [
+        { de: "m", para: "cm", valor: 1, desc: "1 m → cm" },
+        { de: "m", para: "mm", valor: 1, desc: "1 m → mm" },
+        { de: "cm", para: "in", valor: 1, desc: "1 cm → in" },
+        { de: "m", para: "ft", valor: 1, desc: "1 m → ft" },
+        { de: "in", para: "mm", valor: 1, desc: "1 in → mm" },
+        { de: "km", para: "mi", valor: 1, desc: "1 km → mi" }
+      ],
+      area: [
+        { de: "m²", para: "cm²", valor: 1, desc: "1 m² → cm²" },
+        { de: "ha", para: "m²", valor: 1, desc: "1 ha → m²" },
+        { de: "m²", para: "ft²", valor: 1, desc: "1 m² → ft²" },
+        { de: "km²", para: "ha", valor: 1, desc: "1 km² → ha" }
+      ],
+      volume: [
+        { de: "m³", para: "L", valor: 1, desc: "1 m³ → L" },
+        { de: "L", para: "mL", valor: 1, desc: "1 L → mL" },
+        { de: "m³", para: "ft³", valor: 1, desc: "1 m³ → ft³" },
+        { de: "gal", para: "L", valor: 1, desc: "1 gal → L" }
+      ],
+      massa: [
+        { de: "kg", para: "g", valor: 1, desc: "1 kg → g" },
+        { de: "t", para: "kg", valor: 1, desc: "1 t → kg" },
+        { de: "kg", para: "lb", valor: 1, desc: "1 kg → lb" },
+        { de: "lb", para: "kg", valor: 1, desc: "1 lb → kg" }
+      ],
+      pressao: [
+        { de: "MPa", para: "kgf/cm²", valor: 1, desc: "1 MPa → kgf/cm²" },
+        { de: "bar", para: "psi", valor: 1, desc: "1 bar → psi" },
+        { de: "atm", para: "kPa", valor: 1, desc: "1 atm → kPa" },
+        { de: "psi", para: "bar", valor: 1, desc: "1 psi → bar" }
+      ],
+      forca: [
+        { de: "kN", para: "kgf", valor: 1, desc: "1 kN → kgf" },
+        { de: "kgf", para: "N", valor: 1, desc: "1 kgf → N" },
+        { de: "tf", para: "kN", valor: 1, desc: "1 tf → kN" },
+        { de: "lbf", para: "N", valor: 1, desc: "1 lbf → N" }
+      ],
+      momento: [
+        { de: "kN·m", para: "kgf·m", valor: 1, desc: "1 kN·m → kgf·m" },
+        { de: "kgf·m", para: "N·m", valor: 1, desc: "1 kgf·m → N·m" },
+        { de: "tf·m", para: "kN·m", valor: 1, desc: "1 tf·m → kN·m" },
+        { de: "lbf·ft", para: "N·m", valor: 1, desc: "1 lbf·ft → N·m" }
+      ],
+      tensao: [
+        { de: "MPa", para: "kgf/cm²", valor: 1, desc: "1 MPa → kgf/cm²" },
+        { de: "MPa", para: "psi", valor: 1, desc: "1 MPa → psi" },
+        { de: "kgf/cm²", para: "MPa", valor: 1, desc: "1 kgf/cm² → MPa" },
+        { de: "ksi", para: "MPa", valor: 1, desc: "1 ksi → MPa" }
+      ],
+      temperatura: [
+        { de: "°C", para: "°F", valor: 0, desc: "0°C → °F" },
+        { de: "°C", para: "K", valor: 0, desc: "0°C → K" },
+        { de: "°C", para: "°F", valor: 100, desc: "100°C → °F" },
+        { de: "°F", para: "°C", valor: 32, desc: "32°F → °C" }
+      ],
+      velocidade: [
+        { de: "km/h", para: "m/s", valor: 100, desc: "100 km/h → m/s" },
+        { de: "mph", para: "km/h", valor: 60, desc: "60 mph → km/h" },
+        { de: "m/s", para: "km/h", valor: 1, desc: "1 m/s → km/h" },
+        { de: "kn", para: "km/h", valor: 1, desc: "1 nó → km/h" }
+      ],
+      energia: [
+        { de: "kWh", para: "J", valor: 1, desc: "1 kWh → J" },
+        { de: "kcal", para: "J", valor: 1, desc: "1 kcal → J" },
+        { de: "BTU", para: "J", valor: 1, desc: "1 BTU → J" },
+        { de: "J", para: "cal", valor: 1, desc: "1 J → cal" }
+      ],
+      potencia: [
+        { de: "hp", para: "kW", valor: 1, desc: "1 hp → kW" },
+        { de: "cv", para: "kW", valor: 1, desc: "1 cv → kW" },
+        { de: "kW", para: "W", valor: 1, desc: "1 kW → W" },
+        { de: "hp", para: "cv", valor: 1, desc: "1 hp → cv" }
+      ]
+    };
+
+    const observacoes = {
+      comprimento: `📏 COMPRIMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Metro (m)
+• 1 polegada = 2.54 cm (definição exata)
+• 1 pé = 12 polegadas = 30.48 cm
+• 1 jarda = 3 pés = 0.9144 m
+• 1 milha = 1609.344 m
+
+💡 Dicas para Engenharia:
+• Plantas baixas: geralmente em metros ou centímetros
+• Perfis de aço: polegadas (padrão americano)
+• Vergalhões: milímetros
+• Cotas de nível: metros (3 casas decimais)`,
+
+      area: `📐 ÁREA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Metro quadrado (m²)
+• 1 hectare = 10.000 m²
+• 1 alqueire paulista = 24.200 m²
+• Campo de futebol ≈ 7.000 m² (0.7 ha)
+
+💡 Dicas para Engenharia:
+• Áreas construídas: m²
+• Terrenos urbanos: m²
+• Propriedades rurais: hectares ou alqueires
+• Países: km²`,
+
+      volume: `📦 VOLUME
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Metro cúbico (m³)
+• 1 m³ = 1.000 litros (definição exata)
+• 1 litro = 1 dm³
+• 1 galão (US) ≈ 3.785 litros
+
+💡 Dicas para Engenharia:
+• Concreto: m³ (ex: 15 m³ de concreto)
+• Reservatórios: litros ou m³
+• Aterros: m³
+• Consumo de água: litros`,
+
+      massa: `⚖️ MASSA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Quilograma (kg)
+• 1 tonelada = 1.000 kg
+• Peso ≠ Massa (Peso = Massa × gravidade)
+• g = 9.80665 m/s² (valor padrão)
+
+💡 Dicas para Engenharia:
+• Cargas estruturais: kg ou kN
+• Materiais a granel: toneladas
+• Armaduras: kg/m³
+• Aço: kg/m ou kg/peça`,
+
+      pressao: `🔵 PRESSÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Pascal (Pa)
+• 1 MPa = 10.2 kgf/cm² ≈ 145 psi
+• 1 bar ≈ 1 atm ≈ 100 kPa
+• 1 atm = 101.325 kPa (definição exata)
+
+💡 Dicas para Engenharia:
+• fck concreto: MPa (ex: C30 = 30 MPa)
+• Pressão hidráulica: bar ou kgf/cm²
+• Pressão atmosférica: hPa (meteorologia)
+• Vácuo: mmHg ou mbar`,
+
+      forca: `💪 FORÇA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Newton (N)
+• 1 kgf = 9.80665 N (definição exata)
+• 1 tf = 9.80665 kN
+• Peso de 1 kg na Terra ≈ 9.81 N
+
+💡 Dicas para Engenharia:
+• Cargas pontuais: kN
+• Reações de apoio: kN
+• Protensão: kN ou tf
+• Normas brasileiras: preferem kN`,
+
+      momento: `🔄 MOMENTO / TORQUE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Newton-metro (N·m)
+• 1 kgf·m = 9.80665 N·m
+• Momento = Força × Distância
+• Sentido: horário (-) ou anti-horário (+)
+
+💡 Dicas para Engenharia:
+• Momentos fletores: kN·m
+• Momentos torsores: kN·m
+• Torque de parafusos: N·m
+• Dimensionamento: verificar sinais!`,
+
+      tensao: `🔧 TENSÃO (MECÂNICA)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade padrão: MPa = N/mm²
+• Tensão = Força / Área
+• 1 MPa ≈ 10.2 kgf/cm²
+
+💡 Valores típicos:
+• Concreto fck: 20-50 MPa
+• Aço CA-50: fy = 500 MPa
+• Aço CA-60: fy = 600 MPa
+• Madeira (flexão): 6-12 MPa
+• Solo (admissível): 0.1-0.5 MPa`,
+
+      temperatura: `🌡️ TEMPERATURA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Kelvin (K)
+• Engenharia civil: Celsius (°C)
+• °F = (°C × 9/5) + 32
+• K = °C + 273.15
+
+💡 Aplicações:
+• Dilatação térmica de estruturas
+• Conforto térmico (18-26°C)
+• Concretagem: evitar acima de 35°C
+• Ponto de fusão do aço: ~1500°C`,
+
+      velocidade: `🚀 VELOCIDADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: m/s
+• 1 m/s = 3.6 km/h
+• Velocidade do som: ~343 m/s (20°C)
+• 1 nó = 1 milha náutica/hora
+
+💡 Aplicações:
+• Velocidade do vento: m/s ou km/h
+• Escoamento de fluidos: m/s
+• Tráfego: km/h
+• Navegação: nós`,
+
+      energia: `⚡ ENERGIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Joule (J)
+• 1 kWh = 3.600.000 J
+• 1 cal = 4.184 J (definição)
+• 1 BTU ≈ 1055 J
+
+💡 Aplicações:
+• Consumo elétrico: kWh
+• Energia térmica: kcal ou BTU
+• Energia mecânica: J ou kJ
+• Poder calorífico: kJ/kg`,
+
+      potencia: `🔌 POTÊNCIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Unidade base SI: Watt (W)
+• 1 cv = 735.5 W (métrico)
+• 1 hp = 745.7 W (mecânico)
+• Potência = Energia / Tempo
+
+💡 Aplicações:
+• Motores elétricos: kW ou cv
+• Ar-condicionado: BTU/h
+• Geradores: kW ou MVA
+• Bombas hidráulicas: cv`
+    };
+
+    // ==================== STATE ====================
+    let categoriaAtual = "comprimento";
+    let precision = 6;
+    let historico = JSON.parse(localStorage.getItem("conversor_historico") || "[]");
+    let favoritos = JSON.parse(localStorage.getItem("conversor_favoritos") || "[]");
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function showToast(message, type = "success") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      const colors = {
+        success: "border-green-500 bg-green-500/20",
+        error: "border-red-500 bg-red-500/20",
+        info: "border-cyan-500 bg-cyan-500/20"
+      };
+      toast.className = `toast glass ${colors[type]} border-l-4 px-4 py-3 rounded-lg shadow-lg`;
+      toast.innerHTML = `<span class="text-white">${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function formatarNumero(num) {
+      if (num === 0) return "0";
+      if (isNaN(num) || !isFinite(num)) return "Erro";
+      
+      const abs = Math.abs(num);
+      if (abs < Math.pow(10, -precision) && abs !== 0) {
+        return num.toExponential(precision);
+      } else if (abs >= Math.pow(10, precision + 3)) {
+        return num.toExponential(precision);
+      } else {
+        const fixed = parseFloat(num.toFixed(precision));
+        return fixed.toLocaleString("pt-BR", { maximumFractionDigits: precision });
+      }
+    }
+
+    // ==================== CONVERSION FUNCTIONS ====================
+    function converterTemperatura(valor, de, para) {
+      if (de === para) return valor;
+      
+      // Convert to Celsius first
+      let celsius;
+      switch(de) {
+        case "°C": celsius = valor; break;
+        case "°F": celsius = (valor - 32) * (5/9); break;
+        case "K": celsius = valor - 273.15; break;
+        case "°R": celsius = (valor - 491.67) * (5/9); break;
+      }
+      
+      // Convert from Celsius to target
+      switch(para) {
+        case "°C": return celsius;
+        case "°F": return (celsius * 9/5) + 32;
+        case "K": return celsius + 273.15;
+        case "°R": return (celsius + 273.15) * (9/5);
+      }
+    }
+
+    function converter(valor, de, para, categoria) {
+      const cat = unidades[categoria];
+      if (cat.especial && categoria === "temperatura") {
+        return converterTemperatura(valor, de, para);
+      }
+      const valorBase = valor * cat.unidades[de].fator;
+      return valorBase / cat.unidades[para].fator;
+    }
+
+    // ==================== UI FUNCTIONS ====================
+    function carregarCategoria(categoria) {
+      categoriaAtual = categoria;
+      const cat = unidades[categoria];
+      
+      document.getElementById("categoriaTitulo").innerHTML = `${cat.icone} ${cat.nome}`;
+      
+      const selectOrigem = document.getElementById("unidadeOrigem");
+      const selectDestino = document.getElementById("unidadeDestino");
+      
+      selectOrigem.innerHTML = "";
+      selectDestino.innerHTML = "";
+      
+      Object.keys(cat.unidades).forEach((key, index) => {
+        const un = cat.unidades[key];
+        const optOrigem = document.createElement("option");
+        optOrigem.value = key;
+        optOrigem.textContent = `${un.nome} (${un.simbolo})`;
+        selectOrigem.appendChild(optOrigem);
+        
+        const optDestino = optOrigem.cloneNode(true);
+        selectDestino.appendChild(optDestino);
+      });
+      
+      if (selectDestino.options.length > 1) {
+        selectDestino.selectedIndex = 1;
+      }
+      
+      document.getElementById("valorOrigem").value = "1";
+      
+      // Update tabs
+      document.querySelectorAll(".categoria-tab").forEach(tab => {
+        tab.classList.remove("tab-active");
+        if (tab.dataset.categoria === categoria) {
+          tab.classList.add("tab-active");
+        }
+      });
+      
+      carregarConversoesRapidas();
+      carregarTabelaReferencia();
+      carregarObservacoes();
+      realizarConversao();
+      atualizarBotaoFavorito();
+    }
+
+    function realizarConversao() {
+      const valor = parseFloat(document.getElementById("valorOrigem").value) || 0;
+      const origem = document.getElementById("unidadeOrigem").value;
+      const destino = document.getElementById("unidadeDestino").value;
+      
+      if (!origem || !destino) return;
+      
+      const resultado = converter(valor, origem, destino, categoriaAtual);
+      document.getElementById("valorDestino").value = formatarNumero(resultado);
+      
+      // Update formula display
+      const cat = unidades[categoriaAtual];
+      const origemSimbolo = cat.unidades[origem].simbolo;
+      const destinoSimbolo = cat.unidades[destino].simbolo;
+      document.getElementById("formulaText").textContent = 
+        `${formatarNumero(valor)} ${origemSimbolo} = ${formatarNumero(resultado)} ${destinoSimbolo}`;
+      
+      adicionarHistorico(valor, origem, resultado, destino);
+    }
+
+    function trocarUnidades() {
+      const origem = document.getElementById("unidadeOrigem");
+      const destino = document.getElementById("unidadeDestino");
+      const valorOrigem = document.getElementById("valorOrigem");
+      const valorDestino = document.getElementById("valorDestino");
+      
+      const tempIdx = origem.selectedIndex;
+      origem.selectedIndex = destino.selectedIndex;
+      destino.selectedIndex = tempIdx;
+      
+      // Use the result as new input
+      const resultValue = parseFloat(valorDestino.value.replace(/\./g, '').replace(',', '.')) || 0;
+      valorOrigem.value = resultValue;
+      
+      realizarConversao();
+    }
+
+    function carregarConversoesRapidas() {
+      const container = document.getElementById("conversoesRapidas");
+      const conversoes = conversoesRapidas[categoriaAtual] || [];
+      
+      container.innerHTML = conversoes.map(c => {
+        const resultado = converter(c.valor, c.de, c.para, categoriaAtual);
+        return `
+          <div class="glass rounded-xl p-4 cursor-pointer hover:border-cyan-400/50 border border-white/10 transition-all group" 
+               onclick="aplicarConversaoRapida('${c.de}', '${c.para}', ${c.valor})">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-cyan-400 font-semibold">${c.desc}</span>
+              <span class="text-gray-500 group-hover:text-cyan-400 transition-all">→</span>
+            </div>
+            <div class="mono text-gray-300 text-sm">
+              ${c.valor} ${c.de} = ${formatarNumero(resultado)} ${c.para}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function aplicarConversaoRapida(de, para, valor) {
+      document.getElementById("unidadeOrigem").value = de;
+      document.getElementById("unidadeDestino").value = para;
+      document.getElementById("valorOrigem").value = valor;
+      realizarConversao();
+      
+      // Scroll to converter
+      document.querySelector('.neon-glow').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function carregarTabelaReferencia() {
+      const tbody = document.querySelector("#tabelaReferencia tbody");
+      const cat = unidades[categoriaAtual];
+      
+      tbody.innerHTML = Object.keys(cat.unidades).map(key => {
+        const un = cat.unidades[key];
+        let equiv = "";
+        
+        if (!cat.especial) {
+          const fator = un.fator / cat.unidades[cat.base].fator;
+          equiv = `1 ${un.simbolo} = ${formatarNumero(fator)} ${cat.base}`;
+        } else if (categoriaAtual === "temperatura") {
+          const equivs = {
+            "°C": "Base de referência",
+            "°F": "°F = (°C × 9/5) + 32",
+            "K": "K = °C + 273.15",
+            "°R": "°R = (°C + 273.15) × 9/5"
+          };
+          equiv = equivs[key] || "";
+        }
+        
+        return `
+          <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
+            <td class="py-3 px-4 text-gray-300">${un.nome}</td>
+            <td class="py-3 px-4 mono text-cyan-400">${un.simbolo}</td>
+            <td class="py-3 px-4 mono text-gray-400">${equiv}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function carregarObservacoes() {
+      document.getElementById("observacoes").textContent = observacoes[categoriaAtual] || "";
+    }
+
+    function adicionarHistorico(valorOrig, unidOrig, valorDest, unidDest) {
+      const cat = unidades[categoriaAtual];
+      const item = {
+        categoria: categoriaAtual,
+        categoriaNome: cat.nome,
+        icone: cat.icone,
+        de: `${formatarNumero(valorOrig)} ${cat.unidades[unidOrig].simbolo}`,
+        para: `${formatarNumero(valorDest)} ${cat.unidades[unidDest].simbolo}`,
+        timestamp: Date.now()
+      };
+      
+      // Avoid duplicates
+      const isDuplicate = historico.length > 0 && 
+        historico[0].de === item.de && 
+        historico[0].para === item.para;
+      
+      if (!isDuplicate) {
+        historico.unshift(item);
+        historico = historico.slice(0, 20);
+        localStorage.setItem("conversor_historico", JSON.stringify(historico));
+        renderHistorico();
+      }
+    }
+
+    function renderHistorico() {
+      const container = document.getElementById("historico");
+      
+      if (historico.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <span class="text-4xl mb-2 block">📜</span>
+            Nenhuma conversão realizada ainda
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = historico.map((h, i) => `
+        <div class="glass rounded-lg px-4 py-3 flex items-center justify-between hover:border-cyan-400/30 border border-transparent transition-all cursor-pointer"
+             onclick="aplicarHistorico(${i})">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">${h.icone}</span>
+            <div>
+              <span class="text-gray-300">${h.de}</span>
+              <span class="text-gray-500 mx-2">→</span>
+              <span class="text-cyan-400 font-medium">${h.para}</span>
+            </div>
+          </div>
+          <span class="text-xs text-gray-500 hidden sm:block">${new Date(h.timestamp).toLocaleTimeString('pt-BR')}</span>
+        </div>
+      `).join('');
+    }
+
+    function aplicarHistorico(index) {
+      const h = historico[index];
+      if (h.categoria !== categoriaAtual) {
+        carregarCategoria(h.categoria);
+      }
+      showToast(`Conversão carregada: ${h.de} → ${h.para}`, "info");
+    }
+
+    function limparHistorico() {
+      if (!confirm("Limpar todo o histórico?")) return;
+      historico = [];
+      localStorage.removeItem("conversor_historico");
+      renderHistorico();
+      showToast("Histórico limpo!", "success");
+    }
+
+    function copiarResultado() {
+      const valor = document.getElementById("valorDestino").value;
+      const unidade = document.getElementById("unidadeDestino").selectedOptions[0].textContent;
+      const texto = `${valor} ${unidade.split('(')[1]?.replace(')', '') || unidade}`;
+      
+      navigator.clipboard.writeText(texto).then(() => {
+        showToast(`📋 Copiado: ${texto}`, "success");
+      });
+    }
+
+    function limpar() {
+      document.getElementById("valorOrigem").value = "1";
+      realizarConversao();
+    }
+
+    // ==================== COMPARISON ====================
+    function mostrarComparacao() {
+      const section = document.getElementById("comparisonSection");
+      const tbody = document.getElementById("comparisonBody");
+      const valor = parseFloat(document.getElementById("valorOrigem").value) || 1;
+      const origem = document.getElementById("unidadeOrigem").value;
+      const cat = unidades[categoriaAtual];
+      
+      tbody.innerHTML = Object.keys(cat.unidades).map(key => {
+        const un = cat.unidades[key];
+        const resultado = converter(valor, origem, key, categoriaAtual);
+        return `
+          <tr class="comparison-row border-b border-white/5">
+            <td class="py-3 px-4 text-gray-300">${un.nome}</td>
+            <td class="py-3 px-4 mono text-cyan-400">${un.simbolo}</td>
+            <td class="py-3 px-4 mono text-right text-purple-400 font-medium">${formatarNumero(resultado)}</td>
+            <td class="py-3 px-4 text-center">
+              <button onclick="copiarValor('${formatarNumero(resultado)} ${un.simbolo}')" 
+                      class="text-gray-400 hover:text-cyan-400 transition-all">📋</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      section.classList.remove("hidden");
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copiarValor(valor) {
+      navigator.clipboard.writeText(valor);
+      showToast(`📋 Copiado: ${valor}`, "success");
+    }
+
+    // ==================== FAVORITES ====================
+    function toggleFavorito() {
+      const origem = document.getElementById("unidadeOrigem").value;
+      const destino = document.getElementById("unidadeDestino").value;
+      const key = `${categoriaAtual}:${origem}:${destino}`;
+      
+      const index = favoritos.findIndex(f => f.key === key);
+      
+      if (index > -1) {
+        favoritos.splice(index, 1);
+        showToast("Removido dos favoritos", "info");
+      } else {
+        const cat = unidades[categoriaAtual];
+        favoritos.push({
+          key,
+          categoria: categoriaAtual,
+          icone: cat.icone,
+          nome: cat.nome,
+          origem,
+          destino,
+          origemNome: cat.unidades[origem].nome,
+          destinoNome: cat.unidades[destino].nome
+        });
+        showToast("⭐ Adicionado aos favoritos!", "success");
+      }
+      
+      localStorage.setItem("conversor_favoritos", JSON.stringify(favoritos));
+      atualizarBotaoFavorito();
+      renderFavoritos();
+    }
+
+    function atualizarBotaoFavorito() {
+      const origem = document.getElementById("unidadeOrigem").value;
+      const destino = document.getElementById("unidadeDestino").value;
+      const key = `${categoriaAtual}:${origem}:${destino}`;
+      const btn = document.getElementById("btnFavoritarConversao");
+      
+      const isFavorito = favoritos.some(f => f.key === key);
+      btn.textContent = isFavorito ? "★" : "☆";
+      btn.classList.toggle("active", isFavorito);
+    }
+
+    function renderFavoritos() {
+      const section = document.getElementById("favoritosSection");
+      const container = document.getElementById("favoritosList");
+      
+      if (favoritos.length === 0) {
+        section.classList.add("hidden");
+        return;
+      }
+      
+      section.classList.remove("hidden");
+      container.innerHTML = favoritos.map(f => `
+        <div class="glass rounded-xl p-4 cursor-pointer hover:border-cyan-400/50 border border-white/10 transition-all"
+             onclick="aplicarFavorito('${f.categoria}', '${f.origem}', '${f.destino}')">
+          <div class="flex items-center gap-2 mb-2">
+            <span>${f.icone}</span>
+            <span class="text-gray-400 text-sm">${f.nome}</span>
+          </div>
+          <div class="text-cyan-400 font-medium">
+            ${f.origemNome} → ${f.destinoNome}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function aplicarFavorito(categoria, origem, destino) {
+      if (categoria !== categoriaAtual) {
+        carregarCategoria(categoria);
+      }
+      document.getElementById("unidadeOrigem").value = origem;
+      document.getElementById("unidadeDestino").value = destino;
+      realizarConversao();
+      showToast("Favorito aplicado!", "info");
+    }
+
+    function limparFavoritos() {
+      if (!confirm("Limpar todos os favoritos?")) return;
+      favoritos = [];
+      localStorage.removeItem("conversor_favoritos");
+      renderFavoritos();
+      atualizarBotaoFavorito();
+      showToast("Favoritos limpos!", "success");
+    }
+
+    // ==================== SEARCH ====================
+    function setupSearch() {
+      const input = document.getElementById("searchUnits");
+      const results = document.getElementById("searchResults");
+      
+      input.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        if (query.length < 2) {
+          results.classList.add("hidden");
+          return;
+        }
+        
+        const matches = [];
+        
+        for (const [catKey, cat] of Object.entries(unidades)) {
+          for (const [unitKey, unit] of Object.entries(cat.unidades)) {
+            if (unit.nome.toLowerCase().includes(query) || 
+                unit.simbolo.toLowerCase().includes(query) ||
+                unitKey.toLowerCase().includes(query)) {
+              matches.push({
+                categoria: catKey,
+                categoriaNome: cat.nome,
+                icone: cat.icone,
+                unidade: unitKey,
+                nome: unit.nome,
+                simbolo: unit.simbolo
+              });
+            }
+          }
+        }
+        
+        if (matches.length === 0) {
+          results.innerHTML = `<div class="p-4 text-gray-500 text-center">Nenhum resultado encontrado</div>`;
+        } else {
+          results.innerHTML = matches.slice(0, 10).map(m => `
+            <div class="p-3 hover:bg-white/5 cursor-pointer border-b border-white/5 transition-all"
+                 onclick="selecionarBusca('${m.categoria}', '${m.unidade}')">
+              <div class="flex items-center gap-2">
+                <span>${m.icone}</span>
+                <span class="text-cyan-400">${m.nome}</span>
+                <span class="text-gray-500 mono text-sm">(${m.simbolo})</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">${m.categoriaNome}</div>
+            </div>
+          `).join('');
+        }
+        
+        results.classList.remove("hidden");
+      });
+      
+      // Close on click outside
+      document.addEventListener("click", (e) => {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+          results.classList.add("hidden");
+        }
+      });
+    }
+
+    function selecionarBusca(categoria, unidade) {
+      document.getElementById("searchResults").classList.add("hidden");
+      document.getElementById("searchUnits").value = "";
+      
+      carregarCategoria(categoria);
+      document.getElementById("unidadeOrigem").value = unidade;
+      realizarConversao();
+    }
+
+    // ==================== EXPORT ====================
+    function exportarHistorico() {
+      if (historico.length === 0) {
+        showToast("Nenhum histórico para exportar", "error");
+        return;
+      }
+      
+      const csv = "Categoria,De,Para,Data\n" + historico.map(h => 
+        `"${h.categoriaNome}","${h.de}","${h.para}","${new Date(h.timestamp).toLocaleString('pt-BR')}"`
+      ).join("\n");
+      
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `historico_conversoes_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      
+      showToast("📥 Histórico exportado!", "success");
+    }
+
+    // ==================== KEYBOARD SHORTCUTS ====================
+    function setupKeyboardShortcuts() {
+      document.addEventListener("keydown", (e) => {
+        // Ignore if typing in input
+        if (e.target.tagName === "INPUT" && e.target.type !== "range") return;
+        
+        switch(e.key.toLowerCase()) {
+          case 's':
+            e.preventDefault();
+            trocarUnidades();
+            break;
+          case 'c':
+            e.preventDefault();
+            copiarResultado();
+            break;
+          case 'l':
+            e.preventDefault();
+            limpar();
+            break;
+          case 't':
+            e.preventDefault();
+            mostrarComparacao();
+            break;
+          case 'f':
+            e.preventDefault();
+            document.getElementById("valorOrigem").focus();
+            break;
+          case 'arrowleft':
+            e.preventDefault();
+            navegarCategoria(-1);
+            break;
+          case 'arrowright':
+            e.preventDefault();
+            navegarCategoria(1);
+            break;
+        }
+      });
+    }
+
+    function navegarCategoria(direction) {
+      const categorias = Object.keys(unidades);
+      const currentIndex = categorias.indexOf(categoriaAtual);
+      const newIndex = (currentIndex + direction + categorias.length) % categorias.length;
+      carregarCategoria(categorias[newIndex]);
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    document.addEventListener("DOMContentLoaded", () => {
+      // Year
+      document.getElementById("ano").textContent = new Date().getFullYear();
+      
+      // Category tabs
+      document.querySelectorAll(".categoria-tab").forEach(tab => {
+        tab.addEventListener("click", () => carregarCategoria(tab.dataset.categoria));
+      });
+      
+      // Converter inputs
+      document.getElementById("valorOrigem").addEventListener("input", realizarConversao);
+      document.getElementById("unidadeOrigem").addEventListener("change", () => {
+        realizarConversao();
+        atualizarBotaoFavorito();
+      });
+      document.getElementById("unidadeDestino").addEventListener("change", () => {
+        realizarConversao();
+        atualizarBotaoFavorito();
+      });
+      
+      // Precision slider
+      document.getElementById("precisionSlider").addEventListener("input", (e) => {
+        precision = parseInt(e.target.value);
+        document.getElementById("precisionValue").textContent = `${precision} casas`;
+        realizarConversao();
+      });
+      
+      // Buttons
+      document.getElementById("btnSwap").addEventListener("click", trocarUnidades);
+      document.getElementById("btnCopiar").addEventListener("click", copiarResultado);
+      document.getElementById("btnLimpar").addEventListener("click", limpar);
+      document.getElementById("btnCompare").addEventListener("click", mostrarComparacao);
+      document.getElementById("btnCloseComparison").addEventListener("click", () => {
+        document.getElementById("comparisonSection").classList.add("hidden");
+      });
+      document.getElementById("btnLimparHistorico").addEventListener("click", limparHistorico);
+      document.getElementById("btnFavoritarConversao").addEventListener("click", toggleFavorito);
+      document.getElementById("btnFavoritos").addEventListener("click", () => {
+        const section = document.getElementById("favoritosSection");
+        section.classList.toggle("hidden");
+        if (!section.classList.contains("hidden")) {
+          section.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+      document.getElementById("btnClearFavoritos").addEventListener("click", limparFavoritos);
+      document.getElementById("btnExport").addEventListener("click", exportarHistorico);
+      
+      // Keyboard modal
+      document.getElementById("btnKeyboard").addEventListener("click", () => {
+        document.getElementById("keyboardModal").classList.remove("hidden");
+      });
+      document.getElementById("btnCloseKeyboard").addEventListener("click", () => {
+        document.getElementById("keyboardModal").classList.add("hidden");
+      });
+      document.getElementById("keyboardModal").addEventListener("click", (e) => {
+        if (e.target.id === "keyboardModal") {
+          document.getElementById("keyboardModal").classList.add("hidden");
+        }
+      });
+      
+      // Initialize
+      setupSearch();
+      setupKeyboardShortcuts();
+      carregarCategoria("comprimento");
+      renderHistorico();
+      renderFavoritos();
+    });
+  </script>
+</body>
+</html>
