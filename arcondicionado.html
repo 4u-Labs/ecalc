@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>❄️ Dimensionamento de Ar Condicionado | Cálculo de BTU</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0d1f35 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        /* Efeito de neve/gelo animado */
+        .ice-bg {
+            position: fixed;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0,200,255,0.2) 0%, rgba(0,200,255,0.05) 40%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: pulse-ice 4s ease-in-out infinite;
+        }
+
+        .ice-bg-2 {
+            position: fixed;
+            bottom: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(100,150,255,0.15) 0%, rgba(100,150,255,0.03) 50%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: pulse-ice 5s ease-in-out infinite reverse;
+        }
+
+        @keyframes pulse-ice {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 200, 255, 0.15);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 200, 255, 0.2);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00c8ff;
+        }
+
+        .card-header .icon {
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00c8ff;
+            font-size: 0.9rem;
+        }
+
+        .form-group .hint {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(0, 200, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #00c8ff;
+            box-shadow: 0 0 20px rgba(0, 200, 255, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: #666;
+        }
+
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300c8ff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        select.form-control option {
+            background: #1a2d4a;
+            color: #fff;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group .form-control {
+            flex: 1;
+        }
+
+        .input-suffix {
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            background: rgba(0, 200, 255, 0.1);
+            border: 2px solid rgba(0, 200, 255, 0.2);
+            border-radius: 12px;
+            color: #00c8ff;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00c8ff 0%, #0080ff 100%);
+            color: #000;
+            width: 100%;
+            box-shadow: 0 8px 30px rgba(0, 200, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 200, 255, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 200, 255, 0.3);
+            color: #00c8ff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 200, 255, 0.1);
+        }
+
+        /* Resultados */
+        .results-container {
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(0, 200, 255, 0.1) 0%, rgba(0, 128, 255, 0.05) 100%);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 200, 255, 0.15);
+        }
+
+        .result-card .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .result-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #00c8ff;
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        .result-card .unit {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .result-card .label {
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-top: 8px;
+        }
+
+        .result-card.highlight {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.05) 100%);
+            border-color: rgba(0, 255, 136, 0.3);
+        }
+
+        .result-card.highlight .value {
+            color: #00ff88;
+        }
+
+        .result-card.warning {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.15) 0%, rgba(255, 170, 0, 0.05) 100%);
+            border-color: rgba(255, 170, 0, 0.3);
+        }
+
+        .result-card.warning .value {
+            color: #ffaa00;
+        }
+
+        /* Detalhes técnicos */
+        .tech-details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .tech-details h3 {
+            color: #00c8ff;
+            font-size: 1.1rem;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tech-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tech-row:last-child {
+            border-bottom: none;
+        }
+
+        .tech-row .label {
+            color: #999;
+        }
+
+        .tech-row .value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Cargas térmicas breakdown */
+        .carga-bar {
+            margin-bottom: 15px;
+        }
+
+        .carga-bar-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .carga-bar-header .label {
+            color: #ccc;
+        }
+
+        .carga-bar-header .value {
+            color: #00c8ff;
+            font-weight: 600;
+        }
+
+        .carga-bar-track {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .carga-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+
+        .carga-bar-fill.ambiente { background: linear-gradient(90deg, #00c8ff, #0080ff); }
+        .carga-bar-fill.pessoas { background: linear-gradient(90deg, #ff6b6b, #ff4757); }
+        .carga-bar-fill.equipamentos { background: linear-gradient(90deg, #ffa502, #ff7f00); }
+        .carga-bar-fill.iluminacao { background: linear-gradient(90deg, #ffdd59, #ffc107); }
+        .carga-bar-fill.solar { background: linear-gradient(90deg, #00ff88, #00cc6a); }
+
+        /* Modelos recomendados */
+        .modelo-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .modelo-card:hover {
+            border-color: #00c8ff;
+            background: rgba(0, 200, 255, 0.05);
+        }
+
+        .modelo-card.recomendado {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .modelo-icon {
+            font-size: 2.5rem;
+        }
+
+        .modelo-info {
+            flex: 1;
+        }
+
+        .modelo-nome {
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .modelo-desc {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .modelo-btu {
+            text-align: right;
+        }
+
+        .modelo-btu .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #00c8ff;
+        }
+
+        .modelo-btu .unit {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .selo-procel {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .selo-a { background: #00a650; color: #fff; }
+        .selo-b { background: #8cc63f; color: #000; }
+        .selo-c { background: #ffcc00; color: #000; }
+        .selo-d { background: #f7941d; color: #000; }
+        .selo-e { background: #ed1c24; color: #fff; }
+
+        /* Alertas e avisos */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert-warning {
+            background: rgba(255, 152, 0, 0.15);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            color: #ffb74d;
+        }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.15);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            color: #64b5f6;
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #81c784;
+        }
+
+        .alert .icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .alert .content {
+            flex: 1;
+        }
+
+        .alert .title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .alert .text {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            border-radius: 10px;
+            color: #ccc;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tab-btn:hover {
+            background: rgba(0, 200, 255, 0.1);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #00c8ff 0%, #0080ff 100%);
+            color: #000;
+            border-color: transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Info tooltip */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: rgba(0, 200, 255, 0.2);
+            border-radius: 50%;
+            font-size: 0.7rem;
+            color: #00c8ff;
+            cursor: help;
+            margin-left: 6px;
+        }
+
+        /* Checkbox e Radio customizados */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: rgba(0, 200, 255, 0.3);
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: #00c8ff;
+        }
+
+        .checkbox-item label {
+            color: #ccc;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Incremento/Decremento */
+        .number-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .number-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 200, 255, 0.3);
+            background: rgba(0, 200, 255, 0.1);
+            color: #00c8ff;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-btn:hover {
+            background: rgba(0, 200, 255, 0.2);
+            border-color: #00c8ff;
+        }
+
+        .number-display {
+            min-width: 60px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00c8ff;
+        }
+
+        /* Print styles */
+        .btn-print {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            color: #00c8ff;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #000;
+                padding: 20px;
+            }
+
+            .card {
+                background: #fff;
+                border: 1px solid #ddd;
+                box-shadow: none;
+                break-inside: avoid;
+            }
+
+            .btn, .tabs, .form-group, .ice-bg, .ice-bg-2 {
+                display: none !important;
+            }
+
+            .results-container {
+                display: block !important;
+            }
+
+            .result-card {
+                background: #f5f5f5;
+                border: 1px solid #ddd;
+            }
+
+            .result-card .value {
+                color: #0080ff;
+            }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #00c8ff;
+            text-decoration: none;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .result-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .result-card {
+                padding: 15px;
+            }
+
+            .result-card .value {
+                font-size: 1.5rem;
+            }
+
+            .tabs {
+                gap: 6px;
+            }
+
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.8rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-suffix {
+                justify-content: center;
+                padding: 10px;
+            }
+
+            .modelo-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .modelo-btu {
+                text-align: center;
+            }
+        }
+
+        /* Visualização do ambiente */
+        .room-preview {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            position: relative;
+            min-height: 200px;
+        }
+
+        .room-box {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(0, 200, 255, 0.1) 0%, rgba(0, 128, 255, 0.05) 100%);
+            border: 2px solid rgba(0, 200, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .room-dimensions {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .room-dimensions .area {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #00c8ff;
+        }
+
+        .room-dimensions .label {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .room-elements {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .room-element {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .room-element .icon {
+            font-size: 1.5rem;
+        }
+
+        .room-element .count {
+            font-size: 0.8rem;
+            color: #00c8ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="ice-bg"></div>
+    <div class="ice-bg-2"></div>
+
+    <main class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                <span class="text-4xl">❄️</span>
+                <span class="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    Dimensionamento de Ar Condicionado
+                </span>
+            </h1>
+            <p class="text-gray-400 max-w-2xl mx-auto">
+                Calculadora profissional de carga térmica para dimensionamento de sistemas de climatização, seguindo as normas técnicas brasileiras (ABNT NBR 16401 e Selo PROCEL)
+            </p>
+        </header>
+
+        <!-- Formulário de Entrada -->
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">📐</span>
+                <h2>Dados do Ambiente</h2>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('ambiente')">Ambiente</button>
+                <button class="tab-btn" onclick="switchTab('ocupacao')">Ocupação</button>
+                <button class="tab-btn" onclick="switchTab('equipamentos')">Equipamentos</button>
+                <button class="tab-btn" onclick="switchTab('caracteristicas')">Características</button>
+            </div>
+
+            <!-- Tab Ambiente -->
+            <div class="tab-content active" id="tab-ambiente">
+                <div class="form-group">
+                    <label>Tipo de Ambiente</label>
+                    <select class="form-control" id="tipo-ambiente" onchange="atualizarPresets()">
+                        <option value="quarto">🛏️ Quarto</option>
+                        <option value="sala" selected>🛋️ Sala de Estar</option>
+                        <option value="escritorio">💼 Escritório/Home Office</option>
+                        <option value="cozinha">🍳 Cozinha</option>
+                        <option value="comercial">🏪 Loja/Comercial</option>
+                        <option value="servidor">🖥️ Sala de Servidores</option>
+                        <option value="restaurante">🍽️ Restaurante</option>
+                        <option value="academia">🏋️ Academia</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="form-group">
+                        <label>Comprimento</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="comprimento" 
+                                   placeholder="Ex: 5" min="1" max="50" step="0.1" value="5">
+                            <span class="input-suffix">m</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Largura</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="largura" 
+                                   placeholder="Ex: 4" min="1" max="50" step="0.1" value="4">
+                            <span class="input-suffix">m</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pé-direito (altura)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="pe-direito" 
+                                   placeholder="Ex: 2.8" min="2" max="10" step="0.1" value="2.8">
+                            <span class="input-suffix">m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Região Climática do Brasil</label>
+                    <select class="form-control" id="regiao">
+                        <option value="norte">🌴 Norte (Manaus, Belém) - Muito Quente</option>
+                        <option value="nordeste">☀️ Nordeste (Recife, Salvador) - Quente</option>
+                        <option value="centro-oeste" selected>🌡️ Centro-Oeste (Brasília, Goiânia) - Quente</option>
+                        <option value="sudeste">🏙️ Sudeste (São Paulo, Rio) - Moderado</option>
+                        <option value="sul">🍃 Sul (Curitiba, Porto Alegre) - Ameno</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Orientação Solar (face principal)</label>
+                    <select class="form-control" id="orientacao">
+                        <option value="norte">Norte - Alta incidência solar</option>
+                        <option value="sul">Sul - Baixa incidência solar</option>
+                        <option value="leste" selected>Leste - Sol da manhã</option>
+                        <option value="oeste">Oeste - Sol da tarde (mais quente)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Andar do Ambiente</label>
+                    <select class="form-control" id="andar">
+                        <option value="terreo">Térreo</option>
+                        <option value="intermediario" selected>Intermediário</option>
+                        <option value="cobertura">Cobertura/Último andar</option>
+                    </select>
+                    <p class="hint">Coberturas recebem mais calor pela laje</p>
+                </div>
+            </div>
+
+            <!-- Tab Ocupação -->
+            <div class="tab-content" id="tab-ocupacao">
+                <div class="form-group">
+                    <label>Número de Pessoas (ocupação máxima)</label>
+                    <div class="number-input">
+                        <button class="number-btn" onclick="alterarNumero('pessoas', -1)">−</button>
+                        <div class="number-display" id="pessoas-display">2</div>
+                        <button class="number-btn" onclick="alterarNumero('pessoas', 1)">+</button>
+                        <input type="hidden" id="pessoas" value="2">
+                    </div>
+                    <p class="hint">Cada pessoa gera aproximadamente 100-150W de calor</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Nível de Atividade</label>
+                    <select class="form-control" id="atividade">
+                        <option value="repouso">😴 Repouso/Dormindo (70W/pessoa)</option>
+                        <option value="leve" selected>🧘 Atividade Leve - Escritório (100W/pessoa)</option>
+                        <option value="moderada">🚶 Atividade Moderada - Em pé (130W/pessoa)</option>
+                        <option value="intensa">🏃 Atividade Intensa - Exercício (200W/pessoa)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tempo Médio de Ocupação</label>
+                    <select class="form-control" id="tempo-ocupacao">
+                        <option value="parcial">Parcial (até 4 horas/dia)</option>
+                        <option value="integral" selected>Integral (4-8 horas/dia)</option>
+                        <option value="continuo">Contínuo (mais de 8 horas/dia)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tab Equipamentos -->
+            <div class="tab-content" id="tab-equipamentos">
+                <div class="form-group">
+                    <label>Equipamentos Eletrônicos</label>
+                    <p class="hint" style="margin-bottom: 15px;">Selecione os equipamentos presentes no ambiente</p>
+                    
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-computador" checked>
+                            <label for="eq-computador">💻 Computador (150W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-notebook">
+                            <label for="eq-notebook">💻 Notebook (50W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-tv" checked>
+                            <label for="eq-tv">📺 TV LED/LCD (100W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-tv-grande">
+                            <label for="eq-tv-grande">📺 TV Grande 55"+ (150W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-geladeira">
+                            <label for="eq-geladeira">🧊 Geladeira (150W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-freezer">
+                            <label for="eq-freezer">❄️ Freezer (200W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-microondas">
+                            <label for="eq-microondas">🍿 Micro-ondas (1000W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-forno">
+                            <label for="eq-forno">🍕 Forno Elétrico (1500W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-impressora">
+                            <label for="eq-impressora">🖨️ Impressora (100W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-servidor">
+                            <label for="eq-servidor">🖥️ Servidor (500W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-cafeteira">
+                            <label for="eq-cafeteira">☕ Cafeteira (800W)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eq-secador">
+                            <label for="eq-secador">💇 Secador (1500W)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Outros Equipamentos (carga adicional)</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="carga-extra" 
+                               placeholder="0" min="0" max="10000" value="0">
+                        <span class="input-suffix">Watts</span>
+                    </div>
+                    <p class="hint">Some a potência de outros equipamentos não listados</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Iluminação</label>
+                    <select class="form-control" id="iluminacao">
+                        <option value="led">💡 LED (baixo consumo) - 10W/m²</option>
+                        <option value="fluorescente" selected>💡 Fluorescente - 15W/m²</option>
+                        <option value="incandescente">💡 Incandescente/Halógena - 25W/m²</option>
+                        <option value="mista">💡 Mista - 20W/m²</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tab Características -->
+            <div class="tab-content" id="tab-caracteristicas">
+                <div class="form-group">
+                    <label>Tipo de Janelas</label>
+                    <select class="form-control" id="tipo-janela">
+                        <option value="nenhuma">Sem janelas</option>
+                        <option value="pequena">Janela pequena (até 1m²)</option>
+                        <option value="media" selected>Janela média (1-2m²)</option>
+                        <option value="grande">Janela grande (2-4m²)</option>
+                        <option value="parede-vidro">Parede de vidro/Pele de vidro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Proteção Solar nas Janelas</label>
+                    <select class="form-control" id="protecao-solar">
+                        <option value="nenhuma">Nenhuma proteção</option>
+                        <option value="cortina-clara">Cortina clara/Voil</option>
+                        <option value="cortina-escura" selected>Cortina escura/Blackout</option>
+                        <option value="persiana">Persiana</option>
+                        <option value="insulfilm">Película/Insulfilm</option>
+                        <option value="brises">Brise-soleil/Toldo externo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Cobertura (se último andar)</label>
+                    <select class="form-control" id="tipo-cobertura">
+                        <option value="laje-exposta">Laje exposta ao sol</option>
+                        <option value="laje-impermeabilizada" selected>Laje impermeabilizada (comum)</option>
+                        <option value="telhado-ceramica">Telhado cerâmica</option>
+                        <option value="telhado-metalico">Telhado metálico</option>
+                        <option value="telhado-verde">Telhado verde/Isolado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Parede Externa</label>
+                    <select class="form-control" id="tipo-parede">
+                        <option value="alvenaria-simples">Alvenaria simples (1 tijolo)</option>
+                        <option value="alvenaria-dupla" selected>Alvenaria com reboco duplo</option>
+                        <option value="drywall">Drywall/Gesso</option>
+                        <option value="concreto">Concreto aparente</option>
+                        <option value="isolada">Parede isolada termicamente</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Cor da Fachada Externa</label>
+                    <select class="form-control" id="cor-fachada">
+                        <option value="clara" selected>Clara (branco, bege, amarelo claro)</option>
+                        <option value="media">Média (cinza, verde, azul)</option>
+                        <option value="escura">Escura (marrom, vermelho, preto)</option>
+                    </select>
+                    <p class="hint">Cores escuras absorvem mais calor</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Ventilação Natural</label>
+                    <select class="form-control" id="ventilacao">
+                        <option value="nenhuma">Ambiente fechado (sem ventilação)</option>
+                        <option value="parcial" selected>Ventilação parcial</option>
+                        <option value="boa">Boa ventilação cruzada</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botão Calcular -->
+            <button class="btn btn-primary" onclick="calcularBTU()">
+                <span>❄️</span>
+                Calcular Capacidade
+            </button>
+
+            <!-- Preview do Ambiente -->
+            <div class="room-preview">
+                <h4 style="color: #00c8ff; margin: 0 0 15px 0; text-align: center;">📏 Visualização do Ambiente</h4>
+                <div class="room-box">
+                    <div class="room-dimensions">
+                        <div class="area" id="preview-area">20 m²</div>
+                        <div class="label">Área Total</div>
+                        <div style="color: #666; font-size: 0.8rem; margin-top: 5px;">
+                            <span id="preview-dimensoes">5m × 4m × 2.8m</span> = <span id="preview-volume">56 m³</span>
+                        </div>
+                    </div>
+                    <div class="room-elements">
+                        <div class="room-element">
+                            <div class="icon">👥</div>
+                            <div class="count" id="preview-pessoas">2 pessoas</div>
+                        </div>
+                        <div class="room-element">
+                            <div class="icon">🪟</div>
+                            <div class="count" id="preview-janela">Média</div>
+                        </div>
+                        <div class="room-element">
+                            <div class="icon">☀️</div>
+                            <div class="count" id="preview-orientacao">Leste</div>
+                        </div>
+                        <div class="room-element">
+                            <div class="icon">🔌</div>
+                            <div class="count" id="preview-equipamentos">2 equip.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="results-container" id="results">
+            
+            <!-- Resumo Principal -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">🎯</span>
+                    <h2>Resultado do Dimensionamento</h2>
+                    <button class="btn btn-print ml-auto" onclick="window.print()" style="margin-left: auto;">
+                        🖨️ Imprimir
+                    </button>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-card highlight">
+                        <div class="icon">❄️</div>
+                        <div class="value" id="res-btu">0</div>
+                        <div class="unit">BTU/h</div>
+                        <div class="label">Capacidade Recomendada</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="icon">⚡</div>
+                        <div class="value" id="res-watts">0</div>
+                        <div class="unit">Watts</div>
+                        <div class="label">Potência Térmica</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="icon">📐</div>
+                        <div class="value" id="res-area">0</div>
+                        <div class="unit">m²</div>
+                        <div class="label">Área do Ambiente</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="icon">📊</div>
+                        <div class="value" id="res-btu-m2">0</div>
+                        <div class="unit">BTU/m²</div>
+                        <div class="label">Densidade Térmica</div>
+                    </div>
+                    <div class="result-card warning">
+                        <div class="icon">🔌</div>
+                        <div class="value" id="res-consumo">0</div>
+                        <div class="unit">kWh/mês</div>
+                        <div class="label">Consumo Estimado*</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="icon">💰</div>
+                        <div class="value" id="res-custo">R$ 0</div>
+                        <div class="unit">por mês</div>
+                        <div class="label">Custo Estimado*</div>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.8rem; color: #888; text-align: center;">
+                    * Estimativa baseada em 8 horas de uso diário. Consumo real depende do uso e eficiência do equipamento.
+                </p>
+
+                <!-- Alertas -->
+                <div id="alertas-container"></div>
+            </div>
+
+            <!-- Modelos Recomendados -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">🏷️</span>
+                    <h2>Modelos Recomendados</h2>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="icon">💡</span>
+                    <div class="content">
+                        <div class="title">Dica de Escolha</div>
+                        <div class="text">Prefira modelos Inverter com selo PROCEL A. Eles consomem até 60% menos energia e mantêm a temperatura mais estável.</div>
+                    </div>
+                </div>
+
+                <div id="modelos-container"></div>
+            </div>
+
+            <!-- Composição da Carga Térmica -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">📊</span>
+                    <h2>Composição da Carga Térmica</h2>
+                </div>
+
+                <div id="cargas-breakdown"></div>
+
+                <div class="tech-details" style="margin-top: 20px;">
+                    <h3>📋 Detalhamento dos Cálculos</h3>
+                    <div class="tech-row">
+                        <span class="label">Área do ambiente</span>
+                        <span class="value" id="calc-area">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Volume do ambiente</span>
+                        <span class="value" id="calc-volume">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Carga por área (base)</span>
+                        <span class="value" id="calc-carga-area">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Carga por pessoas</span>
+                        <span class="value" id="calc-carga-pessoas">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Carga por equipamentos</span>
+                        <span class="value" id="calc-carga-equipamentos">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Carga por iluminação</span>
+                        <span class="value" id="calc-carga-iluminacao">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Fator solar (janelas)</span>
+                        <span class="value" id="calc-fator-solar">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Fator de região</span>
+                        <span class="value" id="calc-fator-regiao">-</span>
+                    </div>
+                    <div class="tech-row" style="border-top: 2px solid rgba(0,200,255,0.2); margin-top: 10px; padding-top: 15px;">
+                        <span class="label" style="color: #00c8ff; font-weight: 600;">CARGA TOTAL</span>
+                        <span class="value" style="color: #00c8ff; font-size: 1.1rem;" id="calc-total">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requisitos de Instalação -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">🔧</span>
+                    <h2>Requisitos de Instalação</h2>
+                </div>
+
+                <div class="tech-details">
+                    <h3>⚡ Requisitos Elétricos</h3>
+                    <div class="tech-row">
+                        <span class="label">Tensão recomendada</span>
+                        <span class="value" id="req-tensao">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Disjuntor</span>
+                        <span class="value" id="req-disjuntor">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Seção do cabo</span>
+                        <span class="value" id="req-cabo">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Circuito</span>
+                        <div class="subtitle">Estimado com base no uso de 8h/dia</div>
+                    </div>
+                </div>
+
+                <!-- Orçamento Projeto (Injetado) -->
+                <div class="budget-card">
+                    <div class="budget-info">
+                        <h4>💰 Investimento Estimado 2025</h4>
+                        <div class="budget-value" id="res-investimento-total">R$ ---</div>
+                        <p class="budget-disclaimer" id="res-detalhe-investimento">Estimativa baseada em modelos Inverter Classe A</p>
+                    </div>
+                    <div class="text-right" style="text-align: right;">
+                        <div style="font-size: 0.7rem; color: #2ecc71; opacity: 0.7; margin-bottom: 5px;">Mão de Obra + Equipamento</div>
+                        <div style="display: inline-block; padding: 4px 10px; background: rgba(46, 204, 113, 0.2); color: #2ecc71; border-radius: 20px; font-size: 0.7rem; font-weight: bold;">Ref: SINAPI 2025</div>
+                    </div>
+                </div>
+
+                <div class="tech-details-grid" style="margin-top: 24px;">
+                    <h3>📏 Requisitos de Instalação (Split)</h3>
+                    <div class="tech-row">
+                        <span class="label">Distância máx. evaporadora-condensadora</span>
+                        <span class="value">15 metros (sem perda)</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Desnível máximo</span>
+                        <span class="value">5 metros (condensadora abaixo)</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Altura mínima instalação evaporadora</span>
+                        <span class="value">1,8m do piso</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Distância mínima da condensadora da parede</span>
+                        <span class="value">15 cm (laterais) / 50 cm (frontal)</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Dreno de condensado</span>
+                        <span class="value">Queda mínima de 1% (1cm/m)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Normas e Regulamentações -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">📜</span>
+                    <h2>Normas e Regulamentações</h2>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="icon">ℹ️</span>
+                    <div class="content">
+                        <div class="title">Importante</div>
+                        <div class="text">A instalação de ar condicionado deve ser realizada por profissional qualificado, respeitando as normas técnicas e regulamentações locais.</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <div class="modelo-card">
+                        <div class="modelo-icon">📋</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">ABNT NBR 16401</div>
+                            <div class="modelo-desc">Instalações de ar-condicionado - Sistemas centrais e unitários. Parte 1: Projetos das instalações, Parte 2: Parâmetros de conforto térmico.</div>
+                        </div>
+                    </div>
+                    <div class="modelo-card">
+                        <div class="modelo-icon">📋</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">ABNT NBR 5410</div>
+                            <div class="modelo-desc">Instalações elétricas de baixa tensão - Define requisitos para circuitos de ar condicionado.</div>
+                        </div>
+                    </div>
+                    <div class="modelo-card">
+                        <div class="modelo-icon">🏷️</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Selo PROCEL / INMETRO</div>
+                            <div class="modelo-desc">Programa Brasileiro de Etiquetagem - Classifica a eficiência energética de A (mais eficiente) a E (menos eficiente).</div>
+                        </div>
+                    </div>
+                    <div class="modelo-card">
+                        <div class="modelo-icon">🌡️</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Portaria INMETRO 234/2020</div>
+                            <div class="modelo-desc">Requisitos de avaliação da conformidade para condicionadores de ar. Define níveis mínimos de eficiência.</div>
+                        </div>
+                    </div>
+                    <div class="modelo-card">
+                        <div class="modelo-icon">🌿</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Lei 13.589/2018 (PMOC)</div>
+                            <div class="modelo-desc">Plano de Manutenção, Operação e Controle - Obrigatório para ambientes climatizados de uso coletivo.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dicas de Economia -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">💡</span>
+                    <h2>Dicas de Economia de Energia</h2>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+                    <div class="modelo-card">
+                        <div class="modelo-icon">🌡️</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Temperatura Ideal: 23°C</div>
+                            <div class="modelo-desc">Cada grau abaixo de 23°C aumenta o consumo em aproximadamente 8%.</div>
+                        </div>
+                    </div>
+                    <div class="modelo-card">
+                        <div class="modelo-icon">🔄</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Prefira Inverter</div>
+                            <div class="modelo-desc">Modelos Inverter economizam até 60% de energia comparado aos convencionais.</div>
+                        </div>
+                    </div>
+                    <div class="modelo-card">
+                        <div class="modelo-icon">🧹</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Limpeza Regular</div>
+                            <div class="modelo-desc">Limpe os filtros a cada 15 dias. Filtros sujos aumentam o consumo em até 25%.</div>
+                        </div>
+                    </div>
+                    <div class="modelo-card">
+                        <div class="modelo-icon">🚪</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Mantenha Fechado</div>
+                            <div class="modelo-desc">Portas e janelas abertas fazem o aparelho trabalhar mais, gastando mais energia.</div>
+                        </div>
+                    </div>
+                    <div class="modelo-card">
+                        <div class="modelo-icon">🌅</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Use Cortinas</div>
+                            <div class="modelo-desc">Bloquear o sol direto pode reduzir a carga térmica em até 30%.</div>
+                        </div>
+                    </div>
+                    <div class="modelo-card">
+                        <div class="modelo-icon">⏰</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Timer e Sleep</div>
+                            <div class="modelo-desc">Use as funções timer e sleep para evitar funcionamento desnecessário.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>❄️ Ferramenta de Dimensionamento de Ar Condicionado</p>
+        <p>Baseado nas normas ABNT NBR 16401 e metodologia ASHRAE</p>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #555;">
+            ⚠️ Esta ferramenta fornece estimativas para orientação. Para projetos comerciais ou situações especiais, consulte um engenheiro especializado.
+        </p>
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+    <!-- Estilos para orçamentos injetados -->
+    <style>
+        .budget-card {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(21, 128, 61, 0.05) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        .budget-info h4 { color: #2ecc71; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .budget-value { font-size: 2.2rem; font-weight: 800; color: #2ecc71; }
+        .budget-disclaimer { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 8px; }
+    </style>
+
+    <script>
+        // ==================== CONSTANTES E FATORES ====================
+        
+        // BTU base por m² conforme tipo de ambiente
+        const btuBasePorAmbiente = {
+            'quarto': 600,
+            'sala': 600,
+            'escritorio': 700,
+            'cozinha': 800,
+            'comercial': 800,
+            'servidor': 1000,
+            'restaurante': 700,
+            'academia': 900
+        };
+
+        // Fator de região climática
+        const fatorRegiao = {
+            'norte': 1.30,        // Muito quente
+            'nordeste': 1.20,    // Quente
+            'centro-oeste': 1.15, // Quente
+            'sudeste': 1.00,     // Moderado (referência)
+            'sul': 0.90          // Ameno
+        };
+
+        // Fator de orientação solar
+        const fatorOrientacao = {
+            'norte': 1.15,
+            'sul': 0.95,
+            'leste': 1.05,
+            'oeste': 1.20  // Sol da tarde é mais intenso
+        };
+
+        // Fator de andar
+        const fatorAndar = {
+            'terreo': 1.00,
+            'intermediario': 1.00,
+            'cobertura': 1.20
+        };
+
+        // Carga térmica por pessoa (Watts)
+        const cargaPorPessoa = {
+            'repouso': 70,
+            'leve': 100,
+            'moderada': 130,
+            'intensa': 200
+        };
+
+        // Carga de equipamentos (Watts)
+        const cargaEquipamentos = {
+            'eq-computador': 150,
+            'eq-notebook': 50,
+            'eq-tv': 100,
+            'eq-tv-grande': 150,
+            'eq-geladeira': 150,
+            'eq-freezer': 200,
+            'eq-microondas': 300,  // Uso intermitente
+            'eq-forno': 500,       // Uso intermitente
+            'eq-impressora': 100,
+            'eq-servidor': 500,
+            'eq-cafeteira': 200,   // Uso intermitente
+            'eq-secador': 500      // Uso intermitente
+        };
+
+        // Carga de iluminação (W/m²)
+        const cargaIluminacao = {
+            'led': 10,
+            'fluorescente': 15,
+            'incandescente': 25,
+            'mista': 20
+        };
+
+        // Fator de janela
+        const fatorJanela = {
+            'nenhuma': 1.00,
+            'pequena': 1.05,
+            'media': 1.10,
+            'grande': 1.20,
+            'parede-vidro': 1.40
+        };
+
+        // Fator de proteção solar
+        const fatorProtecaoSolar = {
+            'nenhuma': 1.00,
+            'cortina-clara': 0.90,
+            'cortina-escura': 0.75,
+            'persiana': 0.80,
+            'insulfilm': 0.70,
+            'brises': 0.60
+        };
+
+        // Fator de cobertura (para último andar)
+        const fatorCobertura = {
+            'laje-exposta': 1.15,
+            'laje-impermeabilizada': 1.08,
+            'telhado-ceramica': 1.05,
+            'telhado-metalico': 1.20,
+            'telhado-verde': 0.95
+        };
+
+        // Fator de parede
+        const fatorParede = {
+            'alvenaria-simples': 1.10,
+            'alvenaria-dupla': 1.00,
+            'drywall': 1.15,
+            'concreto': 1.20,
+            'isolada': 0.85
+        };
+
+        // Fator cor fachada
+        const fatorCorFachada = {
+            'clara': 1.00,
+            'media': 1.08,
+            'escura': 1.15
+        };
+
+        // Modelos comerciais disponíveis (BTU)
+        const modelosDisponiveis = [7500, 9000, 12000, 18000, 22000, 24000, 30000, 36000, 48000, 60000];
+
+        // ==================== FUNÇÕES DE INTERFACE ====================
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function alterarNumero(campo, delta) {
+            const input = document.getElementById(campo);
+            const display = document.getElementById(campo + '-display');
+            let valor = parseInt(input.value) + delta;
+            if (valor < 1) valor = 1;
+            if (valor > 50) valor = 50;
+            input.value = valor;
+            display.textContent = valor;
+            atualizarPreview();
+        }
+
+        function atualizarPresets() {
+            const tipo = document.getElementById('tipo-ambiente').value;
+            
+            // Presets de pessoas por ambiente
+            const pessoasPreset = {
+                'quarto': 2,
+                'sala': 4,
+                'escritorio': 2,
+                'cozinha': 2,
+                'comercial': 6,
+                'servidor': 1,
+                'restaurante': 10,
+                'academia': 8
+            };
+            
+            document.getElementById('pessoas').value = pessoasPreset[tipo] || 2;
+            document.getElementById('pessoas-display').textContent = pessoasPreset[tipo] || 2;
+            
+            atualizarPreview();
+        }
+
+        function atualizarPreview() {
+            const comprimento = parseFloat(document.getElementById('comprimento').value) || 5;
+            const largura = parseFloat(document.getElementById('largura').value) || 4;
+            const peDireito = parseFloat(document.getElementById('pe-direito').value) || 2.8;
+            const pessoas = parseInt(document.getElementById('pessoas').value) || 2;
+            const janela = document.getElementById('tipo-janela').value;
+            const orientacao = document.getElementById('orientacao').value;
+            
+            const area = comprimento * largura;
+            const volume = area * peDireito;
+            
+            // Contar equipamentos selecionados
+            let numEquipamentos = 0;
+            Object.keys(cargaEquipamentos).forEach(id => {
+                if (document.getElementById(id)?.checked) numEquipamentos++;
+            });
+            
+            document.getElementById('preview-area').textContent = area.toFixed(1) + ' m²';
+            document.getElementById('preview-dimensoes').textContent = `${comprimento}m × ${largura}m × ${peDireito}m`;
+            document.getElementById('preview-volume').textContent = volume.toFixed(1) + ' m³';
+            document.getElementById('preview-pessoas').textContent = pessoas + ' pessoa' + (pessoas > 1 ? 's' : '');
+            document.getElementById('preview-janela').textContent = janela.charAt(0).toUpperCase() + janela.slice(1).replace('-', ' ');
+            document.getElementById('preview-orientacao').textContent = orientacao.charAt(0).toUpperCase() + orientacao.slice(1);
+            document.getElementById('preview-equipamentos').textContent = numEquipamentos + ' equip.';
+        }
+
+        // ==================== CÁLCULO PRINCIPAL ====================
+
+        function calcularBTU() {
+            // Coletar dados
+            const tipoAmbiente = document.getElementById('tipo-ambiente').value;
+            const comprimento = parseFloat(document.getElementById('comprimento').value) || 5;
+            const largura = parseFloat(document.getElementById('largura').value) || 4;
+            const peDireito = parseFloat(document.getElementById('pe-direito').value) || 2.8;
+            const regiao = document.getElementById('regiao').value;
+            const orientacao = document.getElementById('orientacao').value;
+            const andar = document.getElementById('andar').value;
+            
+            const pessoas = parseInt(document.getElementById('pessoas').value) || 2;
+            const atividade = document.getElementById('atividade').value;
+            
+            const tipoJanela = document.getElementById('tipo-janela').value;
+            const protecaoSolar = document.getElementById('protecao-solar').value;
+            const tipoCobertura = document.getElementById('tipo-cobertura').value;
+            const tipoParede = document.getElementById('tipo-parede').value;
+            const corFachada = document.getElementById('cor-fachada').value;
+            const iluminacao = document.getElementById('iluminacao').value;
+            const cargaExtra = parseFloat(document.getElementById('carga-extra').value) || 0;
+            
+            // Cálculos base
+            const area = comprimento * largura;
+            const volume = area * peDireito;
+            
+            // 1. Carga por área (BTU)
+            const btuBase = btuBasePorAmbiente[tipoAmbiente];
+            let cargaArea = area * btuBase;
+            
+            // Aplicar fatores de ajuste
+            cargaArea *= fatorRegiao[regiao];
+            cargaArea *= fatorOrientacao[orientacao];
+            cargaArea *= fatorAndar[andar];
+            cargaArea *= fatorParede[tipoParede];
+            cargaArea *= fatorCorFachada[corFachada];
+            
+            // Fator cobertura (só para último andar)
+            if (andar === 'cobertura') {
+                cargaArea *= fatorCobertura[tipoCobertura];
+            }
+            
+            // 2. Carga por pessoas (converter W para BTU: 1W = 3.412 BTU/h)
+            const wattsPessoas = pessoas * cargaPorPessoa[atividade];
+            const cargaPessoas = wattsPessoas * 3.412;
+            
+            // 3. Carga por equipamentos
+            let wattsEquipamentos = 0;
+            Object.keys(cargaEquipamentos).forEach(id => {
+                if (document.getElementById(id)?.checked) {
+                    wattsEquipamentos += cargaEquipamentos[id];
+                }
+            });
+            wattsEquipamentos += cargaExtra;
+            const cargaEquipamentosTotal = wattsEquipamentos * 3.412;
+            
+            // 4. Carga por iluminação
+            const wattsIluminacao = area * cargaIluminacao[iluminacao];
+            const cargaIluminacaoTotal = wattsIluminacao * 3.412;
+            
+            // 5. Carga solar (janelas)
+            let fatorSolar = fatorJanela[tipoJanela] * fatorProtecaoSolar[protecaoSolar];
+            const cargaSolar = cargaArea * (fatorSolar - 1); // Adicional pela janela
+            
+            // Carga total
+            let cargaTotal = cargaArea + cargaPessoas + cargaEquipamentosTotal + cargaIluminacaoTotal;
+            
+            // Margem de segurança (10%)
+            cargaTotal *= 1.10;
+            
+            // Arredondar para modelo comercial
+            const btuRecomendado = encontrarModeloAdequado(cargaTotal);
+            
+            // Watts equivalentes
+            const wattsTotal = cargaTotal / 3.412;
+            
+            // BTU por m²
+            const btuPorM2 = cargaTotal / area;
+            
+            // Estimativa de consumo (8h/dia, 30 dias, eficiência média)
+            // Para aparelho Inverter selo A: EER médio de 3.5 W/W
+            const potenciaEletrica = btuRecomendado / 3.412 / 3.5; // Watts elétricos
+            const consumoMensal = (potenciaEletrica * 8 * 30) / 1000; // kWh
+            const custoMensal = consumoMensal * 0.95; // R$ 0.95/kWh médio 2025
+
+            // Orçamento Estimado 2025 (Equipamento + Instalação)
+            const precosAC = {
+                7500: 2200, 9000: 2450, 12000: 2850, 18000: 3900, 22000: 4800, 
+                24000: 5200, 30000: 7500, 36000: 9200, 48000: 12500, 60000: 15800
+            };
+            const custoInstalacao = btuRecomendado <= 12000 ? 650 : (btuRecomendado <= 24000 ? 950 : 1500);
+            const custoEquipamento = precosAC[btuRecomendado] || 3000;
+            const investimentoTotal = custoEquipamento + custoInstalacao;
+
+            // ==================== ATUALIZAR INTERFACE ====================
+            
+            document.getElementById('results').classList.add('show');
+            
+            setTimeout(() => {
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
+            // Resultados principais
+            document.getElementById('res-btu').textContent = formatarNumero(btuRecomendado);
+            document.getElementById('res-watts').textContent = formatarNumero(Math.round(wattsTotal));
+            document.getElementById('res-area').textContent = area.toFixed(1);
+            document.getElementById('res-btu-m2').textContent = Math.round(btuPorM2);
+            document.getElementById('res-consumo').textContent = consumoMensal.toFixed(0);
+            document.getElementById('res-custo').textContent = 'R$ ' + custoMensal.toFixed(0);
+
+            // Interface do Orçamento
+            document.getElementById('res-investimento-total').textContent = 'R$ ' + formatarNumero(investimentoTotal);
+            document.getElementById('res-detalhe-investimento').textContent = 
+                `Aparelho Inverter (R$ ${formatarNumero(custoEquipamento)}) + Instalação Padrão (R$ ${formatarNumero(custoInstalacao)})`;
+
+            // Detalhes do cálculo
+            document.getElementById('calc-area').textContent = area.toFixed(1) + ' m²';
+            document.getElementById('calc-volume').textContent = volume.toFixed(1) + ' m³';
+            document.getElementById('calc-carga-area').textContent = formatarNumero(Math.round(cargaArea)) + ' BTU/h';
+            document.getElementById('calc-carga-pessoas').textContent = formatarNumero(Math.round(cargaPessoas)) + ' BTU/h (' + pessoas + ' pessoas)';
+            document.getElementById('calc-carga-equipamentos').textContent = formatarNumero(Math.round(cargaEquipamentosTotal)) + ' BTU/h';
+            document.getElementById('calc-carga-iluminacao').textContent = formatarNumero(Math.round(cargaIluminacaoTotal)) + ' BTU/h';
+            document.getElementById('calc-fator-solar').textContent = (fatorSolar * 100).toFixed(0) + '%';
+            document.getElementById('calc-fator-regiao').textContent = (fatorRegiao[regiao] * 100).toFixed(0) + '%';
+            document.getElementById('calc-total').textContent = formatarNumero(Math.round(cargaTotal)) + ' BTU/h';
+
+            // Requisitos elétricos
+            atualizarRequisitosEletricos(btuRecomendado);
+
+            // Breakdown das cargas
+            renderizarBreakdownCargas(cargaArea, cargaPessoas, cargaEquipamentosTotal, cargaIluminacaoTotal, cargaTotal);
+
+            // Modelos recomendados
+            renderizarModelos(cargaTotal, btuRecomendado);
+
+            // Alertas
+            renderizarAlertas(btuRecomendado, area, pessoas, tipoAmbiente);
+        }
+
+        function encontrarModeloAdequado(btuCalculado) {
+            // Encontrar o menor modelo que atenda a demanda
+            for (let modelo of modelosDisponiveis) {
+                if (modelo >= btuCalculado) {
+                    return modelo;
+                }
+            }
+            // Se maior que todos, retornar o maior ou sugerir split
+            return modelosDisponiveis[modelosDisponiveis.length - 1];
+        }
+
+        function formatarNumero(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function atualizarRequisitosEletricos(btu) {
+            let tensao, disjuntor, cabo, circuito;
+            
+            if (btu <= 12000) {
+                tensao = '127V ou 220V';
+                disjuntor = '15A';
+                cabo = '2,5 mm²';
+                circuito = 'Exclusivo';
+            } else if (btu <= 18000) {
+                tensao = '220V (recomendado)';
+                disjuntor = '20A';
+                cabo = '2,5 mm²';
+                circuito = 'Exclusivo';
+            } else if (btu <= 24000) {
+                tensao = '220V';
+                disjuntor = '25A';
+                cabo = '4 mm²';
+                circuito = 'Exclusivo';
+            } else if (btu <= 36000) {
+                tensao = '220V';
+                disjuntor = '32A';
+                cabo = '6 mm²';
+                circuito = 'Exclusivo';
+            } else {
+                tensao = '220V ou 380V (trifásico)';
+                disjuntor = '40A ou maior';
+                cabo = '10 mm² ou maior';
+                circuito = 'Exclusivo trifásico';
+            }
+            
+            document.getElementById('req-tensao').textContent = tensao;
+            document.getElementById('req-disjuntor').textContent = disjuntor;
+            document.getElementById('req-cabo').textContent = cabo;
+            const reqCircuito = document.getElementById('req-circuito');
+            if (reqCircuito) reqCircuito.textContent = circuito;
+        }
+
+        function renderizarBreakdownCargas(cargaArea, cargaPessoas, cargaEquip, cargaIlum, total) {
+            const container = document.getElementById('cargas-breakdown');
+            
+            const cargas = [
+                { nome: 'Ambiente (área, paredes, região)', valor: cargaArea, classe: 'ambiente' },
+                { nome: 'Pessoas', valor: cargaPessoas, classe: 'pessoas' },
+                { nome: 'Equipamentos', valor: cargaEquip, classe: 'equipamentos' },
+                { nome: 'Iluminação', valor: cargaIlum, classe: 'iluminacao' }
+            ];
+            
+            let html = '';
+            cargas.forEach(carga => {
+                const percentual = (carga.valor / total) * 100;
+                html += `
+                    <div class="carga-bar">
+                        <div class="carga-bar-header">
+                            <span class="label">${carga.nome}</span>
+                            <span class="value">${formatarNumero(Math.round(carga.valor))} BTU/h (${percentual.toFixed(1)}%)</span>
+                        </div>
+                        <div class="carga-bar-track">
+                            <div class="carga-bar-fill ${carga.classe}" style="width: ${percentual}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function renderizarModelos(cargaCalculada, btuRecomendado) {
+            const container = document.getElementById('modelos-container');
+            
+            // Encontrar modelos adequados
+            const modelosAdequados = modelosDisponiveis.filter(m => m >= cargaCalculada * 0.9);
+            const top3 = modelosAdequados.slice(0, 3);
+            
+            const tiposAC = {
+                7500: { nome: 'Split Hi-Wall Compacto', tipo: 'Ideal para quartos pequenos' },
+                9000: { nome: 'Split Hi-Wall 9.000', tipo: 'Quartos e escritórios pequenos' },
+                12000: { nome: 'Split Hi-Wall 12.000', tipo: 'Quartos e salas médias' },
+                18000: { nome: 'Split Hi-Wall 18.000', tipo: 'Salas e ambientes maiores' },
+                22000: { nome: 'Split Hi-Wall 22.000', tipo: 'Salas amplas' },
+                24000: { nome: 'Split Hi-Wall 24.000', tipo: 'Salas grandes e comercial' },
+                30000: { nome: 'Split Piso-Teto ou Cassete', tipo: 'Ambientes comerciais' },
+                36000: { nome: 'Split Piso-Teto', tipo: 'Lojas e escritórios' },
+                48000: { nome: 'Split Piso-Teto ou Multi-Split', tipo: 'Grandes espaços' },
+                60000: { nome: 'Piso-Teto ou VRF', tipo: 'Grandes áreas comerciais' }
+            };
+            
+            let html = '';
+            top3.forEach((modelo, index) => {
+                const info = tiposAC[modelo] || { nome: 'Ar Condicionado', tipo: 'Consulte especificações' };
+                const isRecomendado = modelo === btuRecomendado;
+                
+                html += `
+                    <div class="modelo-card ${isRecomendado ? 'recomendado' : ''}">
+                        <div class="modelo-icon">${isRecomendado ? '⭐' : '❄️'}</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">${info.nome}</div>
+                            <div class="modelo-desc">${info.tipo}</div>
+                            ${isRecomendado ? '<span class="selo-procel selo-a">✓ RECOMENDADO</span>' : ''}
+                        </div>
+                        <div class="modelo-btu">
+                            <div class="value">${formatarNumero(modelo)}</div>
+                            <div class="unit">BTU/h</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Se carga muito alta, sugerir multi-split
+            if (cargaCalculada > 60000) {
+                html += `
+                    <div class="modelo-card">
+                        <div class="modelo-icon">🔧</div>
+                        <div class="modelo-info">
+                            <div class="modelo-nome">Multi-Split ou VRF</div>
+                            <div class="modelo-desc">Para cargas acima de 60.000 BTU, considere sistemas multi-split ou VRF (Variable Refrigerant Flow)</div>
+                        </div>
+                        <div class="modelo-btu">
+                            <div class="value">+60k</div>
+                            <div class="unit">BTU/h</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function renderizarAlertas(btu, area, pessoas, tipoAmbiente) {
+            const container = document.getElementById('alertas-container');
+            let html = '';
+            
+            // Densidade de pessoas alta
+            if (pessoas / area > 0.5) {
+                html += `
+                    <div class="alert alert-warning">
+                        <span class="icon">👥</span>
+                        <div class="content">
+                            <div class="title">Alta Densidade de Ocupação</div>
+                            <div class="text">O ambiente tem alta concentração de pessoas (${(pessoas/area).toFixed(2)} pessoas/m²). Considere ventilação adicional para renovação de ar.</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // BTU muito alto
+            if (btu >= 36000) {
+                html += `
+                    <div class="alert alert-info">
+                        <span class="icon">⚡</span>
+                        <div class="content">
+                            <div class="title">Alta Capacidade</div>
+                            <div class="text">Para sistemas acima de 36.000 BTU, considere modelos Piso-Teto, Cassete ou a divisão em múltiplos equipamentos para melhor distribuição do ar.</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Ambiente comercial ou servidor
+            if (tipoAmbiente === 'servidor') {
+                html += `
+                    <div class="alert alert-warning">
+                        <span class="icon">🖥️</span>
+                        <div class="content">
+                            <div class="title">Sala de Servidores</div>
+                            <div class="text">Para data centers e salas de servidores, considere sistemas de precisão com controle de umidade e redundância. Consulte um especialista.</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (tipoAmbiente === 'comercial' || tipoAmbiente === 'restaurante') {
+                html += `
+                    <div class="alert alert-info">
+                        <span class="icon">📋</span>
+                        <div class="content">
+                            <div class="title">PMOC Obrigatório</div>
+                            <div class="text">Ambientes de uso coletivo devem ter Plano de Manutenção, Operação e Controle (PMOC) conforme Lei 13.589/2018.</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Dica de economia
+            html += `
+                <div class="alert alert-success">
+                    <span class="icon">💡</span>
+                    <div class="content">
+                        <div class="title">Dica de Economia</div>
+                        <div class="text">Escolha sempre modelos Inverter com selo PROCEL A. A economia de energia pode pagar a diferença de preço em 1-2 anos.</div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        // ==================== INICIALIZAÇÃO ====================
+        
+        // Adicionar listeners para atualizar preview
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', atualizarPreview);
+            el.addEventListener('input', atualizarPreview);
+        });
+        
+        // Inicializar preview
+        window.addEventListener('load', () => {
+            atualizarPreview();
+        });
+    </script>
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+</body>
+</html>
