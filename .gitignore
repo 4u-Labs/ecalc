@@ -1,0 +1,6 @@
+.env
+*.db
+*.sqlite
+*.log
+*.bak
+uploads/
