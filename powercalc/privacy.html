@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="landing-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidade - PowerCalc</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="assets/icon48.png">
+</head>
+<body class="dark-theme landing-page">
+
+    <!-- CABEÇALHO -->
+    <header class="landing-header">
+        <div class="header-container">
+            <a href="index.html" id="logo-link" class="landing-logo">
+                <span class="logo-icon">🧮</span>
+                <span class="logo-text">Power<span>Calc</span></span>
+            </a>
+            <nav class="landing-nav">
+                <a href="index.html#features">Recursos</a>
+                <a href="index.html#pwa">Instalação</a>
+                <a href="support.html">Suporte</a>
+            </nav>
+            <a href="app.html" class="cta-button header-cta">Iniciar App</a>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO LEGAL -->
+    <main class="legal-page">
+        <a href="index.html" class="legal-back-link">&larr; Voltar para a Home</a>
+        <div class="legal-card">
+            <h1>Política de Privacidade</h1>
+            <p class="legal-subtitle">Última atualização: 7 de Junho de 2026</p>
+            
+            <div class="legal-content">
+                <p>A privacidade dos nossos usuários é de extrema importância para nós. Esta Política de Privacidade descreve como a <strong>PowerCalc</strong> trata, armazena e utiliza informações coletadas durante a utilização da calculadora web e da extensão para navegador.</p>
+
+                <h2>1. Coleta de Informações e Dados Pessoais</h2>
+                <p>A PowerCalc foi projetada sob o princípio de <strong>privacidade por padrão</strong>:</p>
+                <ul>
+                    <li><strong>Operações Locais:</strong> Todos os cálculos matemáticos básicos, científicos, estatísticos, financeiros, conversões de unidades, matrizes e cálculos de programador são executados localmente no seu dispositivo. Não coletamos, lemos ou enviamos suas fórmulas, resultados ou históricos para nenhum servidor externo.</li>
+                    <li><strong>Sem Cadastro Obrigatório:</strong> O uso de todas as ferramentas locais não requer login, criação de conta ou fornecimento de qualquer dado pessoal (como nome ou e-mail).</li>
+                </ul>
+
+                <h2>2. Utilização de APIs e Serviços Externos</h2>
+                <p>Alguns recursos específicos do aplicativo requerem conectividade com a rede para funcionar corretamente:</p>
+                <ul>
+                    <li><strong>Conversor de Moedas:</strong> Realiza chamadas periódicas e anônimas para a API pública do Coinbase (<code>api.coinbase.com</code>) exclusivamente para atualizar a tabela de taxas de câmbio de moedas fiduciárias e criptomoedas. Nenhuma informação do usuário é transmitida nessas requisições.</li>
+                    <li><strong>Módulo de Inteligência Artificial (Keep AI):</strong> Quando você utiliza os recursos avançados de Inteligência Artificial na calculadora para resolver problemas complexos passo a passo, as consultas de texto são enviadas de forma segura e criptografada para o nosso servidor Keep AI (<code>https://4u.ia.br</code>), que processa e encaminha a requisição aos modelos de linguagem da OpenAI. O saldo de créditos é associado a um token anônimo ou à sua conta cadastrada.</li>
+                </ul>
+
+                <h2>3. Armazenamento Local (Cookies e LocalStorage)</h2>
+                <p>Utilizamos a tecnologia de <code>localStorage</code> e cache local do PWA para armazenar dados estritamente operacionais diretamente em seu navegador. Estes dados servem exclusivamente para preservar o seu estado de uso:</p>
+                <ul>
+                    <li>Histórico dos últimos 10 cálculos realizados (para fácil reuso).</li>
+                    <li>Preferência de tema visual (Escuro ou Claro).</li>
+                    <li>Preferência de formato numérico (padrão brasileiro ou americano).</li>
+                    <li>Quantidade de casas decimais selecionada.</li>
+                    <li>Valor salvo na memória da calculadora científica (MC/MR/MS/M+/M-).</li>
+                </ul>
+                <p>Esses dados permanecem restritos ao seu próprio navegador e dispositivo, e podem ser limpos por você a qualquer momento limpando o cache ou os dados de navegação do site.</p>
+
+                <h2>4. Segurança e Conformidade (LGPD)</h2>
+                <p>Adotamos medidas técnicas de segurança rigorosas para garantir a conformidade com a Lei Geral de Proteção de Dados (LGPD):</p>
+                <ul>
+                    <li>Criptografia de dados em trânsito (HTTPS/SSL) para todas as consultas de nuvem.</li>
+                    <li>Cadastro anônimo em segundo plano (Guest Trial) para que novos usuários possam experimentar os recursos sem revelar identidade ou informações cadastrais.</li>
+                    <li>Não realizamos venda, compartilhamento ou aluguel de quaisquer dados operacionais ou de tráfego a parceiros comerciais ou empresas de publicidade.</li>
+                </ul>
+
+                <h2>5. Alterações a Esta Política</h2>
+                <p>Podemos atualizar esta política de privacidade de tempos em tempos para refletir mudanças em nossas práticas ou por razões operacionais, legais ou regulatórias. Encorajamos a leitura periódica desta página para manter-se informado.</p>
+
+                <h2>6. Contato</h2>
+                <p>Se você tiver alguma dúvida sobre nossas práticas de privacidade ou sobre o tratamento de dados deste aplicativo, entre em contato através do nosso canal de suporte em <a href="support.html" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">Suporte & Ajuda</a>.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="landing-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <span class="logo-icon">🧮</span>
+                    <span class="logo-text">Power<span>Calc</span></span>
+                </div>
+                <p>A união perfeita entre precisão matemática e design premium.</p>
+            </div>
+            <div class="footer-links">
+                <div class="link-group">
+                    <h4>Legal</h4>
+                    <a href="privacy.html">Política de Privacidade</a>
+                    <a href="terms.html">Termos de Uso</a>
+                </div>
+                <div class="link-group">
+                    <h4>Ajuda</h4>
+                    <a href="support.html">Suporte & FAQ</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 PowerCalc. Todos os direitos reservados. Feito com amor por <a href="https://4u.ia.br" target="_blank" class="footer-owner-link">4u.ia.br</a>.</p>
+        </div>
+    </footer>
+
+    <!-- EASTER EGG SCRIPT (5 cliques no logo) -->
+    <script>
+        const logoLink = document.getElementById('logo-link');
+        if (logoLink) {
+            logoLink.addEventListener('click', function(e) {
+                const now = Date.now();
+                let clicks = parseInt(localStorage.getItem('logo_clicks') || '0');
+                let lastClick = parseInt(localStorage.getItem('logo_last_click') || '0');
+
+                if (now - lastClick < 2000) {
+                    clicks++;
+                } else {
+                    clicks = 1;
+                }
+
+                localStorage.setItem('logo_clicks', clicks);
+                localStorage.setItem('logo_last_click', now);
+
+                if (clicks >= 5) {
+                    e.preventDefault();
+                    localStorage.removeItem('logo_clicks');
+                    localStorage.removeItem('logo_last_click');
+                    window.location.href = 'https://4u.ia.br/admin/login';
+                    return;
+                }
+
+                const targetUrl = this.href;
+                const currentUrl = window.location.href;
+                
+                const cleanTarget = targetUrl.replace(/\/+$/, '').replace(/\/privacy\.html$/, '');
+                const cleanCurrent = currentUrl.replace(/\/+$/, '').replace(/\/privacy\.html$/, '');
+
+                if (cleanTarget === cleanCurrent) {
+                    e.preventDefault();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
