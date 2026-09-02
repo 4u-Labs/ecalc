@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>☀️ Dimensionamento Fotovoltaico Residencial | Energia Solar</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0c1929 0%, #1a365d 50%, #0f2744 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        /* Efeito de sol animado */
+        .sun-bg {
+            position: fixed;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,183,0,0.3) 0%, rgba(255,183,0,0.1) 40%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: pulse-sun 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-sun {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 183, 0, 0.15);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 183, 0, 0.2);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffc107;
+        }
+
+        .card-header .icon {
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ffc107;
+            font-size: 0.9rem;
+        }
+
+        .form-group .hint {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 183, 0, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #ffc107;
+            box-shadow: 0 0 20px rgba(255, 183, 0, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: #666;
+        }
+
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ffc107' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        select.form-control option {
+            background: #1a365d;
+            color: #fff;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group .form-control {
+            flex: 1;
+        }
+
+        .input-suffix {
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            background: rgba(255, 183, 0, 0.1);
+            border: 2px solid rgba(255, 183, 0, 0.2);
+            border-radius: 12px;
+            color: #ffc107;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
+            color: #000;
+            width: 100%;
+            box-shadow: 0 8px 30px rgba(255, 183, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(255, 183, 0, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 183, 0, 0.3);
+            color: #ffc107;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 183, 0, 0.1);
+        }
+
+        /* Resultados */
+        .results-container {
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(255, 183, 0, 0.1) 0%, rgba(255, 143, 0, 0.05) 100%);
+            border: 1px solid rgba(255, 183, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 183, 0, 0.15);
+        }
+
+        .result-card .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .result-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffc107;
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        .result-card .unit {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .result-card .label {
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-top: 8px;
+        }
+
+        .result-card.highlight {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(76, 175, 80, 0.05) 100%);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .result-card.highlight .value {
+            color: #4caf50;
+        }
+
+        /* Detalhes técnicos */
+        .tech-details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .tech-details h3 {
+            color: #ffc107;
+            font-size: 1.1rem;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tech-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tech-row:last-child {
+            border-bottom: none;
+        }
+
+        .tech-row .label {
+            color: #999;
+        }
+
+        .tech-row .value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Diagrama do sistema */
+        .system-diagram {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .diagram-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px 0;
+        }
+
+        .diagram-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 15px 20px;
+            background: rgba(255, 183, 0, 0.1);
+            border: 1px solid rgba(255, 183, 0, 0.2);
+            border-radius: 12px;
+            min-width: 100px;
+        }
+
+        .diagram-item .icon {
+            font-size: 2rem;
+        }
+
+        .diagram-item .name {
+            font-size: 0.8rem;
+            color: #ccc;
+            text-align: center;
+        }
+
+        .diagram-arrow {
+            font-size: 1.5rem;
+            color: #ffc107;
+        }
+
+        /* Tabela de custos */
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .cost-table th,
+        .cost-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cost-table th {
+            background: rgba(255, 183, 0, 0.1);
+            color: #ffc107;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .cost-table td {
+            color: #ccc;
+        }
+
+        .cost-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cost-table .total-row {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .cost-table .total-row td {
+            color: #4caf50;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Gráfico de economia */
+        .economy-chart {
+            margin-top: 20px;
+        }
+
+        .chart-bar-container {
+            margin-bottom: 15px;
+        }
+
+        .chart-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .chart-bar-label .label {
+            color: #999;
+        }
+
+        .chart-bar-label .value {
+            color: #ffc107;
+            font-weight: 600;
+        }
+
+        .chart-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1s ease;
+        }
+
+        .chart-bar-fill.solar {
+            background: linear-gradient(90deg, #ffc107, #ff8f00);
+        }
+
+        .chart-bar-fill.grid {
+            background: linear-gradient(90deg, #f44336, #d32f2f);
+        }
+
+        /* Alertas e avisos */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert-warning {
+            background: rgba(255, 152, 0, 0.15);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            color: #ffb74d;
+        }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.15);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            color: #64b5f6;
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #81c784;
+        }
+
+        .alert .icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .alert .content {
+            flex: 1;
+        }
+
+        .alert .title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .alert .text {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Normas técnicas */
+        .normas-section {
+            margin-top: 24px;
+        }
+
+        .norma-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .norma-item .badge {
+            background: rgba(255, 183, 0, 0.2);
+            color: #ffc107;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .norma-item .text {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 183, 0, 0.2);
+            border-radius: 10px;
+            color: #ccc;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 183, 0, 0.1);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
+            color: #000;
+            border-color: transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Info tooltip */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: rgba(255, 183, 0, 0.2);
+            border-radius: 50%;
+            font-size: 0.7rem;
+            color: #ffc107;
+            cursor: help;
+            margin-left: 6px;
+        }
+
+        /* Print styles */
+        .btn-print {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 183, 0, 0.3);
+            color: #ffc107;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #000;
+                padding: 20px;
+            }
+
+            .card {
+                background: #fff;
+                border: 1px solid #ddd;
+                box-shadow: none;
+                break-inside: avoid;
+            }
+
+            .btn, .tabs, .form-group, .sun-bg {
+                display: none !important;
+            }
+
+            .results-container {
+                display: block !important;
+            }
+
+            .result-card {
+                background: #f5f5f5;
+                border: 1px solid #ddd;
+            }
+
+            .result-card .value {
+                color: #ff8f00;
+            }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .result-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .result-card {
+                padding: 15px;
+            }
+
+            .result-card .value {
+                font-size: 1.5rem;
+            }
+
+            .diagram-flow {
+                flex-direction: column;
+            }
+
+            .diagram-arrow {
+                transform: rotate(90deg);
+            }
+
+            .tabs {
+                gap: 6px;
+            }
+
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.8rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-suffix {
+                justify-content: center;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sun-bg"></div>
+
+    <main class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                <span class="text-4xl">☀️</span>
+                <span class="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                    Dimensionamento Fotovoltaico
+                </span>
+            </h1>
+            <p class="text-gray-400 max-w-2xl mx-auto">
+                Ferramenta de dimensionamento de sistemas fotovoltaicos residenciais seguindo as normas técnicas brasileiras (ABNT NBR 16274, NBR 16690 e Resolução ANEEL 482/2012)
+            </p>
+        </header>
+
+        <!-- Formulário de Entrada -->
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">📊</span>
+                <h2>Dados do Projeto</h2>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('consumo')">Consumo</button>
+                <button class="tab-btn" onclick="switchTab('localizacao')">Localização</button>
+                <button class="tab-btn" onclick="switchTab('equipamentos')">Equipamentos</button>
+                <button class="tab-btn" onclick="switchTab('financeiro')">Financeiro</button>
+            </div>
+
+            <!-- Tab Consumo -->
+            <div class="tab-content active" id="tab-consumo">
+                <div class="form-group">
+                    <label>
+                        Consumo Médio Mensal
+                        <span class="info-icon" title="Média dos últimos 12 meses da sua conta de luz">?</span>
+                    </label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="consumo-mensal" 
+                               placeholder="Ex: 350" min="30" max="10000" value="350">
+                        <span class="input-suffix">kWh/mês</span>
+                    </div>
+                    <p class="hint">Consulte sua fatura de energia elétrica para obter este valor</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Ligação</label>
+                    <select class="form-control" id="tipo-ligacao">
+                        <option value="monofasico">Monofásico (30 kWh mínimo)</option>
+                        <option value="bifasico">Bifásico (50 kWh mínimo)</option>
+                        <option value="trifasico" selected>Trifásico (100 kWh mínimo)</option>
+                    </select>
+                    <p class="hint">Custo de disponibilidade conforme Resolução ANEEL</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Percentual de Compensação Desejado</label>
+                    <div class="input-group">
+                        <input type="range" class="form-control" id="percentual-compensacao" 
+                               min="50" max="120" value="100" 
+                               style="padding: 8px; cursor: pointer;"
+                               oninput="document.getElementById('perc-value').textContent = this.value + '%'">
+                        <span class="input-suffix" id="perc-value">100%</span>
+                    </div>
+                    <p class="hint">100% = compensar todo consumo acima do mínimo</p>
+                </div>
+            </div>
+
+            <!-- Tab Localização -->
+            <div class="tab-content" id="tab-localizacao">
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select class="form-control" id="estado" onchange="atualizarCidades()">
+                        <option value="">Selecione o estado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Cidade/Região</label>
+                    <select class="form-control" id="cidade">
+                        <option value="">Selecione primeiro o estado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Irradiação Solar (HSP)
+                        <span class="info-icon" title="Horas de Sol Pleno - média anual da região">?</span>
+                    </label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="hsp" 
+                               placeholder="Automático" min="3" max="7" step="0.1" readonly>
+                        <span class="input-suffix">kWh/m²/dia</span>
+                    </div>
+                    <p class="hint">Valor preenchido automaticamente baseado na localização (Atlas Solarimétrico)</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Orientação do Telhado</label>
+                    <select class="form-control" id="orientacao">
+                        <option value="norte" data-fator="1.00">Norte (ideal) - 100%</option>
+                        <option value="nordeste" data-fator="0.95">Nordeste - 95%</option>
+                        <option value="noroeste" data-fator="0.95">Noroeste - 95%</option>
+                        <option value="leste" data-fator="0.85">Leste - 85%</option>
+                        <option value="oeste" data-fator="0.85">Oeste - 85%</option>
+                        <option value="sul" data-fator="0.75">Sul (menos ideal) - 75%</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Inclinação do Telhado</label>
+                    <select class="form-control" id="inclinacao">
+                        <option value="0" data-fator="0.90">Plano (0°) - 90%</option>
+                        <option value="10" data-fator="0.95">Baixa (10°) - 95%</option>
+                        <option value="20" data-fator="1.00" selected>Ideal (15-25°) - 100%</option>
+                        <option value="30" data-fator="0.97">Moderada (30°) - 97%</option>
+                        <option value="45" data-fator="0.90">Alta (45°) - 90%</option>
+                    </select>
+                    <p class="hint">Inclinação ideal ≈ latitude local (Brasil: 15° a 25°)</p>
+                </div>
+            </div>
+
+            <!-- Tab Equipamentos -->
+            <div class="tab-content" id="tab-equipamentos">
+                <div class="form-group">
+                    <label>Tipo de Módulo Fotovoltaico</label>
+                    <select class="form-control" id="tipo-modulo" onchange="atualizarPotenciaModulo()">
+                        <option value="monocristalino" data-eficiencia="0.21">Monocristalino (maior eficiência)</option>
+                        <option value="policristalino" data-eficiencia="0.17">Policristalino (custo-benefício)</option>
+                        <option value="bifacial" data-eficiencia="0.22">Bifacial (premium)</option>
+                    </select>
+                </div>
+
+                <div class="input-container">
+                    <label class="input-label" for="potencia-modulo">Potência do Módulo (Wp)</label>
+                    <input class="input-field" id="potencia-modulo" type="number" value="570" min="300" max="800">
+                </div>
+                <div class="input-container">
+                    <label class="input-label" for="performance-ratio">Eficiência do Sistema (%)</label>
+                    <input class="input-field" id="performance-ratio" type="number" value="82" min="60" max="95">
+                    <div class="input-helper">Perdas típicas: 15-25%</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Inversor</label>
+                    <select class="form-control" id="tipo-inversor">
+                        <option value="string" selected>String (convencional)</option>
+                        <option value="micro">Microinversor (por módulo)</option>
+                        <option value="hibrido">Híbrido (com bateria)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Estrutura</label>
+                    <select class="form-control" id="tipo-estrutura">
+                        <option value="telhado-ceramica">Telhado cerâmica/fibrocimento</option>
+                        <option value="telhado-metalico" selected>Telhado metálico</option>
+                        <option value="laje">Laje (com suporte inclinado)</option>
+                        <option value="solo">Solo (ground mount)</option>
+                        <option value="carport">Carport/Garagem</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tab Financeiro -->
+            <div class="tab-content" id="tab-financeiro">
+                    <p class="hint">Consulte sua fatura - média Brasil: R$ 0,75 a R$ 1,10/kWh</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Reajuste Anual Estimado da Tarifa</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="reajuste-tarifa" 
+                               value="8" min="3" max="15" step="0.5">
+                        <span class="input-suffix">% ao ano</span>
+                    </div>
+                    <p class="hint">Histórico Brasil: 6% a 12% ao ano</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Custo Estimado por kWp Instalado</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="custo-kwp" 
+                               value="4500" min="3000" max="8000" step="100">
+                        <span class="input-suffix">R$/kWp</span>
+                    </div>
+                    <p class="hint">Inclui equipamentos, instalação e homologação (2024: R$ 4.000 a R$ 6.000/kWp)</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Degradação Anual dos Módulos</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="degradacao" 
+                               value="0.5" min="0.3" max="1" step="0.1">
+                        <span class="input-suffix">% ao ano</span>
+                    </div>
+                    <p class="hint">Garantia típica: 80% após 25 anos (0.5% a 0.7%/ano)</p>
+                </div>
+            </div>
+
+            <!-- Botão Calcular -->
+            <button class="btn btn-primary" onclick="calcularSistema()">
+                <span>⚡</span>
+                Dimensionar Sistema
+            </button>
+        </div>
+
+        <!-- Resultados -->
+        <div class="results-container" id="results">
+            
+            <!-- Resumo Principal -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">🎯</span>
+                    <h2>Resultado do Dimensionamento</h2>
+                    <button class="btn btn-print ml-auto" onclick="window.print()" style="margin-left: auto;">
+                        🖨️ Imprimir
+                    </button>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="icon">⚡</div>
+                        <div class="value" id="res-potencia">0</div>
+                        <div class="unit">kWp</div>
+                        <div class="label">Potência do Sistema</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="icon">🔲</div>
+                        <div class="value" id="res-modulos">0</div>
+                        <div class="unit">unidades</div>
+                        <div class="label">Módulos Fotovoltaicos</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="icon">📐</div>
+                        <div class="value" id="res-area">0</div>
+                        <div class="unit">m²</div>
+                        <div class="label">Área Necessária</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="icon">🔌</div>
+                        <div class="value" id="res-inversor">0</div>
+                        <div class="unit">kW</div>
+                        <div class="label">Potência Inversor</div>
+                    </div>
+                    <div class="result-card highlight">
+                        <div class="icon">💰</div>
+                        <div class="value" id="res-geracao">0</div>
+                        <div class="unit">kWh/mês</div>
+                        <div class="label">Geração Estimada</div>
+                    </div>
+                    <div class="result-card highlight">
+                        <div class="icon">📅</div>
+                        <div class="value" id="res-payback">0</div>
+                        <div class="unit">anos</div>
+                        <div class="label">Payback Estimado</div>
+                    </div>
+                </div>
+
+                <!-- Alertas -->
+                <div id="alertas-container"></div>
+
+                <!-- Diagrama do Sistema -->
+                <div class="system-diagram">
+                    <h3 style="color: #ffc107; margin: 0 0 15px 0;">
+                        <span>🔄</span> Diagrama Simplificado do Sistema
+                    </h3>
+                    <div class="diagram-flow">
+                        <div class="diagram-item">
+                            <div class="icon">☀️</div>
+                            <div class="name">Radiação Solar</div>
+                        </div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-item">
+                            <div class="icon">🔲</div>
+                            <div class="name">Módulos FV<br><small id="diag-modulos">0 x 545W</small></div>
+                        </div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-item">
+                            <div class="icon">⚡</div>
+                            <div class="name">Inversor<br><small id="diag-inversor">0 kW</small></div>
+                        </div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-item">
+                            <div class="icon">📊</div>
+                            <div class="name">Medidor<br><small>Bidirecional</small></div>
+                        </div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-item">
+                            <div class="icon">🏠</div>
+                            <div class="name">Consumo<br><small id="diag-consumo">0 kWh</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análise Financeira -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">💵</span>
+                    <h2>Análise Financeira</h2>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="icon">🏷️</div>
+                        <div class="value" id="res-investimento">R$ 0</div>
+                        <div class="label">Investimento Estimado</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="icon">💸</div>
+                        <div class="value" id="res-economia-mensal">R$ 0</div>
+                        <div class="label">Economia Mensal</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="icon">📈</div>
+                        <div class="value" id="res-economia-anual">R$ 0</div>
+                        <div class="label">Economia Anual</div>
+                    </div>
+                    <div class="result-card highlight">
+                        <div class="icon">🎉</div>
+                        <div class="value" id="res-economia-25anos">R$ 0</div>
+                        <div class="label">Economia em 25 Anos</div>
+                    </div>
+                </div>
+
+                <!-- Tabela de custos -->
+                <div class="tech-details">
+                    <h3>📋 Composição Estimada do Investimento</h3>
+                    <table class="cost-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantidade</th>
+                                <th>Valor Estimado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-custos">
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Gráfico de economia -->
+                <div class="economy-chart">
+                    <h3 style="color: #ffc107; margin: 20px 0 15px 0;">📊 Projeção de Economia (5 anos)</h3>
+                    <div id="chart-economia"></div>
+                </div>
+            </div>
+
+            <!-- Especificações Técnicas -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">🔧</span>
+                    <h2>Especificações Técnicas</h2>
+                </div>
+
+                <div class="tech-details">
+                    <h3>📐 Parâmetros do Sistema</h3>
+                    <div class="tech-row">
+                        <span class="label">Potência Total do Sistema</span>
+                        <span class="value" id="spec-potencia">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Quantidade de Módulos</span>
+                        <span class="value" id="spec-modulos">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Potência do Inversor</span>
+                        <span class="value" id="spec-inversor">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Área de Instalação</span>
+                        <span class="value" id="spec-area">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Geração Mensal Estimada</span>
+                        <span class="value" id="spec-geracao">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Geração Anual Estimada</span>
+                        <span class="value" id="spec-geracao-anual">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Performance Ratio (PR)</span>
+                        <span class="value" id="spec-pr">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Fator de Capacidade</span>
+                        <span class="value" id="spec-fc">-</span>
+                    </div>
+                </div>
+
+                <div class="tech-details" style="margin-top: 20px;">
+                    <h3>🌍 Dados de Irradiação</h3>
+                    <div class="tech-row">
+                        <span class="label">Localização</span>
+                        <span class="value" id="spec-local">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Irradiação Média (HSP)</span>
+                        <span class="value" id="spec-hsp">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Fator de Orientação</span>
+                        <span class="value" id="spec-orientacao">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Fator de Inclinação</span>
+                        <span class="value" id="spec-inclinacao">-</span>
+                    </div>
+                </div>
+
+                <div class="tech-details" style="margin-top: 20px;">
+                    <h3>🔌 Dimensionamento Elétrico Sugerido</h3>
+                    <div class="tech-row">
+                        <span class="label">Tensão CC do Sistema</span>
+                        <span class="value" id="spec-tensao-cc">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Corrente Máxima String</span>
+                        <span class="value" id="spec-corrente">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Disjuntor CA Sugerido</span>
+                        <span class="value" id="spec-disjuntor">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">Seção do Cabo CA</span>
+                        <span class="value" id="spec-cabo">-</span>
+                    </div>
+                    <div class="tech-row">
+                        <span class="label">DPS (Proteção contra Surtos)</span>
+                        <span class="value" id="spec-dps">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Normas e Regulamentações -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">📜</span>
+                    <h2>Normas e Regulamentações Aplicáveis</h2>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="icon">ℹ️</span>
+                    <div class="content">
+                        <div class="title">Importante</div>
+                        <div class="text">O dimensionamento apresentado é uma estimativa inicial. O projeto executivo deve ser elaborado por profissional habilitado (Engenheiro Eletricista) com registro no CREA.</div>
+                    </div>
+                </div>
+
+                <div class="normas-section">
+                    <div class="norma-item">
+                        <span class="badge">ANEEL</span>
+                        <span class="text"><strong>REN 482/2012</strong> (atualizada pela REN 687/2015 e REN 1.000/2021) - Estabelece as condições gerais para o acesso de microgeração e minigeração distribuída aos sistemas de distribuição de energia elétrica.</span>
+                    </div>
+                    <div class="norma-item">
+                        <span class="badge">ABNT</span>
+                        <span class="text"><strong>NBR 16274:2014</strong> - Sistemas fotovoltaicos conectados à rede — Requisitos mínimos para documentação, ensaios de comissionamento, inspeção e avaliação de desempenho.</span>
+                    </div>
+                    <div class="norma-item">
+                        <span class="badge">ABNT</span>
+                        <span class="text"><strong>NBR 16690:2019</strong> - Instalações elétricas de arranjos fotovoltaicos — Requisitos de projeto.</span>
+                    </div>
+                    <div class="norma-item">
+                        <span class="badge">ABNT</span>
+                        <span class="text"><strong>NBR 5410:2004</strong> - Instalações elétricas de baixa tensão — Requisitos gerais para a instalação elétrica.</span>
+                    </div>
+                    <div class="norma-item">
+                        <span class="badge">ABNT</span>
+                        <span class="text"><strong>NBR 5419:2015</strong> - Proteção contra descargas atmosféricas — Aplicável quando houver SPDA existente.</span>
+                    </div>
+                    <div class="norma-item">
+                        <span class="badge">INMETRO</span>
+                        <span class="text"><strong>Portaria 004/2011</strong> - Requisitos de Avaliação da Conformidade para Sistemas e Equipamentos para Energia Fotovoltaica (módulos, inversores, controladores).</span>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning" style="margin-top: 20px;">
+                    <span class="icon">⚠️</span>
+                    <div class="content">
+                        <div class="title">Marco Legal (Lei 14.300/2022)</div>
+                        <div class="text">A partir de janeiro/2023, novos sistemas passam por regras de transição. Sistemas solicitados até 06/01/2023 mantêm direitos adquiridos por 25 anos. Novos sistemas terão cobrança gradual do "fio B" (TUSD distribuição).</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Próximos Passos -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">✅</span>
+                    <h2>Próximos Passos</h2>
+                </div>
+
+                <div class="grid gap-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                    <div class="norma-item" style="flex-direction: column; align-items: flex-start;">
+                        <span class="badge" style="margin-bottom: 8px;">1</span>
+                        <strong style="color: #ffc107;">Avaliação Técnica</strong>
+                        <span class="text" style="margin-top: 4px;">Solicitar visita técnica para avaliação do telhado, quadro elétrico e viabilidade da instalação.</span>
+                    </div>
+                    <div class="norma-item" style="flex-direction: column; align-items: flex-start;">
+                        <span class="badge" style="margin-bottom: 8px;">2</span>
+                        <strong style="color: #ffc107;">Projeto Executivo</strong>
+                        <span class="text" style="margin-top: 4px;">Elaboração do projeto por engenheiro eletricista com ART (Anotação de Responsabilidade Técnica).</span>
+                    </div>
+                    <div class="norma-item" style="flex-direction: column; align-items: flex-start;">
+                        <span class="badge" style="margin-bottom: 8px;">3</span>
+                        <strong style="color: #ffc107;">Solicitação de Acesso</strong>
+                        <span class="text" style="margin-top: 4px;">Enviar documentação à distribuidora local (parecer de acesso e vistoria).</span>
+                    </div>
+                    <div class="norma-item" style="flex-direction: column; align-items: flex-start;">
+                        <span class="badge" style="margin-bottom: 8px;">4</span>
+                        <strong style="color: #ffc107;">Instalação e Comissionamento</strong>
+                        <span class="text" style="margin-top: 4px;">Instalação física, testes e comissionamento conforme NBR 16274.</span>
+                    </div>
+                    <div class="norma-item" style="flex-direction: column; align-items: flex-start;">
+                        <span class="badge" style="margin-bottom: 8px;">5</span>
+                        <strong style="color: #ffc107;">Vistoria e Conexão</strong>
+                        <span class="text" style="margin-top: 4px;">Vistoria da distribuidora, troca do medidor e liberação para operação.</span>
+                    </div>
+                    <div class="norma-item" style="flex-direction: column; align-items: flex-start;">
+                        <span class="badge" style="margin-bottom: 8px;">6</span>
+                        <strong style="color: #ffc107;">Monitoramento</strong>
+                        <span class="text" style="margin-top: 4px;">Configurar sistema de monitoramento para acompanhar geração e desempenho.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>☀️ Ferramenta de Dimensionamento Fotovoltaico</p>
+        <p>Baseado nas normas ABNT NBR 16274, NBR 16690 e Resolução ANEEL 482/2012</p>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #555;">
+            ⚠️ Esta ferramenta fornece estimativas para fins de estudo. O projeto definitivo deve ser elaborado por profissional habilitado.
+        </p>
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+    <script>
+        // ==================== DADOS DE IRRADIAÇÃO SOLAR (HSP) ====================
+        // Fonte: Atlas Brasileiro de Energia Solar (INPE) - valores médios anuais
+        const dadosIrradiacao = {
+            'AC': { nome: 'Acre', cidades: { 'Rio Branco': 4.5, 'Cruzeiro do Sul': 4.4 }, media: 4.5 },
+            'AL': { nome: 'Alagoas', cidades: { 'Maceió': 5.4, 'Arapiraca': 5.5 }, media: 5.4 },
+            'AP': { nome: 'Amapá', cidades: { 'Macapá': 4.8, 'Santana': 4.7 }, media: 4.8 },
+            'AM': { nome: 'Amazonas', cidades: { 'Manaus': 4.5, 'Parintins': 4.6 }, media: 4.5 },
+            'BA': { nome: 'Bahia', cidades: { 'Salvador': 5.3, 'Feira de Santana': 5.5, 'Vitória da Conquista': 5.6, 'Barreiras': 5.9, 'Juazeiro': 6.1 }, media: 5.6 },
+            'CE': { nome: 'Ceará', cidades: { 'Fortaleza': 5.5, 'Juazeiro do Norte': 5.8, 'Sobral': 5.7 }, media: 5.7 },
+            'DF': { nome: 'Distrito Federal', cidades: { 'Brasília': 5.4 }, media: 5.4 },
+            'ES': { nome: 'Espírito Santo', cidades: { 'Vitória': 5.0, 'Vila Velha': 5.0, 'Serra': 5.1 }, media: 5.0 },
+            'GO': { nome: 'Goiás', cidades: { 'Goiânia': 5.3, 'Anápolis': 5.4, 'Rio Verde': 5.5 }, media: 5.4 },
+            'MA': { nome: 'Maranhão', cidades: { 'São Luís': 5.2, 'Imperatriz': 5.3, 'Balsas': 5.6 }, media: 5.4 },
+            'MT': { nome: 'Mato Grosso', cidades: { 'Cuiabá': 5.3, 'Rondonópolis': 5.4, 'Sinop': 5.2 }, media: 5.3 },
+            'MS': { nome: 'Mato Grosso do Sul', cidades: { 'Campo Grande': 5.2, 'Dourados': 5.3, 'Três Lagoas': 5.4 }, media: 5.3 },
+            'MG': { nome: 'Minas Gerais', cidades: { 'Belo Horizonte': 5.3, 'Uberlândia': 5.4, 'Montes Claros': 5.8, 'Juiz de Fora': 4.9, 'Uberaba': 5.5 }, media: 5.3 },
+            'PA': { nome: 'Pará', cidades: { 'Belém': 4.7, 'Santarém': 5.0, 'Marabá': 5.1 }, media: 4.9 },
+            'PB': { nome: 'Paraíba', cidades: { 'João Pessoa': 5.5, 'Campina Grande': 5.6, 'Patos': 5.9 }, media: 5.7 },
+            'PR': { nome: 'Paraná', cidades: { 'Curitiba': 4.5, 'Londrina': 5.0, 'Maringá': 5.1, 'Foz do Iguaçu': 5.0, 'Cascavel': 5.0 }, media: 4.9 },
+            'PE': { nome: 'Pernambuco', cidades: { 'Recife': 5.4, 'Petrolina': 6.0, 'Caruaru': 5.6 }, media: 5.7 },
+            'PI': { nome: 'Piauí', cidades: { 'Teresina': 5.6, 'Parnaíba': 5.7, 'Picos': 5.9, 'Bom Jesus': 6.0 }, media: 5.8 },
+            'RJ': { nome: 'Rio de Janeiro', cidades: { 'Rio de Janeiro': 4.9, 'Niterói': 4.9, 'Campos dos Goytacazes': 5.2 }, media: 5.0 },
+            'RN': { nome: 'Rio Grande do Norte', cidades: { 'Natal': 5.6, 'Mossoró': 5.9, 'Caicó': 6.0 }, media: 5.8 },
+            'RS': { nome: 'Rio Grande do Sul', cidades: { 'Porto Alegre': 4.5, 'Caxias do Sul': 4.6, 'Pelotas': 4.4, 'Santa Maria': 4.7 }, media: 4.5 },
+            'RO': { nome: 'Rondônia', cidades: { 'Porto Velho': 4.6, 'Ji-Paraná': 4.7 }, media: 4.7 },
+            'RR': { nome: 'Roraima', cidades: { 'Boa Vista': 5.0 }, media: 5.0 },
+            'SC': { nome: 'Santa Catarina', cidades: { 'Florianópolis': 4.3, 'Joinville': 4.2, 'Blumenau': 4.3, 'Chapecó': 4.6 }, media: 4.4 },
+            'SP': { nome: 'São Paulo', cidades: { 'São Paulo': 4.6, 'Campinas': 5.0, 'Ribeirão Preto': 5.3, 'Santos': 4.5, 'Sorocaba': 4.8, 'São José do Rio Preto': 5.4 }, media: 4.9 },
+            'SE': { nome: 'Sergipe', cidades: { 'Aracaju': 5.5, 'Nossa Senhora do Socorro': 5.5 }, media: 5.5 },
+            'TO': { nome: 'Tocantins', cidades: { 'Palmas': 5.4, 'Araguaína': 5.3, 'Gurupi': 5.5 }, media: 5.4 }
+        };
+
+        // ==================== CUSTOS DE DISPONIBILIDADE (ANEEL) ====================
+        const custoDisponibilidade = {
+            'monofasico': 30,  // kWh
+            'bifasico': 50,    // kWh
+            'trifasico': 100   // kWh
+        };
+
+        // ==================== DIMENSÕES TÍPICAS DE MÓDULOS ====================
+        const dimensoesModulo = {
+            // Aproximadamente 2.1m x 1.05m para módulos modernos
+            largura: 1.05,  // metros
+            altura: 2.1,    // metros
+            area: 2.2       // m² (incluindo espaçamento)
+        };
+
+        // ==================== INICIALIZAÇÃO ====================
+        function init() {
+            popularEstados();
+            
+            // Carregar valores salvos se existirem
+            const saved = localStorage.getItem('solar_calc_data');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    Object.keys(data).forEach(key => {
+                        const el = document.getElementById(key);
+                        if (el) el.value = data[key];
+                    });
+                } catch (e) {}
+            }
+        }
+
+        function popularEstados() {
+            const select = document.getElementById('estado');
+            select.innerHTML = '<option value="">Selecione o estado</option>';
+            
+            Object.keys(dadosIrradiacao).sort((a, b) => 
+                dadosIrradiacao[a].nome.localeCompare(dadosIrradiacao[b].nome)
+            ).forEach(uf => {
+                const option = document.createElement('option');
+                option.value = uf;
+                option.textContent = `${dadosIrradiacao[uf].nome} (${uf})`;
+                select.appendChild(option);
+            });
+        }
+
+        function atualizarCidades() {
+            const uf = document.getElementById('estado').value;
+            const selectCidade = document.getElementById('cidade');
+            const inputHSP = document.getElementById('hsp');
+            
+            selectCidade.innerHTML = '<option value="">Selecione a cidade</option>';
+            
+            if (uf && dadosIrradiacao[uf]) {
+                const cidades = dadosIrradiacao[uf].cidades;
+                Object.keys(cidades).sort().forEach(cidade => {
+                    const option = document.createElement('option');
+                    option.value = cidade;
+                    option.textContent = `${cidade} (HSP: ${cidades[cidade]})`;
+                    option.dataset.hsp = cidades[cidade];
+                    selectCidade.appendChild(option);
+                });
+                
+                // Adicionar opção "Outra cidade"
+                const optionOutra = document.createElement('option');
+                optionOutra.value = 'outra';
+                optionOutra.textContent = `Outra cidade (média: ${dadosIrradiacao[uf].media})`;
+                optionOutra.dataset.hsp = dadosIrradiacao[uf].media;
+                selectCidade.appendChild(optionOutra);
+                
+                // Definir HSP médio do estado
+                inputHSP.value = dadosIrradiacao[uf].media;
+            }
+            
+            // Atualizar HSP quando cidade mudar
+            selectCidade.onchange = function() {
+                const option = this.options[this.selectedIndex];
+                if (option && option.dataset.hsp) {
+                    inputHSP.value = option.dataset.hsp;
+                }
+            };
+        }
+
+        // ==================== TROCAR ABAS ====================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // ==================== CÁLCULO PRINCIPAL ====================
+        function calcularSistema() {
+            // Coletar dados de entrada
+            const consumoMensal = parseFloat(document.getElementById('consumo-mensal').value) || 350;
+            const tipoLigacao = document.getElementById('tipo-ligacao').value;
+            const percentualCompensacao = parseFloat(document.getElementById('percentual-compensacao').value) / 100;
+            
+            const uf = document.getElementById('estado').value || 'SP';
+            const cidade = document.getElementById('cidade').value || 'São Paulo';
+            const hsp = parseFloat(document.getElementById('hsp').value) || 4.9;
+            
+            const orientacaoSelect = document.getElementById('orientacao');
+            const fatorOrientacao = parseFloat(orientacaoSelect.options[orientacaoSelect.selectedIndex].dataset.fator) || 1;
+            
+            const inclinacaoSelect = document.getElementById('inclinacao');
+            const fatorInclinacao = parseFloat(inclinacaoSelect.options[inclinacaoSelect.selectedIndex].dataset.fator) || 1;
+            
+            const potenciaModulo = parseFloat(document.getElementById('potencia-modulo').value) || 545;
+            const tipoInversor = document.getElementById('tipo-inversor').value;
+            const performanceRatio = parseFloat(document.getElementById('performance-ratio').value) / 100 || 0.80;
+            
+            const tarifaEnergia = parseFloat(document.getElementById('tarifa-energia')?.value) || 0.95;
+            const reajusteTarifa = parseFloat(document.getElementById('reajuste-tarifa').value) / 100 || 0.08;
+            const custoKwp = parseFloat(document.getElementById('custo-kwp').value) || 3800;
+            const degradacao = parseFloat(document.getElementById('degradacao').value) / 100 || 0.005;
+
+            // Custo de disponibilidade (mínimo a pagar)
+            const consumoMinimo = custoDisponibilidade[tipoLigacao];
+            
+            // Consumo a ser compensado
+            const consumoCompensar = Math.max(0, (consumoMensal - consumoMinimo) * percentualCompensacao);
+            
+            // Fator de correção total (orientação + inclinação)
+            const fatorCorrecao = fatorOrientacao * fatorInclinacao;
+            
+            // HSP efetivo
+            const hspEfetivo = hsp * fatorCorrecao;
+            
+            // Cálculo da potência necessária (kWp)
+            // Fórmula: Potência = Consumo / (HSP * dias * PR)
+            const diasMes = 30;
+            const potenciaNecessaria = consumoCompensar / (hspEfetivo * diasMes * performanceRatio);
+            
+            // Número de módulos (arredondar para cima)
+            const numModulos = Math.ceil((potenciaNecessaria * 1000) / potenciaModulo);
+            
+            // Potência real do sistema
+            const potenciaReal = (numModulos * potenciaModulo) / 1000; // kWp
+            
+            // Geração mensal estimada
+            const geracaoMensal = potenciaReal * hspEfetivo * diasMes * performanceRatio;
+            
+            // Geração anual
+            const geracaoAnual = geracaoMensal * 12;
+            
+            // Área necessária
+            const areaNecessaria = numModulos * dimensoesModulo.area;
+            
+            // Potência do inversor (tipicamente 75% a 100% da potência FV)
+            let potenciaInversor;
+            if (tipoInversor === 'micro') {
+                potenciaInversor = potenciaReal; // Microinversor: 1:1
+            } else {
+                // String inverter: fator FDI (Fator de Dimensionamento do Inversor)
+                // Recomendado: 0.75 a 1.0 (em regiões de alta irradiação, pode ser menor)
+                const fdi = hsp > 5.5 ? 0.80 : 0.85;
+                potenciaInversor = potenciaReal * fdi;
+            }
+            
+            // Arredondar para potências comerciais de inversores
+            const potenciasInversor = [1.5, 2, 3, 3.6, 4, 5, 6, 7, 8, 10, 12, 15, 20, 25, 30, 33, 36, 40, 50, 60, 75];
+            potenciaInversor = potenciasInversor.find(p => p >= potenciaInversor) || potenciaInversor;
+            
+            // Investimento estimado
+            const investimentoTotal = potenciaReal * custoKwp;
+            
+            // Economia mensal
+            const economiaMensal = Math.min(geracaoMensal, consumoMensal - consumoMinimo) * tarifaEnergia;
+            
+            // Economia anual (primeiro ano)
+            const economiaAnual = economiaMensal * 12;
+            
+            // Payback simples
+            const paybackSimples = investimentoTotal / economiaAnual;
+            
+            // Economia em 25 anos (considerando reajuste e degradação)
+            let economia25anos = 0;
+            let tarifaAtual = tarifaEnergia;
+            let geracaoAtual = geracaoAnual;
+            for (let ano = 1; ano <= 25; ano++) {
+                economia25anos += geracaoAtual * tarifaAtual;
+                tarifaAtual *= (1 + reajusteTarifa);
+                geracaoAtual *= (1 - degradacao);
+            }
+            
+            // Fator de capacidade
+            const fatorCapacidade = geracaoAnual / (potenciaReal * 8760) * 100;
+
+            // ==================== ATUALIZAR INTERFACE ====================
+            
+            // Mostrar resultados
+            document.getElementById('results').classList.add('show');
+            
+            // Scroll suave para resultados
+            setTimeout(() => {
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
+            // Cards principais
+            document.getElementById('res-potencia').textContent = potenciaReal.toFixed(2);
+            document.getElementById('res-modulos').textContent = numModulos;
+            document.getElementById('res-area').textContent = areaNecessaria.toFixed(1);
+            document.getElementById('res-inversor').textContent = potenciaInversor.toFixed(1);
+            document.getElementById('res-geracao').textContent = geracaoMensal.toFixed(0);
+            document.getElementById('res-payback').textContent = paybackSimples.toFixed(1);
+
+            // Financeiro
+            document.getElementById('res-investimento').textContent = formatarMoeda(investimentoTotal);
+            document.getElementById('res-economia-mensal').textContent = formatarMoeda(economiaMensal);
+            document.getElementById('res-economia-anual').textContent = formatarMoeda(economiaAnual);
+            document.getElementById('res-economia-25anos').textContent = formatarMoeda(economia25anos);
+
+            // Diagrama
+            document.getElementById('diag-modulos').textContent = `${numModulos}x ${potenciaModulo}W`;
+            document.getElementById('diag-inversor').textContent = `${potenciaInversor.toFixed(1)} kW`;
+            document.getElementById('diag-consumo').textContent = `${consumoMensal} kWh`;
+
+            // Especificações técnicas
+            document.getElementById('spec-potencia').textContent = `${potenciaReal.toFixed(2)} kWp (${(potenciaReal * 1000).toFixed(0)} Wp)`;
+            document.getElementById('spec-modulos').textContent = `${numModulos} módulos de ${potenciaModulo} Wp`;
+            document.getElementById('spec-inversor').textContent = `${potenciaInversor.toFixed(1)} kW (${tipoInversor})`;
+            document.getElementById('spec-area').textContent = `${areaNecessaria.toFixed(1)} m² (${(areaNecessaria * 1.2).toFixed(1)} m² com circulação)`;
+            document.getElementById('spec-geracao').textContent = `${geracaoMensal.toFixed(0)} kWh/mês`;
+            document.getElementById('spec-geracao-anual').textContent = `${geracaoAnual.toFixed(0)} kWh/ano`;
+            document.getElementById('spec-pr').textContent = `${(performanceRatio * 100).toFixed(0)}%`;
+            document.getElementById('spec-fc').textContent = `${fatorCapacidade.toFixed(1)}%`;
+
+            // Localização
+            const nomeEstado = dadosIrradiacao[uf]?.nome || uf;
+            document.getElementById('spec-local').textContent = cidade !== 'outra' ? `${cidade} - ${nomeEstado}` : nomeEstado;
+            document.getElementById('spec-hsp').textContent = `${hsp} kWh/m²/dia (efetivo: ${hspEfetivo.toFixed(2)})`;
+            document.getElementById('spec-orientacao').textContent = `${orientacaoSelect.options[orientacaoSelect.selectedIndex].text}`;
+            document.getElementById('spec-inclinacao').textContent = `${inclinacaoSelect.options[inclinacaoSelect.selectedIndex].text}`;
+
+            // Dimensionamento elétrico
+            const tensaoModulo = 40; // Voc típico
+            const correnteModulo = 14; // Isc típico
+            const modulosPorString = Math.min(numModulos, Math.floor(500 / tensaoModulo));
+            const numStrings = Math.ceil(numModulos / modulosPorString);
+            
+            document.getElementById('spec-tensao-cc').textContent = `${(modulosPorString * tensaoModulo).toFixed(0)} V (${modulosPorString} módulos/string)`;
+            document.getElementById('spec-corrente').textContent = `${(numStrings * correnteModulo).toFixed(1)} A (${numStrings} string${numStrings > 1 ? 's' : ''})`;
+            
+            // Disjuntor e cabo baseado na potência
+            let disjuntor, cabo;
+            const correnteCA = (potenciaInversor * 1000) / 220 / 1.732; // Trifásico
+            if (correnteCA <= 20) { disjuntor = '20A'; cabo = '4 mm²'; }
+            else if (correnteCA <= 25) { disjuntor = '25A'; cabo = '4 mm²'; }
+            else if (correnteCA <= 32) { disjuntor = '32A'; cabo = '6 mm²'; }
+            else if (correnteCA <= 40) { disjuntor = '40A'; cabo = '10 mm²'; }
+            else if (correnteCA <= 50) { disjuntor = '50A'; cabo = '10 mm²'; }
+            else { disjuntor = '63A'; cabo = '16 mm²'; }
+            
+            document.getElementById('spec-disjuntor').textContent = `${disjuntor} tripolar curva C`;
+            document.getElementById('spec-cabo').textContent = `${cabo} (mínimo conforme NBR 5410)`;
+            document.getElementById('spec-dps').textContent = `Classe II - CC e CA (conforme NBR 5410)`;
+
+            // Tabela de custos
+            renderizarTabelaCustos(potenciaReal, numModulos, potenciaModulo, potenciaInversor, custoKwp, investimentoTotal);
+
+            // Gráfico de economia
+            renderizarGraficoEconomia(geracaoAnual, tarifaEnergia, reajusteTarifa, degradacao);
+
+            // Alertas
+            renderizarAlertas(potenciaReal, geracaoMensal, consumoMensal, consumoMinimo, areaNecessaria, paybackSimples);
+
+            // Salvar dados
+            salvarDados();
+        }
+
+        // ==================== FUNÇÕES AUXILIARES ====================
+
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function renderizarTabelaCustos(potencia, numModulos, potModulo, potInversor, custoKwp, total) {
+            const tbody = document.getElementById('tabela-custos');
+            
+            // Estimativa de composição (aproximada)
+            const custoModulos = total * 0.45;
+            const custoInversor = total * 0.25;
+            const custoEstrutura = total * 0.10;
+            const custoInstalacao = total * 0.12;
+            const custoDocumentacao = total * 0.08;
+
+            tbody.innerHTML = `
+                <tr>
+                    <td>Módulos Fotovoltaicos</td>
+                    <td>${numModulos}x ${potModulo} Wp</td>
+                    <td>${formatarMoeda(custoModulos)}</td>
+                </tr>
+                <tr>
+                    <td>Inversor Grid-Tie</td>
+                    <td>${potInversor.toFixed(1)} kW</td>
+                    <td>${formatarMoeda(custoInversor)}</td>
+                </tr>
+                <tr>
+                    <td>Estrutura de Fixação</td>
+                    <td>Kit completo</td>
+                    <td>${formatarMoeda(custoEstrutura)}</td>
+                </tr>
+                <tr>
+                    <td>Instalação e Cabeamento</td>
+                    <td>Mão de obra + materiais</td>
+                    <td>${formatarMoeda(custoInstalacao)}</td>
+                </tr>
+                <tr>
+                    <td>Projeto e Homologação</td>
+                    <td>ART + documentação</td>
+                    <td>${formatarMoeda(custoDocumentacao)}</td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>TOTAL ESTIMADO</strong></td>
+                    <td><strong>${potencia.toFixed(2)} kWp</strong></td>
+                    <td><strong>${formatarMoeda(total)}</strong></td>
+                </tr>
+            `;
+        }
+
+        function renderizarGraficoEconomia(geracaoAnual, tarifa, reajuste, degradacao) {
+            const container = document.getElementById('chart-economia');
+            let html = '';
+            
+            let tarifaAtual = tarifa;
+            let geracaoAtual = geracaoAnual;
+            let economiaAcumulada = 0;
+            const maxEconomia = geracaoAnual * tarifa * Math.pow(1 + reajuste, 5) * 5;
+            
+            for (let ano = 1; ano <= 5; ano++) {
+                const economiaAno = geracaoAtual * tarifaAtual;
+                economiaAcumulada += economiaAno;
+                const porcentagem = (economiaAcumulada / maxEconomia) * 100;
+                
+                html += `
+                    <div class="chart-bar-container">
+                        <div class="chart-bar-label">
+                            <span class="label">Ano ${ano}</span>
+                            <span class="value">${formatarMoeda(economiaAno)} (acum: ${formatarMoeda(economiaAcumulada)})</span>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-bar-fill solar" style="width: ${porcentagem}%"></div>
+                        </div>
+                    </div>
+                `;
+                
+                tarifaAtual *= (1 + reajuste);
+                geracaoAtual *= (1 - degradacao);
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function renderizarAlertas(potencia, geracao, consumo, minimo, area, payback) {
+            const container = document.getElementById('alertas-container');
+            let html = '';
+            
+            // Alerta de potência alta
+            if (potencia > 75) {
+                html += `
+                    <div class="alert alert-warning">
+                        <span class="icon">⚠️</span>
+                        <div class="content">
+                            <div class="title">Sistema de Grande Porte</div>
+                            <div class="text">Potência acima de 75 kWp se enquadra como minigeração distribuída e pode requerer análises adicionais da distribuidora.</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Alerta de geração vs consumo
+            const percentualGeracao = (geracao / (consumo - minimo)) * 100;
+            if (percentualGeracao > 110) {
+                html += `
+                    <div class="alert alert-info">
+                        <span class="icon">💡</span>
+                        <div class="content">
+                            <div class="title">Geração Excedente</div>
+                            <div class="text">O sistema pode gerar ${percentualGeracao.toFixed(0)}% do consumo compensável. O excedente gera créditos válidos por 60 meses.</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Alerta de área
+            if (area > 50) {
+                html += `
+                    <div class="alert alert-info">
+                        <span class="icon">📐</span>
+                        <div class="content">
+                            <div class="title">Área Necessária</div>
+                            <div class="text">O sistema requer ${area.toFixed(0)} m² de área útil. Verifique se há espaço disponível no telhado ou considere instalação em solo.</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Alerta de payback
+            if (payback <= 4) {
+                html += `
+                    <div class="alert alert-success">
+                        <span class="icon">🎉</span>
+                        <div class="content">
+                            <div class="title">Excelente Retorno</div>
+                            <div class="text">Payback estimado de ${payback.toFixed(1)} anos é considerado excelente para investimentos em energia solar!</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function salvarDados() {
+            const campos = ['consumo-mensal', 'tipo-ligacao', 'percentual-compensacao', 'estado', 'cidade', 
+                           'orientacao', 'inclinacao', 'tipo-modulo', 'potencia-modulo', 'tipo-inversor',
+                           'performance-ratio', 'tarifa-energia', 'reajuste-tarifa', 'custo-kwp', 'degradacao'];
+            
+            const data = {};
+            campos.forEach(campo => {
+                const el = document.getElementById(campo);
+                if (el) data[campo] = el.value;
+            });
+            
+            localStorage.setItem('solar_calc_data', JSON.stringify(data));
+        }
+
+        // ==================== INICIAR ====================
+        window.addEventListener('load', init);
+    </script>
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+</body>
+</html>
