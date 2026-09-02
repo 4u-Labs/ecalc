@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Impermeabilização | Ferramentas de Engenharia</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00ffff;
+            --secondary: #8b1bf7;
+            --dark: #0f0f14;
+            --darker: #1a1a25;
+            --light: #e0e0e0;
+            --muted: #999;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--light);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .site-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--dark);
+            font-weight: bold;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .site-logo:hover {
+            transform: scale(1.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(139, 27, 247, 0.5)); }
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+
+        .content-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .content-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.1);
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tipo-sistema {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .tipo-btn {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            color: var(--light);
+            text-align: center;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tipo-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .tipo-btn:hover::before {
+            left: 100%;
+        }
+
+        .tipo-btn:hover {
+            border-color: var(--primary);
+            background: rgba(0, 255, 255, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .tipo-btn.active {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--dark);
+            border-color: var(--primary);
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--light);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 8px;
+            color: var(--primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: var(--dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .spec-item {
+            background: rgba(0, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .spec-item:hover {
+            background: rgba(0, 255, 255, 0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .spec-label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .spec-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid;
+            line-height: 1.6;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-info {
+            background: rgba(0, 255, 255, 0.08);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .alert-warning {
+            background: rgba(255, 165, 0, 0.1);
+            border-color: #ffa500;
+            color: #ffb84d;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            border-color: #28a745;
+            color: #4caf50;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .info-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .info-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .info-list li:hover::before {
+            transform: translateX(5px);
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .resultado-header {
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            padding: 30px;
+            border-radius: 16px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .modal-title {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .precos-grid {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .preco-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .preco-item:hover {
+            background: rgba(0, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .preco-label {
+            color: var(--light);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .preco-descricao {
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin-top: 3px;
+        }
+
+        .preco-input {
+            width: 150px;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: var(--primary);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: right;
+            transition: all 0.3s ease;
+        }
+
+        .preco-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .categoria-header {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .categoria-header:first-child {
+            margin-top: 0;
+        }
+
+        .btn-voltar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .btn-voltar:hover {
+            background: rgba(0, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 50px;
+            color: var(--muted);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--darker);
+            color: var(--light);
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            border: 1px solid var(--primary);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tipo-sistema {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .specs-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .btn-voltar {
+                position: static;
+                margin-bottom: 20px;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table th {
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .rating {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #ffd700;
+            font-size: 1rem;
+        }
+
+        .star.empty {
+            color: rgba(255, 215, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <a href="#" class="btn-voltar" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <a href="#" class="site-logo">IE</a>
+            </div>
+            <h1>Calculadora de Impermeabilização</h1>
+            <p class="subtitle">Ferramenta profissional para dimensionamento e orçamento</p>
+        </header>
+
+        <main>
+            <!-- Botões de ação -->
+            <div class="actions">
+                <button class="btn btn-primary" id="btnCalcular">
+                    <i class="fas fa-calculator"></i> Calcular
+                </button>
+                <button class="btn btn-outline" id="btnConfigurarPrecos">
+                    <i class="fas fa-cog"></i> Configurar Preços
+                </button>
+                <button class="btn btn-outline" id="btnComparar">
+                    <i class="fas fa-balance-scale"></i> Comparar Sistemas
+                </button>
+                <button class="btn btn-outline" id="btnReset">
+                    <i class="fas fa-redo"></i> Limpar
+                </button>
+            </div>
+
+            <!-- Seleção de tipo de impermeabilização -->
+            <section class="content-section fade-in">
+                <h2><i class="fas fa-shield-alt"></i> Tipo de Impermeabilização</h2>
+                <div class="tipo-sistema" id="tipoSistema">
+                    <!-- Buttons will be generated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Dados de entrada -->
+            <section class="content-section fade-in">
+                <h2><i class="fas fa-ruler-combined"></i> Dados da Área</h2>
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Tipo de ambiente
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Selecione o tipo de ambiente para recomendações específicas</span>
+                            </span>
+                        </label>
+                        <select class="form-select" id="ambiente">
+                            <option value="laje">Laje (cobertura/garagem)</option>
+                            <option value="banheiro">Banheiro/Área molhada</option>
+                            <option value="piscina">Piscina</option>
+                            <option value="reservatorio">Reservatório</option>
+                            <option value="subsolo">Subsolo</option>
+                            <option value="fundacao">Fundação/Baldrames</option>
+                            <option value="jardineira">Jardineira/Floreiras</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Área horizontal (m²)
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Área total da superfície horizontal</span>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="area-horizontal" step="0.01" value="50.00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Perímetro de rodapé (m)
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Soma de todos os perímetros que precisarão de rodapé</span>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="perimetro" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Altura do rodapé (cm)
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Altura da continuação nas paredes (mínimo recomendado pelo sistema)</span>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="altura-rodape" step="1" value="20">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Número de demãos/camadas
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Quantidade de aplicações necessárias</span>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="demaos" value="2">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Perda (%)
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Percentual de perda durante a aplicação</span>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="perda" step="1" value="10">
+                    </div>
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>Dica:</strong> O rodapé é a continuação da impermeabilização pelas paredes 
+                    (mínimo 20cm para áreas molhadas, 30cm para piscinas).
+                </div>
+            </section>
+
+            <!-- Resultados -->
+            <section class="content-section fade-in" id="sectionResultado" style="display: none;">
+                <h2><i class="fas fa-chart-line"></i> Dimensionamento e Materiais</h2>
+                <div id="resultado"></div>
+            </section>
+
+            <!-- Comparação de Sistemas -->
+            <section class="content-section fade-in" id="sectionComparacao" style="display: none;">
+                <h2><i class="fas fa-balance-scale"></i> Comparação de Sistemas</h2>
+                <div id="comparacao"></div>
+            </section>
+
+            <!-- Referências NBR -->
+            <section class="content-section fade-in">
+                <h2><i class="fas fa-book"></i> Referências Normativas</h2>
+                <ul class="info-list">
+                    <li><strong>NBR 9575:2010</strong> - Impermeabilização - Seleção e Projeto</li>
+                    <li><strong>NBR 9574:2008</strong> - Execução de Impermeabilização</li>
+                    <li><strong>NBR 15352:2006</strong> - Mantas Termoplásticas</li>
+                    <li><strong>NBR 13724:2011</strong> - Mantas Asfálticas</li>
+                    <li><strong>NBR 11941:2022</strong> - Revestimento de Paredes com Argamassa</li>
+                    <li><strong>NBR 15849:2010</strong> - Sistemas de Impermeabilização com Tintas</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; <span id="ano"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+        </footer>
+    </div>
+
+    <!-- Modal de Configuração de Preços -->
+    <div id="modalPrecos" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-cog"></i> Configurar Preços de Materiais</h3>
+                <button class="modal-close" onclick="fecharModalPrecos()">×</button>
+            </div>
+            
+            <div class="categoria-header">Sistemas de Impermeabilização (por m²)</div>
+            <div class="precos-grid" id="precosGrid">
+                <!-- Preço items will be generated by JavaScript -->
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="restaurarPrecos()">
+                    <i class="fas fa-undo"></i> Restaurar Padrão
+                </button>
+                <button class="btn btn-primary" onclick="salvarPrecos()">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let tipoSistemaAtual = 'manta-asfaltica';
+        let calculoRealizado = false;
+
+        // Preços padrão
+        const precosPadrao = {
+            mantaAsfaltica: 72,
+            mantaPvc: 65,
+            argamassa: 58,
+            cristalizante: 25,
+            acrilica: 30,
+            poliureia: 185
+        };
+
+        // Carregar preços do localStorage
+        let precos = JSON.parse(localStorage.getItem('precosImpermeabilizacao')) || { ...precosPadrao };
+
+        // Sistemas de impermeabilização
+        const sistemas = {
+            'manta-asfaltica': {
+                nome: 'Manta Asfáltica',
+                icone: '📜',
+                unidade: 'm²',
+                rendimento: 1.0,
+                consumoAdesivo: 0.3,
+                get custoM2() { return precos.mantaAsfaltica; },
+                espessura: '3-4mm',
+                durabilidade: 20,
+                dificuldade: 3,
+                vantagens: [
+                    'Alta durabilidade (15-20 anos)',
+                    'Resistente a intempéries',
+                    'Boa flexibilidade',
+                    'Adequada para grandes áreas'
+                ],
+                cuidados: [
+                    'Necessita maçarico (risco de incêndio)',
+                    'Mão de obra especializada',
+                    'Cuidado com emendas',
+                    'Proteção mecânica recomendada'
+                ],
+                aplicacoes: ['Lajes', 'Coberturas', 'Subsolos', 'Piscinas'],
+                camadas: 1
+            },
+            'manta-pvc': {
+                nome: 'Manta PVC',
+                icone: '📄',
+                unidade: 'm²',
+                rendimento: 1.0,
+                consumoAdesivo: 0.5,
+                get custoM2() { return precos.mantaPvc; },
+                espessura: '1-2mm',
+                durabilidade: 25,
+                dificuldade: 2,
+                vantagens: [
+                    'Não necessita maçarico',
+                    'Flexível mesmo em baixas temperaturas',
+                    'Resistente a raízes',
+                    'Emendas por solda química'
+                ],
+                cuidados: [
+                    'Sensível a perfurações',
+                    'Necessita base lisa',
+                    'Custo mais elevado',
+                    'Proteção UV necessária'
+                ],
+                aplicacoes: ['Lajes verdes', 'Jardineiras', 'Piscinas', 'Reservatórios'],
+                camadas: 1
+            },
+            'argamassa': {
+                nome: 'Argamassa Polimérica',
+                icone: '🧱',
+                unidade: 'kg',
+                rendimento: 2.5,
+                consumoAdesivo: 0,
+                get custoM2() { return precos.argamassa; },
+                espessura: '2-3mm',
+                durabilidade: 10,
+                dificuldade: 1,
+                vantagens: [
+                    'Fácil aplicação',
+                    'Aderência excelente',
+                    'Flexível',
+                    'Permite pintura e acabamento'
+                ],
+                cuidados: [
+                    'Múltiplas demãos necessárias',
+                    'Cura lenta (24-48h)',
+                    'Não suporta grandes movimentações',
+                    'Preparação da base crítica'
+                ],
+                aplicacoes: ['Banheiros', 'Áreas molhadas', 'Jardineiras', 'Lajes'],
+                camadas: 3
+            },
+            'cristalizante': {
+                nome: 'Cristalizante',
+                icone: '💎',
+                unidade: 'kg',
+                rendimento: 1.5,
+                consumoAdesivo: 0,
+                get custoM2() { return precos.cristalizante; },
+                espessura: 'Penetração',
+                durabilidade: 30,
+                dificuldade: 1,
+                vantagens: [
+                    'Penetra no concreto',
+                    'Não forma película',
+                    'Permite transpiração',
+                    'Auto-selante (fecha fissuras)'
+                ],
+                cuidados: [
+                    'Apenas para concreto',
+                    'Não adequado para movimentação',
+                    'Necessita umidade para ativar',
+                    'Não indicado para pressão negativa alta'
+                ],
+                aplicacoes: ['Fundações', 'Subsolos', 'Reservatórios', 'Piscinas'],
+                camadas: 2
+            },
+            'acrilica': {
+                nome: 'Acrílica Elastomérica',
+                icone: '🎨',
+                unidade: 'L',
+                rendimento: 0.4,
+                consumoAdesivo: 0,
+                get custoM2() { return precos.acrilica; },
+                espessura: '1-2mm',
+                durabilidade: 8,
+                dificuldade: 1,
+                vantagens: [
+                    'Aplicação simples (rolo/brocha)',
+                    'Elasticidade alta',
+                    'Resistente a UV',
+                    'Diversas cores disponíveis'
+                ],
+                cuidados: [
+                    'Necessita múltiplas demãos (3-4)',
+                    'Durabilidade média (5-8 anos)',
+                    'Não indicada para água parada',
+                    'Manutenção periódica'
+                ],
+                aplicacoes: ['Lajes', 'Coberturas', 'Calhas', 'Rufos'],
+                camadas: 4
+            },
+            'poliureia': {
+                nome: 'Poliureia',
+                icone: '⚗️',
+                unidade: 'kg',
+                rendimento: 1.8,
+                consumoAdesivo: 0.2,
+                get custoM2() { return precos.poliureia; },
+                espessura: '2-3mm',
+                durabilidade: 35,
+                dificuldade: 5,
+                vantagens: [
+                    'Cura ultrarrápida (segundos)',
+                    'Altíssima resistência',
+                    'Sem emendas',
+                    'Durabilidade excepcional (30+ anos)'
+                ],
+                cuidados: [
+                    'Custo muito elevado',
+                    'Equipamento específico necessário',
+                    'Mão de obra altamente especializada',
+                    'Preparação rigorosa da base'
+                ],
+                aplicacoes: ['Piscinas', 'Reservatórios', 'Lajes técnicas', 'Áreas críticas'],
+                camadas: 1
+            }
+        };
+
+        // Ambientes
+        const ambientes = {
+            'laje': {
+                nome: 'Laje (cobertura/garagem)',
+                sistemas: ['manta-asfaltica', 'manta-pvc', 'acrilica', 'poliureia'],
+                rodapeMin: 0,
+                observacao: 'Atenção com caimento (mínimo 1%) e ralos'
+            },
+            'banheiro': {
+                nome: 'Banheiro/Área molhada',
+                sistemas: ['argamassa', 'manta-asfaltica'],
+                rodapeMin: 20,
+                observacao: 'Rodapé mínimo 20cm. Cuidado com ralos e tubulações'
+            },
+            'piscina': {
+                nome: 'Piscina',
+                sistemas: ['manta-asfaltica', 'manta-pvc', 'poliureia', 'cristalizante'],
+                rodapeMin: 30,
+                observacao: 'Sistema deve resistir à pressão hidrostática contínua'
+            },
+            'reservatorio': {
+                nome: 'Reservatório',
+                sistemas: ['manta-asfaltica', 'cristalizante', 'poliureia'],
+                rodapeMin: 30,
+                observacao: 'Água potável: verificar atestado de potabilidade do sistema'
+            },
+            'subsolo': {
+                nome: 'Subsolo',
+                sistemas: ['manta-asfaltica', 'cristalizante'],
+                rodapeMin: 50,
+                observacao: 'Atenção à pressão negativa. Lençol freático alto: sistema externo'
+            },
+            'fundacao': {
+                nome: 'Fundação/Baldrames',
+                sistemas: ['manta-asfaltica', 'cristalizante'],
+                rodapeMin: 0,
+                observacao: 'Impermeabilização deve subir até 30cm acima do nível do solo'
+            },
+            'jardineira': {
+                nome: 'Jardineira/Floreiras',
+                sistemas: ['manta-pvc', 'argamassa', 'manta-asfaltica'],
+                rodapeMin: 20,
+                observacao: 'Sistema deve resistir a raízes e fertilizantes'
+            }
+        };
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('ano').textContent = new Date().getFullYear();
+            renderizarBotoesSistema();
+            renderizarPrecosModal();
+            adicionarEventListeners();
+            calcular(); // Cálculo inicial
+        });
+
+        // Renderizar botões de sistema
+        function renderizarBotoesSistema() {
+            const container = document.getElementById('tipoSistema');
+            container.innerHTML = '';
+            
+            Object.keys(sistemas).forEach(key => {
+                const sistema = sistemas[key];
+                const btn = document.createElement('button');
+                btn.className = `tipo-btn ${key === tipoSistemaAtual ? 'active' : ''}`;
+                btn.onclick = () => selecionarTipo(key);
+                btn.innerHTML = `
+                    <div style="font-size: 2rem; margin-bottom: 8px;">${sistema.icone}</div>
+                    <div style="font-weight: 600;">${sistema.nome}</div>
+                    <small class="text-muted">${sistema.espessura}</small>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(sistema.durabilidade / 35) * 100}%"></div>
+                    </div>
+                    <small style="color: var(--muted);">${sistema.durabilidade} anos</small>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        // Renderizar modal de preços
+        function renderizarPrecosModal() {
+            const container = document.getElementById('precosGrid');
+            container.innerHTML = '';
+            
+            Object.keys(sistemas).forEach(key => {
+                const sistema = sistemas[key];
+                const item = document.createElement('div');
+                item.className = 'preco-item';
+                item.innerHTML = `
+                    <div>
+                        <div class="preco-label">${sistema.icone} ${sistema.nome}</div>
+                        <div class="preco-descricao">${sistema.espessura} • ${sistema.durabilidade} anos</div>
+                    </div>
+                    <input type="number" id="preco-${key}" class="preco-input" step="5" min="0" 
+                           value="${sistema.custoM2.toFixed(0)}">
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Adicionar event listeners
+        function adicionarEventListeners() {
+            // Botões principais
+            document.getElementById('btnCalcular').addEventListener('click', calcular);
+            document.getElementById('btnReset').addEventListener('click', limpar);
+            document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+            document.getElementById('btnComparar').addEventListener('click', compararSistemas);
+
+            // Inputs
+            ['ambiente', 'area-horizontal', 'perimetro', 'altura-rodape', 'demaos', 'perda'].forEach(id => {
+                const element = document.getElementById(id);
+                element.addEventListener('input', () => {
+                    if (calculoRealizado) calcular();
+                });
+                element.addEventListener('change', calcular);
+            });
+
+            // Modal
+            document.getElementById('modalPrecos').addEventListener('click', (e) => {
+                if (e.target.id === 'modalPrecos') {
+                    fecharModalPrecos();
+                }
+            });
+        }
+
+        // Selecionar tipo de sistema
+        function selecionarTipo(tipo) {
+            tipoSistemaAtual = tipo;
+            document.querySelectorAll('.tipo-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.tipo-btn').classList.add('active');
+            document.getElementById('demaos').value = sistemas[tipo].camadas;
+            if (calculoRealizado) calcular();
+        }
+
+        // Calcular
+        function calcular() {
+            const ambiente = document.getElementById('ambiente').value;
+            const areaHorizontal = parseFloat(document.getElementById('area-horizontal').value) || 0;
+            const perimetro = parseFloat(document.getElementById('perimetro').value) || 0;
+            const alturaRodape = (parseFloat(document.getElementById('altura-rodape').value) || 0) / 100;
+            const demaos = parseFloat(document.getElementById('demaos').value) || 1;
+            const perda = (parseFloat(document.getElementById('perda').value) || 0) / 100;
+
+            if (areaHorizontal <= 0) {
+                mostrarAlerta('Por favor, informe uma área válida!', 'warning');
+                return;
+            }
+
+            const sistema = sistemas[tipoSistemaAtual];
+            const infoAmbiente = ambientes[ambiente];
+
+            // Cálculos
+            const areaRodape = perimetro * alturaRodape;
+            const areaTotal = areaHorizontal + areaRodape;
+
+            let consumoMaterial;
+            let unidadeMaterial;
+            if (sistema.unidade === 'm²') {
+                consumoMaterial = areaTotal * sistema.rendimento * (1 + perda);
+                unidadeMaterial = 'm²';
+            } else if (sistema.unidade === 'kg') {
+                consumoMaterial = areaTotal * sistema.rendimento * demaos * (1 + perda);
+                unidadeMaterial = 'kg';
+            } else if (sistema.unidade === 'L') {
+                consumoMaterial = areaTotal * sistema.rendimento * demaos * (1 + perda);
+                unidadeMaterial = 'litros';
+            }
+
+            const consumoAdesivo = areaTotal * sistema.consumoAdesivo * (1 + perda);
+            const custoMaterial = areaTotal * sistema.custoM2;
+            const custoMaoObra = areaTotal * (sistema.custoM2 * 0.4);
+            const custoTotal = custoMaterial + custoMaoObra;
+
+            // Alertas
+            let alertas = [];
+            if (perimetro > 0 && alturaRodape * 100 < infoAmbiente.rodapeMin) {
+                alertas.push({
+                    tipo: 'warning',
+                    mensagem: `⚠️ Atenção: Altura do rodapé recomendada para ${infoAmbiente.nome} é de ${infoAmbiente.rodapeMin}cm (atual: ${(alturaRodape * 100).toFixed(0)}cm)`
+                });
+            }
+            if (!infoAmbiente.sistemas.includes(tipoSistemaAtual)) {
+                alertas.push({
+                    tipo: 'warning',
+                    mensagem: `⚠️ Atenção: ${sistema.nome} não é o sistema mais indicado para ${infoAmbiente.nome}. Considere: ${infoAmbiente.sistemas.map(s => sistemas[s].nome).join(', ')}`
+                });
+            }
+
+            // Renderizar resultados
+            let html = `
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <div class="spec-label">Sistema</div>
+                        <div class="spec-value" style="font-size: 1.1rem;">${sistema.icone} ${sistema.nome}</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Área Total</div>
+                        <div class="spec-value">${areaTotal.toFixed(2)} m²</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Material</div>
+                        <div class="spec-value">${consumoMaterial.toFixed(2)} ${unidadeMaterial}</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Demãos/Camadas</div>
+                        <div class="spec-value">${demaos}</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Custo Material</div>
+                        <div class="spec-value">R$ ${custoMaterial.toFixed(2)}</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Custo Total</div>
+                        <div class="spec-value">R$ ${custoTotal.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+
+            alertas.forEach(alerta => {
+                html += `
+                    <div class="alert alert-${alerta.tipo}">
+                        ${alerta.mensagem}
+                    </div>
+                `;
+            });
+
+            html += `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>${infoAmbiente.nome}:</strong> ${infoAmbiente.observacao}
+                </div>
+
+                <div class="content-section mt-2">
+                    <div class="resultado-header"><i class="fas fa-box"></i> Materiais Necessários</div>
+                    <ul class="info-list">
+                        <li><strong>${sistema.nome}:</strong> ${consumoMaterial.toFixed(2)} ${unidadeMaterial}</li>
+            `;
+
+            if (consumoAdesivo > 0) {
+                html += `<li><strong>Primer/Adesivo:</strong> ${consumoAdesivo.toFixed(2)} kg</li>`;
+            }
+
+            html += `
+                        <li><strong>Área horizontal:</strong> ${areaHorizontal.toFixed(2)} m²</li>
+                        <li><strong>Área rodapé:</strong> ${areaRodape.toFixed(2)} m² (${perimetro.toFixed(2)}m × ${(alturaRodape * 100).toFixed(0)}cm)</li>
+                        <li><strong>Perda considerada:</strong> ${(perda * 100).toFixed(0)}%</li>
+                    </ul>
+                </div>
+
+                <div class="content-section mt-2">
+                    <div class="resultado-header"><i class="fas fa-star"></i> Avaliação do Sistema</div>
+                    <div class="grid">
+                        <div class="spec-item">
+                            <div class="spec-label">Durabilidade</div>
+                            <div class="rating">
+                                ${gerarEstrelas(sistema.durabilidade / 7)}
+                            </div>
+                            <small>${sistema.durabilidade} anos</small>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Dificuldade</div>
+                            <div class="rating">
+                                ${gerarEstrelas(5 - sistema.dificuldade + 1)}
+                            </div>
+                            <small>${getNivelDificuldade(sistema.dificuldade)}</small>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Custo-benefício</div>
+                            <div class="rating">
+                                ${gerarEstrelas(calcularCustoBeneficio(sistema))}
+                            </div>
+                            <small>${getCustoBeneficioTexto(calcularCustoBeneficio(sistema))}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section mt-2">
+                    <div class="resultado-header"><i class="fas fa-check-circle"></i> Vantagens - ${sistema.nome}</div>
+                    <ul class="info-list">
+                        ${sistema.vantagens.map(v => `<li>${v}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="content-section mt-2">
+                    <div class="resultado-header"><i class="fas fa-exclamation-triangle"></i> Cuidados e Limitações</div>
+                    <ul class="info-list">
+                        ${sistema.cuidados.map(c => `<li>${c}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="content-section mt-2">
+                    <div class="resultado-header"><i class="fas fa-building"></i> Aplicações Recomendadas</div>
+                    <ul class="info-list">
+                        ${sistema.aplicacoes.map(a => `<li>${a}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="content-section mt-2">
+                    <div class="resultado-header"><i class="fas fa-dollar-sign"></i> Composição de Custos</div>
+                    <ul class="info-list">
+                        <li><strong>Material:</strong> R$ ${custoMaterial.toFixed(2)} (${areaTotal.toFixed(2)}m² × R$ ${sistema.custoM2}/m²)</li>
+                        <li><strong>Mão de obra estimada:</strong> R$ ${custoMaoObra.toFixed(2)}</li>
+                        <li><strong>Custo por m²:</strong> R$ ${(custoTotal / areaTotal).toFixed(2)}/m²</li>
+                        <li><strong>Total estimado:</strong> R$ ${custoTotal.toFixed(2)}</li>
+                    </ul>
+                    <span class="text-muted">*Valores aproximados - variam por região e fornecedor</span>
+                </div>
+
+                <div class="content-section mt-2">
+                    <div class="resultado-header"><i class="fas fa-clipboard-check"></i> Checklist de Execução</div>
+                    <ul class="info-list">
+                        <li>✓ Verificar caimento mínimo (1-2%)</li>
+                        <li>✓ Base deve estar limpa, seca e curada</li>
+                        <li>✓ Corrigir fissuras e imperfeições</li>
+                        <li>✓ Arredondar cantos (raio mínimo 5cm)</li>
+                        <li>✓ Prever teste de estanqueidade (24h)</li>
+                        <li>✓ Proteção mecânica quando necessário</li>
+                        <li>✓ Respeitar tempo de cura antes do uso</li>
+                    </ul>
+                </div>
+            `;
+
+            document.getElementById('resultado').innerHTML = html;
+            document.getElementById('sectionResultado').style.display = 'block';
+            document.getElementById('sectionResultado').scrollIntoView({ behavior: 'smooth' });
+            calculoRealizado = true;
+        }
+
+        // Comparar sistemas
+        function compararSistemas() {
+            const ambiente = document.getElementById('ambiente').value;
+            const areaHorizontal = parseFloat(document.getElementById('area-horizontal').value) || 50;
+            
+            let html = `
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Sistema</th>
+                            <th>Durabilidade</th>
+                            <th>Custo/m²</th>
+                            <th>Dificuldade</th>
+                            <th>Indicação</th>
+                            <th>Custo Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.keys(sistemas).forEach(key => {
+                const sistema = sistemas[key];
+                const custoTotal = areaHorizontal * sistema.custoM2 * 1.4; // Incluindo mão de obra
+                const indicado = ambientes[ambiente].sistemas.includes(key);
+                
+                html += `
+                    <tr>
+                        <td><strong>${sistema.icone} ${sistema.nome}</strong></td>
+                        <td>
+                            <div class="rating">
+                                ${gerarEstrelas(sistema.durabilidade / 7)}
+                            </div>
+                            <small>${sistema.durabilidade} anos</small>
+                        </td>
+                        <td>R$ ${sistema.custoM2.toFixed(2)}</td>
+                        <td>
+                            <div class="rating">
+                                ${gerarEstrelas(5 - sistema.dificuldade + 1)}
+                            </div>
+                            <small>${getNivelDificuldade(sistema.dificuldade)}</small>
+                        </td>
+                        <td>${indicado ? '✅ Recomendado' : '⚠️ Verificar'}</td>
+                        <td><strong>R$ ${custoTotal.toFixed(2)}</strong></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Recomendação para ${ambientes[ambiente].nome}:</strong> 
+                    ${ambientes[ambiente].sistemas.map(s => sistemas[s].nome).join(', ')}
+                </div>
+            `;
+
+            document.getElementById('comparacao').innerHTML = html;
+            document.getElementById('sectionComparacao').style.display = 'block';
+            document.getElementById('sectionComparacao').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Funções auxiliares
+        function gerarEstrelas(nota) {
+            let estrelas = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= nota) {
+                    estrelas += '<i class="fas fa-star star"></i>';
+                } else {
+                    estrelas += '<i class="fas fa-star star empty"></i>';
+                }
+            }
+            return estrelas;
+        }
+
+        function getNivelDificuldade(dificuldade) {
+            const niveis = ['Muito Fácil', 'Fácil', 'Médio', 'Difícil', 'Muito Difícil'];
+            return niveis[dificuldade - 1] || 'Médio';
+        }
+
+        function calcularCustoBeneficio(sistema) {
+            const notaDurabilidade = sistema.durabilidade / 7;
+            const notaCusto = 5 - (sistema.custoM2 / 30); // Inverso do custo
+            const notaDificuldade = 5 - sistema.dificuldade + 1;
+            return Math.round((notaDurabilidade + notaCusto + notaDificuldade) / 3);
+        }
+
+        function getCustoBeneficioTexto(nota) {
+            if (nota >= 4) return 'Excelente';
+            if (nota >= 3) return 'Bom';
+            if (nota >= 2) return 'Regular';
+            return 'Baixo';
+        }
+
+        function mostrarAlerta(mensagem, tipo = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${tipo}`;
+            alertDiv.innerHTML = mensagem;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '10000';
+            alertDiv.style.maxWidth = '400px';
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Modal de preços
+        function abrirModalPrecos() {
+            document.getElementById('modalPrecos').classList.add('active');
+        }
+
+        function fecharModalPrecos() {
+            document.getElementById('modalPrecos').classList.remove('active');
+        }
+
+        function salvarPrecos() {
+            Object.keys(sistemas).forEach(key => {
+                const input = document.getElementById(`preco-${key}`);
+                const valor = parseFloat(input.value);
+                if (!isNaN(valor) && valor >= 0) {
+                    if (key === 'manta-asfaltica') precos.mantaAsfaltica = valor;
+                    else if (key === 'manta-pvc') precos.mantaPvc = valor;
+                    else if (key === 'argamassa') precos.argamassa = valor;
+                    else if (key === 'cristalizante') precos.cristalizante = valor;
+                    else if (key === 'acrilica') precos.acrilica = valor;
+                    else if (key === 'poliureia') precos.poliureia = valor;
+                }
+            });
+
+            localStorage.setItem('precosImpermeabilizacao', JSON.stringify(precos));
+            
+            if (calculoRealizado) {
+                calcular();
+            }
+            
+            fecharModalPrecos();
+            mostrarAlerta('✅ Preços salvos com sucesso!', 'success');
+        }
+
+        function restaurarPrecos() {
+            if (confirm('Deseja restaurar os preços padrão?')) {
+                precos = { ...precosPadrao };
+                localStorage.setItem('precosImpermeabilizacao', JSON.stringify(precos));
+                renderizarPrecosModal();
+                
+                if (calculoRealizado) {
+                    calcular();
+                }
+                
+                mostrarAlerta('✅ Preços restaurados com sucesso!', 'success');
+            }
+        }
+
+        // Limpar formulário
+        function limpar() {
+            document.getElementById('ambiente').value = 'laje';
+            document.getElementById('area-horizontal').value = '50.00';
+            document.getElementById('perimetro').value = '0';
+            document.getElementById('altura-rodape').value = '20';
+            document.getElementById('demaos').value = sistemas[tipoSistemaAtual].camadas;
+            document.getElementById('perda').value = '10';
+            document.getElementById('resultado').innerHTML = '';
+            document.getElementById('sectionResultado').style.display = 'none';
+            document.getElementById('sectionComparacao').style.display = 'none';
+            calculoRealizado = false;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
