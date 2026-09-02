@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Desempenho Térmico NBR 15575 | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 30px;
+      background: rgba(0, 255, 255, 0.03);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      border-radius: 20px;
+    }
+    
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #00ffff, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      color: #888;
+      font-size: 0.95rem;
+    }
+    
+    /* Cards */
+    .card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #00ffff;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .card-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(180deg, #00ffff, #8b5cf6);
+      border-radius: 2px;
+    }
+    
+    /* Zona Bioclimática */
+    .zona-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+    
+    .zona-btn {
+      padding: 16px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(0,255,255,0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .zona-btn:hover {
+      border-color: #00ffff;
+      background: rgba(0,255,255,0.05);
+      transform: translateY(-2px);
+    }
+    
+    .zona-btn.active {
+      background: linear-gradient(135deg, rgba(0,255,255,0.2), rgba(139,92,246,0.2));
+      border-color: #00ffff;
+      box-shadow: 0 0 20px rgba(0,255,255,0.2);
+    }
+    
+    .zona-btn.active::after {
+      content: '✓';
+      position: absolute;
+      top: 5px;
+      right: 8px;
+      font-size: 0.75rem;
+      color: #00ffff;
+    }
+    
+    .zona-numero {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #00ffff;
+      display: block;
+    }
+    
+    .zona-descricao {
+      font-size: 0.7rem;
+      color: #888;
+      margin-top: 4px;
+    }
+    
+    /* Info Card */
+    .zona-info-card {
+      background: linear-gradient(135deg, rgba(0,255,255,0.05), rgba(139,92,246,0.05));
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    
+    .zona-titulo {
+      font-size: 1.1rem;
+      color: #00ffff;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .zona-estados {
+      color: #888;
+      font-size: 0.85rem;
+      margin-bottom: 15px;
+    }
+    
+    .zona-specs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    
+    .zona-spec {
+      background: rgba(0,0,0,0.3);
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 3px solid #00ffff;
+    }
+    
+    .zona-spec-label {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .zona-spec-value {
+      font-size: 0.95rem;
+      color: #00ffff;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    
+    /* Presets */
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .preset-btn {
+      padding: 14px;
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+    
+    .preset-btn:hover {
+      background: rgba(139,92,246,0.2);
+      border-color: #8b5cf6;
+      transform: translateY(-2px);
+    }
+    
+    .preset-nome {
+      font-weight: 600;
+      color: #8b5cf6;
+      font-size: 0.9rem;
+    }
+    
+    .preset-descricao {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 4px;
+    }
+    
+    /* Camadas */
+    .camadas-container {
+      min-height: 100px;
+    }
+    
+    .camada-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: auto 1fr auto auto auto;
+      gap: 12px;
+      align-items: center;
+      transition: all 0.3s ease;
+      cursor: grab;
+    }
+    
+    .camada-item:active {
+      cursor: grabbing;
+    }
+    
+    .camada-item.dragging {
+      opacity: 0.5;
+      border-color: #8b5cf6;
+    }
+    
+    .camada-item:hover {
+      border-color: rgba(0,255,255,0.4);
+      background: rgba(0,255,255,0.03);
+    }
+    
+    .camada-numero {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #00ffff, #8b5cf6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #000;
+    }
+    
+    .camada-info {
+      min-width: 0;
+    }
+    
+    .camada-nome {
+      font-weight: 600;
+      color: #e0e0e0;
+      font-size: 0.9rem;
+    }
+    
+    .camada-props {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 2px;
+    }
+    
+    .camada-select {
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0,255,255,0.3);
+      color: #fff;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      min-width: 180px;
+      cursor: pointer;
+    }
+    
+    .camada-select:focus {
+      outline: none;
+      border-color: #00ffff;
+    }
+    
+    .camada-input {
+      width: 70px;
+      padding: 8px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0,255,255,0.3);
+      color: #00ffff;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .camada-input:focus {
+      outline: none;
+      border-color: #00ffff;
+    }
+    
+    .btn-remover {
+      width: 32px;
+      height: 32px;
+      background: rgba(220,53,69,0.2);
+      border: 1px solid rgba(220,53,69,0.5);
+      color: #dc3545;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+    
+    .btn-remover:hover {
+      background: rgba(220,53,69,0.4);
+    }
+    
+    .btn-add-camada {
+      width: 100%;
+      padding: 14px;
+      background: rgba(0,255,255,0.05);
+      border: 2px dashed rgba(0,255,255,0.3);
+      color: #00ffff;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .btn-add-camada:hover {
+      background: rgba(0,255,255,0.1);
+      border-color: #00ffff;
+    }
+    
+    /* Absortância */
+    .absortancia-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px;
+      margin-top: 15px;
+    }
+    
+    .absortancia-btn {
+      padding: 12px 8px;
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .absortancia-btn:hover {
+      border-color: rgba(255,255,255,0.3);
+    }
+    
+    .absortancia-btn.active {
+      border-color: var(--cor);
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .absortancia-cor {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin: 0 auto 6px;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    
+    .absortancia-valor {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    
+    .absortancia-nome {
+      font-size: 0.7rem;
+      color: #888;
+      margin-top: 2px;
+    }
+    
+    /* Botões principais */
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 25px 0;
+    }
+    
+    .btn {
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #00ffff, #8b5cf6);
+      color: #000;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,255,255,0.3);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 2px solid rgba(0,255,255,0.3);
+      color: #00ffff;
+    }
+    
+    .btn-outline:hover {
+      background: rgba(0,255,255,0.1);
+      border-color: #00ffff;
+    }
+    
+    .btn-secondary {
+      background: rgba(139,92,246,0.2);
+      border: 2px solid rgba(139,92,246,0.4);
+      color: #8b5cf6;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(139,92,246,0.3);
+    }
+    
+    /* Resultados */
+    .resultado-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .resultado-item {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+    }
+    
+    .resultado-label {
+      font-size: 0.8rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .resultado-valor {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #00ffff;
+      margin: 8px 0;
+    }
+    
+    .resultado-limite {
+      font-size: 0.85rem;
+      color: #888;
+    }
+    
+    .resultado-item.atende {
+      border-color: #22c55e;
+    }
+    
+    .resultado-item.atende .resultado-valor {
+      color: #22c55e;
+    }
+    
+    .resultado-item.nao-atende {
+      border-color: #ef4444;
+    }
+    
+    .resultado-item.nao-atende .resultado-valor {
+      color: #ef4444;
+    }
+    
+    /* Níveis de desempenho */
+    .niveis-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+    
+    .nivel-item {
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      border: 2px solid transparent;
+      opacity: 0.5;
+      transition: all 0.3s ease;
+    }
+    
+    .nivel-item.ativo {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+    
+    .nivel-minimo {
+      background: rgba(245,158,11,0.1);
+      border-color: rgba(245,158,11,0.3);
+    }
+    
+    .nivel-minimo.ativo {
+      border-color: #f59e0b;
+      box-shadow: 0 0 20px rgba(245,158,11,0.2);
+    }
+    
+    .nivel-intermediario {
+      background: rgba(59,130,246,0.1);
+      border-color: rgba(59,130,246,0.3);
+    }
+    
+    .nivel-intermediario.ativo {
+      border-color: #3b82f6;
+      box-shadow: 0 0 20px rgba(59,130,246,0.2);
+    }
+    
+    .nivel-superior {
+      background: rgba(34,197,94,0.1);
+      border-color: rgba(34,197,94,0.3);
+    }
+    
+    .nivel-superior.ativo {
+      border-color: #22c55e;
+      box-shadow: 0 0 20px rgba(34,197,94,0.2);
+    }
+    
+    .nivel-icone {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    
+    .nivel-nome {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    
+    .nivel-minimo .nivel-nome { color: #f59e0b; }
+    .nivel-intermediario .nivel-nome { color: #3b82f6; }
+    .nivel-superior .nivel-nome { color: #22c55e; }
+    
+    .nivel-desc {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 4px;
+    }
+    
+    /* Conformidade Badge */
+    .conformidade-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 1rem;
+      margin: 15px 0;
+    }
+    
+    .conformidade-atende {
+      background: rgba(34,197,94,0.15);
+      border: 2px solid #22c55e;
+      color: #22c55e;
+    }
+    
+    .conformidade-nao-atende {
+      background: rgba(239,68,68,0.15);
+      border: 2px solid #ef4444;
+      color: #ef4444;
+    }
+    
+    /* Visualização da parede */
+    .parede-visual {
+      background: linear-gradient(135deg, rgba(139,69,19,0.1), rgba(160,82,45,0.1));
+      border: 2px solid rgba(139,69,19,0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .parede-titulo {
+      text-align: center;
+      color: #00ffff;
+      font-weight: 600;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+    
+    .camada-visual {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      padding: 12px;
+      margin: 6px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .camada-visual-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .camada-visual-barra {
+      height: 30px;
+      background: linear-gradient(90deg, rgba(0,255,255,0.3), rgba(139,92,246,0.3));
+      border-radius: 4px;
+      min-width: 20px;
+    }
+    
+    /* Custo */
+    .custo-container {
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .custo-titulo {
+      color: #8b5cf6;
+      font-weight: 700;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .custo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    
+    .custo-item {
+      background: rgba(0,0,0,0.3);
+      padding: 14px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .custo-label {
+      font-size: 0.75rem;
+      color: #888;
+    }
+    
+    .custo-valor {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #8b5cf6;
+      margin-top: 4px;
+    }
+    
+    /* Alertas */
+    .alert {
+      padding: 14px 18px;
+      border-radius: 10px;
+      margin: 15px 0;
+      border-left: 4px solid;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .alert-icon {
+      font-size: 1.2rem;
+    }
+    
+    .alert-content {
+      flex: 1;
+    }
+    
+    .alert-info {
+      background: rgba(0,255,255,0.08);
+      border-color: #00ffff;
+      color: #00ffff;
+    }
+    
+    .alert-warning {
+      background: rgba(245,158,11,0.08);
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+    
+    .alert-success {
+      background: rgba(34,197,94,0.08);
+      border-color: #22c55e;
+      color: #22c55e;
+    }
+    
+    .alert-danger {
+      background: rgba(239,68,68,0.08);
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      background: rgba(0,0,0,0.3);
+      padding: 5px;
+      border-radius: 10px;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: #888;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .tab.active {
+      background: linear-gradient(135deg, rgba(0,255,255,0.2), rgba(139,92,246,0.2));
+      color: #00ffff;
+    }
+    
+    .tab:hover:not(.active) {
+      color: #fff;
+    }
+    
+    /* Recomendações */
+    .recomendacoes-lista {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .recomendacoes-lista li {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .recomendacoes-lista li:last-child {
+      border-bottom: none;
+    }
+    
+    .recomendacoes-lista li::before {
+      content: '→';
+      color: #00ffff;
+      font-weight: bold;
+    }
+    
+    /* Form */
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 6px;
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: 12px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0,255,255,0.3);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    
+    .form-select:focus {
+      outline: none;
+      border-color: #00ffff;
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #0f0f14, #1a1a25);
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px solid rgba(0,255,255,0.3);
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.9);
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0,255,255,0.2);
+    }
+    
+    .modal-title {
+      color: #00ffff;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      line-height: 1;
+    }
+    
+    .modal-close:hover {
+      color: #fff;
+      transform: rotate(90deg);
+    }
+    
+    .precos-categoria {
+      margin-bottom: 25px;
+    }
+    
+    .precos-categoria-titulo {
+      color: #8b5cf6;
+      font-weight: 600;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(139,92,246,0.2);
+    }
+    
+    .precos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    
+    .preco-item {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .preco-label {
+      font-size: 0.85rem;
+      color: #ccc;
+    }
+    
+    .preco-input {
+      width: 100px;
+      padding: 8px;
+      background: rgba(0,255,255,0.1);
+      border: 1px solid rgba(0,255,255,0.3);
+      color: #00ffff;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: right;
+      font-weight: 600;
+    }
+    
+    .preco-input:focus {
+      outline: none;
+      border-color: #00ffff;
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #666;
+      font-size: 0.85rem;
+      margin-top: 40px;
+    }
+    
+    /* Responsivo */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .camada-item {
+        grid-template-columns: auto 1fr;
+        gap: 10px;
+      }
+      
+      .camada-select,
+      .camada-input {
+        grid-column: 1 / -1;
+      }
+      
+      .btn-remover {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+      
+      .camada-item {
+        position: relative;
+        padding-right: 50px;
+      }
+      
+      .resultado-valor {
+        font-size: 1.4rem;
+      }
+      
+      .niveis-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Animações */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease forwards;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Comparação */
+    .comparacao-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .comparacao-item {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    
+    .comparacao-titulo {
+      font-weight: 600;
+      color: #00ffff;
+      margin-bottom: 12px;
+    }
+    
+    .comparacao-valor {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    /* Print */
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+      }
+      
+      .btn, .actions, .modal-overlay {
+        display: none !important;
+      }
+      
+      .card {
+        border: 1px solid #ddd;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>🌡️ Desempenho Térmico NBR 15575</h1>
+      <p>Verificação de transmitância e capacidade térmica conforme norma brasileira</p>
+    </header>
+    
+    <!-- Ações principais -->
+    <div class="actions">
+      <button class="btn btn-primary" id="btnCalcular">
+        📊 Calcular Desempenho
+      </button>
+      <button class="btn btn-secondary" id="btnConfigurarPrecos">
+        ⚙️ Configurar Custos
+      </button>
+      <button class="btn btn-outline" id="btnExportar">
+        📄 Exportar PDF
+      </button>
+      <button class="btn btn-outline" id="btnReset">
+        🔄 Limpar
+      </button>
+    </div>
+    
+    <!-- Zona Bioclimática -->
+    <div class="card">
+      <h2 class="card-title">Zona Bioclimática Brasileira</h2>
+      
+      <div class="alert alert-info">
+        <span class="alert-icon">💡</span>
+        <div class="alert-content">
+          <strong>NBR 15220-3:</strong> O Brasil é dividido em 8 zonas bioclimáticas. Selecione a zona do seu projeto para verificar os requisitos aplicáveis.
+        </div>
+      </div>
+      
+      <div class="zona-grid" id="zonaGrid">
+        <!-- Preenchido via JS -->
+      </div>
+      
+      <div id="zona-info"></div>
+    </div>
+    
+    <!-- Tipo de vedação e Presets -->
+    <div class="card">
+      <h2 class="card-title">Composição da Vedação</h2>
+      
+      <div class="tabs">
+        <button class="tab active" data-tipo="parede">🧱 Parede Externa</button>
+        <button class="tab" data-tipo="cobertura">🏠 Cobertura</button>
+      </div>
+      
+      <h3 style="color: #8b5cf6; font-size: 0.95rem; margin-bottom: 12px;">⚡ Composições Pré-definidas</h3>
+      <div class="presets-grid" id="presetsGrid">
+        <!-- Preenchido via JS -->
+      </div>
+      
+      <!-- Absortância -->
+      <h3 style="color: #888; font-size: 0.9rem; margin: 20px 0 10px;">☀️ Absortância da Superfície Externa (α)</h3>
+      <div class="absortancia-grid" id="absortanciaGrid">
+        <!-- Preenchido via JS -->
+      </div>
+    </div>
+    
+    <!-- Camadas -->
+    <div class="card">
+      <h2 class="card-title">Camadas do Sistema (exterior → interior)</h2>
+      
+      <div class="camadas-container" id="listaCamadas">
+        <!-- Preenchido via JS -->
+      </div>
+      
+      <button class="btn-add-camada" id="btnAddCamada">
+        + Adicionar Camada
+      </button>
+      
+      <div class="alert alert-warning" style="margin-top: 15px;">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-content">
+          <strong>Dica:</strong> Arraste as camadas para reordená-las. A ordem deve ser do exterior para o interior.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Resultados -->
+    <div class="card" id="resultadoCard" style="display: none;">
+      <h2 class="card-title">Resultado da Verificação</h2>
+      <div id="resultado"></div>
+    </div>
+    
+    <!-- Referências -->
+    <div class="card">
+      <h2 class="card-title">📚 Referências Normativas</h2>
+      <ul class="recomendacoes-lista">
+        <li><strong>NBR 15575:2021</strong> - Edificações Habitacionais — Desempenho</li>
+        <li><strong>NBR 15220-2:2005</strong> - Desempenho térmico de edificações (Métodos de cálculo)</li>
+        <li><strong>NBR 15220-3:2005</strong> - Zoneamento bioclimático brasileiro</li>
+        <li><strong>Parte 4 (NBR 15575-4)</strong> - Requisitos para sistemas de vedações verticais</li>
+        <li><strong>Parte 5 (NBR 15575-5)</strong> - Requisitos para coberturas</li>
+      </ul>
+    </div>
+  </div>
+  
+  <!-- Modal de Preços -->
+  <div class="modal-overlay" id="modalPrecos">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ Configurar Custos de Materiais (R$/m²)</h3>
+        <button class="modal-close" id="btnFecharModal">×</button>
+      </div>
+      
+      <div id="precosContainer"></div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btnRestaurarPrecos">Restaurar Padrão</button>
+        <button class="btn btn-primary" id="btnSalvarPrecos">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+  
+  
+
+  <script>
+    // ================== DADOS ==================
+    
+    // Zonas bioclimáticas
+    const zonasInfo = {
+      1: {
+        nome: 'Zona 1 - Frio',
+        estados: 'RS (serra), SC (serra), PR (sul)',
+        temp: 'Mín < 6°C | Máx < 29°C',
+        caracteristicas: 'Inverno rigoroso, verão ameno',
+        parede: { U_max: 2.5, CT_min: 130, U_max_alfa_baixo: null },
+        cobertura: { U_max: 2.3, CT_min: null, U_max_alfa_baixo: null },
+        aberturas: 'Pequenas (10-15%)',
+        sombreamento: 'Permitir sol no inverno',
+        ventilacao: 'Controlada'
+      },
+      2: {
+        nome: 'Zona 2 - Temperado',
+        estados: 'RS, SC, PR (maioria)',
+        temp: 'Mín 6-12°C | Máx 29-31°C',
+        caracteristicas: 'Clima ameno todo ano',
+        parede: { U_max: 2.5, CT_min: 130, U_max_alfa_baixo: 3.7 },
+        cobertura: { U_max: 2.3, CT_min: null, U_max_alfa_baixo: null },
+        aberturas: 'Médias (15-25%)',
+        sombreamento: 'Sombreamento parcial',
+        ventilacao: 'Cruzada seletiva'
+      },
+      3: {
+        nome: 'Zona 3 - Ameno',
+        estados: 'SP (interior), MS (sul), MG (sul)',
+        temp: 'Mín 12-15°C | Máx 31-33°C',
+        caracteristicas: 'Verões quentes, invernos amenos',
+        parede: { U_max: 2.5, CT_min: 130, U_max_alfa_baixo: 3.7 },
+        cobertura: { U_max: 2.3, CT_min: null, U_max_alfa_baixo: null },
+        aberturas: 'Médias (15-25%)',
+        sombreamento: 'Sombreamento recomendado',
+        ventilacao: 'Cruzada seletiva'
+      },
+      4: {
+        nome: 'Zona 4 - Intermediário',
+        estados: 'SP, MS, MT (sul), MG, RJ, ES',
+        temp: 'Mín 12-18°C | Máx 29-32°C',
+        caracteristicas: 'Verões quentes, boa amplitude',
+        parede: { U_max: 2.5, CT_min: 130, U_max_alfa_baixo: 3.7 },
+        cobertura: { U_max: 2.3, CT_min: null, U_max_alfa_baixo: null },
+        aberturas: 'Médias (15-25%)',
+        sombreamento: 'Sombreamento obrigatório',
+        ventilacao: 'Cruzada seletiva'
+      },
+      5: {
+        nome: 'Zona 5 - Quente Seco',
+        estados: 'MS, MT, GO, TO, BA (oeste)',
+        temp: 'Mín 12-18°C | Máx 31-36°C',
+        caracteristicas: 'Quente e seco, baixa umidade',
+        parede: { U_max: 2.5, CT_min: 130, U_max_alfa_baixo: 3.7 },
+        cobertura: { U_max: 2.3, CT_min: null, U_max_alfa_baixo: null },
+        aberturas: 'Médias-Grandes (25-40%)',
+        sombreamento: 'Sombreamento obrigatório',
+        ventilacao: 'Cruzada seletiva'
+      },
+      6: {
+        nome: 'Zona 6 - Quente Úmido',
+        estados: 'RJ, ES, MG, BA, SE (litoral)',
+        temp: 'Mín 18-21°C | Máx 30-33°C',
+        caracteristicas: 'Quente e úmido o ano todo',
+        parede: { U_max: 2.5, CT_min: null, U_max_alfa_baixo: 3.7 },
+        cobertura: { U_max: 2.3, CT_min: null, U_max_alfa_baixo: null },
+        aberturas: 'Grandes (40%+)',
+        sombreamento: 'Sombreamento obrigatório',
+        ventilacao: 'Cruzada permanente'
+      },
+      7: {
+        nome: 'Zona 7 - Muito Quente Seco',
+        estados: 'PI, MA, CE, RN, PB, PE, AL (interior)',
+        temp: 'Mín 18-24°C | Máx 33-38°C',
+        caracteristicas: 'Muito quente e seco',
+        parede: { U_max: 2.5, CT_min: 130, U_max_alfa_baixo: 3.7 },
+        cobertura: { U_max: 1.5, CT_min: null, U_max_alfa_baixo: 2.3 },
+        aberturas: 'Grandes com ventilação',
+        sombreamento: 'Obrigatório + massa térmica',
+        ventilacao: 'Cruzada seletiva'
+      },
+      8: {
+        nome: 'Zona 8 - Muito Quente Úmido',
+        estados: 'AM, PA, AP, RR, RO, AC, MA, Norte/NE litoral',
+        temp: 'Mín 21-27°C | Máx 31-36°C',
+        caracteristicas: 'Muito quente e úmido, tropical',
+        parede: { U_max: 2.5, CT_min: null, U_max_alfa_baixo: 3.7 },
+        cobertura: { U_max: 2.3, CT_min: null, U_max_alfa_baixo: null },
+        aberturas: 'Muito grandes',
+        sombreamento: 'Obrigatório + ventilação',
+        ventilacao: 'Cruzada permanente'
+      }
+    };
+    
+    // Materiais com propriedades térmicas
+    const materiais = {
+      // Revestimentos externos
+      'argamassa-externa': { nome: 'Argamassa externa', lambda: 1.15, densidade: 2000, calor: 1.00, espessura: 0.025, custo: 38, categoria: 'revestimento' },
+      'ceramica-externa': { nome: 'Cerâmica/Pastilha', lambda: 1.05, densidade: 2000, calor: 0.92, espessura: 0.01, custo: 75, categoria: 'revestimento' },
+      'pintura': { nome: 'Pintura acrílica', lambda: 0.70, densidade: 1600, calor: 1.00, espessura: 0.003, custo: 32, categoria: 'revestimento' },
+      
+      // Blocos e estrutura
+      'bloco-concreto': { nome: 'Bloco concreto (14cm)', lambda: 1.75, densidade: 2400, calor: 1.00, espessura: 0.14, custo: 72, categoria: 'estrutura' },
+      'bloco-ceramico': { nome: 'Bloco cerâmico (14cm)', lambda: 0.90, densidade: 1600, calor: 0.92, espessura: 0.14, custo: 64, categoria: 'estrutura' },
+      'bloco-ceramico-9': { nome: 'Bloco cerâmico (9cm)', lambda: 0.90, densidade: 1600, calor: 0.92, espessura: 0.09, custo: 48, categoria: 'estrutura' },
+      'bloco-ceramico-19': { nome: 'Bloco cerâmico (19cm)', lambda: 0.90, densidade: 1600, calor: 0.92, espessura: 0.19, custo: 88, categoria: 'estrutura' },
+      'tijolo-macico': { nome: 'Tijolo maciço', lambda: 1.05, densidade: 1800, calor: 0.92, espessura: 0.10, custo: 58, categoria: 'estrutura' },
+      'concreto': { nome: 'Concreto armado', lambda: 1.75, densidade: 2400, calor: 1.00, espessura: 0.10, custo: 240, categoria: 'estrutura' },
+      'bloco-aac': { nome: 'Bloco AAC (concreto celular)', lambda: 0.17, densidade: 500, calor: 1.00, espessura: 0.10, custo: 110, categoria: 'estrutura' },
+      
+      // Isolantes
+      'eps': { nome: 'EPS (Isopor) 3cm', lambda: 0.040, densidade: 25, calor: 1.42, espessura: 0.03, custo: 35, categoria: 'isolante' },
+      'eps-5': { nome: 'EPS (Isopor) 5cm', lambda: 0.040, densidade: 25, calor: 1.42, espessura: 0.05, custo: 55, categoria: 'isolante' },
+      'xps': { nome: 'XPS 3cm', lambda: 0.035, densidade: 35, calor: 1.42, espessura: 0.03, custo: 65, categoria: 'isolante' },
+      'la-rocha': { nome: 'Lã de rocha 5cm', lambda: 0.045, densidade: 100, calor: 0.75, espessura: 0.05, custo: 60, categoria: 'isolante' },
+      'la-vidro': { nome: 'Lã de vidro 5cm', lambda: 0.045, densidade: 100, calor: 0.70, espessura: 0.05, custo: 50, categoria: 'isolante' },
+      'poliuretano': { nome: 'Poliuretano 3cm', lambda: 0.030, densidade: 30, calor: 1.67, espessura: 0.03, custo: 85, categoria: 'isolante' },
+      
+      // Revestimentos internos
+      'argamassa-interna': { nome: 'Argamassa interna', lambda: 1.15, densidade: 2000, calor: 1.00, espessura: 0.015, custo: 28, categoria: 'revestimento' },
+      'gesso': { nome: 'Gesso liso', lambda: 0.70, densidade: 1200, calor: 0.84, espessura: 0.01, custo: 38, category: 'revestimento' },
+      'drywall': { nome: 'Placa drywall', lambda: 0.35, densidade: 750, calor: 0.84, espessura: 0.0125, custo: 75, categoria: 'revestimento' },
+      
+      // Coberturas
+      'telha-ceramica': { nome: 'Telha cerâmica', lambda: 1.05, densidade: 2000, calor: 0.92, espessura: 0.01, custo: 95, categoria: 'cobertura' },
+      'telha-fibrocimento': { nome: 'Telha fibrocimento', lambda: 0.95, densidade: 1900, calor: 0.84, espessura: 0.006, custo: 65, categoria: 'cobertura' },
+      'telha-metalica': { nome: 'Telha metálica', lambda: 55.0, densidade: 7800, calor: 0.46, espessura: 0.0005, custo: 125, categoria: 'cobertura' },
+      'telha-sanduiche': { nome: 'Telha sanduíche 30mm', lambda: 0.040, densidade: 50, calor: 1.00, espessura: 0.03, custo: 165, categoria: 'cobertura' },
+      'laje-concreto': { nome: 'Laje concreto 10cm', lambda: 1.75, densidade: 2400, calor: 1.00, espessura: 0.10, custo: 260, categoria: 'cobertura' },
+      'forro-pvc': { nome: 'Forro PVC', lambda: 0.20, densidade: 1400, calor: 1.00, espessura: 0.008, custo: 48, categoria: 'cobertura' },
+      'forro-madeira': { nome: 'Forro madeira', lambda: 0.15, densidade: 600, calor: 1.34, espessura: 0.01, custo: 95, categoria: 'cobertura' },
+      
+      // Câmaras de ar
+      'camara-ar': { nome: 'Câmara de ar (>5cm)', lambda: null, resistencia: 0.16, densidade: 1.2, calor: 1.00, espessura: 0.05, custo: 0, categoria: 'especial' },
+      'camara-ar-ventilada': { nome: 'Câmara de ar ventilada', lambda: null, resistencia: 0.21, densidade: 1.2, calor: 1.00, espessura: 0.05, custo: 0, categoria: 'especial' }
+    };
+    
+    // Absortâncias
+    const absortancias = [
+      { cor: '#ffffff', nome: 'Branco', valor: 0.20 },
+      { cor: '#f5f5dc', nome: 'Creme', valor: 0.30 },
+      { cor: '#ffff00', nome: 'Amarelo', valor: 0.35 },
+      { cor: '#ffa500', nome: 'Laranja', valor: 0.50 },
+      { cor: '#a52a2a', nome: 'Marrom', valor: 0.70 },
+      { cor: '#808080', nome: 'Cinza', valor: 0.65 },
+      { cor: '#0000ff', nome: 'Azul', valor: 0.75 },
+      { cor: '#333333', nome: 'Escuro', valor: 0.90 }
+    ];
+    
+    // Presets de composições
+    const presets = {
+      parede: [
+        {
+          nome: 'Alvenaria convencional',
+          descricao: 'Bloco cerâmico 14cm + reboco',
+          camadas: ['argamassa-externa', 'bloco-ceramico', 'argamassa-interna']
+        },
+        {
+          nome: 'Alvenaria com isolamento',
+          descricao: 'Bloco + EPS + gesso',
+          camadas: ['argamassa-externa', 'bloco-ceramico', 'eps', 'gesso']
+        },
+        {
+          nome: 'Parede dupla',
+          descricao: 'Dois blocos com câmara de ar',
+          camadas: ['argamassa-externa', 'bloco-ceramico-9', 'camara-ar', 'bloco-ceramico-9', 'argamassa-interna']
+        },
+        {
+          nome: 'Alto desempenho',
+          descricao: 'AAC + poliuretano',
+          camadas: ['argamassa-externa', 'bloco-aac', 'poliuretano', 'drywall']
+        }
+      ],
+      cobertura: [
+        {
+          nome: 'Telha cerâmica + laje',
+          descricao: 'Sistema tradicional',
+          camadas: ['telha-ceramica', 'camara-ar-ventilada', 'laje-concreto', 'gesso']
+        },
+        {
+          nome: 'Telha sanduíche',
+          descricao: 'Metálica com isolamento',
+          camadas: ['telha-sanduiche', 'camara-ar', 'forro-pvc']
+        },
+        {
+          nome: 'Laje isolada',
+          descricao: 'Laje + EPS + manta',
+          camadas: ['laje-concreto', 'eps-5', 'argamassa-interna']
+        },
+        {
+          nome: 'Fibrocimento + forro',
+          descricao: 'Econômico com isolamento',
+          camadas: ['telha-fibrocimento', 'camara-ar-ventilada', 'la-vidro', 'forro-pvc']
+        }
+      ]
+    };
+    
+    // ================== ESTADO ==================
+    
+    let estado = {
+      zonaAtual: 1,
+      tipoVedacao: 'parede',
+      absortancia: 0.30,
+      camadas: [],
+      precos: JSON.parse(localStorage.getItem('precosTermico')) || {}
+    };
+    
+    // ================== INICIALIZAÇÃO ==================
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderizarZonas();
+      renderizarAbsortancias();
+      renderizarPresets();
+      carregarPresetPadrao();
+      
+      // Event listeners
+      document.getElementById('btnCalcular').addEventListener('click', calcular);
+      document.getElementById('btnReset').addEventListener('click', limpar);
+      document.getElementById('btnAddCamada').addEventListener('click', () => adicionarCamada());
+      document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+      document.getElementById('btnFecharModal').addEventListener('click', fecharModalPrecos);
+      document.getElementById('btnSalvarPrecos').addEventListener('click', salvarPrecos);
+      document.getElementById('btnRestaurarPrecos').addEventListener('click', restaurarPrecos);
+      document.getElementById('btnExportar').addEventListener('click', exportarPDF);
+      
+      // Tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          estado.tipoVedacao = tab.dataset.tipo;
+          renderizarPresets();
+          carregarPresetPadrao();
+        });
+      });
+      
+      // Modal click outside
+      document.getElementById('modalPrecos').addEventListener('click', (e) => {
+        if (e.target.id === 'modalPrecos') fecharModalPrecos();
+      });
+      
+      // Ano no footer
+      document.getElementById('year').textContent = new Date().getFullYear();
+    });
+    
+    // ================== RENDERIZAÇÃO ==================
+    
+    function renderizarZonas() {
+      const container = document.getElementById('zonaGrid');
+      container.innerHTML = Object.entries(zonasInfo).map(([num, info]) => `
+        <button class="zona-btn ${num == estado.zonaAtual ? 'active' : ''}" data-zona="${num}">
+          <span class="zona-numero">Z${num}</span>
+          <span class="zona-descricao">${info.nome.split(' - ')[1]}</span>
+        </button>
+      `).join('');
+      
+      container.querySelectorAll('.zona-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.zona-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          estado.zonaAtual = parseInt(btn.dataset.zona);
+          mostrarInfoZona();
+        });
+      });
+      
+      mostrarInfoZona();
+    }
+    
+    function mostrarInfoZona() {
+      const info = zonasInfo[estado.zonaAtual];
+      const tipo = estado.tipoVedacao;
+      const specs = info[tipo];
+      
+      document.getElementById('zona-info').innerHTML = `
+        <div class="zona-info-card fade-in">
+          <div class="zona-titulo">${info.nome}</div>
+          <div class="zona-estados">${info.estados}</div>
+          <div class="zona-specs">
+            <div class="zona-spec">
+              <div class="zona-spec-label">Temperatura</div>
+              <div class="zona-spec-value">${info.temp}</div>
+            </div>
+            <div class="zona-spec">
+              <div class="zona-spec-label">U máx (α>0.6)</div>
+              <div class="zona-spec-value">${specs.U_max} W/(m².K)</div>
+            </div>
+            <div class="zona-spec">
+              <div class="zona-spec-label">U máx (α≤0.6)</div>
+              <div class="zona-spec-value">${specs.U_max_alfa_baixo || specs.U_max} W/(m².K)</div>
+            </div>
+            <div class="zona-spec">
+              <div class="zona-spec-label">CT mínima</div>
+              <div class="zona-spec-value">${specs.CT_min ? specs.CT_min + ' kJ/(m².K)' : 'Não exigida'}</div>
+            </div>
+            <div class="zona-spec">
+              <div class="zona-spec-label">Aberturas</div>
+              <div class="zona-spec-value">${info.aberturas}</div>
+            </div>
+            <div class="zona-spec">
+              <div class="zona-spec-label">Ventilação</div>
+              <div class="zona-spec-value">${info.ventilacao}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function renderizarAbsortancias() {
+      const container = document.getElementById('absortanciaGrid');
+      container.innerHTML = absortancias.map((abs, idx) => `
+        <button class="absortancia-btn ${abs.valor === estado.absortancia ? 'active' : ''}" 
+                data-valor="${abs.valor}" 
+                style="--cor: ${abs.cor}">
+          <div class="absortancia-cor" style="background: ${abs.cor}"></div>
+          <div class="absortancia-valor">${abs.valor.toFixed(2)}</div>
+          <div class="absortancia-nome">${abs.nome}</div>
+        </button>
+      `).join('');
+      
+      container.querySelectorAll('.absortancia-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.absortancia-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          estado.absortancia = parseFloat(btn.dataset.valor);
+        });
+      });
+    }
+    
+    function renderizarPresets() {
+      const container = document.getElementById('presetsGrid');
+      const lista = presets[estado.tipoVedacao];
+      
+      container.innerHTML = lista.map((preset, idx) => `
+        <button class="preset-btn" data-idx="${idx}">
+          <div class="preset-nome">${preset.nome}</div>
+          <div class="preset-descricao">${preset.descricao}</div>
+        </button>
+      `).join('');
+      
+      container.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.idx);
+          carregarPreset(lista[idx]);
+        });
+      });
+    }
+    
+    function carregarPreset(preset) {
+      estado.camadas = preset.camadas.map((mat, idx) => ({
+        id: Date.now() + idx,
+        material: mat,
+        espessura: materiais[mat].espessura
+      }));
+      renderizarCamadas();
+    }
+    
+    function carregarPresetPadrao() {
+      const lista = presets[estado.tipoVedacao];
+      carregarPreset(lista[0]);
+    }
+    
+    function renderizarCamadas() {
+      const container = document.getElementById('listaCamadas');
+      
+      if (estado.camadas.length === 0) {
+        container.innerHTML = `
+          <div class="alert alert-info">
+            <span class="alert-icon">ℹ️</span>
+            <div class="alert-content">Adicione camadas do sistema construtivo ou selecione uma composição pré-definida.</div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = estado.camadas.map((camada, idx) => {
+        const mat = materiais[camada.material];
+        return `
+          <div class="camada-item" draggable="true" data-id="${camada.id}">
+            <div class="camada-numero">${idx + 1}</div>
+            <div class="camada-info">
+              <div class="camada-nome">${mat.nome}</div>
+              <div class="camada-props">
+                ${mat.lambda ? `λ=${mat.lambda} W/(m.K)` : `R=${mat.resistencia} m².K/W`} | 
+                ρ=${mat.densidade} kg/m³
+              </div>
+            </div>
+            <select class="camada-select" data-id="${camada.id}">
+              ${Object.entries(materiais).map(([key, m]) => `
+                <option value="${key}" ${key === camada.material ? 'selected' : ''}>${m.nome}</option>
+              `).join('')}
+            </select>
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <input type="number" class="camada-input" value="${(camada.espessura * 100).toFixed(1)}" 
+                     min="0.1" step="0.5" data-id="${camada.id}">
+              <span style="color: #888; font-size: 0.8rem;">cm</span>
+            </div>
+            <button class="btn-remover" data-id="${camada.id}">✕</button>
+          </div>
+        `;
+      }).join('');
+      
+      // Event listeners
+      container.querySelectorAll('.camada-select').forEach(select => {
+        select.addEventListener('change', (e) => {
+          const id = parseInt(e.target.dataset.id);
+          const camada = estado.camadas.find(c => c.id === id);
+          if (camada) {
+            camada.material = e.target.value;
+            camada.espessura = materiais[e.target.value].espessura;
+            renderizarCamadas();
+          }
+        });
+      });
+      
+      container.querySelectorAll('.camada-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const id = parseInt(e.target.dataset.id);
+          const camada = estado.camadas.find(c => c.id === id);
+          if (camada) {
+            camada.espessura = parseFloat(e.target.value) / 100;
+          }
+        });
+      });
+      
+      container.querySelectorAll('.btn-remover').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = parseInt(e.target.dataset.id);
+          estado.camadas = estado.camadas.filter(c => c.id !== id);
+          renderizarCamadas();
+        });
+      });
+      
+      // Drag and drop
+      setupDragAndDrop();
+    }
+    
+    function setupDragAndDrop() {
+      const container = document.getElementById('listaCamadas');
+      const items = container.querySelectorAll('.camada-item');
+      
+      items.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+          item.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', item.dataset.id);
+        });
+        
+        item.addEventListener('dragend', () => {
+          item.classList.remove('dragging');
+        });
+        
+        item.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          const dragging = container.querySelector('.dragging');
+          if (dragging !== item) {
+            const rect = item.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            if (e.clientY < midY) {
+              container.insertBefore(dragging, item);
+            } else {
+              container.insertBefore(dragging, item.nextSibling);
+            }
+          }
+        });
+        
+        item.addEventListener('drop', (e) => {
+          e.preventDefault();
+          // Reordenar o array de camadas
+          const newOrder = Array.from(container.querySelectorAll('.camada-item'))
+            .map(el => parseInt(el.dataset.id));
+          estado.camadas.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
+          renderizarCamadas();
+        });
+      });
+    }
+    
+    function adicionarCamada(material = 'bloco-ceramico') {
+      const mat = materiais[material];
+      estado.camadas.push({
+        id: Date.now(),
+        material: material,
+        espessura: mat.espessura
+      });
+      renderizarCamadas();
+    }
+    
+    // ================== CÁLCULO ==================
+    
+    function calcular() {
+      if (estado.camadas.length === 0) {
+        alert('Adicione pelo menos uma camada!');
+        return;
+      }
+      
+      const zona = zonasInfo[estado.zonaAtual];
+      const specs = zona[estado.tipoVedacao];
+      const alfa = estado.absortancia;
+      
+      // Resistências superficiais
+      const Rse = 0.04; // externo
+      const Rsi = 0.13; // interno
+      
+      let Rtotal = Rse + Rsi;
+      let CTtotal = 0;
+      let custoTotal = 0;
+      let espessuraTotal = 0;
+      
+      const detalhes = estado.camadas.map(camada => {
+        const mat = materiais[camada.material];
+        let R, CT;
+        
+        if (mat.resistencia) {
+          R = mat.resistencia;
+          CT = 0;
+        } else {
+          R = camada.espessura / mat.lambda;
+          CT = mat.densidade * mat.calor * camada.espessura;
+        }
+        
+        const custo = (estado.precos[camada.material] || mat.custo);
+        
+        Rtotal += R;
+        CTtotal += CT;
+        custoTotal += custo;
+        espessuraTotal += camada.espessura;
+        
+        return {
+          nome: mat.nome,
+          espessura: camada.espessura,
+          R: R,
+          CT: CT,
+          custo: custo
+        };
+      });
+      
+      const U = 1 / Rtotal;
+      
+      // Determinar limite de U baseado na absortância
+      let limiteU;
+      if (alfa <= 0.6 && specs.U_max_alfa_baixo) {
+        limiteU = specs.U_max_alfa_baixo;
+      } else {
+        limiteU = specs.U_max;
+      }
+      
+      const limiteCT = specs.CT_min;
+      
+      // Verificações
+      const atendeU = U <= limiteU;
+      const atendeCT = limiteCT ? CTtotal >= limiteCT : true;
+      const atendeGeral = atendeU && atendeCT;
+      
+      // Determinar nível de desempenho
+      let nivel = 'nao-atende';
+      if (atendeGeral) {
+        nivel = 'minimo';
+        // Critérios para níveis superiores (simplificados)
+        if (U <= limiteU * 0.8 && (!limiteCT || CTtotal >= limiteCT * 1.2)) {
+          nivel = 'intermediario';
+        }
+        if (U <= limiteU * 0.6 && (!limiteCT || CTtotal >= limiteCT * 1.5)) {
+          nivel = 'superior';
+        }
+      }
+      
+      exibirResultado({
+        zona,
+        detalhes,
+        U,
+        limiteU,
+        Rtotal,
+        CTtotal,
+        limiteCT,
+        atendeU,
+        atendeCT,
+        atendeGeral,
+        nivel,
+        custoTotal,
+        espessuraTotal,
+        alfa
+      });
+    }
+    
+    function exibirResultado(dados) {
+      const { zona, detalhes, U, limiteU, Rtotal, CTtotal, limiteCT, atendeU, atendeCT, atendeGeral, nivel, custoTotal, espessuraTotal, alfa } = dados;
+      
+      document.getElementById('resultadoCard').style.display = 'block';
+      
+      document.getElementById('resultado').innerHTML = `
+        <!-- Badge de conformidade -->
+        <div style="text-align: center;">
+          <div class="conformidade-badge ${atendeGeral ? 'conformidade-atende' : 'conformidade-nao-atende'} pulse">
+            ${atendeGeral ? '✅ ATENDE NBR 15575' : '❌ NÃO ATENDE NBR 15575'}
+          </div>
+        </div>
+        
+        <!-- Níveis de desempenho -->
+        <div class="niveis-grid">
+          <div class="nivel-item nivel-minimo ${nivel === 'minimo' ? 'ativo' : ''}">
+            <div class="nivel-icone">🟡</div>
+            <div class="nivel-nome">Mínimo (M)</div>
+            <div class="nivel-desc">Atende requisitos básicos</div>
+          </div>
+          <div class="nivel-item nivel-intermediario ${nivel === 'intermediario' ? 'ativo' : ''}">
+            <div class="nivel-icone">🔵</div>
+            <div class="nivel-nome">Intermediário (I)</div>
+            <div class="nivel-desc">Supera em 20%</div>
+          </div>
+          <div class="nivel-item nivel-superior ${nivel === 'superior' ? 'ativo' : ''}">
+            <div class="nivel-icone">🟢</div>
+            <div class="nivel-nome">Superior (S)</div>
+            <div class="nivel-desc">Supera em 40%</div>
+          </div>
+        </div>
+        
+        <!-- Resultados principais -->
+        <div class="resultado-grid">
+          <div class="resultado-item ${atendeU ? 'atende' : 'nao-atende'}">
+            <div class="resultado-label">Transmitância (U)</div>
+            <div class="resultado-valor">${U.toFixed(2)}</div>
+            <div class="resultado-limite">Limite: ≤ ${limiteU.toFixed(2)} W/(m².K)</div>
+          </div>
+          <div class="resultado-item ${atendeCT ? 'atende' : 'nao-atende'}">
+            <div class="resultado-label">Capacidade Térmica</div>
+            <div class="resultado-valor">${CTtotal.toFixed(0)}</div>
+            <div class="resultado-limite">${limiteCT ? `Mínimo: ≥ ${limiteCT} kJ/(m².K)` : 'Não exigida'}</div>
+          </div>
+          <div class="resultado-item">
+            <div class="resultado-label">Resistência Total</div>
+            <div class="resultado-valor">${Rtotal.toFixed(2)}</div>
+            <div class="resultado-limite">(m².K)/W</div>
+          </div>
+          <div class="resultado-item">
+            <div class="resultado-label">Absortância (α)</div>
+            <div class="resultado-valor">${alfa.toFixed(2)}</div>
+            <div class="resultado-limite">${alfa <= 0.6 ? 'Clara (limite flexibilizado)' : 'Escura'}</div>
+          </div>
+        </div>
+        
+        <!-- Alertas -->
+        ${atendeU ? 
+          '<div class="alert alert-success"><span class="alert-icon">✅</span><div class="alert-content"><strong>Transmitância térmica:</strong> Dentro do limite normativo!</div></div>' : 
+          '<div class="alert alert-danger"><span class="alert-icon">❌</span><div class="alert-content"><strong>Transmitância térmica acima do limite!</strong> Adicione isolamento térmico (EPS, lã de rocha, poliuretano) ou use cores claras na fachada.</div></div>'}
+        
+        ${limiteCT ? (atendeCT ? 
+          '<div class="alert alert-success"><span class="alert-icon">✅</span><div class="alert-content"><strong>Capacidade térmica:</strong> Atende ao mínimo exigido!</div></div>' : 
+          '<div class="alert alert-danger"><span class="alert-icon">❌</span><div class="alert-content"><strong>Capacidade térmica insuficiente!</strong> Aumente a espessura ou use materiais mais densos (concreto, tijolo maciço).</div></div>') : 
+          '<div class="alert alert-info"><span class="alert-icon">ℹ️</span><div class="alert-content"><strong>Capacidade térmica:</strong> Não exigida para esta zona bioclimática.</div></div>'}
+        
+        <!-- Visualização da composição -->
+        <div class="parede-visual">
+          <div class="parede-titulo">📐 COMPOSIÇÃO DO SISTEMA (${(espessuraTotal * 100).toFixed(1)} cm total)</div>
+          ${detalhes.map((cam, idx) => {
+            const largura = Math.max(30, Math.min(200, cam.espessura * 1000));
+            return `
+              <div class="camada-visual">
+                <div class="camada-visual-info">
+                  <div class="camada-visual-barra" style="width: ${largura}px;"></div>
+                  <span style="color: #ccc; font-size: 0.85rem;">${idx + 1}. ${cam.nome}</span>
+                </div>
+                <div style="text-align: right;">
+                  <div style="color: #00ffff; font-weight: 600;">${(cam.espessura * 100).toFixed(1)} cm</div>
+                  <div style="color: #888; font-size: 0.75rem;">R=${cam.R.toFixed(3)} | CT=${cam.CT.toFixed(0)}</div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        
+        <!-- Custos -->
+        <div class="custo-container">
+          <div class="custo-titulo">💰 Estimativa de Custo</div>
+          <div class="custo-grid">
+            <div class="custo-item">
+              <div class="custo-label">Custo por m²</div>
+              <div class="custo-valor">R$ ${custoTotal.toFixed(2)}</div>
+            </div>
+            <div class="custo-item">
+              <div class="custo-label">Custo 10 m²</div>
+              <div class="custo-valor">R$ ${(custoTotal * 10).toFixed(2)}</div>
+            </div>
+            <div class="custo-item">
+              <div class="custo-label">Custo 100 m²</div>
+              <div class="custo-valor">R$ ${(custoTotal * 100).toFixed(2)}</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recomendações -->
+        <div style="margin-top: 20px;">
+          <h3 style="color: #00ffff; font-size: 1rem; margin-bottom: 12px;">💡 Recomendações para Zona ${estado.zonaAtual}</h3>
+          <ul class="recomendacoes-lista">
+            <li><strong>Aberturas:</strong> ${zona.aberturas}</li>
+            <li><strong>Sombreamento:</strong> ${zona.sombreamento}</li>
+            <li><strong>Ventilação:</strong> ${zona.ventilacao}</li>
+            ${!atendeU ? '<li><strong>Isolamento:</strong> Adicione EPS, XPS, lã de rocha ou poliuretano</li>' : ''}
+            ${limiteCT && !atendeCT ? '<li><strong>Massa térmica:</strong> Use materiais mais densos ou aumente espessuras</li>' : ''}
+            <li><strong>Cores externas:</strong> ${estado.zonaAtual <= 4 ? 'Podem ser escuras (absorção solar benéfica)' : 'Preferencialmente claras (reflexão solar)'}</li>
+          </ul>
+        </div>
+        
+        <div class="alert alert-warning" style="margin-top: 20px;">
+          <span class="alert-icon">⚠️</span>
+          <div class="alert-content">
+            <strong>Nota:</strong> Esta é uma verificação simplificada. Para projetos oficiais, realize simulação computacional conforme NBR 15575-1 (Anexo A) ou consulte um engenheiro especialista.
+          </div>
+        </div>
+      `;
+      
+      // Scroll para resultado
+      document.getElementById('resultadoCard').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // ================== PREÇOS ==================
+    
+    function abrirModalPrecos() {
+      const container = document.getElementById('precosContainer');
+      
+      const categorias = {
+        'Revestimentos': ['argamassa-externa', 'ceramica-externa', 'pintura', 'argamassa-interna', 'gesso', 'drywall'],
+        'Blocos e Estrutura': ['bloco-concreto', 'bloco-ceramico', 'bloco-ceramico-9', 'bloco-ceramico-19', 'tijolo-macico', 'concreto', 'bloco-aac'],
+        'Isolantes Térmicos': ['eps', 'eps-5', 'xps', 'la-rocha', 'la-vidro', 'poliuretano'],
+        'Coberturas': ['telha-ceramica', 'telha-fibrocimento', 'telha-metalica', 'telha-sanduiche', 'laje-concreto', 'forro-pvc', 'forro-madeira']
+      };
+      
+      container.innerHTML = Object.entries(categorias).map(([cat, mats]) => `
+        <div class="precos-categoria">
+          <div class="precos-categoria-titulo">${cat}</div>
+          <div class="precos-grid">
+            ${mats.map(key => {
+              const mat = materiais[key];
+              const preco = estado.precos[key] || mat.custo;
+              return `
+                <div class="preco-item">
+                  <div class="preco-label">${mat.nome}</div>
+                  <input type="number" class="preco-input" data-material="${key}" 
+                         value="${preco}" min="0" step="1">
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('modalPrecos').classList.add('active');
+    }
+    
+    function fecharModalPrecos() {
+      document.getElementById('modalPrecos').classList.remove('active');
+    }
+    
+    function salvarPrecos() {
+      document.querySelectorAll('#precosContainer .preco-input').forEach(input => {
+        const mat = input.dataset.material;
+        const valor = parseFloat(input.value);
+        if (!isNaN(valor) && valor >= 0) {
+          estado.precos[mat] = valor;
+        }
+      });
+      
+      localStorage.setItem('precosTermico', JSON.stringify(estado.precos));
+      fecharModalPrecos();
+      
+      // Feedback visual
+      const btn = document.getElementById('btnConfigurarPrecos');
+      const textoOriginal = btn.innerHTML;
+      btn.innerHTML = '✓ Salvo!';
+      btn.style.background = 'rgba(34, 197, 94, 0.2)';
+      btn.style.borderColor = '#22c55e';
+      btn.style.color = '#22c55e';
+      
+      setTimeout(() => {
+        btn.innerHTML = textoOriginal;
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }, 2000);
+    }
+    
+    function restaurarPrecos() {
+      if (confirm('Restaurar todos os preços para os valores padrão?')) {
+        estado.precos = {};
+        localStorage.removeItem('precosTermico');
+        abrirModalPrecos();
+      }
+    }
+    
+    // ================== OUTRAS FUNÇÕES ==================
+    
+    function limpar() {
+      estado.camadas = [];
+      renderizarCamadas();
+      document.getElementById('resultadoCard').style.display = 'none';
+    }
+    
+    function exportarPDF() {
+      // Preparar para impressão
+      const resultado = document.getElementById('resultado').innerHTML;
+      if (!resultado) {
+        alert('Calcule o desempenho primeiro antes de exportar!');
+        return;
+      }
+      
+      window.print();
+    }
+  </script>
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
