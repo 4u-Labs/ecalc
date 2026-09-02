@@ -1,0 +1,3391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4U.IA.BR - Google Keep</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://www.google.com/images/icons/product/keep-32.png">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #fff;
+      color: #202124;
+      overflow-x: hidden;
+    }
+
+    /* --- Header --- */
+    .top-bar {
+      background: #fff;
+      height: 64px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 8px;
+      min-width: 200px;
+    }
+
+    .menu-button {
+      background: none;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #5f6368;
+      transition: background-color 0.2s;
+    }
+
+    .menu-button:hover {
+      background: rgba(95, 99, 104, 0.078);
+    }
+
+    .logo {
+      height: 40px;
+      width: 40px;
+    }
+
+    .top-bar h1 {
+      font-size: 22px;
+      color: #5f6368;
+      font-weight: 400;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    .search-area {
+      flex: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      background: #f1f3f4;
+      border-radius: 8px;
+      padding: 0 12px;
+      height: 48px;
+      transition: background-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-area:focus-within {
+      background: #fff;
+      box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.302), 0 4px 8px 3px rgba(60, 64, 67, 0.149);
+    }
+
+    .search-area .material-icons-outlined {
+      color: #5f6368;
+      font-size: 20px;
+    }
+
+    .search-area input {
+      flex: 1;
+      border: none;
+      background: none;
+      outline: none;
+      padding: 0 12px;
+      font-size: 16px;
+      color: #202124;
+    }
+
+    .search-clear {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #5f6368;
+      display: none;
+      padding: 4px;
+      border-radius: 50%;
+    }
+
+    .search-clear:hover {
+      background: rgba(95, 99, 104, 0.078);
+    }
+
+    .search-area.has-value .search-clear {
+      display: flex;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 4px;
+      margin-right: 8px;
+    }
+
+    .icon-button {
+      background: none;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #5f6368;
+      transition: background-color 0.2s;
+    }
+
+    .icon-button:hover {
+      background: rgba(95, 99, 104, 0.078);
+    }
+
+    .icon-button .material-icons-outlined {
+      font-size: 20px;
+    }
+
+    .icon-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1a73e8;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 64px;
+      width: 280px;
+      height: calc(100vh - 64px);
+      background: #fff;
+      padding: 8px 0;
+      transition: width 0.15s ease;
+      z-index: 90;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .sidebar.collapsed {
+      width: 80px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      height: 48px;
+      gap: 20px;
+      cursor: pointer;
+      color: #202124;
+      text-decoration: none;
+      border-radius: 0 25px 25px 0;
+      margin: 0 12px 0 0;
+      transition: background-color 0.2s;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .sidebar-item:hover {
+      background: #f1f3f4;
+    }
+
+    .sidebar-item.active {
+      background: #feefc3;
+      color: #202124;
+    }
+
+    .sidebar-item .material-icons-outlined {
+      font-size: 24px;
+      color: #5f6368;
+      flex-shrink: 0;
+    }
+
+    .sidebar-item.active .material-icons-outlined {
+      color: #202124;
+    }
+
+    .sidebar.collapsed .sidebar-item {
+      padding: 0;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      margin: 4px auto;
+      border-radius: 50%;
+    }
+
+    .sidebar.collapsed .sidebar-item span:not(.material-icons-outlined) {
+      display: none;
+    }
+
+    .sidebar-section {
+      padding: 4px 0;
+    }
+
+    .sidebar-label {
+      padding: 12px 24px 4px;
+      font-size: 11px;
+      color: #5f6368;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 500;
+    }
+
+    .sidebar.collapsed .sidebar-label {
+      display: none;
+    }
+
+    /* --- Main Content --- */
+    .main-wrapper {
+      margin-left: 280px;
+      transition: margin-left 0.15s ease;
+      min-height: calc(100vh - 64px);
+    }
+
+    .main-wrapper.expanded {
+      margin-left: 80px;
+    }
+
+    /* --- Form de Nota --- */
+    .note-form-wrapper {
+      max-width: 600px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+
+    .note-form-collapsed {
+      background: #fff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: text;
+      color: #5f6368;
+      font-size: 15px;
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 1px 3px 1px rgba(60, 64, 67, 0.149);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: box-shadow 0.2s;
+    }
+
+    .note-form-collapsed:hover {
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 2px 6px 2px rgba(60, 64, 67, 0.149);
+    }
+
+    .note-form-collapsed .quick-icons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .note-form-collapsed .quick-icons .icon-button {
+      width: 36px;
+      height: 36px;
+    }
+
+    .note-form {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 2px 6px 2px rgba(60, 64, 67, 0.149);
+      overflow: hidden;
+    }
+
+    .note-image-preview {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      display: none;
+    }
+
+    .note-image-preview.show {
+      display: block;
+    }
+
+    .note-form-content {
+      padding: 12px 16px;
+    }
+
+    .note-form input[type="text"].note-title-input,
+    .note-form textarea {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      font-family: 'Roboto', sans-serif;
+      color: #202124;
+      background: transparent;
+      resize: none;
+    }
+
+    .note-form input[type="text"].note-title-input {
+      font-size: 16px;
+      font-weight: 500;
+      padding: 4px 0 12px;
+    }
+
+    .note-form input[type="text"]::placeholder,
+    .note-form textarea::placeholder {
+      color: #80868b;
+      font-weight: 400;
+    }
+
+    .note-form textarea {
+      min-height: 46px;
+      line-height: 1.5;
+    }
+
+    .form-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 8px;
+    }
+
+    .toolbar-icons {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .toolbar-icons .icon-button {
+      width: 34px;
+      height: 34px;
+    }
+
+    .toolbar-icons .icon-button .material-icons-outlined {
+      font-size: 18px;
+    }
+
+    .form-buttons button {
+      padding: 8px 24px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      background: none;
+      font-weight: 500;
+      color: #202124;
+      font-size: 14px;
+      font-family: 'Google Sans', sans-serif;
+      transition: background-color 0.2s;
+    }
+
+    .form-buttons button:hover {
+      background: rgba(95, 99, 104, 0.078);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Hidden file input */
+    .hidden-input {
+      position: absolute;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* --- Color Palette Popup --- */
+    .color-popup {
+      position: absolute;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 2px 6px 2px rgba(60, 64, 67, 0.149);
+      padding: 8px;
+      z-index: 200;
+      display: none;
+    }
+
+    .color-popup.show {
+      display: block;
+    }
+
+    .color-popup-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+    }
+
+    .color-option {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .color-option:hover {
+      border-color: #202124;
+    }
+
+    .color-option.selected::after {
+      content: 'check';
+      font-family: 'Material Icons Outlined';
+      font-size: 18px;
+      color: #202124;
+    }
+
+    .color-option.default-color {
+      border: 2px solid #e0e0e0;
+    }
+
+    /* --- Labels Popup --- */
+    .label-popup {
+      position: absolute;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 2px 6px 2px rgba(60, 64, 67, 0.149);
+      padding: 12px 0;
+      z-index: 200;
+      min-width: 225px;
+      display: none;
+    }
+
+    .label-popup.show {
+      display: block;
+    }
+
+    .label-popup-header {
+      padding: 0 12px 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #202124;
+    }
+
+    .label-popup-search {
+      padding: 0 12px 8px;
+    }
+
+    .label-popup-search input {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 8px 0;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .label-popup-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .label-popup-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .label-popup-item:hover {
+      background: #f1f3f4;
+    }
+
+    .label-popup-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .label-popup-item span {
+      font-size: 14px;
+      color: #202124;
+    }
+
+    .create-label-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      cursor: pointer;
+      color: #202124;
+      font-size: 14px;
+    }
+
+    .create-label-item:hover {
+      background: #f1f3f4;
+    }
+
+    /* --- Reminder Popup --- */
+    .reminder-popup {
+      position: absolute;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 2px 6px 2px rgba(60, 64, 67, 0.149);
+      padding: 12px;
+      z-index: 200;
+      min-width: 280px;
+      display: none;
+    }
+
+    .reminder-popup.show {
+      display: block;
+    }
+
+    .reminder-popup-header {
+      font-size: 14px;
+      font-weight: 500;
+      color: #202124;
+      margin-bottom: 12px;
+    }
+
+    .reminder-quick-options {
+      margin-bottom: 12px;
+    }
+
+    .reminder-quick-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #202124;
+    }
+
+    .reminder-quick-option:hover {
+      background: #f1f3f4;
+    }
+
+    .reminder-quick-option .material-icons-outlined {
+      font-size: 20px;
+      color: #5f6368;
+    }
+
+    .reminder-quick-option span:last-child {
+      margin-left: auto;
+      color: #5f6368;
+      font-size: 13px;
+    }
+
+    .reminder-divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 8px 0;
+    }
+
+    .reminder-popup input[type="datetime-local"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .reminder-popup-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .reminder-popup-buttons button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    .reminder-popup-buttons .cancel-btn {
+      background: none;
+      color: #1a73e8;
+    }
+
+    .reminder-popup-buttons .save-btn {
+      background: #1a73e8;
+      color: white;
+    }
+
+    .reminder-popup-buttons .save-btn:hover {
+      background: #1557b0;
+    }
+
+    /* --- Collaborator Popup --- */
+    .collab-popup {
+      position: absolute;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 2px 6px 2px rgba(60, 64, 67, 0.149);
+      padding: 16px;
+      z-index: 200;
+      min-width: 320px;
+      display: none;
+    }
+
+    .collab-popup.show {
+      display: block;
+    }
+
+    .collab-popup-header {
+      font-size: 16px;
+      font-weight: 500;
+      color: #202124;
+      margin-bottom: 16px;
+    }
+
+    .collab-popup input[type="email"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .collab-popup input[type="email"]:focus {
+      border-color: #1a73e8;
+      outline: none;
+    }
+
+    .collab-list {
+      margin: 12px 0;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .collab-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      border-radius: 4px;
+    }
+
+    .collab-item:hover {
+      background: #f1f3f4;
+    }
+
+    .collab-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1a73e8;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .collab-info {
+      flex: 1;
+    }
+
+    .collab-info .name {
+      font-size: 14px;
+      color: #202124;
+    }
+
+    .collab-info .email {
+      font-size: 12px;
+      color: #5f6368;
+    }
+
+    .collab-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #5f6368;
+      padding: 4px;
+      border-radius: 50%;
+    }
+
+    .collab-remove:hover {
+      background: rgba(0,0,0,0.1);
+    }
+
+    .collab-popup-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .collab-popup-buttons button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    .collab-popup-buttons .cancel-btn {
+      background: none;
+      color: #5f6368;
+    }
+
+    .collab-popup-buttons .save-btn {
+      background: #1a73e8;
+      color: white;
+    }
+
+    /* --- Seções de Notas --- */
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .note-section {
+      margin-bottom: 24px;
+    }
+
+    .note-section h2 {
+      color: #5f6368;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin: 16px 0 8px 8px;
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      padding: 8px 0;
+    }
+
+    .notes-grid.list-view {
+      grid-template-columns: 1fr;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* --- Cards de Nota --- */
+    .note {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      position: relative;
+      word-wrap: break-word;
+      cursor: default;
+      transition: box-shadow 0.2s ease;
+      overflow: hidden;
+    }
+
+    .note:hover {
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 1px 3px 1px rgba(60, 64, 67, 0.149);
+    }
+
+    .note-image {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+    }
+
+    .note-inner {
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+
+    .note-title {
+      font-weight: 500;
+      margin-bottom: 4px;
+      font-size: 16px;
+      color: #202124;
+      line-height: 1.5;
+    }
+
+    .note-content {
+      white-space: pre-wrap;
+      font-size: 14px;
+      color: #202124;
+      line-height: 1.5;
+    }
+
+    .note-pin {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 10;
+    }
+
+    .note:hover .note-pin,
+    .note .note-pin.pinned {
+      opacity: 1;
+    }
+
+    .note-pin.pinned .material-icons-outlined {
+      color: #202124;
+    }
+
+    /* --- Botões da Nota --- */
+    .note-toolbar {
+      display: flex;
+      padding: 4px 8px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .note:hover .note-toolbar {
+      opacity: 1;
+    }
+
+    .note-toolbar button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #5f6368;
+      transition: background-color 0.2s;
+    }
+
+    .note-toolbar button:hover {
+      background: rgba(95, 99, 104, 0.157);
+    }
+
+    .note-toolbar .material-icons-outlined {
+      font-size: 18px;
+    }
+
+    /* --- Collaborators display --- */
+    .note-collaborators {
+      display: flex;
+      gap: -8px;
+      margin-top: 8px;
+    }
+
+    .note-collaborators .collab-avatar {
+      width: 24px;
+      height: 24px;
+      font-size: 10px;
+      margin-left: -8px;
+      border: 2px solid #fff;
+    }
+
+    .note-collaborators .collab-avatar:first-child {
+      margin-left: 0;
+    }
+
+    /* --- Checklist --- */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 4px 0;
+    }
+
+    .checklist-item input[type='checkbox'] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      cursor: pointer;
+      flex-shrink: 0;
+      accent-color: #1a73e8;
+    }
+
+    .checklist-item span {
+      flex: 1;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #202124;
+    }
+
+    .checklist-item.done span {
+      text-decoration: line-through;
+      color: #80868b;
+    }
+
+    /* --- Checklist no Form --- */
+    #checklistArea {
+      padding: 8px 0;
+    }
+
+    .checklist-item-edit {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .checklist-item-edit input[type='checkbox'] {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      cursor: pointer;
+      accent-color: #1a73e8;
+    }
+
+    .checklist-item-edit input[type='text'] {
+      flex: 1;
+      padding: 6px 0;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      background: transparent;
+    }
+
+    .checklist-item-edit .remove-item {
+      border: none;
+      background: none;
+      color: #5f6368;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .checklist-item-edit:hover .remove-item {
+      opacity: 1;
+    }
+
+    .checklist-item-edit .remove-item:hover {
+      background: rgba(95, 99, 104, 0.078);
+    }
+
+    .add-list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      color: #5f6368;
+      cursor: text;
+    }
+
+    .add-list-item input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      background: transparent;
+    }
+
+    /* --- Mensagem de Vazio --- */
+    .empty-state {
+      text-align: center;
+      padding: 80px 16px;
+      color: #80868b;
+    }
+
+    .empty-state .material-icons-outlined {
+      font-size: 120px;
+      color: #e0e0e0;
+      margin-bottom: 16px;
+    }
+
+    .empty-state p {
+      font-size: 22px;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    /* --- Labels --- */
+    .note-labels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .label-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.08);
+      font-size: 11px;
+      color: #202124;
+    }
+
+    .label-badge .material-icons-outlined {
+      font-size: 14px;
+    }
+
+    /* --- Reminders --- */
+    .reminder-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background: rgba(66, 133, 244, 0.15);
+      font-size: 11px;
+      color: #1967d2;
+      margin-top: 8px;
+    }
+
+    .reminder-badge.past {
+      background: rgba(234, 67, 53, 0.15);
+      color: #c5221f;
+    }
+
+    .reminder-badge .material-icons-outlined {
+      font-size: 14px;
+    }
+
+    /* --- Edit Modal --- */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .edit-modal {
+      background: #fff;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12), 0 11px 15px -7px rgba(0, 0, 0, 0.2);
+    }
+
+    .edit-modal-image {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      display: none;
+    }
+
+    .edit-modal-image.show {
+      display: block;
+    }
+
+    .edit-modal-content {
+      padding: 16px;
+    }
+
+    .edit-modal input[type="text"],
+    .edit-modal textarea {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      font-family: 'Roboto', sans-serif;
+      color: #202124;
+      background: transparent;
+      resize: none;
+    }
+
+    .edit-modal input[type="text"] {
+      font-size: 18px;
+      font-weight: 500;
+      padding: 8px 0 16px;
+    }
+
+    .edit-modal textarea {
+      min-height: 100px;
+      line-height: 1.5;
+    }
+
+    .edit-modal-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    /* --- Labels Modal --- */
+    .labels-modal {
+      background: #fff;
+      border-radius: 8px;
+      max-width: 300px;
+      width: 90%;
+      box-shadow: 0 24px 38px 3px rgba(0, 0, 0, 0.14);
+    }
+
+    .labels-modal-header {
+      padding: 16px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .labels-modal-header h3 {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .labels-modal-header input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-bottom: 2px solid #1a73e8;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .labels-modal-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .labels-modal-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+
+    .labels-modal-item:hover {
+      background: #f1f3f4;
+    }
+
+    .labels-modal-item span {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .labels-modal-item .delete-label {
+      opacity: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #5f6368;
+      padding: 4px;
+      border-radius: 50%;
+    }
+
+    .labels-modal-item:hover .delete-label {
+      opacity: 1;
+    }
+
+    .labels-modal-footer {
+      padding: 12px 16px;
+      border-top: 1px solid #e0e0e0;
+      text-align: right;
+    }
+
+    .labels-modal-footer button {
+      padding: 8px 24px;
+      background: none;
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #202124;
+      cursor: pointer;
+      border-radius: 4px;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    .labels-modal-footer button:hover {
+      background: rgba(95, 99, 104, 0.078);
+    }
+
+    /* --- Settings Modal --- */
+    .settings-modal {
+      background: #fff;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 24px 38px 3px rgba(0, 0, 0, 0.14);
+    }
+
+    .settings-modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .settings-modal-header h3 {
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .settings-modal-content {
+      padding: 16px 24px;
+    }
+
+    .settings-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .settings-item:last-child {
+      border-bottom: none;
+    }
+
+    .settings-item label {
+      font-size: 14px;
+      color: #202124;
+    }
+
+    .settings-item select {
+      padding: 8px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 24px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: #1a73e8;
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    /* --- Trash/Archive View --- */
+    .view-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .view-header h2 {
+      font-size: 16px;
+      color: #5f6368;
+      font-weight: 400;
+    }
+
+    .view-header button {
+      padding: 8px 16px;
+      background: none;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #5f6368;
+    }
+
+    .view-header button:hover {
+      background: #f1f3f4;
+    }
+
+    /* --- Responsivo --- */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        box-shadow: 0 16px 10px 0 rgba(0, 0, 0, 0.14);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-wrapper {
+        margin-left: 0 !important;
+      }
+
+      .search-area {
+        max-width: none;
+        margin: 0 8px;
+      }
+
+      .logo-area {
+        min-width: auto;
+      }
+
+      .logo-area h1 {
+        display: none;
+      }
+
+      .notes-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .note-form-wrapper {
+        margin: 16px auto;
+      }
+    }
+
+    /* --- Overlay para mobile --- */
+    .sidebar-overlay {
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 85;
+      display: none;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    /* More menu popup */
+    .more-popup {
+      position: absolute;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 2px 6px 2px rgba(60, 64, 67, 0.149);
+      z-index: 200;
+      min-width: 180px;
+      display: none;
+      padding: 8px 0;
+    }
+
+    .more-popup.show {
+      display: block;
+    }
+
+    .more-popup-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #202124;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .more-popup-item:hover {
+      background: #f1f3f4;
+    }
+
+    .more-popup-item .material-icons-outlined {
+      font-size: 18px;
+      color: #5f6368;
+    }
+
+    /* Undo toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #323232;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 4px;
+      display: none;
+      align-items: center;
+      gap: 24px;
+      z-index: 500;
+      font-size: 14px;
+    }
+
+    .toast.show {
+      display: flex;
+    }
+
+    .toast button {
+      background: none;
+      border: none;
+      color: #8ab4f8;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* Spinning animation for refresh */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .spinning {
+      animation: spin 1s linear infinite;
+    }
+  </style>
+</head>
+<body>
+  <header class="top-bar">
+    <button class="menu-button" id="menuToggle" title="Menu principal">
+      <span class="material-icons-outlined">menu</span>
+    </button>
+    <div class="logo-area">
+      <img src="https://www.google.com/images/icons/product/keep-512.png" alt="Keep Logo" class="logo" />
+      <h1>Keep</h1>
+    </div>
+    <div class="search-area" id="searchArea">
+      <span class="material-icons-outlined">search</span>
+      <input id="searchInput" type="text" placeholder="Pesquisar" />
+      <button class="search-clear" id="searchClear">
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+    <div class="top-actions">
+      <button id="refreshBtn" class="icon-button" title="Atualizar">
+        <span class="material-icons-outlined">refresh</span>
+      </button>
+      <button id="toggleViewBtn" class="icon-button" title="Visualização em grade">
+        <span class="material-icons-outlined">view_agenda</span>
+      </button>
+      <button id="settingsBtn" class="icon-button" title="Configurações">
+        <span class="material-icons-outlined">settings</span>
+      </button>
+    </div>
+    <div class="user-avatar" id="userAvatar">U</div>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <a href="#" class="sidebar-item active" data-view="notes">
+        <span class="material-icons-outlined">lightbulb</span>
+        <span>Notas</span>
+      </a>
+      <a href="#" class="sidebar-item" data-view="reminders">
+        <span class="material-icons-outlined">notifications</span>
+        <span>Lembretes</span>
+      </a>
+    </div>
+    
+    <div class="sidebar-section" id="labelsSidebarSection">
+      <div class="sidebar-label">Marcadores</div>
+      <div id="sidebarLabels"></div>
+      <a href="#" class="sidebar-item edit-labels-btn" data-view="edit-labels">
+        <span class="material-icons-outlined">edit</span>
+        <span>Editar marcadores</span>
+      </a>
+    </div>
+    
+    <div class="sidebar-section">
+      <a href="#" class="sidebar-item" data-view="archive">
+        <span class="material-icons-outlined">archive</span>
+        <span>Arquivo</span>
+      </a>
+      <a href="#" class="sidebar-item" data-view="trash">
+        <span class="material-icons-outlined">delete</span>
+        <span>Lixeira</span>
+      </a>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="main-wrapper" id="mainWrapper">
+    <section id="noteFormWrapper" class="note-form-wrapper">
+      <div id="formCollapsed" class="note-form-collapsed">
+        <span>Criar uma nota...</span>
+        <div class="quick-icons">
+          <button class="icon-button" id="quickChecklistBtn" title="Nova lista">
+            <span class="material-icons-outlined">check_box</span>
+          </button>
+          <button class="icon-button" id="quickImageBtn" title="Nova nota com imagem">
+            <span class="material-icons-outlined">image</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="formExpanded" class="note-form hidden">
+        <img id="formImagePreview" class="note-image-preview" />
+        <div class="note-form-content">
+          <input type="text" id="noteTitle" class="note-title-input" placeholder="Título" />
+          <textarea id="noteContent" placeholder="Criar uma nota..."></textarea>
+          <div id="checklistArea" class="hidden">
+            <div id="checklistItems"></div>
+            <div class="add-list-item">
+              <span class="material-icons-outlined" style="font-size: 18px; color: #5f6368;">add</span>
+              <input type="text" id="newListItem" placeholder="Item da lista" />
+            </div>
+          </div>
+          <div id="formLabels" class="note-labels"></div>
+          <div id="formReminder" class="hidden"></div>
+          <div id="formCollaborators" class="note-collaborators hidden"></div>
+        </div>
+        <div class="form-toolbar">
+          <div class="toolbar-icons">
+            <button class="icon-button" id="reminderBtn" title="Lembrar-me">
+              <span class="material-icons-outlined">add_alert</span>
+            </button>
+            <button class="icon-button" id="collabBtn" title="Colaborador">
+              <span class="material-icons-outlined">person_add</span>
+            </button>
+            <button class="icon-button" id="colorBtn" title="Opções de plano de fundo">
+              <span class="material-icons-outlined">palette</span>
+            </button>
+            <button class="icon-button" id="imageBtn" title="Adicionar imagem">
+              <span class="material-icons-outlined">image</span>
+            </button>
+            <button class="icon-button" id="archiveFormBtn" title="Arquivar">
+              <span class="material-icons-outlined">archive</span>
+            </button>
+            <button class="icon-button" id="moreBtn" title="Mais">
+              <span class="material-icons-outlined">more_vert</span>
+            </button>
+            <button class="icon-button" id="undoBtn" title="Desfazer" disabled>
+              <span class="material-icons-outlined">undo</span>
+            </button>
+            <button class="icon-button" id="redoBtn" title="Refazer" disabled>
+              <span class="material-icons-outlined">redo</span>
+            </button>
+          </div>
+          <div class="form-buttons">
+            <button id="closeFormBtn">Fechar</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Hidden file inputs -->
+      <input type="file" id="formImageInput" class="hidden-input" accept="image/*" />
+      <input type="file" id="quickImageInput" class="hidden-input" accept="image/*" />
+    </section>
+
+    <div id="viewHeader" class="view-header hidden">
+      <h2 id="viewHeaderTitle"></h2>
+      <button id="emptyTrashBtn" class="hidden">Esvaziar lixeira</button>
+    </div>
+
+    <main>
+      <section id="pinnedSection" class="note-section hidden">
+        <h2>Fixadas</h2>
+        <div class="notes-grid" id="pinnedGrid"></div>
+      </section>
+
+      <section id="otherSection" class="note-section">
+        <h2 id="otherSectionTitle" class="hidden">Outras</h2>
+        <div class="notes-grid" id="notesGrid"></div>
+      </section>
+
+      <div id="emptyState" class="empty-state hidden">
+        <span class="material-icons-outlined" id="emptyIcon">lightbulb</span>
+        <p id="emptyText">As notas adicionadas serão exibidas aqui</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Color Popup -->
+  <div class="color-popup" id="colorPopup">
+    <div class="color-popup-grid" id="colorGrid"></div>
+  </div>
+
+  <!-- Label Popup -->
+  <div class="label-popup" id="labelPopup">
+    <div class="label-popup-header">Marcador da nota</div>
+    <div class="label-popup-search">
+      <input type="text" id="labelSearch" placeholder="Insira o nome do marcador" />
+    </div>
+    <div class="label-popup-list" id="labelList"></div>
+    <div class="create-label-item" id="createLabelBtn">
+      <span class="material-icons-outlined">add</span>
+      <span>Criar "<span id="newLabelName"></span>"</span>
+    </div>
+  </div>
+
+  <!-- Reminder Popup -->
+  <div class="reminder-popup" id="reminderPopup">
+    <div class="reminder-popup-header">Lembrete</div>
+    <div class="reminder-quick-options">
+      <div class="reminder-quick-option" data-time="today-20">
+        <span class="material-icons-outlined">wb_twilight</span>
+        Hoje à noite
+        <span>20:00</span>
+      </div>
+      <div class="reminder-quick-option" data-time="tomorrow-08">
+        <span class="material-icons-outlined">wb_sunny</span>
+        Amanhã de manhã
+        <span>08:00</span>
+      </div>
+      <div class="reminder-quick-option" data-time="tomorrow-13">
+        <span class="material-icons-outlined">restaurant</span>
+        Amanhã à tarde
+        <span>13:00</span>
+      </div>
+    </div>
+    <div class="reminder-divider"></div>
+    <div class="reminder-popup-header" style="margin-top: 8px;">Escolher data e hora</div>
+    <input type="datetime-local" id="reminderDateTime" />
+    <div class="reminder-popup-buttons">
+      <button class="cancel-btn" id="cancelReminder">Cancelar</button>
+      <button class="save-btn" id="saveReminder">Salvar</button>
+    </div>
+  </div>
+
+  <!-- Collaborator Popup -->
+  <div class="collab-popup" id="collabPopup">
+    <div class="collab-popup-header">Colaboradores</div>
+    <input type="email" id="collabEmail" placeholder="Adicionar pessoa por e-mail" />
+    <div class="collab-list" id="collabList"></div>
+    <div class="collab-popup-buttons">
+      <button class="cancel-btn" id="cancelCollab">Cancelar</button>
+      <button class="save-btn" id="saveCollab">Salvar</button>
+    </div>
+  </div>
+
+  <!-- More Popup -->
+  <div class="more-popup" id="morePopup">
+    <div class="more-popup-item" id="addLabelMenuItem">
+      <span class="material-icons-outlined">label</span>
+      Adicionar marcador
+    </div>
+    <div class="more-popup-item" id="addDrawingMenuItem">
+      <span class="material-icons-outlined">brush</span>
+      Adicionar desenho
+    </div>
+    <div class="more-popup-item" id="makeChecklistMenuItem">
+      <span class="material-icons-outlined">check_box</span>
+      Mostrar caixas de seleção
+    </div>
+    <div class="more-popup-item" id="makeCopyMenuItem">
+      <span class="material-icons-outlined">content_copy</span>
+      Fazer uma cópia
+    </div>
+    <div class="more-popup-item" id="deleteNoteMenuItem">
+      <span class="material-icons-outlined">delete</span>
+      Excluir nota
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="edit-modal" id="editModalContent">
+      <img id="editImagePreview" class="edit-modal-image" />
+      <div class="edit-modal-content">
+        <input type="text" id="editTitle" placeholder="Título" />
+        <textarea id="editContent" placeholder="Nota..."></textarea>
+        <div id="editChecklistArea" class="hidden">
+          <div id="editChecklistItems"></div>
+          <div class="add-list-item">
+            <span class="material-icons-outlined" style="font-size: 18px; color: #5f6368;">add</span>
+            <input type="text" id="editNewListItem" placeholder="Item da lista" />
+          </div>
+        </div>
+        <div id="editLabels" class="note-labels"></div>
+        <div id="editReminder"></div>
+        <div id="editCollaborators" class="note-collaborators"></div>
+      </div>
+      <div class="edit-modal-toolbar">
+        <div class="toolbar-icons">
+          <button class="icon-button" id="editReminderBtn" title="Lembrar-me">
+            <span class="material-icons-outlined">add_alert</span>
+          </button>
+          <button class="icon-button" id="editCollabBtn" title="Colaborador">
+            <span class="material-icons-outlined">person_add</span>
+          </button>
+          <button class="icon-button" id="editColorBtn" title="Opções de plano de fundo">
+            <span class="material-icons-outlined">palette</span>
+          </button>
+          <button class="icon-button" id="editImageBtn" title="Adicionar imagem">
+            <span class="material-icons-outlined">image</span>
+          </button>
+          <button class="icon-button" id="editArchiveBtn" title="Arquivar">
+            <span class="material-icons-outlined">archive</span>
+          </button>
+          <button class="icon-button" id="editMoreBtn" title="Mais">
+            <span class="material-icons-outlined">more_vert</span>
+          </button>
+        </div>
+        <div class="form-buttons">
+          <button id="closeEditModal">Fechar</button>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="editImageInput" class="hidden-input" accept="image/*" />
+  </div>
+
+  <!-- Labels Modal -->
+  <div class="modal-overlay" id="labelsModal">
+    <div class="labels-modal">
+      <div class="labels-modal-header">
+        <h3>Editar marcadores</h3>
+        <input type="text" id="newLabelInput" placeholder="Criar novo marcador" />
+      </div>
+      <div class="labels-modal-list" id="labelsModalList"></div>
+      <div class="labels-modal-footer">
+        <button id="closeLabelsModal">Concluído</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="settings-modal">
+      <div class="settings-modal-header">
+        <h3>Configurações</h3>
+        <button class="icon-button" id="closeSettingsBtn">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+      <div class="settings-modal-content">
+        <div class="settings-item">
+          <label>Adicionar novas notas no topo</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="settingNewOnTop" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <label>Exibir visualização rica de links</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="settingRichLinks" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <label>Tema</label>
+          <select id="settingTheme">
+            <option value="light">Claro</option>
+            <option value="dark">Escuro</option>
+            <option value="system">Sistema</option>
+          </select>
+        </div>
+        <div class="settings-item">
+          <label>Horário padrão do lembrete</label>
+          <select id="settingReminderTime">
+            <option value="08:00">08:00</option>
+            <option value="09:00">09:00</option>
+            <option value="10:00">10:00</option>
+            <option value="12:00">12:00</option>
+            <option value="14:00">14:00</option>
+            <option value="18:00">18:00</option>
+            <option value="20:00" selected>20:00</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toastMessage"></span>
+    <button id="toastUndo">Desfazer</button>
+  </div>
+
+  <script>
+    // App State
+    const state = {
+      notes: [],
+      labels: ['Trabalho', 'Pessoal', 'Ideias'],
+      currentView: 'notes',
+      currentLabelFilter: null,
+      editingNoteId: null,
+      isListView: false,
+      formColor: '',
+      formLabels: [],
+      formReminder: null,
+      formIsChecklist: false,
+      formImage: null,
+      formCollaborators: [],
+      checklistItems: [],
+      lastDeletedNote: null,
+      undoStack: [],
+      redoStack: [],
+      settings: {
+        newOnTop: true,
+        richLinks: true,
+        theme: 'light',
+        reminderTime: '20:00'
+      },
+      tempCollaborators: []
+    };
+
+    // Colors
+    const colors = [
+      { name: 'default', value: '#ffffff' },
+      { name: 'coral', value: '#faafa8' },
+      { name: 'peach', value: '#f39f76' },
+      { name: 'sand', value: '#fff8b8' },
+      { name: 'mint', value: '#e2f6d3' },
+      { name: 'sage', value: '#b4ddd3' },
+      { name: 'fog', value: '#d4e4ed' },
+      { name: 'storm', value: '#aeccdc' },
+      { name: 'dusk', value: '#d3bfdb' },
+      { name: 'blossom', value: '#f6e2dd' },
+      { name: 'clay', value: '#e9e3d4' },
+      { name: 'chalk', value: '#efeff1' }
+    ];
+
+    // DOM Elements
+    const elements = {
+      sidebar: document.getElementById('sidebar'),
+      sidebarOverlay: document.getElementById('sidebarOverlay'),
+      mainWrapper: document.getElementById('mainWrapper'),
+      menuToggle: document.getElementById('menuToggle'),
+      formCollapsed: document.getElementById('formCollapsed'),
+      formExpanded: document.getElementById('formExpanded'),
+      noteTitle: document.getElementById('noteTitle'),
+      noteContent: document.getElementById('noteContent'),
+      checklistArea: document.getElementById('checklistArea'),
+      checklistItems: document.getElementById('checklistItems'),
+      newListItem: document.getElementById('newListItem'),
+      closeFormBtn: document.getElementById('closeFormBtn'),
+      colorBtn: document.getElementById('colorBtn'),
+      colorPopup: document.getElementById('colorPopup'),
+      colorGrid: document.getElementById('colorGrid'),
+      labelPopup: document.getElementById('labelPopup'),
+      labelSearch: document.getElementById('labelSearch'),
+      labelList: document.getElementById('labelList'),
+      createLabelBtn: document.getElementById('createLabelBtn'),
+      newLabelName: document.getElementById('newLabelName'),
+      reminderPopup: document.getElementById('reminderPopup'),
+      reminderDateTime: document.getElementById('reminderDateTime'),
+      collabPopup: document.getElementById('collabPopup'),
+      collabEmail: document.getElementById('collabEmail'),
+      collabList: document.getElementById('collabList'),
+      pinnedSection: document.getElementById('pinnedSection'),
+      pinnedGrid: document.getElementById('pinnedGrid'),
+      otherSection: document.getElementById('otherSection'),
+      otherSectionTitle: document.getElementById('otherSectionTitle'),
+      notesGrid: document.getElementById('notesGrid'),
+      emptyState: document.getElementById('emptyState'),
+      emptyIcon: document.getElementById('emptyIcon'),
+      emptyText: document.getElementById('emptyText'),
+      searchInput: document.getElementById('searchInput'),
+      searchArea: document.getElementById('searchArea'),
+      searchClear: document.getElementById('searchClear'),
+      toggleViewBtn: document.getElementById('toggleViewBtn'),
+      editModal: document.getElementById('editModal'),
+      editModalContent: document.getElementById('editModalContent'),
+      editTitle: document.getElementById('editTitle'),
+      editContent: document.getElementById('editContent'),
+      closeEditModal: document.getElementById('closeEditModal'),
+      labelsModal: document.getElementById('labelsModal'),
+      newLabelInput: document.getElementById('newLabelInput'),
+      labelsModalList: document.getElementById('labelsModalList'),
+      closeLabelsModal: document.getElementById('closeLabelsModal'),
+      sidebarLabels: document.getElementById('sidebarLabels'),
+      viewHeader: document.getElementById('viewHeader'),
+      viewHeaderTitle: document.getElementById('viewHeaderTitle'),
+      emptyTrashBtn: document.getElementById('emptyTrashBtn'),
+      noteFormWrapper: document.getElementById('noteFormWrapper'),
+      morePopup: document.getElementById('morePopup'),
+      toast: document.getElementById('toast'),
+      toastMessage: document.getElementById('toastMessage'),
+      formLabels: document.getElementById('formLabels'),
+      formReminder: document.getElementById('formReminder'),
+      formCollaborators: document.getElementById('formCollaborators'),
+      editLabels: document.getElementById('editLabels'),
+      editReminder: document.getElementById('editReminder'),
+      editCollaborators: document.getElementById('editCollaborators'),
+      editChecklistArea: document.getElementById('editChecklistArea'),
+      editChecklistItems: document.getElementById('editChecklistItems'),
+      editNewListItem: document.getElementById('editNewListItem'),
+      quickChecklistBtn: document.getElementById('quickChecklistBtn'),
+      formImagePreview: document.getElementById('formImagePreview'),
+      formImageInput: document.getElementById('formImageInput'),
+      quickImageInput: document.getElementById('quickImageInput'),
+      editImagePreview: document.getElementById('editImagePreview'),
+      editImageInput: document.getElementById('editImageInput'),
+      settingsModal: document.getElementById('settingsModal'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      settingsBtn: document.getElementById('settingsBtn'),
+      undoBtn: document.getElementById('undoBtn'),
+      redoBtn: document.getElementById('redoBtn')
+    };
+
+    // Initialize
+    function init() {
+      loadFromStorage();
+      renderColorPalette();
+      renderSidebarLabels();
+      renderNotes();
+      setupEventListeners();
+      applySettings();
+    }
+
+    // Storage
+    function loadFromStorage() {
+      const savedNotes = localStorage.getItem('keepNotes');
+      const savedLabels = localStorage.getItem('keepLabels');
+      const savedSettings = localStorage.getItem('keepSettings');
+      if (savedNotes) state.notes = JSON.parse(savedNotes);
+      if (savedLabels) state.labels = JSON.parse(savedLabels);
+      if (savedSettings) state.settings = { ...state.settings, ...JSON.parse(savedSettings) };
+    }
+
+    function saveToStorage() {
+      localStorage.setItem('keepNotes', JSON.stringify(state.notes));
+      localStorage.setItem('keepLabels', JSON.stringify(state.labels));
+      localStorage.setItem('keepSettings', JSON.stringify(state.settings));
+    }
+
+    // Apply Settings
+    function applySettings() {
+      document.getElementById('settingNewOnTop').checked = state.settings.newOnTop;
+      document.getElementById('settingRichLinks').checked = state.settings.richLinks;
+      document.getElementById('settingTheme').value = state.settings.theme;
+      document.getElementById('settingReminderTime').value = state.settings.reminderTime;
+      
+      // Apply theme
+      if (state.settings.theme === 'dark') {
+        document.body.style.background = '#202124';
+        document.body.style.color = '#e8eaed';
+      } else {
+        document.body.style.background = '#fff';
+        document.body.style.color = '#202124';
+      }
+    }
+
+    // Color Palette
+    function renderColorPalette() {
+      elements.colorGrid.innerHTML = colors.map(color => `
+        <button class="color-option ${color.name === 'default' ? 'default-color' : ''}" 
+                style="background: ${color.value}" 
+                data-color="${color.value}"
+                title="${color.name}">
+        </button>
+      `).join('');
+    }
+
+    // Sidebar Labels
+    function renderSidebarLabels() {
+      elements.sidebarLabels.innerHTML = state.labels.map(label => `
+        <a href="#" class="sidebar-item" data-view="label" data-label="${label}">
+          <span class="material-icons-outlined">label</span>
+          <span>${label}</span>
+        </a>
+      `).join('');
+    }
+
+    // Render Notes
+    function renderNotes() {
+      let notesToRender = state.notes.filter(note => {
+        if (state.currentView === 'notes') return !note.archived && !note.trashed;
+        if (state.currentView === 'archive') return note.archived && !note.trashed;
+        if (state.currentView === 'trash') return note.trashed;
+        if (state.currentView === 'reminders') return note.reminder && !note.archived && !note.trashed;
+        if (state.currentView === 'label') return note.labels?.includes(state.currentLabelFilter) && !note.archived && !note.trashed;
+        return false;
+      });
+
+      // Search filter
+      const searchTerm = elements.searchInput.value.toLowerCase();
+      if (searchTerm) {
+        notesToRender = notesToRender.filter(note => 
+          note.title?.toLowerCase().includes(searchTerm) ||
+          note.content?.toLowerCase().includes(searchTerm) ||
+          note.checklist?.some(item => item.text.toLowerCase().includes(searchTerm))
+        );
+      }
+
+      const pinnedNotes = notesToRender.filter(n => n.pinned);
+      const otherNotes = notesToRender.filter(n => !n.pinned);
+
+      // Update view
+      elements.noteFormWrapper.classList.toggle('hidden', state.currentView === 'trash' || state.currentView === 'archive');
+      elements.viewHeader.classList.toggle('hidden', state.currentView === 'notes' || state.currentView === 'label');
+      elements.emptyTrashBtn.classList.toggle('hidden', state.currentView !== 'trash');
+
+      if (state.currentView === 'trash') {
+        elements.viewHeaderTitle.textContent = 'As notas na lixeira são excluídas após 7 dias.';
+      } else if (state.currentView === 'archive') {
+        elements.viewHeaderTitle.textContent = '';
+      }
+
+      // Show/hide sections
+      const hasPinned = pinnedNotes.length > 0;
+
+      elements.pinnedSection.classList.toggle('hidden', !hasPinned || state.currentView === 'trash');
+      elements.otherSectionTitle.classList.toggle('hidden', !hasPinned || state.currentView === 'trash');
+
+      if (notesToRender.length === 0) {
+        elements.emptyState.classList.remove('hidden');
+        elements.otherSection.classList.add('hidden');
+        updateEmptyState();
+      } else {
+        elements.emptyState.classList.add('hidden');
+        elements.otherSection.classList.remove('hidden');
+      }
+
+      // Render grids
+      elements.pinnedGrid.innerHTML = pinnedNotes.map(note => createNoteCard(note)).join('');
+      elements.notesGrid.innerHTML = otherNotes.map(note => createNoteCard(note)).join('');
+
+      // Apply view mode
+      elements.pinnedGrid.classList.toggle('list-view', state.isListView);
+      elements.notesGrid.classList.toggle('list-view', state.isListView);
+    }
+
+    function updateEmptyState() {
+      const icons = {
+        notes: 'lightbulb',
+        reminders: 'notifications',
+        archive: 'archive',
+        trash: 'delete',
+        label: 'label'
+      };
+      const texts = {
+        notes: 'As notas adicionadas serão exibidas aqui',
+        reminders: 'Notas com lembretes definidos aparecem aqui',
+        archive: 'Suas notas arquivadas aparecem aqui',
+        trash: 'Nenhuma nota na lixeira',
+        label: 'Nenhuma nota com este marcador'
+      };
+      elements.emptyIcon.textContent = icons[state.currentView] || 'lightbulb';
+      elements.emptyText.textContent = texts[state.currentView] || 'As notas adicionadas serão exibidas aqui';
+    }
+
+    function createNoteCard(note) {
+      const bgColor = note.color || '#fff';
+      const borderColor = bgColor === '#fff' || bgColor === '#ffffff' ? '#e0e0e0' : bgColor;
+      
+      let imageHtml = '';
+      if (note.image) {
+        imageHtml = `<img src="${note.image}" class="note-image" alt="Imagem da nota" />`;
+      }
+      
+      let contentHtml = '';
+      if (note.isChecklist && note.checklist) {
+        const unchecked = note.checklist.filter(i => !i.checked);
+        const checked = note.checklist.filter(i => i.checked);
+        contentHtml = `
+          <div class="checklist-preview">
+            ${unchecked.slice(0, 5).map(item => `
+              <div class="checklist-item">
+                <input type="checkbox" ${item.checked ? 'checked' : ''} data-note-id="${note.id}" data-item-id="${item.id}" />
+                <span>${escapeHtml(item.text)}</span>
+              </div>
+            `).join('')}
+            ${unchecked.length > 5 ? `<div style="color: #5f6368; font-size: 13px;">+ ${unchecked.length - 5} itens</div>` : ''}
+            ${checked.length > 0 ? `
+              <div style="color: #5f6368; font-size: 13px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1);">
+                + ${checked.length} itens marcados
+              </div>
+            ` : ''}
+          </div>
+        `;
+      } else {
+        contentHtml = `<div class="note-content">${escapeHtml(note.content || '').substring(0, 300)}</div>`;
+      }
+
+      const labelsHtml = note.labels?.length ? `
+        <div class="note-labels">
+          ${note.labels.map(l => `<span class="label-badge">${escapeHtml(l)}</span>`).join('')}
+        </div>
+      ` : '';
+
+      const reminderHtml = note.reminder ? `
+        <div class="reminder-badge ${new Date(note.reminder) < new Date() ? 'past' : ''}">
+          <span class="material-icons-outlined">schedule</span>
+          ${formatReminder(note.reminder)}
+        </div>
+      ` : '';
+      
+      const collaboratorsHtml = note.collaborators?.length ? `
+        <div class="note-collaborators">
+          ${note.collaborators.slice(0, 3).map(c => `
+            <div class="collab-avatar" title="${escapeHtml(c.email)}">${c.email[0].toUpperCase()}</div>
+          `).join('')}
+          ${note.collaborators.length > 3 ? `<div class="collab-avatar">+${note.collaborators.length - 3}</div>` : ''}
+        </div>
+      ` : '';
+
+      return `
+        <div class="note" style="background: ${bgColor}; border-color: ${borderColor};" data-id="${note.id}">
+          <button class="icon-button note-pin ${note.pinned ? 'pinned' : ''}" data-action="pin">
+            <span class="material-icons-outlined">push_pin</span>
+          </button>
+          ${imageHtml}
+          <div class="note-inner" data-action="edit">
+            ${note.title ? `<div class="note-title">${escapeHtml(note.title)}</div>` : ''}
+            ${contentHtml}
+            ${labelsHtml}
+            ${reminderHtml}
+            ${collaboratorsHtml}
+          </div>
+          <div class="note-toolbar">
+            <button data-action="reminder" title="Lembrar-me">
+              <span class="material-icons-outlined">add_alert</span>
+            </button>
+            <button data-action="collab" title="Colaborador">
+              <span class="material-icons-outlined">person_add</span>
+            </button>
+            <button data-action="color" title="Opções de plano de fundo">
+              <span class="material-icons-outlined">palette</span>
+            </button>
+            <button data-action="image" title="Adicionar imagem">
+              <span class="material-icons-outlined">image</span>
+            </button>
+            <button data-action="${note.archived ? 'unarchive' : 'archive'}" title="${note.archived ? 'Desarquivar' : 'Arquivar'}">
+              <span class="material-icons-outlined">${note.archived ? 'unarchive' : 'archive'}</span>
+            </button>
+            <button data-action="more" title="Mais">
+              <span class="material-icons-outlined">more_vert</span>
+            </button>
+            ${note.trashed ? `
+              <button data-action="restore" title="Restaurar">
+                <span class="material-icons-outlined">restore_from_trash</span>
+              </button>
+              <button data-action="delete-forever" title="Excluir permanentemente">
+                <span class="material-icons-outlined">delete_forever</span>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function formatReminder(dateStr) {
+      const date = new Date(dateStr);
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const timeStr = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      
+      if (date.toDateString() === today.toDateString()) {
+        return `Hoje, ${timeStr}`;
+      } else if (date.toDateString() === tomorrow.toDateString()) {
+        return `Amanhã, ${timeStr}`;
+      } else {
+        return date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }) + ', ' + timeStr;
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Event Listeners
+    function setupEventListeners() {
+      // Menu toggle
+      elements.menuToggle.addEventListener('click', toggleSidebar);
+      elements.sidebarOverlay.addEventListener('click', () => {
+        elements.sidebar.classList.remove('open');
+        elements.sidebarOverlay.classList.remove('active');
+      });
+
+      // Form collapse/expand
+      elements.formCollapsed.addEventListener('click', (e) => {
+        if (!e.target.closest('.quick-icons')) {
+          expandForm(false);
+        }
+      });
+      
+      elements.quickChecklistBtn.addEventListener('click', () => {
+        expandForm(true);
+      });
+      
+      // Quick image button
+      document.getElementById('quickImageBtn').addEventListener('click', () => {
+        elements.quickImageInput.click();
+      });
+      
+      elements.quickImageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            state.formImage = ev.target.result;
+            expandForm(false);
+            elements.formImagePreview.src = state.formImage;
+            elements.formImagePreview.classList.add('show');
+          };
+          reader.readAsDataURL(file);
+        }
+        e.target.value = '';
+      });
+
+      elements.closeFormBtn.addEventListener('click', closeForm);
+
+      // New list item
+      elements.newListItem.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && e.target.value.trim()) {
+          addChecklistItem(e.target.value.trim());
+          e.target.value = '';
+        }
+      });
+
+      // Color button
+      elements.colorBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showColorPopup(elements.colorBtn, 'form');
+      });
+
+      // Reminder button
+      document.getElementById('reminderBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        showReminderPopup(e.target.closest('button'), 'form');
+      });
+      
+      // Collaborator button
+      document.getElementById('collabBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.tempCollaborators = [...state.formCollaborators];
+        showCollabPopup(e.target.closest('button'), 'form');
+      });
+      
+      // Image button in form
+      document.getElementById('imageBtn').addEventListener('click', () => {
+        elements.formImageInput.click();
+      });
+      
+      elements.formImageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            state.formImage = ev.target.result;
+            elements.formImagePreview.src = state.formImage;
+            elements.formImagePreview.classList.add('show');
+          };
+          reader.readAsDataURL(file);
+        }
+        e.target.value = '';
+      });
+      
+      // Archive from form
+      document.getElementById('archiveFormBtn').addEventListener('click', () => {
+        const title = elements.noteTitle.value.trim();
+        const content = elements.noteContent.value.trim();
+        const hasChecklist = state.checklistItems.length > 0;
+
+        if (title || content || hasChecklist || state.formImage) {
+          const note = {
+            id: Date.now(),
+            title,
+            content: state.formIsChecklist ? '' : content,
+            isChecklist: state.formIsChecklist,
+            checklist: state.formIsChecklist ? [...state.checklistItems] : null,
+            color: state.formColor || '#ffffff',
+            labels: [...state.formLabels],
+            reminder: state.formReminder,
+            collaborators: [...state.formCollaborators],
+            image: state.formImage,
+            pinned: false,
+            archived: true,
+            trashed: false,
+            createdAt: new Date().toISOString()
+          };
+          state.notes.unshift(note);
+          saveToStorage();
+          renderNotes();
+          showToast('Nota arquivada');
+        }
+        resetForm();
+      });
+
+      // More button
+      document.getElementById('moreBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        showMorePopup(e.target.closest('button'), 'form');
+      });
+
+      // Reminder quick options
+      document.querySelectorAll('.reminder-quick-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          const timeType = opt.dataset.time;
+          const now = new Date();
+          let targetDate = new Date();
+          
+          if (timeType === 'today-20') {
+            targetDate.setHours(20, 0, 0, 0);
+          } else if (timeType === 'tomorrow-08') {
+            targetDate.setDate(targetDate.getDate() + 1);
+            targetDate.setHours(8, 0, 0, 0);
+          } else if (timeType === 'tomorrow-13') {
+            targetDate.setDate(targetDate.getDate() + 1);
+            targetDate.setHours(13, 0, 0, 0);
+          }
+          
+          const dateStr = targetDate.toISOString().slice(0, 16);
+          
+          if (state.editingNoteId) {
+            const note = state.notes.find(n => n.id === state.editingNoteId);
+            if (note) {
+              note.reminder = dateStr;
+              saveToStorage();
+              renderEditReminder(note);
+              renderNotes();
+            }
+          } else {
+            state.formReminder = dateStr;
+            renderFormReminder();
+          }
+          elements.reminderPopup.classList.remove('show');
+        });
+      });
+
+      // Save reminder
+      document.getElementById('saveReminder').addEventListener('click', () => {
+        const dateTime = elements.reminderDateTime.value;
+        if (dateTime) {
+          if (state.editingNoteId) {
+            const note = state.notes.find(n => n.id === state.editingNoteId);
+            if (note) {
+              note.reminder = dateTime;
+              saveToStorage();
+              renderEditReminder(note);
+              renderNotes();
+            }
+          } else {
+            state.formReminder = dateTime;
+            renderFormReminder();
+          }
+        }
+        elements.reminderPopup.classList.remove('show');
+      });
+
+      document.getElementById('cancelReminder').addEventListener('click', () => {
+        elements.reminderPopup.classList.remove('show');
+      });
+      
+      // Collaborator popup
+      document.getElementById('collabEmail').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const email = e.target.value.trim();
+          if (email && email.includes('@')) {
+            state.tempCollaborators.push({ email });
+            renderCollabList();
+            e.target.value = '';
+          }
+        }
+      });
+      
+      document.getElementById('saveCollab').addEventListener('click', () => {
+        if (state.editingNoteId) {
+          const note = state.notes.find(n => n.id === state.editingNoteId);
+          if (note) {
+            note.collaborators = [...state.tempCollaborators];
+            saveToStorage();
+            renderEditCollaborators(note);
+            renderNotes();
+          }
+        } else {
+          state.formCollaborators = [...state.tempCollaborators];
+          renderFormCollaborators();
+        }
+        elements.collabPopup.classList.remove('show');
+      });
+      
+      document.getElementById('cancelCollab').addEventListener('click', () => {
+        elements.collabPopup.classList.remove('show');
+      });
+
+      // Color popup clicks
+      elements.colorGrid.addEventListener('click', (e) => {
+        const colorBtn = e.target.closest('.color-option');
+        if (colorBtn) {
+          const color = colorBtn.dataset.color;
+          if (state.editingNoteId) {
+            const note = state.notes.find(n => n.id === state.editingNoteId);
+            if (note) {
+              note.color = color;
+              elements.editModalContent.style.background = color;
+              saveToStorage();
+              renderNotes();
+            }
+          } else {
+            state.formColor = color;
+            elements.formExpanded.style.background = color;
+          }
+          elements.colorPopup.classList.remove('show');
+        }
+      });
+
+      // Make checklist
+      document.getElementById('makeChecklistMenuItem').addEventListener('click', () => {
+        if (state.editingNoteId) {
+          const note = state.notes.find(n => n.id === state.editingNoteId);
+          if (note) {
+            if (!note.isChecklist) {
+              // Convert text to checklist
+              const lines = (note.content || '').split('\n').filter(l => l.trim());
+              note.checklist = lines.map((text, i) => ({ id: Date.now() + i, text, checked: false }));
+              note.isChecklist = true;
+              note.content = '';
+            } else {
+              // Convert checklist to text
+              note.content = note.checklist.map(i => i.text).join('\n');
+              note.isChecklist = false;
+              note.checklist = null;
+            }
+            saveToStorage();
+            // Re-open modal
+            openEditModal(note);
+          }
+        } else {
+          state.formIsChecklist = !state.formIsChecklist;
+          elements.noteContent.classList.toggle('hidden', state.formIsChecklist);
+          elements.checklistArea.classList.toggle('hidden', !state.formIsChecklist);
+        }
+        elements.morePopup.classList.remove('show');
+      });
+      
+      // Make copy
+      document.getElementById('makeCopyMenuItem').addEventListener('click', () => {
+        if (state.editingNoteId) {
+          const note = state.notes.find(n => n.id === state.editingNoteId);
+          if (note) {
+            const copy = {
+              ...JSON.parse(JSON.stringify(note)),
+              id: Date.now(),
+              createdAt: new Date().toISOString()
+            };
+            state.notes.unshift(copy);
+            saveToStorage();
+            renderNotes();
+            showToast('Cópia criada');
+            closeEditModal();
+          }
+        }
+        elements.morePopup.classList.remove('show');
+      });
+
+      // Add label from menu
+      document.getElementById('addLabelMenuItem').addEventListener('click', (e) => {
+        elements.morePopup.classList.remove('show');
+        showLabelPopup(document.getElementById('moreBtn'), state.editingNoteId ? 'edit' : 'form');
+      });
+
+      // Delete note from menu
+      document.getElementById('deleteNoteMenuItem').addEventListener('click', () => {
+        elements.morePopup.classList.remove('show');
+        if (state.editingNoteId) {
+          const note = state.notes.find(n => n.id === state.editingNoteId);
+          if (note) {
+            state.lastDeletedNote = note;
+            note.trashed = true;
+            note.trashedAt = new Date().toISOString();
+            saveToStorage();
+            closeEditModal();
+            renderNotes();
+            showToast('Nota movida para a lixeira');
+          }
+        }
+      });
+
+      // Label popup
+      elements.labelSearch.addEventListener('input', (e) => {
+        elements.newLabelName.textContent = e.target.value;
+        elements.createLabelBtn.style.display = e.target.value.trim() ? 'flex' : 'none';
+        renderLabelList(e.target.value);
+      });
+
+      elements.createLabelBtn.addEventListener('click', () => {
+        const name = elements.labelSearch.value.trim();
+        if (name && !state.labels.includes(name)) {
+          state.labels.push(name);
+          saveToStorage();
+          renderSidebarLabels();
+          renderLabelList('');
+          if (state.editingNoteId) {
+            const note = state.notes.find(n => n.id === state.editingNoteId);
+            if (note) {
+              if (!note.labels) note.labels = [];
+              note.labels.push(name);
+              saveToStorage();
+              renderEditLabels(note);
+            }
+          } else {
+            state.formLabels.push(name);
+            renderFormLabels();
+          }
+        }
+        elements.labelSearch.value = '';
+        elements.labelPopup.classList.remove('show');
+      });
+
+      // Sidebar navigation
+      document.getElementById('sidebar').addEventListener('click', (e) => {
+        const item = e.target.closest('.sidebar-item');
+        if (item) {
+          e.preventDefault();
+          const view = item.dataset.view;
+          
+          if (view === 'edit-labels') {
+            showLabelsModal();
+            return;
+          }
+
+          document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          
+          state.currentView = view === 'label' ? 'label' : view;
+          state.currentLabelFilter = item.dataset.label || null;
+          
+          renderNotes();
+          
+          // Mobile: close sidebar
+          if (window.innerWidth <= 768) {
+            elements.sidebar.classList.remove('open');
+            elements.sidebarOverlay.classList.remove('active');
+          }
+        }
+      });
+
+      // Search
+      elements.searchInput.addEventListener('input', () => {
+        elements.searchArea.classList.toggle('has-value', elements.searchInput.value.length > 0);
+        renderNotes();
+      });
+
+      elements.searchClear.addEventListener('click', () => {
+        elements.searchInput.value = '';
+        elements.searchArea.classList.remove('has-value');
+        renderNotes();
+      });
+
+      // Toggle view
+      elements.toggleViewBtn.addEventListener('click', () => {
+        state.isListView = !state.isListView;
+        elements.toggleViewBtn.querySelector('.material-icons-outlined').textContent = 
+          state.isListView ? 'grid_view' : 'view_agenda';
+        renderNotes();
+      });
+      
+      // Refresh button
+      elements.refreshBtn.addEventListener('click', () => {
+        const icon = elements.refreshBtn.querySelector('.material-icons-outlined');
+        icon.classList.add('spinning');
+        setTimeout(() => {
+          renderNotes();
+          icon.classList.remove('spinning');
+          showToast('Notas atualizadas');
+        }, 500);
+      });
+      
+      // Settings button
+      elements.settingsBtn.addEventListener('click', () => {
+        elements.settingsModal.classList.add('show');
+      });
+      
+      document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+        elements.settingsModal.classList.remove('show');
+      });
+      
+      elements.settingsModal.addEventListener('click', (e) => {
+        if (e.target === elements.settingsModal) {
+          elements.settingsModal.classList.remove('show');
+        }
+      });
+      
+      // Settings changes
+      document.getElementById('settingNewOnTop').addEventListener('change', (e) => {
+        state.settings.newOnTop = e.target.checked;
+        saveToStorage();
+      });
+      
+      document.getElementById('settingRichLinks').addEventListener('change', (e) => {
+        state.settings.richLinks = e.target.checked;
+        saveToStorage();
+      });
+      
+      document.getElementById('settingTheme').addEventListener('change', (e) => {
+        state.settings.theme = e.target.value;
+        saveToStorage();
+        applySettings();
+      });
+      
+      document.getElementById('settingReminderTime').addEventListener('change', (e) => {
+        state.settings.reminderTime = e.target.value;
+        saveToStorage();
+      });
+      
+      // Undo/Redo buttons
+      elements.undoBtn.addEventListener('click', () => {
+        if (state.undoStack.length > 0) {
+          const lastState = state.undoStack.pop();
+          state.redoStack.push({
+            title: elements.noteTitle.value,
+            content: elements.noteContent.value
+          });
+          elements.noteTitle.value = lastState.title;
+          elements.noteContent.value = lastState.content;
+          updateUndoRedoButtons();
+        }
+      });
+      
+      elements.redoBtn.addEventListener('click', () => {
+        if (state.redoStack.length > 0) {
+          const nextState = state.redoStack.pop();
+          state.undoStack.push({
+            title: elements.noteTitle.value,
+            content: elements.noteContent.value
+          });
+          elements.noteTitle.value = nextState.title;
+          elements.noteContent.value = nextState.content;
+          updateUndoRedoButtons();
+        }
+      });
+      
+      // Track changes for undo
+      let typingTimer;
+      const trackChange = () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => {
+          state.undoStack.push({
+            title: elements.noteTitle.value,
+            content: elements.noteContent.value
+          });
+          state.redoStack = [];
+          updateUndoRedoButtons();
+        }, 500);
+      };
+      
+      elements.noteTitle.addEventListener('input', trackChange);
+      elements.noteContent.addEventListener('input', trackChange);
+
+      // Notes grid click handling
+      document.addEventListener('click', (e) => {
+        const note = e.target.closest('.note');
+        if (note) {
+          const noteId = parseInt(note.dataset.id);
+          const action = e.target.closest('[data-action]')?.dataset.action;
+          
+          if (action) {
+            handleNoteAction(noteId, action, e);
+          }
+        }
+
+        // Checkbox in note
+        const checkbox = e.target.closest('.checklist-item input[type="checkbox"]');
+        if (checkbox) {
+          e.stopPropagation();
+          const noteId = parseInt(checkbox.dataset.noteId);
+          const itemId = parseInt(checkbox.dataset.itemId);
+          const noteData = state.notes.find(n => n.id === noteId);
+          if (noteData) {
+            const item = noteData.checklist.find(i => i.id === itemId);
+            if (item) {
+              item.checked = checkbox.checked;
+              saveToStorage();
+              renderNotes();
+            }
+          }
+        }
+
+        // Close popups when clicking outside
+        if (!e.target.closest('.color-popup') && !e.target.closest('[data-action="color"]') && !e.target.closest('#colorBtn') && !e.target.closest('#editColorBtn')) {
+          elements.colorPopup.classList.remove('show');
+        }
+        if (!e.target.closest('.label-popup') && !e.target.closest('#addLabelMenuItem')) {
+          elements.labelPopup.classList.remove('show');
+        }
+        if (!e.target.closest('.reminder-popup') && !e.target.closest('[data-action="reminder"]') && !e.target.closest('#reminderBtn') && !e.target.closest('#editReminderBtn')) {
+          elements.reminderPopup.classList.remove('show');
+        }
+        if (!e.target.closest('.collab-popup') && !e.target.closest('[data-action="collab"]') && !e.target.closest('#collabBtn') && !e.target.closest('#editCollabBtn')) {
+          elements.collabPopup.classList.remove('show');
+        }
+        if (!e.target.closest('.more-popup') && !e.target.closest('[data-action="more"]') && !e.target.closest('#moreBtn') && !e.target.closest('#editMoreBtn')) {
+          elements.morePopup.classList.remove('show');
+        }
+      });
+
+      // Edit modal
+      elements.closeEditModal.addEventListener('click', closeEditModal);
+      elements.editModal.addEventListener('click', (e) => {
+        if (e.target === elements.editModal) closeEditModal();
+      });
+
+      document.getElementById('editColorBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        showColorPopup(e.target.closest('button'), 'edit');
+      });
+
+      document.getElementById('editReminderBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        showReminderPopup(e.target.closest('button'), 'edit');
+      });
+      
+      document.getElementById('editCollabBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const note = state.notes.find(n => n.id === state.editingNoteId);
+        state.tempCollaborators = note?.collaborators ? [...note.collaborators] : [];
+        showCollabPopup(e.target.closest('button'), 'edit');
+      });
+      
+      document.getElementById('editImageBtn').addEventListener('click', () => {
+        elements.editImageInput.click();
+      });
+      
+      elements.editImageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const note = state.notes.find(n => n.id === state.editingNoteId);
+            if (note) {
+              note.image = ev.target.result;
+              elements.editImagePreview.src = note.image;
+              elements.editImagePreview.classList.add('show');
+              saveToStorage();
+              renderNotes();
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+        e.target.value = '';
+      });
+
+      document.getElementById('editArchiveBtn').addEventListener('click', () => {
+        const note = state.notes.find(n => n.id === state.editingNoteId);
+        if (note) {
+          note.archived = !note.archived;
+          saveToStorage();
+          closeEditModal();
+          renderNotes();
+          showToast(note.archived ? 'Nota arquivada' : 'Nota desarquivada');
+        }
+      });
+
+      document.getElementById('editMoreBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        showMorePopup(e.target.closest('button'), 'edit');
+      });
+
+      // Edit checklist
+      elements.editNewListItem.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && e.target.value.trim()) {
+          const note = state.notes.find(n => n.id === state.editingNoteId);
+          if (note) {
+            if (!note.checklist) note.checklist = [];
+            note.checklist.push({
+              id: Date.now(),
+              text: e.target.value.trim(),
+              checked: false
+            });
+            saveToStorage();
+            renderEditChecklist(note);
+            e.target.value = '';
+          }
+        }
+      });
+
+      // Labels modal
+      elements.closeLabelsModal.addEventListener('click', closeLabelsModal);
+      elements.labelsModal.addEventListener('click', (e) => {
+        if (e.target === elements.labelsModal) closeLabelsModal();
+      });
+
+      elements.newLabelInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && e.target.value.trim()) {
+          const name = e.target.value.trim();
+          if (!state.labels.includes(name)) {
+            state.labels.push(name);
+            saveToStorage();
+            renderSidebarLabels();
+            renderLabelsModal();
+          }
+          e.target.value = '';
+        }
+      });
+
+      // Empty trash
+      elements.emptyTrashBtn.addEventListener('click', () => {
+        if (confirm('Esvaziar a lixeira? Todas as notas na lixeira serão excluídas permanentemente.')) {
+          state.notes = state.notes.filter(n => !n.trashed);
+          saveToStorage();
+          renderNotes();
+        }
+      });
+
+      // Toast undo
+      document.getElementById('toastUndo').addEventListener('click', () => {
+        if (state.lastDeletedNote) {
+          state.lastDeletedNote.trashed = false;
+          delete state.lastDeletedNote.trashedAt;
+          saveToStorage();
+          renderNotes();
+          elements.toast.classList.remove('show');
+          state.lastDeletedNote = null;
+        }
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (elements.editModal.classList.contains('show')) {
+            closeEditModal();
+          } else if (elements.settingsModal.classList.contains('show')) {
+            elements.settingsModal.classList.remove('show');
+          } else if (!elements.formExpanded.classList.contains('hidden')) {
+            closeForm();
+          }
+          elements.colorPopup.classList.remove('show');
+          elements.labelPopup.classList.remove('show');
+          elements.reminderPopup.classList.remove('show');
+          elements.collabPopup.classList.remove('show');
+          elements.morePopup.classList.remove('show');
+        }
+      });
+    }
+    
+    function updateUndoRedoButtons() {
+      elements.undoBtn.disabled = state.undoStack.length === 0;
+      elements.redoBtn.disabled = state.redoStack.length === 0;
+    }
+
+    function toggleSidebar() {
+      if (window.innerWidth <= 768) {
+        elements.sidebar.classList.toggle('open');
+        elements.sidebarOverlay.classList.toggle('active');
+      } else {
+        elements.sidebar.classList.toggle('collapsed');
+        elements.mainWrapper.classList.toggle('expanded');
+      }
+    }
+
+    function expandForm(asChecklist) {
+      state.formIsChecklist = asChecklist;
+      elements.formCollapsed.classList.add('hidden');
+      elements.formExpanded.classList.remove('hidden');
+      elements.noteContent.classList.toggle('hidden', asChecklist);
+      elements.checklistArea.classList.toggle('hidden', !asChecklist);
+      if (asChecklist) {
+        elements.newListItem.focus();
+      } else {
+        elements.noteContent.focus();
+      }
+    }
+
+    function closeForm() {
+      const title = elements.noteTitle.value.trim();
+      const content = elements.noteContent.value.trim();
+      const hasChecklist = state.checklistItems.length > 0;
+
+      if (title || content || hasChecklist || state.formImage) {
+        const note = {
+          id: Date.now(),
+          title,
+          content: state.formIsChecklist ? '' : content,
+          isChecklist: state.formIsChecklist,
+          checklist: state.formIsChecklist ? [...state.checklistItems] : null,
+          color: state.formColor || '#ffffff',
+          labels: [...state.formLabels],
+          reminder: state.formReminder,
+          collaborators: [...state.formCollaborators],
+          image: state.formImage,
+          pinned: false,
+          archived: false,
+          trashed: false,
+          createdAt: new Date().toISOString()
+        };
+        
+        if (state.settings.newOnTop) {
+          state.notes.unshift(note);
+        } else {
+          state.notes.push(note);
+        }
+        saveToStorage();
+        renderNotes();
+      }
+
+      resetForm();
+    }
+    
+    function resetForm() {
+      elements.noteTitle.value = '';
+      elements.noteContent.value = '';
+      elements.checklistItems.innerHTML = '';
+      state.checklistItems = [];
+      state.formColor = '';
+      state.formLabels = [];
+      state.formReminder = null;
+      state.formCollaborators = [];
+      state.formImage = null;
+      state.formIsChecklist = false;
+      state.undoStack = [];
+      state.redoStack = [];
+      elements.formExpanded.style.background = '';
+      elements.formLabels.innerHTML = '';
+      elements.formReminder.classList.add('hidden');
+      elements.formCollaborators.classList.add('hidden');
+      elements.formImagePreview.src = '';
+      elements.formImagePreview.classList.remove('show');
+      elements.formExpanded.classList.add('hidden');
+      elements.formCollapsed.classList.remove('hidden');
+      elements.noteContent.classList.remove('hidden');
+      elements.checklistArea.classList.add('hidden');
+      updateUndoRedoButtons();
+    }
+
+    function addChecklistItem(text) {
+      const item = { id: Date.now(), text, checked: false };
+      state.checklistItems.push(item);
+      renderChecklistItems();
+    }
+
+    function renderChecklistItems() {
+      elements.checklistItems.innerHTML = state.checklistItems.map(item => `
+        <div class="checklist-item-edit" data-id="${item.id}">
+          <input type="checkbox" ${item.checked ? 'checked' : ''} />
+          <input type="text" value="${escapeHtml(item.text)}" />
+          <button class="remove-item">
+            <span class="material-icons-outlined" style="font-size: 18px;">close</span>
+          </button>
+        </div>
+      `).join('');
+
+      elements.checklistItems.querySelectorAll('.checklist-item-edit').forEach(el => {
+        const id = parseInt(el.dataset.id);
+        const checkbox = el.querySelector('input[type="checkbox"]');
+        const textInput = el.querySelector('input[type="text"]');
+        const removeBtn = el.querySelector('.remove-item');
+
+        checkbox.addEventListener('change', () => {
+          const item = state.checklistItems.find(i => i.id === id);
+          if (item) item.checked = checkbox.checked;
+        });
+
+        textInput.addEventListener('input', () => {
+          const item = state.checklistItems.find(i => i.id === id);
+          if (item) item.text = textInput.value;
+        });
+
+        removeBtn.addEventListener('click', () => {
+          state.checklistItems = state.checklistItems.filter(i => i.id !== id);
+          renderChecklistItems();
+        });
+      });
+    }
+
+    function showColorPopup(button, mode) {
+      const rect = button.getBoundingClientRect();
+      elements.colorPopup.style.top = `${rect.bottom + 8}px`;
+      elements.colorPopup.style.left = `${Math.max(8, rect.left - 50)}px`;
+      elements.colorPopup.classList.toggle('show');
+    }
+
+    function showReminderPopup(button, mode) {
+      const rect = button.getBoundingClientRect();
+      elements.reminderPopup.style.top = `${rect.bottom + 8}px`;
+      elements.reminderPopup.style.left = `${Math.max(8, rect.left - 100)}px`;
+      
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      elements.reminderDateTime.min = now.toISOString().slice(0, 16);
+      elements.reminderDateTime.value = '';
+      
+      elements.reminderPopup.classList.toggle('show');
+    }
+    
+    function showCollabPopup(button, mode) {
+      const rect = button.getBoundingClientRect();
+      elements.collabPopup.style.top = `${rect.bottom + 8}px`;
+      elements.collabPopup.style.left = `${Math.max(8, rect.left - 150)}px`;
+      elements.collabEmail.value = '';
+      renderCollabList();
+      elements.collabPopup.classList.toggle('show');
+    }
+    
+    function renderCollabList() {
+      elements.collabList.innerHTML = state.tempCollaborators.map((c, i) => `
+        <div class="collab-item">
+          <div class="collab-avatar">${c.email[0].toUpperCase()}</div>
+          <div class="collab-info">
+            <div class="email">${escapeHtml(c.email)}</div>
+          </div>
+          <button class="collab-remove" data-index="${i}">
+            <span class="material-icons-outlined" style="font-size: 18px;">close</span>
+          </button>
+        </div>
+      `).join('');
+      
+      elements.collabList.querySelectorAll('.collab-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = parseInt(btn.dataset.index);
+          state.tempCollaborators.splice(index, 1);
+          renderCollabList();
+        });
+      });
+    }
+
+    function showMorePopup(button, mode) {
+      const rect = button.getBoundingClientRect();
+      elements.morePopup.style.top = `${rect.bottom + 8}px`;
+      elements.morePopup.style.left = `${Math.max(8, rect.left - 50)}px`;
+      elements.morePopup.classList.toggle('show');
+    }
+
+    function showLabelPopup(button, mode) {
+      const rect = button.getBoundingClientRect();
+      elements.labelPopup.style.top = `${rect.bottom + 8}px`;
+      elements.labelPopup.style.left = `${Math.max(8, rect.left - 50)}px`;
+      elements.labelSearch.value = '';
+      elements.createLabelBtn.style.display = 'none';
+      renderLabelList('');
+      elements.labelPopup.classList.toggle('show');
+    }
+
+    function renderLabelList(filter) {
+      const filtered = state.labels.filter(l => 
+        l.toLowerCase().includes(filter.toLowerCase())
+      );
+      
+      const currentLabels = state.editingNoteId 
+        ? (state.notes.find(n => n.id === state.editingNoteId)?.labels || [])
+        : state.formLabels;
+
+      elements.labelList.innerHTML = filtered.map(label => `
+        <div class="label-popup-item" data-label="${escapeHtml(label)}">
+          <input type="checkbox" ${currentLabels.includes(label) ? 'checked' : ''} />
+          <span>${escapeHtml(label)}</span>
+        </div>
+      `).join('');
+
+      elements.labelList.querySelectorAll('.label-popup-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          const label = item.dataset.label;
+          const checkbox = item.querySelector('input[type="checkbox"]');
+          checkbox.checked = !checkbox.checked;
+
+          if (state.editingNoteId) {
+            const note = state.notes.find(n => n.id === state.editingNoteId);
+            if (note) {
+              if (!note.labels) note.labels = [];
+              if (checkbox.checked) {
+                if (!note.labels.includes(label)) note.labels.push(label);
+              } else {
+                note.labels = note.labels.filter(l => l !== label);
+              }
+              saveToStorage();
+              renderEditLabels(note);
+              renderNotes();
+            }
+          } else {
+            if (checkbox.checked) {
+              if (!state.formLabels.includes(label)) state.formLabels.push(label);
+            } else {
+              state.formLabels = state.formLabels.filter(l => l !== label);
+            }
+            renderFormLabels();
+          }
+        });
+      });
+    }
+
+    function renderFormLabels() {
+      elements.formLabels.innerHTML = state.formLabels.map(l => 
+        `<span class="label-badge">${escapeHtml(l)}</span>`
+      ).join('');
+    }
+
+    function renderFormReminder() {
+      if (state.formReminder) {
+        elements.formReminder.classList.remove('hidden');
+        elements.formReminder.innerHTML = `
+          <div class="reminder-badge">
+            <span class="material-icons-outlined">schedule</span>
+            ${formatReminder(state.formReminder)}
+          </div>
+        `;
+      } else {
+        elements.formReminder.classList.add('hidden');
+      }
+    }
+    
+    function renderFormCollaborators() {
+      if (state.formCollaborators.length > 0) {
+        elements.formCollaborators.classList.remove('hidden');
+        elements.formCollaborators.innerHTML = state.formCollaborators.map(c => 
+          `<div class="collab-avatar" title="${escapeHtml(c.email)}">${c.email[0].toUpperCase()}</div>`
+        ).join('');
+      } else {
+        elements.formCollaborators.classList.add('hidden');
+      }
+    }
+
+    function renderEditLabels(note) {
+      elements.editLabels.innerHTML = (note.labels || []).map(l => 
+        `<span class="label-badge">${escapeHtml(l)}</span>`
+      ).join('');
+    }
+
+    function renderEditReminder(note) {
+      if (note.reminder) {
+        elements.editReminder.innerHTML = `
+          <div class="reminder-badge ${new Date(note.reminder) < new Date() ? 'past' : ''}">
+            <span class="material-icons-outlined">schedule</span>
+            ${formatReminder(note.reminder)}
+          </div>
+        `;
+      } else {
+        elements.editReminder.innerHTML = '';
+      }
+    }
+    
+    function renderEditCollaborators(note) {
+      if (note.collaborators?.length > 0) {
+        elements.editCollaborators.innerHTML = note.collaborators.map(c => 
+          `<div class="collab-avatar" title="${escapeHtml(c.email)}">${c.email[0].toUpperCase()}</div>`
+        ).join('');
+      } else {
+        elements.editCollaborators.innerHTML = '';
+      }
+    }
+
+    function handleNoteAction(noteId, action, event) {
+      const note = state.notes.find(n => n.id === noteId);
+      if (!note) return;
+
+      switch (action) {
+        case 'edit':
+          openEditModal(note);
+          break;
+        case 'pin':
+          note.pinned = !note.pinned;
+          saveToStorage();
+          renderNotes();
+          break;
+        case 'archive':
+          note.archived = true;
+          saveToStorage();
+          renderNotes();
+          showToast('Nota arquivada');
+          break;
+        case 'unarchive':
+          note.archived = false;
+          saveToStorage();
+          renderNotes();
+          showToast('Nota desarquivada');
+          break;
+        case 'color':
+          state.editingNoteId = noteId;
+          showColorPopup(event.target.closest('button'), 'note');
+          break;
+        case 'reminder':
+          state.editingNoteId = noteId;
+          showReminderPopup(event.target.closest('button'), 'note');
+          break;
+        case 'collab':
+          state.editingNoteId = noteId;
+          state.tempCollaborators = note.collaborators ? [...note.collaborators] : [];
+          showCollabPopup(event.target.closest('button'), 'note');
+          break;
+        case 'image':
+          state.editingNoteId = noteId;
+          elements.editImageInput.click();
+          break;
+        case 'more':
+          state.editingNoteId = noteId;
+          showMorePopup(event.target.closest('button'), 'note');
+          break;
+        case 'restore':
+          note.trashed = false;
+          delete note.trashedAt;
+          saveToStorage();
+          renderNotes();
+          showToast('Nota restaurada');
+          break;
+        case 'delete-forever':
+          if (confirm('Excluir esta nota permanentemente?')) {
+            state.notes = state.notes.filter(n => n.id !== noteId);
+            saveToStorage();
+            renderNotes();
+          }
+          break;
+      }
+    }
+
+    function openEditModal(note) {
+      state.editingNoteId = note.id;
+      elements.editTitle.value = note.title || '';
+      elements.editContent.value = note.content || '';
+      elements.editModalContent.style.background = note.color || '#fff';
+      
+      // Image
+      if (note.image) {
+        elements.editImagePreview.src = note.image;
+        elements.editImagePreview.classList.add('show');
+      } else {
+        elements.editImagePreview.src = '';
+        elements.editImagePreview.classList.remove('show');
+      }
+      
+      if (note.isChecklist && note.checklist) {
+        elements.editContent.classList.add('hidden');
+        elements.editChecklistArea.classList.remove('hidden');
+        renderEditChecklist(note);
+      } else {
+        elements.editContent.classList.remove('hidden');
+        elements.editChecklistArea.classList.add('hidden');
+      }
+      
+      renderEditLabels(note);
+      renderEditReminder(note);
+      renderEditCollaborators(note);
+      
+      elements.editModal.classList.add('show');
+    }
+
+    function renderEditChecklist(note) {
+      elements.editChecklistItems.innerHTML = note.checklist.map(item => `
+        <div class="checklist-item-edit" data-id="${item.id}">
+          <input type="checkbox" ${item.checked ? 'checked' : ''} />
+          <input type="text" value="${escapeHtml(item.text)}" />
+          <button class="remove-item">
+            <span class="material-icons-outlined" style="font-size: 18px;">close</span>
+          </button>
+        </div>
+      `).join('');
+
+      elements.editChecklistItems.querySelectorAll('.checklist-item-edit').forEach(el => {
+        const id = parseInt(el.dataset.id);
+        const checkbox = el.querySelector('input[type="checkbox"]');
+        const textInput = el.querySelector('input[type="text"]');
+        const removeBtn = el.querySelector('.remove-item');
+
+        checkbox.addEventListener('change', () => {
+          const item = note.checklist.find(i => i.id === id);
+          if (item) {
+            item.checked = checkbox.checked;
+            saveToStorage();
+          }
+        });
+
+        textInput.addEventListener('input', () => {
+          const item = note.checklist.find(i => i.id === id);
+          if (item) {
+            item.text = textInput.value;
+            saveToStorage();
+          }
+        });
+
+        removeBtn.addEventListener('click', () => {
+          note.checklist = note.checklist.filter(i => i.id !== id);
+          saveToStorage();
+          renderEditChecklist(note);
+        });
+      });
+    }
+
+    function closeEditModal() {
+      const note = state.notes.find(n => n.id === state.editingNoteId);
+      if (note) {
+        note.title = elements.editTitle.value.trim();
+        if (!note.isChecklist) {
+          note.content = elements.editContent.value.trim();
+        }
+        saveToStorage();
+        renderNotes();
+      }
+      state.editingNoteId = null;
+      elements.editModal.classList.remove('show');
+    }
+
+    function showLabelsModal() {
+      renderLabelsModal();
+      elements.labelsModal.classList.add('show');
+    }
+
+    function renderLabelsModal() {
+      elements.labelsModalList.innerHTML = state.labels.map(label => `
+        <div class="labels-modal-item" data-label="${escapeHtml(label)}">
+          <span>
+            <span class="material-icons-outlined">label</span>
+            ${escapeHtml(label)}
+          </span>
+          <button class="delete-label" title="Excluir marcador">
+            <span class="material-icons-outlined" style="font-size: 18px;">delete</span>
+          </button>
+        </div>
+      `).join('');
+
+      elements.labelsModalList.querySelectorAll('.delete-label').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const label = btn.closest('.labels-modal-item').dataset.label;
+          if (confirm(`Excluir o marcador "${label}"? Ele será removido de todas as notas.`)) {
+            state.labels = state.labels.filter(l => l !== label);
+            state.notes.forEach(note => {
+              if (note.labels) {
+                note.labels = note.labels.filter(l => l !== label);
+              }
+            });
+            saveToStorage();
+            renderLabelsModal();
+            renderSidebarLabels();
+            renderNotes();
+          }
+        });
+      });
+    }
+
+    function closeLabelsModal() {
+      elements.labelsModal.classList.remove('show');
+    }
+
+    function showToast(message) {
+      elements.toastMessage.textContent = message;
+      elements.toast.classList.add('show');
+      setTimeout(() => {
+        elements.toast.classList.remove('show');
+      }, 5000);
+    }
+
+    // Initialize app
+    init();
+  </script>
+</body>
+</html>
