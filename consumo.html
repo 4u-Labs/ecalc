@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Calculador de Consumo por m² | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --primary: #00ffff;
+      --primary-dark: #00cccc;
+      --secondary: #7c3aed;
+      --tertiary: #f59e0b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg-dark: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card-hover: #1a1a25;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --border-color: rgba(0, 255, 255, 0.2);
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(ellipse at top, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(124, 58, 237, 0.05) 0%, transparent 50%);
+    }
+    
+    /* Header */
+    .header {
+      background: rgba(18, 18, 26, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-content {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    
+    .logo-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .logo-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .header-stats {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .header-stat {
+      text-align: center;
+      padding: 8px 16px;
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+    }
+    
+    .header-stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .header-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+    
+    /* Main Container */
+    .main-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    /* Page Title */
+    .page-title {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .page-title h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    
+    .page-title p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      border-color: rgba(0, 255, 255, 0.4);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    
+    .card-icon.primary { background: rgba(0, 255, 255, 0.15); color: var(--primary); }
+    .card-icon.secondary { background: rgba(124, 58, 237, 0.15); color: var(--secondary); }
+    .card-icon.success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .card-icon.warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .card-icon.danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+    }
+    
+    .form-control, .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.15);
+    }
+    
+    .form-select option {
+      background: var(--bg-card);
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .input-group .form-control {
+      flex: 1;
+    }
+    
+    .input-group .form-select {
+      width: 80px;
+      flex-shrink: 0;
+    }
+    
+    /* Grid Layouts */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+    
+    @media (max-width: 1200px) {
+      .grid-5 { grid-template-columns: repeat(3, 1fr); }
+    }
+    
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+      .header-stats { display: none; }
+    }
+    
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #000;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(124, 58, 237, 0.2);
+      color: var(--secondary);
+      border: 1px solid var(--secondary);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(124, 58, 237, 0.3);
+    }
+    
+    .btn-success {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+    
+    .btn-success:hover {
+      background: rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+    
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.3);
+    }
+    
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+    
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Material Presets */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .preset-btn {
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .preset-btn:hover, .preset-btn.active {
+      border-color: var(--primary);
+      background: rgba(0, 255, 255, 0.1);
+    }
+    
+    .preset-btn.active {
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+    
+    .preset-icon {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+    
+    .preset-name {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+    
+    thead {
+      background: rgba(0, 255, 255, 0.08);
+    }
+    
+    th {
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+    
+    td {
+      padding: 12px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+    }
+    
+    tbody tr {
+      transition: all 0.2s ease;
+    }
+    
+    tbody tr:hover {
+      background: rgba(0, 255, 255, 0.03);
+    }
+    
+    tfoot {
+      background: rgba(0, 255, 255, 0.05);
+    }
+    
+    tfoot td {
+      padding: 16px 12px;
+      font-weight: 700;
+      border-bottom: none;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(124, 58, 237, 0.2);
+      color: var(--secondary);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .badge-primary {
+      background: rgba(0, 255, 255, 0.2);
+      color: var(--primary);
+    }
+    
+    .item-actions {
+      display: flex;
+      gap: 6px;
+    }
+    
+    /* Charts */
+    .chart-container {
+      height: 350px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+    }
+    
+    .stat-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+    
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+    
+    /* Alerts */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border-left: 4px solid;
+    }
+    
+    .alert-info {
+      background: rgba(0, 255, 255, 0.08);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .alert-warning {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+    
+    .alert-success {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: var(--success);
+      color: var(--success);
+    }
+    
+    .alert i {
+      font-size: 1.2rem;
+      margin-top: 2px;
+    }
+    
+    /* Total Display */
+    .total-display {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(124, 58, 237, 0.15));
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+    
+    .total-label {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .total-value {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .total-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlideIn 0.3s ease;
+    }
+    
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .modal-close {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+    
+    .empty-state h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+    
+    /* Tooltips */
+    .tooltip {
+      position: relative;
+      cursor: help;
+    }
+    
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .tooltip:hover::after {
+      opacity: 1;
+      visibility: visible;
+      bottom: calc(100% + 8px);
+    }
+    
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .slide-up {
+      animation: slideUp 0.5s ease;
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Search & Filter */
+    .search-box {
+      position: relative;
+    }
+    
+    .search-box input {
+      padding-left: 40px;
+    }
+    
+    .search-box i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+    }
+    
+    /* Print Styles */
+    @media print {
+      body { background: #fff; color: #000; }
+      .header, .action-buttons, .btn, .no-print, .preset-grid { display: none !important; }
+      .card { border: 1px solid #ddd; box-shadow: none; break-inside: avoid; }
+      .stat-value, .total-value { color: #000 !important; -webkit-text-fill-color: #000 !important; }
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border-color);
+      margin-top: 3rem;
+    }
+
+    /* Summary Text */
+    .summary-text {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 1rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Tab Navigation */
+    .tabs {
+      display: flex;
+      gap: 5px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 10px 16px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+    
+    .tab.active {
+      background: var(--primary);
+      color: #000;
+    }
+    
+    .tab:hover:not(.active) {
+      color: var(--text-primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Quick calc display */
+    .quick-calc {
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .quick-calc-title {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .quick-calc-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-paint-roller"></i>
+        </div>
+        <span class="logo-text">Consumo m²</span>
+      </a>
+      
+      <div class="header-stats">
+        <div class="header-stat">
+          <div class="header-stat-value" id="headerItens">0</div>
+          <div class="header-stat-label">Itens</div>
+        </div>
+        <div class="header-stat">
+          <div class="header-stat-value" id="headerArea">0 m²</div>
+          <div class="header-stat-label">Área Total</div>
+        </div>
+        <div class="header-stat">
+          <div class="header-stat-value" id="headerTotal">R$ 0</div>
+          <div class="header-stat-label">Custo Total</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Page Title -->
+    <div class="page-title fade-in">
+      <h1><i class="fas fa-calculator"></i> Calculador de Consumo por m²</h1>
+      <p>Calcule materiais de construção, custos e gere orçamentos profissionais</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons slide-up no-print">
+      <button class="btn btn-primary" id="btnAdicionar">
+        <i class="fas fa-plus"></i> Adicionar Item
+      </button>
+      <button class="btn btn-secondary" id="btnRecalcular">
+        <i class="fas fa-sync-alt"></i> Recalcular
+      </button>
+      <button class="btn btn-outline" id="btnExcel">
+        <i class="fas fa-file-excel"></i> Excel
+      </button>
+      <button class="btn btn-outline" id="btnPDF">
+        <i class="fas fa-file-pdf"></i> PDF
+      </button>
+      <button class="btn btn-outline" id="btnImprimir">
+        <i class="fas fa-print"></i> Imprimir
+      </button>
+      <button class="btn btn-outline" id="btnExportJSON">
+        <i class="fas fa-download"></i> Exportar
+      </button>
+      <button class="btn btn-outline" id="btnImportJSON">
+        <i class="fas fa-upload"></i> Importar
+      </button>
+      <button class="btn btn-danger" id="btnLimpar">
+        <i class="fas fa-trash"></i> Limpar
+      </button>
+      <input type="file" id="fileInput" accept=".json" style="display:none">
+    </div>
+
+    <!-- Material Presets -->
+    <div class="card slide-up no-print">
+      <div class="card-header">
+        <div class="card-icon primary">
+          <i class="fas fa-swatchbook"></i>
+        </div>
+        <div>
+          <h2 class="card-title">Selecione o Material</h2>
+          <p class="card-subtitle">Clique para carregar as configurações padrão</p>
+        </div>
+      </div>
+      
+      <div class="preset-grid" id="presetGrid"></div>
+    </div>
+
+    <!-- Input Form -->
+    <div class="card slide-up no-print">
+      <div class="card-header">
+        <div class="card-icon secondary">
+          <i class="fas fa-edit"></i>
+        </div>
+        <div>
+          <h2 class="card-title">Configurar Material</h2>
+          <p class="card-subtitle">Ajuste os parâmetros conforme necessário</p>
+        </div>
+      </div>
+
+      <div class="grid-5">
+        <div class="form-group">
+          <label class="form-label">Nome do Material</label>
+          <input type="text" class="form-control" id="nome" placeholder="Ex.: Tinta fosca branca">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Área (m²)</label>
+          <input type="number" class="form-control" id="area" value="100" step="0.01" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nº de Demãos</label>
+          <input type="number" class="form-control" id="demaos" value="2" min="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label tooltip" data-tooltip="Para reboco, emboço, contrapiso">Espessura (cm)</label>
+          <input type="number" class="form-control" id="espessura" value="2.0" step="0.1" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label tooltip" data-tooltip="Consumo por m² do fabricante">Rendimento (kg ou L/m²)</label>
+          <input type="number" class="form-control" id="rendimento" value="0.1" step="0.01" min="0">
+        </div>
+      </div>
+
+      <div class="grid-5">
+        <div class="form-group">
+          <label class="form-label tooltip" data-tooltip="Para argamassas e rebocos">Densidade (kg/m³)</label>
+          <input type="number" class="form-control" id="densidade" value="1800" step="1" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Perda (%)</label>
+          <input type="number" class="form-control" id="perda" value="8" step="1" min="0" max="50">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tamanho da Embalagem</label>
+          <div class="input-group">
+            <input type="number" class="form-control" id="unidadeTam" value="18" step="0.1" min="0.1">
+            <select class="form-select" id="unidadeTipo">
+              <option value="L">L</option>
+              <option value="kg" selected>kg</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preço por Unidade (R$)</label>
+          <input type="number" class="form-control" id="preco" value="150.00" step="0.01" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">&nbsp;</label>
+          <button class="btn btn-primary" id="btnAddItem" style="width: 100%;">
+            <i class="fas fa-plus"></i> Adicionar à Lista
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Calculation Preview -->
+      <div class="quick-calc" id="quickCalc">
+        <div class="grid-4">
+          <div>
+            <div class="quick-calc-title">Consumo Estimado</div>
+            <div class="quick-calc-value" id="previewConsumo">0 kg</div>
+          </div>
+          <div>
+            <div class="quick-calc-title">Unidades Necessárias</div>
+            <div class="quick-calc-value" id="previewUnidades">0</div>
+          </div>
+          <div>
+            <div class="quick-calc-title">Custo Estimado</div>
+            <div class="quick-calc-value" id="previewCusto">R$ 0,00</div>
+          </div>
+          <div>
+            <div class="quick-calc-title">Custo por m²</div>
+            <div class="quick-calc-value" id="previewCustoM2">R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="stats-grid fade-in" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value" id="statItens">0</div>
+        <div class="stat-label">Itens no Orçamento</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📐</div>
+        <div class="stat-value" id="statArea">0</div>
+        <div class="stat-label">Área Total (m²)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎨</div>
+        <div class="stat-value" id="statMateriais">0</div>
+        <div class="stat-label">Tipos de Material</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value" id="statCustoM2">R$ 0</div>
+        <div class="stat-label">Custo Médio/m²</div>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="card fade-in">
+      <div class="card-header">
+        <div class="card-icon warning">
+          <i class="fas fa-list"></i>
+        </div>
+        <div>
+          <h2 class="card-title">Lista de Materiais</h2>
+          <p class="card-subtitle">Gerencie os itens do seu orçamento</p>
+        </div>
+        <div style="margin-left: auto;">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" class="form-control" id="searchInput" placeholder="Buscar material..." style="width: 200px;">
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="tabela">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Material</th>
+              <th>Área (m²)</th>
+              <th>Esp. (cm)</th>
+              <th>Demãos</th>
+              <th>Consumo Total</th>
+              <th>Unidades</th>
+              <th>Preço/Un</th>
+              <th>Subtotal</th>
+              <th>Custo/m²</th>
+              <th class="no-print">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaBody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="8" style="text-align: right;">TOTAL GERAL</td>
+              <td id="totalCusto" style="color: var(--primary);">R$ 0,00</td>
+              <td id="totalCustoM2">R$ 0,00</td>
+              <td class="no-print"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <i class="fas fa-inbox"></i>
+        <h3>Nenhum item adicionado</h3>
+        <p>Selecione um material acima e clique em "Adicionar à Lista"</p>
+      </div>
+    </div>
+
+    <!-- Total Display -->
+    <div class="total-display fade-in" id="totalDisplay" style="display: none;">
+      <div class="total-label">💰 Investimento Total Estimado</div>
+      <div class="total-value" id="totalValor">R$ 0,00</div>
+      <div class="total-subtitle">Valores incluem perdas estimadas de material</div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid-2 no-print" id="chartsSection" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon success">
+            <i class="fas fa-chart-pie"></i>
+          </div>
+          <div>
+            <h2 class="card-title">Participação no Custo</h2>
+            <p class="card-subtitle">Distribuição percentual</p>
+          </div>
+        </div>
+        <div class="chart-container" id="graficoPie"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon danger">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <div>
+            <h2 class="card-title">Custo por Material</h2>
+            <p class="card-subtitle">Comparativo de valores</p>
+          </div>
+        </div>
+        <div class="chart-container" id="graficoBar"></div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card fade-in" id="resumoSection" style="display: none;">
+      <div class="card-header">
+        <div class="card-icon primary">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <div>
+          <h2 class="card-title">Resumo do Orçamento</h2>
+          <p class="card-subtitle">Visão detalhada para impressão</p>
+        </div>
+      </div>
+      <div class="summary-text" id="resumoTexto"></div>
+    </div>
+
+    <!-- Tips -->
+    <div class="card no-print">
+      <div class="card-header">
+        <div class="card-icon warning">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <div>
+          <h2 class="card-title">Dicas de Uso</h2>
+          <p class="card-subtitle">Aproveite ao máximo a calculadora</p>
+        </div>
+      </div>
+      
+      <div class="grid-3">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i>
+          <div>
+            <strong>Rendimento:</strong> Consulte a embalagem do fabricante para valores precisos de consumo por m².
+          </div>
+        </div>
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <strong>Perdas:</strong> Considere 5-15% para aplicações normais e até 20% para superfícies irregulares.
+          </div>
+        </div>
+        <div class="alert alert-success">
+          <i class="fas fa-check-circle"></i>
+          <div>
+            <strong>Exportação:</strong> Use JSON para salvar e reabrir orçamentos depois.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de Edição -->
+  <div class="modal-overlay" id="modalEditar">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-edit"></i> Editar Item</h3>
+        <button class="modal-close" onclick="fecharModalEditar()">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editIndex">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input type="text" class="form-control" id="editNome">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Área (m²)</label>
+            <input type="number" class="form-control" id="editArea" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Demãos</label>
+            <input type="number" class="form-control" id="editDemaos" min="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Espessura (cm)</label>
+            <input type="number" class="form-control" id="editEspessura" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Perda (%)</label>
+            <input type="number" class="form-control" id="editPerda" step="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preço/Un (R$)</label>
+            <input type="number" class="form-control" id="editPreco" step="0.01">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="fecharModalEditar()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarEdicao()">
+          <i class="fas fa-save"></i> Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <script>
+    // ==================== PRESETS DE MATERIAIS ====================
+    const presets = {
+      tinta: { 
+        nome: "Tinta acrílica", 
+        icon: "🎨",
+        rendimento: 0.1, 
+        unidadeTam: 18, 
+        unidadeTipo: "L", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: true, 
+        preco: 450 
+      },
+      tintaLatex: { 
+        nome: "Tinta látex PVA", 
+        icon: "🖌️",
+        rendimento: 0.12, 
+        unidadeTam: 18, 
+        unidadeTipo: "L", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: true, 
+        preco: 180 
+      },
+      massa: { 
+        nome: "Massa corrida", 
+        icon: "🪣",
+        rendimento: 1.5, 
+        unidadeTam: 25, 
+        unidadeTipo: "kg", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: false, 
+        preco: 115 
+      },
+      massaAcrilica: { 
+        nome: "Massa acrílica", 
+        icon: "🫙",
+        rendimento: 1.2, 
+        unidadeTam: 25, 
+        unidadeTipo: "kg", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: false, 
+        preco: 120 
+      },
+      reboco: { 
+        nome: "Reboco", 
+        icon: "🧱",
+        rendimento: null, 
+        unidadeTam: 50, 
+        unidadeTipo: "kg", 
+        densidade: 1800, 
+        usaEspessura: true, 
+        usaDemaos: false, 
+        preco: 45 
+      },
+      emboco: { 
+        nome: "Emboço", 
+        icon: "🏗️",
+        rendimento: null, 
+        unidadeTam: 50, 
+        unidadeTipo: "kg", 
+        densidade: 1700, 
+        usaEspessura: true, 
+        usaDemaos: false, 
+        preco: 45 
+      },
+      argamassa: { 
+        nome: "Argamassa colante", 
+        icon: "⬜",
+        rendimento: 4.5, 
+        unidadeTam: 20, 
+        unidadeTipo: "kg", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: false, 
+        preco: 35 
+      },
+      argamassaAC2: { 
+        nome: "Argamassa AC-II", 
+        icon: "🔲",
+        rendimento: 5.0, 
+        unidadeTam: 20, 
+        unidadeTipo: "kg", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: false, 
+        preco: 68 
+      },
+      rejunte: { 
+        nome: "Rejunte", 
+        icon: "🧩",
+        rendimento: 0.3, 
+        unidadeTam: 1, 
+        unidadeTipo: "kg", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: false, 
+        preco: 15 
+      },
+      impermeabilizante: { 
+        nome: "Impermeabilizante", 
+        icon: "💧",
+        rendimento: 0.8, 
+        unidadeTam: 18, 
+        unidadeTipo: "L", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: false, 
+        preco: 200 
+      },
+      contrapiso: { 
+        nome: "Contrapiso", 
+        icon: "🏠",
+        rendimento: null, 
+        unidadeTam: 50, 
+        unidadeTipo: "kg", 
+        densidade: 2000, 
+        usaEspessura: true, 
+        usaDemaos: false, 
+        preco: 40 
+      },
+      gesso: { 
+        nome: "Gesso liso", 
+        icon: "⬜",
+        rendimento: 1.0, 
+        unidadeTam: 40, 
+        unidadeTipo: "kg", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: false, 
+        preco: 35 
+      },
+      selador: { 
+        nome: "Selador acrílico", 
+        icon: "🛡️",
+        rendimento: 0.15, 
+        unidadeTam: 18, 
+        unidadeTipo: "L", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: true, 
+        preco: 120 
+      },
+      verniz: { 
+        nome: "Verniz madeira", 
+        icon: "🪵",
+        rendimento: 0.08, 
+        unidadeTam: 3.6, 
+        unidadeTipo: "L", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: true, 
+        preco: 95 
+      },
+      textura: { 
+        nome: "Textura/Grafiato", 
+        icon: "🌊",
+        rendimento: 2.5, 
+        unidadeTam: 25, 
+        unidadeTipo: "kg", 
+        densidade: null, 
+        usaEspessura: false, 
+        usaDemaos: false, 
+        preco: 150 
+      }
+    };
+
+    // ==================== ESTADO DA APLICAÇÃO ====================
+    const fmtBRL = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const fmtNum = v => (isNaN(v) ? "-" : Number(v).toFixed(2));
+
+    const state = {
+      itens: JSON.parse(localStorage.getItem("consumo_itens_v2") || "[]"),
+      selectedPreset: 'tinta'
+    };
+
+    function save() {
+      localStorage.setItem("consumo_itens_v2", JSON.stringify(state.itens));
+    }
+
+    // ==================== RENDERIZAR PRESETS ====================
+    function renderPresets() {
+      const grid = document.getElementById('presetGrid');
+      grid.innerHTML = '';
+      
+      Object.entries(presets).forEach(([key, preset]) => {
+        const btn = document.createElement('div');
+        btn.className = `preset-btn ${state.selectedPreset === key ? 'active' : ''}`;
+        btn.innerHTML = `
+          <div class="preset-icon">${preset.icon}</div>
+          <div class="preset-name">${preset.nome}</div>
+        `;
+        btn.onclick = () => selectPreset(key);
+        grid.appendChild(btn);
+      });
+    }
+
+    function selectPreset(key) {
+      state.selectedPreset = key;
+      const p = presets[key];
+      
+      document.getElementById('nome').value = p.nome;
+      document.getElementById('rendimento').value = p.rendimento ?? 0;
+      document.getElementById('densidade').value = p.densidade ?? '';
+      document.getElementById('demaos').value = p.usaDemaos ? 2 : 1;
+      document.getElementById('unidadeTam').value = p.unidadeTam;
+      document.getElementById('unidadeTipo').value = p.unidadeTipo;
+      document.getElementById('preco').value = p.preco;
+      
+      renderPresets();
+      updatePreview();
+    }
+
+    // ==================== PREVIEW EM TEMPO REAL ====================
+    function updatePreview() {
+      const key = state.selectedPreset;
+      const p = presets[key];
+      
+      const area = parseFloat(document.getElementById('area').value) || 0;
+      const demaos = parseInt(document.getElementById('demaos').value) || 1;
+      const espessura = parseFloat(document.getElementById('espessura').value) || 0;
+      const rendimentoInput = parseFloat(document.getElementById('rendimento').value) || 0;
+      const densidade = parseFloat(document.getElementById('densidade').value) || null;
+      const perda = parseFloat(document.getElementById('perda').value) || 0;
+      const unidadeTam = parseFloat(document.getElementById('unidadeTam').value) || 1;
+      const unidadeTipo = document.getElementById('unidadeTipo').value;
+      const preco = parseFloat(document.getElementById('preco').value) || 0;
+
+      let rendimento = rendimentoInput;
+      if (p.usaEspessura && densidade) {
+        rendimento = densidade * (espessura / 100);
+      }
+      if (p.usaDemaos) {
+        rendimento = rendimento * demaos;
+      }
+
+      const fatorPerda = 1 + perda / 100;
+      const consumoTotal = area * rendimento * fatorPerda;
+      const unidades = Math.ceil(consumoTotal / unidadeTam);
+      const subtotal = unidades * preco;
+      const custoM2 = area > 0 ? subtotal / area : 0;
+
+      document.getElementById('previewConsumo').textContent = `${fmtNum(consumoTotal)} ${unidadeTipo}`;
+      document.getElementById('previewUnidades').textContent = unidades;
+      document.getElementById('previewCusto').textContent = fmtBRL(subtotal);
+      document.getElementById('previewCustoM2').textContent = fmtBRL(custoM2);
+    }
+
+    // ==================== ADICIONAR ITEM ====================
+    function addItem() {
+      const key = state.selectedPreset;
+      const p = presets[key];
+      
+      const nome = document.getElementById('nome').value || p.nome;
+      const area = parseFloat(document.getElementById('area').value) || 0;
+      const demaos = parseInt(document.getElementById('demaos').value) || 1;
+      const espessura = parseFloat(document.getElementById('espessura').value) || 0;
+      const rendimentoInput = parseFloat(document.getElementById('rendimento').value) || 0;
+      const densidade = parseFloat(document.getElementById('densidade').value) || null;
+      const perda = parseFloat(document.getElementById('perda').value) || 0;
+      const unidadeTam = parseFloat(document.getElementById('unidadeTam').value) || 1;
+      const unidadeTipo = document.getElementById('unidadeTipo').value;
+      const preco = parseFloat(document.getElementById('preco').value) || 0;
+
+      if (area <= 0) {
+        alert('Por favor, informe uma área válida.');
+        return;
+      }
+
+      let rendimento = rendimentoInput;
+      if (p.usaEspessura && densidade) {
+        rendimento = densidade * (espessura / 100);
+      }
+      if (p.usaDemaos) {
+        rendimento = rendimento * demaos;
+      }
+
+      const fatorPerda = 1 + perda / 100;
+      const consumoTotal = area * rendimento * fatorPerda;
+      const unidades = Math.ceil(consumoTotal / unidadeTam);
+      const subtotal = unidades * preco;
+      const custoM2 = subtotal / area;
+
+      const item = {
+        key,
+        nome,
+        area,
+        demaos,
+        espessura,
+        rendimentoBase: rendimentoInput,
+        densidade,
+        perda,
+        unidadeTam,
+        unidadeTipo,
+        preco,
+        consumoTotal,
+        unidades,
+        subtotal,
+        custoM2
+      };
+
+      state.itens.push(item);
+      save();
+      render();
+      
+      // Feedback visual
+      const btn = document.getElementById('btnAddItem');
+      btn.innerHTML = '<i class="fas fa-check"></i> Adicionado!';
+      btn.classList.add('btn-success');
+      btn.classList.remove('btn-primary');
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-plus"></i> Adicionar à Lista';
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-primary');
+      }, 1500);
+    }
+
+    // ==================== REMOVER / EDITAR / DUPLICAR ====================
+    function removeItem(idx) {
+      if (confirm('Remover este item?')) {
+        state.itens.splice(idx, 1);
+        save();
+        render();
+      }
+    }
+
+    function duplicateItem(idx) {
+      const item = { ...state.itens[idx] };
+      item.nome = item.nome + ' (cópia)';
+      state.itens.push(item);
+      save();
+      render();
+    }
+
+    function editItem(idx) {
+      const item = state.itens[idx];
+      document.getElementById('editIndex').value = idx;
+      document.getElementById('editNome').value = item.nome;
+      document.getElementById('editArea').value = item.area;
+      document.getElementById('editDemaos').value = item.demaos;
+      document.getElementById('editEspessura').value = item.espessura;
+      document.getElementById('editPerda').value = item.perda;
+      document.getElementById('editPreco').value = item.preco;
+      document.getElementById('modalEditar').classList.add('active');
+    }
+
+    function fecharModalEditar() {
+      document.getElementById('modalEditar').classList.remove('active');
+    }
+
+    function salvarEdicao() {
+      const idx = parseInt(document.getElementById('editIndex').value);
+      const item = state.itens[idx];
+      const p = presets[item.key];
+
+      item.nome = document.getElementById('editNome').value;
+      item.area = parseFloat(document.getElementById('editArea').value) || 0;
+      item.demaos = parseInt(document.getElementById('editDemaos').value) || 1;
+      item.espessura = parseFloat(document.getElementById('editEspessura').value) || 0;
+      item.perda = parseFloat(document.getElementById('editPerda').value) || 0;
+      item.preco = parseFloat(document.getElementById('editPreco').value) || 0;
+
+      // Recalcular
+      let rendimento = item.rendimentoBase || 0;
+      if (p.usaEspessura && item.densidade) {
+        rendimento = item.densidade * (item.espessura / 100);
+      }
+      if (p.usaDemaos) {
+        rendimento = rendimento * item.demaos;
+      }
+
+      const fatorPerda = 1 + item.perda / 100;
+      item.consumoTotal = item.area * rendimento * fatorPerda;
+      item.unidades = Math.ceil(item.consumoTotal / item.unidadeTam);
+      item.subtotal = item.unidades * item.preco;
+      item.custoM2 = item.subtotal / item.area;
+
+      save();
+      render();
+      fecharModalEditar();
+    }
+
+    // ==================== RECALCULAR TUDO ====================
+    function recalcAll() {
+      state.itens = state.itens.map(item => {
+        const p = presets[item.key];
+        let rendimento = item.rendimentoBase || 0;
+        
+        if (p.usaEspessura && item.densidade) {
+          rendimento = item.densidade * (item.espessura / 100);
+        }
+        if (p.usaDemaos) {
+          rendimento = rendimento * (item.demaos || 1);
+        }
+
+        const fatorPerda = 1 + (item.perda || 0) / 100;
+        const consumoTotal = item.area * rendimento * fatorPerda;
+        const unidades = Math.ceil(consumoTotal / item.unidadeTam);
+        const subtotal = unidades * item.preco;
+        const custoM2 = subtotal / Math.max(item.area, 1);
+
+        return { ...item, consumoTotal, unidades, subtotal, custoM2 };
+      });
+
+      save();
+      render();
+    }
+
+    // ==================== RENDERIZAR TABELA ====================
+    function render() {
+      const tbody = document.getElementById('tabelaBody');
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      tbody.innerHTML = '';
+      let total = 0;
+      let totalArea = 0;
+      const materiaisUnicos = new Set();
+
+      const filteredItems = state.itens.filter(it => 
+        it.nome.toLowerCase().includes(searchTerm)
+      );
+
+      filteredItems.forEach((it, idx) => {
+        const realIdx = state.itens.indexOf(it);
+        total += it.subtotal || 0;
+        totalArea += it.area || 0;
+        materiaisUnicos.add(it.key);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${realIdx + 1}</td>
+          <td>
+            <span class="badge">${presets[it.key]?.icon || '📦'} ${presets[it.key]?.nome || it.key}</span>
+            <br><small style="color: var(--text-secondary);">${it.nome || ''}</small>
+          </td>
+          <td>${fmtNum(it.area)}</td>
+          <td>${fmtNum(it.espessura) || '-'}</td>
+          <td>${it.demaos || '-'}</td>
+          <td><strong>${fmtNum(it.consumoTotal)}</strong> ${it.unidadeTipo}</td>
+          <td><strong>${it.unidades}</strong></td>
+          <td>${fmtBRL(it.preco)}</td>
+          <td style="color: var(--primary); font-weight: 600;">${fmtBRL(it.subtotal)}</td>
+          <td>${fmtBRL(it.custoM2)}</td>
+          <td class="no-print">
+            <div class="item-actions">
+              <button class="btn btn-sm btn-outline btn-icon tooltip" data-tooltip="Editar" onclick="editItem(${realIdx})">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-outline btn-icon tooltip" data-tooltip="Duplicar" onclick="duplicateItem(${realIdx})">
+                <i class="fas fa-copy"></i>
+              </button>
+              <button class="btn btn-sm btn-danger btn-icon tooltip" data-tooltip="Remover" onclick="removeItem(${realIdx})">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Totais
+      document.getElementById('totalCusto').textContent = fmtBRL(total);
+      document.getElementById('totalCustoM2').textContent = totalArea > 0 ? fmtBRL(total / totalArea) : '-';
+      document.getElementById('totalValor').textContent = fmtBRL(total);
+
+      // Stats
+      document.getElementById('statItens').textContent = state.itens.length;
+      document.getElementById('statArea').textContent = fmtNum(totalArea);
+      document.getElementById('statMateriais').textContent = materiaisUnicos.size;
+      document.getElementById('statCustoM2').textContent = totalArea > 0 ? fmtBRL(total / totalArea) : 'R$ 0';
+
+      // Header stats
+      document.getElementById('headerItens').textContent = state.itens.length;
+      document.getElementById('headerArea').textContent = `${fmtNum(totalArea)} m²`;
+      document.getElementById('headerTotal').textContent = fmtBRL(total);
+
+      // Show/hide sections
+      const hasItems = state.itens.length > 0;
+      document.getElementById('emptyState').style.display = hasItems ? 'none' : 'block';
+      document.getElementById('totalDisplay').style.display = hasItems ? 'block' : 'none';
+      document.getElementById('chartsSection').style.display = hasItems ? 'grid' : 'none';
+      document.getElementById('resumoSection').style.display = hasItems ? 'block' : 'none';
+
+      if (hasItems) {
+        renderCharts();
+        renderResumo();
+      }
+    }
+
+    // ==================== GRÁFICOS ====================
+    function renderCharts() {
+      if (!window.Plotly) return;
+
+      const labels = state.itens.map(it => it.nome || presets[it.key]?.nome);
+      const valores = state.itens.map(it => Number((it.subtotal || 0).toFixed(2)));
+
+      const layoutBase = {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: '#e0e0e0', size: 11 },
+        margin: { t: 30, b: 30, l: 40, r: 20 }
+      };
+
+      // Pie Chart
+      Plotly.newPlot('graficoPie', [{
+        type: 'pie',
+        labels,
+        values: valores,
+        textinfo: 'label+percent',
+        hoverinfo: 'label+value+percent',
+        marker: {
+          colors: ['#00ffff', '#7c3aed', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#06b6d4', '#84cc16']
+        }
+      }], layoutBase, { displayModeBar: false });
+
+      // Bar Chart
+      Plotly.newPlot('graficoBar', [{
+        x: labels,
+        y: valores,
+        type: 'bar',
+        marker: { 
+          color: valores.map((_, i) => 
+            ['#00ffff', '#7c3aed', '#f59e0b', '#10b981', '#ef4444', '#ec4899'][i % 6]
+          )
+        },
+        text: valores.map(v => fmtBRL(v)),
+        textposition: 'auto'
+      }], {
+        ...layoutBase,
+        xaxis: { tickangle: -45 },
+        yaxis: { title: 'R$', gridcolor: 'rgba(255,255,255,0.1)' }
+      }, { displayModeBar: false });
+    }
+
+    // ==================== RESUMO ====================
+    function renderResumo() {
+      let linhas = [];
+      linhas.push('═'.repeat(70));
+      linhas.push('                    ORÇAMENTO DE MATERIAIS');
+      linhas.push('═'.repeat(70));
+      linhas.push(`Data: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`);
+      linhas.push('─'.repeat(70));
+      linhas.push('');
+
+      let total = 0;
+      let totalArea = 0;
+
+      state.itens.forEach((it, idx) => {
+        total += it.subtotal || 0;
+        totalArea += it.area || 0;
+        linhas.push(`${idx + 1}. ${it.nome || presets[it.key]?.nome}`);
+        linhas.push(`   Área: ${fmtNum(it.area)} m² | Consumo: ${fmtNum(it.consumoTotal)} ${it.unidadeTipo}`);
+        linhas.push(`   Unidades: ${it.unidades} x ${fmtBRL(it.preco)} = ${fmtBRL(it.subtotal)}`);
+        linhas.push(`   Custo/m²: ${fmtBRL(it.custoM2)}`);
+        linhas.push('');
+      });
+
+      linhas.push('═'.repeat(70));
+      linhas.push(`ÁREA TOTAL: ${fmtNum(totalArea)} m²`);
+      linhas.push(`CUSTO MÉDIO/m²: ${totalArea > 0 ? fmtBRL(total / totalArea) : '-'}`);
+      linhas.push(`TOTAL GERAL: ${fmtBRL(total)}`);
+      linhas.push('═'.repeat(70));
+
+      document.getElementById('resumoTexto').textContent = linhas.join('\n');
+    }
+
+    // ==================== EXPORTAÇÕES ====================
+    function exportExcel() {
+      if (!window.XLSX) {
+        alert('Biblioteca XLSX não carregada.');
+        return;
+      }
+
+      const aoa = [['Material', 'Área (m²)', 'Esp.(cm)', 'Demãos', 'Consumo', 'Un.', 'Preço/Un', 'Subtotal', 'Custo/m²']];
+      
+      state.itens.forEach(it => {
+        aoa.push([
+          it.nome || presets[it.key]?.nome,
+          it.area,
+          it.espessura || '',
+          it.demaos || '',
+          `${fmtNum(it.consumoTotal)} ${it.unidadeTipo}`,
+          it.unidades,
+          it.preco,
+          it.subtotal,
+          it.custoM2
+        ]);
+      });
+
+      const total = state.itens.reduce((s, it) => s + (it.subtotal || 0), 0);
+      aoa.push(['', '', '', '', '', '', '', 'TOTAL:', total]);
+
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Consumo m²');
+      
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `consumo_m2_${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function exportPDF() {
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        alert('Biblioteca jsPDF não carregada.');
+        return;
+      }
+
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const margin = 40;
+      let y = 50;
+
+      // Título
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.text('Orçamento de Materiais - Consumo por m²', margin, y);
+      
+      y += 25;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margin, y);
+      
+      y += 30;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      const headers = ['#', 'Material', 'Área', 'Consumo', 'Un.', 'Preço', 'Subtotal'];
+      const colWidths = [25, 180, 50, 80, 35, 60, 80];
+      let x = margin;
+      
+      headers.forEach((h, i) => {
+        doc.text(h, x, y);
+        x += colWidths[i];
+      });
+
+      y += 15;
+      doc.setFont('helvetica', 'normal');
+
+      state.itens.forEach((it, idx) => {
+        if (y > 750) {
+          doc.addPage();
+          y = 50;
+        }
+
+        x = margin;
+        const row = [
+          String(idx + 1),
+          (it.nome || presets[it.key]?.nome).substring(0, 30),
+          `${fmtNum(it.area)} m²`,
+          `${fmtNum(it.consumoTotal)} ${it.unidadeTipo}`,
+          String(it.unidades),
+          fmtBRL(it.preco),
+          fmtBRL(it.subtotal)
+        ];
+
+        row.forEach((cell, i) => {
+          doc.text(cell, x, y);
+          x += colWidths[i];
+        });
+        y += 15;
+      });
+
+      y += 20;
+      const total = state.itens.reduce((s, it) => s + (it.subtotal || 0), 0);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text(`TOTAL: ${fmtBRL(total)}`, margin, y);
+
+      doc.save(`consumo_m2_${new Date().toISOString().split('T')[0]}.pdf`);
+    }
+
+    function exportJSON() {
+      const data = JSON.stringify({ version: '2.0', date: new Date().toISOString(), itens: state.itens }, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `consumo_m2_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJSON() {
+      document.getElementById('fileInput').click();
+    }
+
+    function handleFileImport(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const obj = JSON.parse(ev.target.result);
+          if (obj && Array.isArray(obj.itens)) {
+            state.itens = obj.itens;
+            save();
+            render();
+            alert(`Importados ${obj.itens.length} itens com sucesso!`);
+          }
+        } catch (err) {
+          alert('Erro ao importar: JSON inválido.');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    function limparTudo() {
+      if (confirm('Tem certeza que deseja limpar todos os itens?')) {
+        state.itens = [];
+        save();
+        render();
+      }
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    document.getElementById('btnAdicionar').addEventListener('click', addItem);
+    document.getElementById('btnAddItem').addEventListener('click', addItem);
+    document.getElementById('btnRecalcular').addEventListener('click', recalcAll);
+    document.getElementById('btnExcel').addEventListener('click', exportExcel);
+    document.getElementById('btnPDF').addEventListener('click', exportPDF);
+    document.getElementById('btnImprimir').addEventListener('click', () => window.print());
+    document.getElementById('btnExportJSON').addEventListener('click', exportJSON);
+    document.getElementById('btnImportJSON').addEventListener('click', importJSON);
+    document.getElementById('fileInput').addEventListener('change', handleFileImport);
+    document.getElementById('btnLimpar').addEventListener('click', limparTudo);
+    document.getElementById('searchInput').addEventListener('input', render);
+
+    // Preview em tempo real
+    ['area', 'demaos', 'espessura', 'rendimento', 'densidade', 'perda', 'unidadeTam', 'preco'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updatePreview);
+    });
+
+    // Fechar modal com ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        fecharModalEditar();
+      }
+    });
+
+    // Fechar modal clicando fora
+    document.getElementById('modalEditar').addEventListener('click', (e) => {
+      if (e.target.id === 'modalEditar') {
+        fecharModalEditar();
+      }
+    });
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ==================== INICIALIZAÇÃO ====================
+    window.addEventListener('load', () => {
+      renderPresets();
+      selectPreset('tinta');
+      render();
+    });
+  </script>
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
