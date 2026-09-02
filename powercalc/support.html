@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="landing-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suporte & Ajuda - PowerCalc</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="assets/icon48.png">
+</head>
+<body class="dark-theme landing-page">
+
+    <!-- CABEÇALHO -->
+    <header class="landing-header">
+        <div class="header-container">
+            <a href="index.html" id="logo-link" class="landing-logo">
+                <span class="logo-icon">🧮</span>
+                <span class="logo-text">Power<span>Calc</span></span>
+            </a>
+            <nav class="landing-nav">
+                <a href="index.html#features">Recursos</a>
+                <a href="index.html#pwa">Instalação</a>
+                <a href="support.html">Suporte</a>
+            </nav>
+            <a href="app.html" class="cta-button header-cta">Iniciar App</a>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO DE SUPORTE -->
+    <main class="legal-page">
+        <a href="index.html" class="legal-back-link">&larr; Voltar para a Home</a>
+        <div class="legal-card">
+            <h1>Suporte & Central de Ajuda</h1>
+            <p class="legal-subtitle">Como podemos ajudar você hoje?</p>
+            
+            <div class="legal-content">
+                <h2>Como entrar em contato?</h2>
+                <p>Se você encontrou algum bug no aplicativo, deseja solicitar a inclusão de uma nova fórmula ou precisa de ajuda técnica com o saldo de créditos do módulo de Inteligência Artificial, por favor envie um e-mail para:</p>
+                <p style="font-size: 1.1rem; font-weight: bold; font-family: 'JetBrains Mono', monospace; color: var(--accent-color); margin: 20px 0;">suporte@4u.ia.br</p>
+                <p>Nosso tempo de resposta médio para suporte por e-mail é de <strong>24 a 48 horas úteis</strong>.</p>
+
+                <h2>Perguntas Frequentes (FAQ)</h2>
+                
+                <h3 style="color: var(--text-primary); margin-top: 24px; font-size: 1.05rem;">1. A PowerCalc é gratuita?</h3>
+                <p>Sim! O PowerCalc é 100% gratuito para o uso de todas as calculadoras físicas locais (Simples, Científica, Programador, Engenharia, Matrizes, Conversor, Finanças, Saúde, Datas, Estatística e Porcentagem). O único recurso pago é o envio de prompts complexos para a nuvem da Inteligência Artificial (Keep AI), que consome créditos obtidos por Pix.</p>
+
+                <h3 style="color: var(--text-primary); margin-top: 24px; font-size: 1.05rem;">2. Como faço para instalar no meu celular (PWA)?</h3>
+                <p>Abra este site em seu smartphone:</p>
+                <ul>
+                    <li><strong>No iOS (iPhone):</strong> Toque no botão de "Compartilhar" (quadrado com seta para cima) na barra inferior do Safari e escolha a opção <strong>"Adicionar à Tela de Início"</strong>.</li>
+                    <li><strong>No Android:</strong> Abra no Chrome e clique na barra de notificações <strong>"Adicionar PowerCalc à Tela Inicial"</strong> ou vá nos três pontinhos superiores e selecione <strong>"Instalar aplicativo"</strong>.</li>
+                </ul>
+
+                <h3 style="color: var(--text-primary); margin-top: 24px; font-size: 1.05rem;">3. Posso usar a calculadora sem conexão com a internet?</h3>
+                <p>Sim! Desde que você tenha aberto a calculadora pelo menos uma vez online no navegador ou celular, o <strong>Service Worker</strong> do PWA salvará todos os arquivos e códigos localmente. Os módulos normais funcionam plenamente offline. Apenas a sincronização de cotação de moedas e as consultas ao Keep AI requerem conexão.</p>
+
+                <h3 style="color: var(--text-primary); margin-top: 24px; font-size: 1.05rem;">4. Como funciona o sistema de créditos do Engineering AI?</h3>
+                <p>Ao se cadastrar ou usar o modo de teste (Guest Trial), você ganha <strong>10 créditos de IA gratuitos</strong> para realizar consultas complexas. O roteador local tenta responder à sua pergunta localmente a custo zero (ex: se pedir para calcular a lei de Ohm). Se necessitar da IA externa, cada consulta debita 1 crédito do seu saldo. Recargas adicionais (50 créditos por R$ 5,00) podem ser compradas no painel da IA via Pix.</p>
+
+                <h3 style="color: var(--text-primary); margin-top: 24px; font-size: 1.05rem;">5. Meus históricos e dados de cálculos são enviados a servidores?</h3>
+                <p>Não. Todos os históricos, valores de memória, preferências e configurações de formatação numérica são gravados localmente em seu dispositivo via <code>localStorage</code> do próprio navegador. Nenhum dado de cálculo ou perfil operacional é transmitido, de acordo com a nossa <a href="privacy.html" style="color: var(--accent-color); text-decoration: none;">Política de Privacidade</a>.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="landing-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <span class="logo-icon">🧮</span>
+                    <span class="logo-text">Power<span>Calc</span></span>
+                </div>
+                <p>A união perfeita entre precisão matemática e design premium.</p>
+            </div>
+            <div class="footer-links">
+                <div class="link-group">
+                    <h4>Legal</h4>
+                    <a href="privacy.html">Política de Privacidade</a>
+                    <a href="terms.html">Termos de Uso</a>
+                </div>
+                <div class="link-group">
+                    <h4>Ajuda</h4>
+                    <a href="support.html">Suporte & FAQ</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 PowerCalc. Todos os direitos reservados. Feito com amor por <a href="https://4u.ia.br" target="_blank" class="footer-owner-link">4u.ia.br</a>.</p>
+        </div>
+    </footer>
+
+    <!-- EASTER EGG SCRIPT (5 cliques no logo) -->
+    <script>
+        const logoLink = document.getElementById('logo-link');
+        if (logoLink) {
+            logoLink.addEventListener('click', function(e) {
+                const now = Date.now();
+                let clicks = parseInt(localStorage.getItem('logo_clicks') || '0');
+                let lastClick = parseInt(localStorage.getItem('logo_last_click') || '0');
+
+                if (now - lastClick < 2000) {
+                    clicks++;
+                } else {
+                    clicks = 1;
+                }
+
+                localStorage.setItem('logo_clicks', clicks);
+                localStorage.setItem('logo_last_click', now);
+
+                if (clicks >= 5) {
+                    e.preventDefault();
+                    localStorage.removeItem('logo_clicks');
+                    localStorage.removeItem('logo_last_click');
+                    window.location.href = 'https://4u.ia.br/admin/login';
+                    return;
+                }
+
+                const targetUrl = this.href;
+                const currentUrl = window.location.href;
+                
+                const cleanTarget = targetUrl.replace(/\/+$/, '').replace(/\/support\.html$/, '');
+                const cleanCurrent = currentUrl.replace(/\/+$/, '').replace(/\/support\.html$/, '');
+
+                if (cleanTarget === cleanCurrent) {
+                    e.preventDefault();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
