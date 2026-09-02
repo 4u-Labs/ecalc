@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Comparador de Sistemas Construtivos | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #0f1419 50%, #0a0a0f 100%);
+      min-height: 100vh;
+    }
+    
+    /* Animated background */
+    .bg-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 27, 247, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(0, 255, 255, 0.02) 0%, transparent 30%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .glass-card {
+      background: rgba(15, 15, 25, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    
+    .sistema-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 2px solid rgba(0, 255, 255, 0.15);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .sistema-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+    
+    .sistema-card:hover::before {
+      left: 100%;
+    }
+    
+    .sistema-card:hover {
+      border-color: #00ffff;
+      background: rgba(0, 255, 255, 0.05);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 40px rgba(0, 255, 255, 0.15);
+    }
+    
+    .sistema-card.selected {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.12) 0%, rgba(139, 27, 247, 0.12) 100%);
+      border-color: #00ffff;
+      border-width: 3px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+    }
+    
+    .sistema-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #00ffff, #8b1bf7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #000;
+      font-weight: bold;
+      animation: checkPop 0.3s ease;
+    }
+    
+    @keyframes checkPop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    .btn-cyber {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.15) 0%, rgba(139, 27, 247, 0.15) 100%);
+      border: 2px solid #00ffff;
+      color: #00ffff;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-cyber::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .btn-cyber:hover::before {
+      left: 100%;
+    }
+    
+    .btn-cyber:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.25) 0%, rgba(139, 27, 247, 0.25) 100%);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .btn-primary-cyber {
+      background: linear-gradient(135deg, #00ffff 0%, #8b1bf7 100%);
+      border: none;
+      color: #000;
+      font-weight: 600;
+    }
+    
+    .btn-primary-cyber:hover {
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .input-cyber {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      color: #e0e0e0;
+      transition: all 0.3s ease;
+    }
+    
+    .input-cyber:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.6);
+    }
+    
+    .glow-text {
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    }
+    
+    .rating-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .rating-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.8s ease;
+      position: relative;
+    }
+    
+    .rating-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .caracteristica-card {
+      background: rgba(0, 255, 255, 0.03);
+      border-left: 3px solid #00ffff;
+      transition: all 0.3s ease;
+    }
+    
+    .caracteristica-card:hover {
+      background: rgba(0, 255, 255, 0.08);
+      transform: translateX(5px);
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      z-index: 10000;
+      animation: slideIn 0.4s ease;
+      max-width: 350px;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-overlay {
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal-content {
+      animation: slideUp 0.4s ease;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+    
+    .radar-chart {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .legend-item:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    
+    .pulse-dot {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #00ffff, #8b1bf7);
+      border-radius: 4px;
+    }
+    
+    .comparison-winner {
+      position: relative;
+    }
+    
+    .comparison-winner::before {
+      content: '👑 MELHOR OPÇÃO';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      color: #000;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    
+    .tab-btn {
+      padding: 12px 24px;
+      background: transparent;
+      border: none;
+      color: #888;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .tab-btn:hover {
+      color: #00ffff;
+    }
+    
+    .tab-btn.active {
+      color: #00ffff;
+      border-bottom-color: #00ffff;
+    }
+  </style>
+</head>
+<body class="text-gray-200">
+  <div class="bg-pattern"></div>
+  
+  <!-- Header -->
+  <header class="relative z-10 py-6 px-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center text-2xl font-bold text-black">
+          🏗️
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-cyan-400 glow-text">Comparador de Sistemas</h1>
+          <p class="text-sm text-gray-500">Ferramentas de Engenharia</p>
+        </div>
+      </div>
+      <button onclick="history.back()" class="btn-cyber px-4 py-2 rounded-lg text-sm font-medium">
+        ← Voltar
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 pb-20">
+    
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-4 justify-center mb-8">
+      <button id="btnComparar" class="btn-primary-cyber px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2">
+        <span>📊</span> Comparar Selecionados
+      </button>
+      <button id="btnConfigurarPrecos" class="btn-cyber px-6 py-3 rounded-xl font-medium flex items-center gap-2">
+        <span>⚙️</span> Configurar Preços
+      </button>
+      <button id="btnReset" class="btn-cyber px-6 py-3 rounded-xl font-medium flex items-center gap-2">
+        <span>🔄</span> Limpar Seleção
+      </button>
+      <button id="btnExportar" class="btn-cyber px-6 py-3 rounded-xl font-medium flex items-center gap-2">
+        <span>📥</span> Exportar PDF
+      </button>
+    </div>
+
+    <!-- Systems Selection -->
+    <section class="glass-card rounded-2xl p-6 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-cyan-400 flex items-center gap-3">
+          <span class="w-10 h-10 rounded-lg bg-cyan-400/20 flex items-center justify-center">🏠</span>
+          Selecione até 3 Sistemas para Comparar
+        </h2>
+        <span id="selectionCount" class="px-4 py-2 bg-cyan-400/10 border border-cyan-400/30 rounded-full text-cyan-400 text-sm font-medium">
+          0/3 selecionados
+        </span>
+      </div>
+      
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" id="sistemas-selector">
+        <div class="sistema-card rounded-xl p-5 cursor-pointer text-center" data-sistema="alvenaria-convencional">
+          <div class="text-4xl mb-3">🧱</div>
+          <div class="font-semibold text-cyan-400 text-sm mb-1">Alvenaria Convencional</div>
+          <div class="text-xs text-gray-500">Blocos cerâmicos</div>
+        </div>
+        
+        <div class="sistema-card rounded-xl p-5 cursor-pointer text-center" data-sistema="alvenaria-estrutural">
+          <div class="text-4xl mb-3">🏗️</div>
+          <div class="font-semibold text-cyan-400 text-sm mb-1">Alvenaria Estrutural</div>
+          <div class="text-xs text-gray-500">Blocos de concreto</div>
+        </div>
+        
+        <div class="sistema-card rounded-xl p-5 cursor-pointer text-center" data-sistema="steel-frame">
+          <div class="text-4xl mb-3">⚙️</div>
+          <div class="font-semibold text-cyan-400 text-sm mb-1">Steel Frame</div>
+          <div class="text-xs text-gray-500">Estrutura metálica</div>
+        </div>
+        
+        <div class="sistema-card rounded-xl p-5 cursor-pointer text-center" data-sistema="wood-frame">
+          <div class="text-4xl mb-3">🌲</div>
+          <div class="font-semibold text-cyan-400 text-sm mb-1">Wood Frame</div>
+          <div class="text-xs text-gray-500">Estrutura madeira</div>
+        </div>
+        
+        <div class="sistema-card rounded-xl p-5 cursor-pointer text-center" data-sistema="concreto-moldado">
+          <div class="text-4xl mb-3">🏢</div>
+          <div class="font-semibold text-cyan-400 text-sm mb-1">Concreto Moldado</div>
+          <div class="text-xs text-gray-500">In loco</div>
+        </div>
+        
+        <div class="sistema-card rounded-xl p-5 cursor-pointer text-center" data-sistema="pre-moldado">
+          <div class="text-4xl mb-3">🏭</div>
+          <div class="font-semibold text-cyan-400 text-sm mb-1">Pré-Moldado</div>
+          <div class="text-xs text-gray-500">Painéis concreto</div>
+        </div>
+      </div>
+      
+      <div class="mt-6 p-4 bg-cyan-400/5 border border-cyan-400/20 rounded-xl flex items-start gap-3">
+        <span class="text-cyan-400 text-xl">💡</span>
+        <div>
+          <p class="text-cyan-400 font-medium">Dica Rápida</p>
+          <p class="text-gray-400 text-sm">Clique nos sistemas para selecioná-los. A comparação considera custo, prazo, sustentabilidade e desempenho térmico/acústico.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Project Data -->
+    <section class="glass-card rounded-2xl p-6 mb-8">
+      <h2 class="text-xl font-bold text-cyan-400 mb-6 flex items-center gap-3">
+        <span class="w-10 h-10 rounded-lg bg-cyan-400/20 flex items-center justify-center">📐</span>
+        Dados do Projeto
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Área Construída (m²)</label>
+          <input type="number" id="area-construida" value="100" step="0.01" 
+                 class="input-cyber w-full px-4 py-3 rounded-xl text-lg font-semibold">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Nº de Pavimentos</label>
+          <input type="number" id="pavimentos" value="1" min="1" max="20"
+                 class="input-cyber w-full px-4 py-3 rounded-xl text-lg font-semibold">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Prazo Desejado (meses)</label>
+          <input type="number" id="prazo-desejado" value="6" min="1"
+                 class="input-cyber w-full px-4 py-3 rounded-xl text-lg font-semibold">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Região</label>
+          <select id="regiao" class="input-cyber w-full px-4 py-3 rounded-xl text-lg">
+            <option value="sudeste">Sudeste</option>
+            <option value="sul">Sul</option>
+            <option value="nordeste">Nordeste</option>
+            <option value="norte">Norte</option>
+            <option value="centro-oeste">Centro-Oeste</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison Results -->
+    <section class="glass-card rounded-2xl p-6 mb-8">
+      <h2 class="text-xl font-bold text-cyan-400 mb-6 flex items-center gap-3">
+        <span class="w-10 h-10 rounded-lg bg-cyan-400/20 flex items-center justify-center">📊</span>
+        Comparação Detalhada
+      </h2>
+      
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-700 mb-6 overflow-x-auto">
+        <button class="tab-btn active" data-tab="visao-geral">Visão Geral</button>
+        <button class="tab-btn" data-tab="custos">Custos</button>
+        <button class="tab-btn" data-tab="desempenho">Desempenho</button>
+        <button class="tab-btn" data-tab="sustentabilidade">Sustentabilidade</button>
+      </div>
+      
+      <div id="comparacao-resultado">
+        <div class="text-center py-16 text-gray-500">
+          <div class="text-6xl mb-4 opacity-50">📋</div>
+          <p class="text-lg">Selecione os sistemas e clique em "Comparar" para ver os resultados</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Normative References -->
+    <section class="glass-card rounded-2xl p-6">
+      <h2 class="text-xl font-bold text-cyan-400 mb-6 flex items-center gap-3">
+        <span class="w-10 h-10 rounded-lg bg-cyan-400/20 flex items-center justify-center">📚</span>
+        Referências Normativas
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 bg-white/3 rounded-xl border border-cyan-400/10 hover:border-cyan-400/30 transition-all">
+          <div class="font-semibold text-cyan-400">NBR 15575:2021</div>
+          <div class="text-sm text-gray-400">Desempenho de Edificações Habitacionais</div>
+        </div>
+        <div class="p-4 bg-white/3 rounded-xl border border-cyan-400/10 hover:border-cyan-400/30 transition-all">
+          <div class="font-semibold text-cyan-400">NBR 16055:2012</div>
+          <div class="text-sm text-gray-400">Parede de Concreto Moldada no Local</div>
+        </div>
+        <div class="p-4 bg-white/3 rounded-xl border border-cyan-400/10 hover:border-cyan-400/30 transition-all">
+          <div class="font-semibold text-cyan-400">NBR 15253:2014</div>
+          <div class="text-sm text-gray-400">Perfis de Aço para Steel Frame</div>
+        </div>
+        <div class="p-4 bg-white/3 rounded-xl border border-cyan-400/10 hover:border-cyan-400/30 transition-all">
+          <div class="font-semibold text-cyan-400">NBR 15270:2017</div>
+          <div class="text-sm text-gray-400">Componentes Cerâmicos para Alvenaria</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Price Configuration Modal -->
+  <div id="modalPrecos" class="modal-overlay fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4" style="display: none;">
+    <div class="modal-content glass-card rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-cyan-400/30">
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-cyan-400/20">
+        <h3 class="text-xl font-bold text-cyan-400 flex items-center gap-2">
+          <span>⚙️</span> Configurar Custos por m²
+        </h3>
+        <button onclick="fecharModalPrecos()" class="text-gray-400 hover:text-white text-3xl transition-colors">&times;</button>
+      </div>
+      
+      <div class="space-y-4" id="precosGrid">
+        <!-- Prices will be populated by JS -->
+      </div>
+      
+      <div class="flex gap-4 justify-end mt-8 pt-6 border-t border-white/10">
+        <button onclick="restaurarPrecosSistemas()" class="btn-cyber px-6 py-3 rounded-xl font-medium">
+          Restaurar Padrão
+        </button>
+        <button onclick="salvarPrecosSistemas()" class="btn-primary-cyber px-6 py-3 rounded-xl font-semibold">
+          Salvar Alterações
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  
+
+  <script>
+    // ========== DATA ==========
+    const sistemasData = {
+      'alvenaria-convencional': {
+        nome: 'Alvenaria Convencional',
+        icon: '🧱',
+        custo: 2400,
+        prazo: 8, // meses para 100m²
+        desempenhoTermico: 3,
+        desempenhoAcustico: 4,
+        sustentabilidade: 2,
+        durabilidade: 4,
+        flexibilidade: 3,
+        maoDeObra: 5, // disponibilidade
+        descricao: 'Sistema tradicional com blocos cerâmicos e estrutura de concreto armado.',
+        vantagens: ['Mão de obra abundante', 'Material disponível', 'Boa durabilidade', 'Conhecimento consolidado'],
+        desvantagens: ['Maior tempo de execução', 'Maior geração de resíduos', 'Menos eficiente termicamente'],
+        aplicacao: 'Residências, edifícios até 4 pavimentos, reformas'
+      },
+      'alvenaria-estrutural': {
+        nome: 'Alvenaria Estrutural',
+        icon: '🏗️',
+        custo: 2150,
+        prazo: 6,
+        desempenhoTermico: 4,
+        desempenhoAcustico: 4,
+        sustentabilidade: 3,
+        durabilidade: 5,
+        flexibilidade: 2,
+        maoDeObra: 4,
+        descricao: 'Blocos de concreto que funcionam como estrutura e vedação.',
+        vantagens: ['Economia de até 30%', 'Menor prazo', 'Menos desperdício', 'Excelente resistência'],
+        desvantagens: ['Menor flexibilidade', 'Projeto mais rígido', 'Limitação de vãos'],
+        aplicacao: 'Conjuntos habitacionais, edifícios até 20 pavimentos'
+      },
+      'steel-frame': {
+        nome: 'Steel Frame',
+        icon: '⚙️',
+        custo: 3100,
+        prazo: 4,
+        desempenhoTermico: 5,
+        desempenhoAcustico: 4,
+        sustentabilidade: 4,
+        durabilidade: 5,
+        flexibilidade: 4,
+        maoDeObra: 2,
+        descricao: 'Estrutura em perfis de aço galvanizado com fechamentos em placas.',
+        vantagens: ['Execução rápida', 'Obra limpa', 'Leve', 'Excelente isolamento'],
+        desvantagens: ['Custo inicial maior', 'Mão de obra especializada', 'Limitação de altura'],
+        aplicacao: 'Casas, edifícios baixos, ampliações, construções modulares'
+      },
+      'wood-frame': {
+        nome: 'Wood Frame',
+        icon: '🌲',
+        custo: 2950,
+        prazo: 4,
+        desempenhoTermico: 5,
+        desempenhoAcustico: 3,
+        sustentabilidade: 5,
+        durabilidade: 4,
+        flexibilidade: 4,
+        maoDeObra: 2,
+        descricao: 'Estrutura em madeira tratada com fechamentos diversos.',
+        vantagens: ['Sustentável', 'Rápida execução', 'Leve', 'Conforto térmico'],
+        desvantagens: ['Requer tratamento', 'Mão de obra especializada', 'Manutenção periódica'],
+        aplicacao: 'Casas térreas e sobrados, regiões com madeira disponível'
+      },
+      'concreto-moldado': {
+        nome: 'Concreto Moldado',
+        icon: '🏢',
+        custo: 2750,
+        prazo: 5,
+        desempenhoTermico: 3,
+        desempenhoAcustico: 5,
+        sustentabilidade: 2,
+        durabilidade: 5,
+        flexibilidade: 3,
+        maoDeObra: 3,
+        descricao: 'Paredes de concreto moldadas in loco com formas.',
+        vantagens: ['Alta produtividade', 'Excelente acústica', 'Monolítico', 'Resistente'],
+        desvantagens: ['Requer formas', 'Maior peso', 'Menos flexível'],
+        aplicacao: 'Conjuntos habitacionais, edifícios residenciais'
+      },
+      'pre-moldado': {
+        nome: 'Pré-Moldado',
+        icon: '🏭',
+        custo: 3300,
+        prazo: 3,
+        desempenhoTermico: 4,
+        desempenhoAcustico: 4,
+        sustentabilidade: 4,
+        durabilidade: 5,
+        flexibilidade: 3,
+        maoDeObra: 2,
+        descricao: 'Painéis e estruturas fabricados em indústria e montados no local.',
+        vantagens: ['Menor prazo', 'Qualidade controlada', 'Obra limpa', 'Precisão dimensional'],
+        desvantagens: ['Custo de transporte', 'Necessita guindastes', 'Projeto antecipado'],
+        aplicacao: 'Galpões, indústrias, edifícios comerciais, habitações'
+      }
+    };
+
+    let sistemasSelecionados = [];
+    let precosPersonalizados = {};
+    let tabAtiva = 'visao-geral';
+
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      carregarPrecos();
+      setupEventListeners();
+      renderizarPrecosModal();
+    });
+
+    function setupEventListeners() {
+      // System cards
+      document.querySelectorAll('.sistema-card').forEach(card => {
+        card.addEventListener('click', () => toggleSistema(card));
+      });
+
+      // Buttons
+      document.getElementById('btnComparar').addEventListener('click', compararSistemas);
+      document.getElementById('btnReset').addEventListener('click', resetSelecao);
+      document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+      document.getElementById('btnExportar').addEventListener('click', exportarPDF);
+
+      // Tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          tabAtiva = btn.dataset.tab;
+          if (sistemasSelecionados.length > 0) {
+            renderizarComparacao();
+          }
+        });
+      });
+
+      // Close modal on overlay click
+      document.getElementById('modalPrecos').addEventListener('click', (e) => {
+        if (e.target.id === 'modalPrecos') fecharModalPrecos();
+      });
+
+      // Input changes trigger recalculation
+      ['area-construida', 'pavimentos', 'prazo-desejado', 'regiao'].forEach(id => {
+        document.getElementById(id).addEventListener('change', () => {
+          if (sistemasSelecionados.length > 0) renderizarComparacao();
+        });
+      });
+    }
+
+    // ========== SYSTEM SELECTION ==========
+    function toggleSistema(card) {
+      const sistema = card.dataset.sistema;
+      
+      if (card.classList.contains('selected')) {
+        card.classList.remove('selected');
+        sistemasSelecionados = sistemasSelecionados.filter(s => s !== sistema);
+      } else {
+        if (sistemasSelecionados.length >= 3) {
+          showToast('Máximo de 3 sistemas permitidos!', 'warning');
+          return;
+        }
+        card.classList.add('selected');
+        sistemasSelecionados.push(sistema);
+      }
+      
+      updateSelectionCount();
+    }
+
+    function updateSelectionCount() {
+      document.getElementById('selectionCount').textContent = `${sistemasSelecionados.length}/3 selecionados`;
+    }
+
+    function resetSelecao() {
+      document.querySelectorAll('.sistema-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      sistemasSelecionados = [];
+      updateSelectionCount();
+      document.getElementById('comparacao-resultado').innerHTML = `
+        <div class="text-center py-16 text-gray-500">
+          <div class="text-6xl mb-4 opacity-50">📋</div>
+          <p class="text-lg">Selecione os sistemas e clique em "Comparar" para ver os resultados</p>
+        </div>
+      `;
+      showToast('Seleção limpa!', 'info');
+    }
+
+    // ========== COMPARISON ==========
+    function compararSistemas() {
+      if (sistemasSelecionados.length < 2) {
+        showToast('Selecione pelo menos 2 sistemas para comparar!', 'warning');
+        return;
+      }
+      renderizarComparacao();
+      showToast('Comparação gerada com sucesso!', 'success');
+    }
+
+    function renderizarComparacao() {
+      const area = parseFloat(document.getElementById('area-construida').value) || 100;
+      const pavimentos = parseInt(document.getElementById('pavimentos').value) || 1;
+      const prazoDesejado = parseInt(document.getElementById('prazo-desejado').value) || 6;
+      
+      // Calculate scores
+      const sistemasComScore = sistemasSelecionados.map(id => {
+        const sistema = sistemasData[id];
+        const custoM2 = precosPersonalizados[id] || sistema.custo;
+        const custoTotal = custoM2 * area * (1 + (pavimentos - 1) * 0.1);
+        const prazoEstimado = sistema.prazo * (area / 100) * (1 + (pavimentos - 1) * 0.3);
+        
+        const score = (
+          (5 - (custoM2 / 500)) * 2 + // Peso custo
+          (5 - (prazoEstimado / prazoDesejado) * 2) * 1.5 + // Peso prazo
+          sistema.desempenhoTermico * 1 +
+          sistema.desempenhoAcustico * 1 +
+          sistema.sustentabilidade * 1.2 +
+          sistema.durabilidade * 1
+        );
+        
+        return { 
+          id, 
+          ...sistema, 
+          custoM2, 
+          custoTotal, 
+          prazoEstimado: Math.ceil(prazoEstimado),
+          score 
+        };
+      }).sort((a, b) => b.score - a.score);
+
+      const melhorOpcao = sistemasComScore[0].id;
+
+      let html = '';
+      
+      if (tabAtiva === 'visao-geral') {
+        html = renderVisaoGeral(sistemasComScore, melhorOpcao, area);
+      } else if (tabAtiva === 'custos') {
+        html = renderCustos(sistemasComScore, area);
+      } else if (tabAtiva === 'desempenho') {
+        html = renderDesempenho(sistemasComScore);
+      } else if (tabAtiva === 'sustentabilidade') {
+        html = renderSustentabilidade(sistemasComScore);
+      }
+
+      document.getElementById('comparacao-resultado').innerHTML = html;
+    }
+
+    function renderVisaoGeral(sistemas, melhorOpcao, area) {
+      const colors = ['#00ffff', '#8b1bf7', '#00ff88'];
+      
+      return `
+        <div class="grid grid-cols-1 ${sistemas.length > 1 ? 'md:grid-cols-' + sistemas.length : ''} gap-6">
+          ${sistemas.map((s, i) => `
+            <div class="bg-white/3 rounded-xl p-6 border ${s.id === melhorOpcao ? 'border-yellow-500 comparison-winner' : 'border-cyan-400/20'} ${s.id === melhorOpcao ? 'mt-4' : ''}">
+              <div class="text-center mb-6">
+                <div class="text-5xl mb-3">${s.icon}</div>
+                <h3 class="text-xl font-bold text-cyan-400">${s.nome}</h3>
+                <p class="text-gray-500 text-sm mt-2">${s.descricao}</p>
+              </div>
+              
+              <div class="space-y-4">
+                <div class="caracteristica-card p-4 rounded-lg">
+                  <div class="text-sm text-gray-400">Custo Estimado</div>
+                  <div class="text-2xl font-bold" style="color: ${colors[i]}">
+                    R$ ${s.custoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </div>
+                  <div class="text-xs text-gray-500">R$ ${s.custoM2}/m²</div>
+                </div>
+                
+                <div class="caracteristica-card p-4 rounded-lg">
+                  <div class="text-sm text-gray-400">Prazo Estimado</div>
+                  <div class="text-2xl font-bold" style="color: ${colors[i]}">${s.prazoEstimado} meses</div>
+                </div>
+                
+                <div class="caracteristica-card p-4 rounded-lg">
+                  <div class="text-sm text-gray-400 mb-2">Desempenho</div>
+                  ${renderRatingBar('Térmico', s.desempenhoTermico, colors[i])}
+                  ${renderRatingBar('Acústico', s.desempenhoAcustico, colors[i])}
+                  ${renderRatingBar('Durabilidade', s.durabilidade, colors[i])}
+                </div>
+                
+                <div class="pt-4">
+                  <div class="text-sm text-green-400 font-medium mb-2">✅ Vantagens</div>
+                  <div class="flex flex-wrap gap-2">
+                    ${s.vantagens.map(v => `<span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs">${v}</span>`).join('')}
+                  </div>
+                </div>
+                
+                <div class="pt-2">
+                  <div class="text-sm text-orange-400 font-medium mb-2">⚠️ Considerações</div>
+                  <div class="flex flex-wrap gap-2">
+                    ${s.desvantagens.map(d => `<span class="px-3 py-1 bg-orange-500/10 text-orange-400 rounded-full text-xs">${d}</span>`).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        ${renderResumoComparativo(sistemas)}
+      `;
+    }
+
+    function renderCustos(sistemas, area) {
+      const maxCusto = Math.max(...sistemas.map(s => s.custoTotal));
+      const colors = ['#00ffff', '#8b1bf7', '#00ff88'];
+      
+      return `
+        <div class="space-y-8">
+          <div class="bg-white/3 rounded-xl p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-6">Comparativo de Custos</h3>
+            <div class="space-y-6">
+              ${sistemas.map((s, i) => `
+                <div>
+                  <div class="flex justify-between mb-2">
+                    <span class="flex items-center gap-2">
+                      <span class="text-2xl">${s.icon}</span>
+                      <span class="font-medium">${s.nome}</span>
+                    </span>
+                    <span class="font-bold" style="color: ${colors[i]}">R$ ${s.custoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div class="rating-bar">
+                    <div class="rating-fill" style="width: ${(s.custoTotal / maxCusto) * 100}%; background: linear-gradient(90deg, ${colors[i]}, ${colors[i]}88);"></div>
+                  </div>
+                  <div class="text-xs text-gray-500 mt-1">R$ ${s.custoM2}/m² × ${area}m²</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            ${sistemas.map((s, i) => `
+              <div class="bg-white/3 rounded-xl p-5 text-center border border-cyan-400/10">
+                <div class="text-3xl mb-2">${s.icon}</div>
+                <div class="text-sm text-gray-400">Custo por m²</div>
+                <div class="text-2xl font-bold mt-1" style="color: ${colors[i]}">R$ ${s.custoM2}</div>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="bg-cyan-400/5 border border-cyan-400/20 rounded-xl p-5">
+            <div class="flex items-start gap-3">
+              <span class="text-2xl">💰</span>
+              <div>
+                <p class="font-medium text-cyan-400">Economia Potencial</p>
+                <p class="text-gray-400 text-sm mt-1">
+                  Optando pelo sistema mais econômico (${sistemas.sort((a,b) => a.custoTotal - b.custoTotal)[0].nome}), 
+                  você pode economizar até <strong class="text-green-400">R$ ${(sistemas.sort((a,b) => b.custoTotal - a.custoTotal)[0].custoTotal - sistemas.sort((a,b) => a.custoTotal - b.custoTotal)[0].custoTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDesempenho(sistemas) {
+      const colors = ['#00ffff', '#8b1bf7', '#00ff88'];
+      const categorias = [
+        { key: 'desempenhoTermico', label: 'Desempenho Térmico', icon: '🌡️' },
+        { key: 'desempenhoAcustico', label: 'Desempenho Acústico', icon: '🔊' },
+        { key: 'durabilidade', label: 'Durabilidade', icon: '🛡️' },
+        { key: 'flexibilidade', label: 'Flexibilidade de Projeto', icon: '📐' },
+        { key: 'maoDeObra', label: 'Disponibilidade de Mão de Obra', icon: '👷' }
+      ];
+      
+      return `
+        <div class="space-y-6">
+          ${categorias.map(cat => `
+            <div class="bg-white/3 rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="text-xl">${cat.icon}</span>
+                <span class="font-medium">${cat.label}</span>
+              </div>
+              <div class="space-y-3">
+                ${sistemas.map((s, i) => `
+                  <div class="flex items-center gap-4">
+                    <span class="w-8 text-center">${s.icon}</span>
+                    <div class="flex-1">
+                      <div class="rating-bar">
+                        <div class="rating-fill" style="width: ${s[cat.key] * 20}%; background: ${colors[i]};"></div>
+                      </div>
+                    </div>
+                    <span class="w-12 text-right font-bold" style="color: ${colors[i]}">${s[cat.key]}/5</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+          
+          <div class="flex flex-wrap gap-4 justify-center mt-6">
+            ${sistemas.map((s, i) => `
+              <div class="legend-item">
+                <div class="legend-color" style="background: ${colors[i]}"></div>
+                <span class="text-sm">${s.nome}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSustentabilidade(sistemas) {
+      const colors = ['#00ffff', '#8b1bf7', '#00ff88'];
+      
+      const sustInfo = {
+        'alvenaria-convencional': { residuos: 'Alto', reciclabilidade: 'Média', energia: 'Alta', co2: 'Alto' },
+        'alvenaria-estrutural': { residuos: 'Médio', reciclabilidade: 'Média', energia: 'Média', co2: 'Médio' },
+        'steel-frame': { residuos: 'Baixo', reciclabilidade: 'Alta', energia: 'Média', co2: 'Médio' },
+        'wood-frame': { residuos: 'Baixo', reciclabilidade: 'Alta', energia: 'Baixa', co2: 'Baixo' },
+        'concreto-moldado': { residuos: 'Médio', reciclabilidade: 'Baixa', energia: 'Alta', co2: 'Alto' },
+        'pre-moldado': { residuos: 'Baixo', reciclabilidade: 'Média', energia: 'Média', co2: 'Médio' }
+      };
+      
+      return `
+        <div class="grid grid-cols-1 md:grid-cols-${sistemas.length} gap-6">
+          ${sistemas.map((s, i) => `
+            <div class="bg-white/3 rounded-xl p-6 border border-cyan-400/10">
+              <div class="text-center mb-6">
+                <div class="text-4xl mb-2">${s.icon}</div>
+                <h3 class="font-bold text-cyan-400">${s.nome}</h3>
+                <div class="mt-3">
+                  <span class="text-4xl font-bold" style="color: ${colors[i]}">${s.sustentabilidade}</span>
+                  <span class="text-gray-400">/5</span>
+                </div>
+                <div class="text-sm text-gray-500">Índice de Sustentabilidade</div>
+              </div>
+              
+              <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 bg-white/3 rounded-lg">
+                  <span class="text-sm text-gray-400">🗑️ Geração de Resíduos</span>
+                  <span class="font-medium ${sustInfo[s.id].residuos === 'Baixo' ? 'text-green-400' : sustInfo[s.id].residuos === 'Médio' ? 'text-yellow-400' : 'text-red-400'}">${sustInfo[s.id].residuos}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-white/3 rounded-lg">
+                  <span class="text-sm text-gray-400">♻️ Reciclabilidade</span>
+                  <span class="font-medium ${sustInfo[s.id].reciclabilidade === 'Alta' ? 'text-green-400' : sustInfo[s.id].reciclabilidade === 'Média' ? 'text-yellow-400' : 'text-red-400'}">${sustInfo[s.id].reciclabilidade}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-white/3 rounded-lg">
+                  <span class="text-sm text-gray-400">⚡ Consumo de Energia</span>
+                  <span class="font-medium ${sustInfo[s.id].energia === 'Baixa' ? 'text-green-400' : sustInfo[s.id].energia === 'Média' ? 'text-yellow-400' : 'text-red-400'}">${sustInfo[s.id].energia}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-white/3 rounded-lg">
+                  <span class="text-sm text-gray-400">🌍 Emissão de CO₂</span>
+                  <span class="font-medium ${sustInfo[s.id].co2 === 'Baixo' ? 'text-green-400' : sustInfo[s.id].co2 === 'Médio' ? 'text-yellow-400' : 'text-red-400'}">${sustInfo[s.id].co2}</span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="mt-6 p-5 bg-green-500/5 border border-green-500/20 rounded-xl">
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">🌱</span>
+            <div>
+              <p class="font-medium text-green-400">Dica Sustentável</p>
+              <p class="text-gray-400 text-sm mt-1">
+                ${sistemas.find(s => s.sustentabilidade === Math.max(...sistemas.map(x => x.sustentabilidade))).nome} 
+                é a opção mais sustentável entre as selecionadas, considerando ciclo de vida completo do material.
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRatingBar(label, value, color) {
+      return `
+        <div class="mb-3">
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-gray-400">${label}</span>
+            <span style="color: ${color}">${value}/5</span>
+          </div>
+          <div class="rating-bar">
+            <div class="rating-fill" style="width: ${value * 20}%; background: ${color};"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderResumoComparativo(sistemas) {
+      const melhor = sistemas[0];
+      const maisBarato = [...sistemas].sort((a, b) => a.custoM2 - b.custoM2)[0];
+      const maisRapido = [...sistemas].sort((a, b) => a.prazoEstimado - b.prazoEstimado)[0];
+      const maisSustentavel = [...sistemas].sort((a, b) => b.sustentabilidade - a.sustentabilidade)[0];
+      
+      return `
+        <div class="mt-8 p-6 bg-gradient-to-r from-cyan-400/5 to-purple-500/5 rounded-xl border border-cyan-400/20">
+          <h3 class="text-lg font-bold text-cyan-400 mb-4">📋 Resumo da Análise</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center p-4 bg-white/3 rounded-lg">
+              <div class="text-2xl mb-2">👑</div>
+              <div class="text-xs text-gray-400">Melhor Custo-Benefício</div>
+              <div class="font-bold text-yellow-400 mt-1">${melhor.nome}</div>
+            </div>
+            <div class="text-center p-4 bg-white/3 rounded-lg">
+              <div class="text-2xl mb-2">💰</div>
+              <div class="text-xs text-gray-400">Mais Econômico</div>
+              <div class="font-bold text-green-400 mt-1">${maisBarato.nome}</div>
+            </div>
+            <div class="text-center p-4 bg-white/3 rounded-lg">
+              <div class="text-2xl mb-2">⚡</div>
+              <div class="text-xs text-gray-400">Mais Rápido</div>
+              <div class="font-bold text-cyan-400 mt-1">${maisRapido.nome}</div>
+            </div>
+            <div class="text-center p-4 bg-white/3 rounded-lg">
+              <div class="text-2xl mb-2">🌱</div>
+              <div class="text-xs text-gray-400">Mais Sustentável</div>
+              <div class="font-bold text-emerald-400 mt-1">${maisSustentavel.nome}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ========== PRICE MODAL ==========
+    function abrirModalPrecos() {
+      document.getElementById('modalPrecos').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModalPrecos() {
+      document.getElementById('modalPrecos').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function renderizarPrecosModal() {
+      const grid = document.getElementById('precosGrid');
+      grid.innerHTML = Object.entries(sistemasData).map(([id, sistema]) => `
+        <div class="flex items-center justify-between p-4 bg-white/3 rounded-xl border border-cyan-400/10">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">${sistema.icon}</span>
+            <div>
+              <div class="font-medium">${sistema.nome}</div>
+              <div class="text-xs text-gray-500">${sistema.descricao.substring(0, 40)}...</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400 text-sm">R$</span>
+            <input type="number" 
+                   id="preco-${id}" 
+                   value="${precosPersonalizados[id] || sistema.custo}" 
+                   step="50" 
+                   min="0"
+                   class="input-cyber w-24 px-3 py-2 rounded-lg text-right font-bold text-cyan-400">
+            <span class="text-gray-400 text-sm">/m²</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function salvarPrecosSistemas() {
+      Object.keys(sistemasData).forEach(id => {
+        const input = document.getElementById(`preco-${id}`);
+        if (input) {
+          precosPersonalizados[id] = parseFloat(input.value) || sistemasData[id].custo;
+        }
+      });
+      
+      localStorage.setItem('precosConstrutivos', JSON.stringify(precosPersonalizados));
+      fecharModalPrecos();
+      
+      if (sistemasSelecionados.length >= 2) {
+        renderizarComparacao();
+      }
+      
+      showToast('Preços salvos com sucesso!', 'success');
+    }
+
+    function restaurarPrecosSistemas() {
+      Object.keys(sistemasData).forEach(id => {
+        const input = document.getElementById(`preco-${id}`);
+        if (input) {
+          input.value = sistemasData[id].custo;
+        }
+      });
+      precosPersonalizados = {};
+      localStorage.removeItem('precosConstrutivos');
+      showToast('Preços restaurados!', 'info');
+    }
+
+    function carregarPrecos() {
+      const saved = localStorage.getItem('precosConstrutivos');
+      if (saved) {
+        precosPersonalizados = JSON.parse(saved);
+      }
+    }
+
+    // ========== EXPORT ==========
+    function exportarPDF() {
+      if (sistemasSelecionados.length < 2) {
+        showToast('Compare pelo menos 2 sistemas antes de exportar!', 'warning');
+        return;
+      }
+      
+      showToast('Preparando exportação... (funcionalidade em desenvolvimento)', 'info');
+      
+      // Simple print version
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }
+
+    // ========== TOAST NOTIFICATIONS ==========
+    function showToast(message, type = 'info') {
+      const colors = {
+        success: 'bg-green-500/20 border-green-500 text-green-400',
+        warning: 'bg-yellow-500/20 border-yellow-500 text-yellow-400',
+        error: 'bg-red-500/20 border-red-500 text-red-400',
+        info: 'bg-cyan-500/20 border-cyan-500 text-cyan-400'
+      };
+      
+      const icons = {
+        success: '✓',
+        warning: '⚠',
+        error: '✕',
+        info: 'ℹ'
+      };
+      
+      const toast = document.createElement('div');
+      toast.className = `toast glass-card border ${colors[type]} flex items-center gap-3`;
+      toast.innerHTML = `
+        <span class="text-xl">${icons[type]}</span>
+        <span>${message}</span>
+      `;
+      
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideIn 0.4s ease reverse';
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+  </script>
+
+    <!-- Footer -->
+    
+    
+
+    
+
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
+        <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+    </footer>
+
+
+    <script>
+        if (document.getElementById('year')) {
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+    </script>
+
+
+</body>
+</html>
