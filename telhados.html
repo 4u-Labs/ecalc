@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Dimensionamento de Telhados | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+      min-height: 100vh;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px;
+      background: rgba(0, 255, 255, 0.03);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 255, 0.1);
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00ffff, #00d4ff, #0099ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      color: #888;
+      font-size: 1.1rem;
+    }
+    
+    /* Action Buttons */
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+    
+    .btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #00ffff, #00cccc);
+      color: #0a0a0f;
+      border-color: #00ffff;
+      box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(0, 255, 255, 0.4);
+    }
+    
+    .btn-outline {
+      background: rgba(0, 255, 255, 0.05);
+      color: #00ffff;
+      border-color: rgba(0, 255, 255, 0.3);
+    }
+    
+    .btn-outline:hover {
+      background: rgba(0, 255, 255, 0.1);
+      border-color: #00ffff;
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      border-color: #28a745;
+    }
+    
+    /* Main Grid Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    
+    @media (max-width: 1100px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Content Sections */
+    .content-section {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .content-section h2 {
+      color: #00ffff;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Form Elements */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .form-label {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-control, .form-select {
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+    
+    .form-control::placeholder {
+      color: #666;
+    }
+    
+    .form-select option {
+      background: #1a1a2e;
+      color: #fff;
+    }
+    
+    /* Input with unit */
+    .input-with-unit {
+      position: relative;
+    }
+    
+    .input-with-unit input {
+      width: 100%;
+      padding-right: 50px;
+    }
+    
+    .input-unit {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+    
+    /* Roof Preview */
+    .roof-preview {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      border: 1px solid rgba(0, 255, 255, 0.1);
+    }
+    
+    .roof-preview svg {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    /* Specs Grid */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+    }
+    
+    .spec-item {
+      background: rgba(0, 255, 255, 0.05);
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .spec-item:hover {
+      border-color: rgba(0, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .spec-label {
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .spec-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00ffff;
+    }
+    
+    .spec-value small {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #00cccc;
+    }
+    
+    /* Alerts */
+    .alert {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin: 18px 0;
+      border-left: 4px solid;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    
+    .alert-info {
+      background: rgba(0, 255, 255, 0.08);
+      border-color: #00ffff;
+      color: #00ffff;
+    }
+    
+    .alert-warning {
+      background: rgba(255, 193, 7, 0.1);
+      border-color: #ffc107;
+      color: #ffc107;
+    }
+    
+    .alert-success {
+      background: rgba(40, 167, 69, 0.1);
+      border-color: #28a745;
+      color: #28a745;
+    }
+    
+    .alert-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    
+    /* Info List */
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .info-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .info-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .info-list .label {
+      color: #999;
+    }
+    
+    .info-list .value {
+      color: #00ffff;
+      font-weight: 600;
+    }
+    
+    /* Result Header */
+    .resultado-header {
+      color: #00ffff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,255,255,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Costs Table */
+    .costs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    .costs-table th,
+    .costs-table td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .costs-table th {
+      color: #888;
+      font-weight: 500;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+    
+    .costs-table td {
+      color: #e0e0e0;
+    }
+    
+    .costs-table .cost-value {
+      color: #00ffff;
+      font-weight: 600;
+      text-align: right;
+    }
+    
+    .costs-table .total-row {
+      background: rgba(0, 255, 255, 0.05);
+    }
+    
+    .costs-table .total-row td {
+      color: #00ffff;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    
+    /* Waste Toggle */
+    .waste-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(255, 193, 7, 0.1);
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .waste-toggle label {
+      color: #ffc107;
+      font-size: 0.9rem;
+    }
+    
+    .waste-toggle input[type="number"] {
+      width: 70px;
+      padding: 8px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      border-radius: 6px;
+      color: #ffc107;
+      font-weight: 600;
+      text-align: center;
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #0f0f14 0%, #1a1a25 100%);
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px solid rgba(0,255,255,0.3);
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(0,255,255,0.2);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+    
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0,255,255,0.2);
+    }
+    
+    .modal-title {
+      color: #00ffff;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      line-height: 1;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-close:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .precos-grid {
+      display: grid;
+      gap: 12px;
+    }
+    
+    .preco-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,255,255,0.15);
+      border-radius: 10px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 15px;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .preco-item:hover {
+      border-color: rgba(0,255,255,0.3);
+    }
+    
+    .preco-label {
+      color: #e0e0e0;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    
+    .preco-descricao {
+      color: #666;
+      font-size: 0.8rem;
+      margin-top: 3px;
+    }
+    
+    .preco-input {
+      width: 130px;
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0,255,255,0.3);
+      color: #00ffff;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: right;
+    }
+    
+    .preco-input:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow: 0 0 10px rgba(0,255,255,0.3);
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .categoria-header {
+      color: #00ffff;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 25px 0 15px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0,255,255,0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .categoria-header:first-child {
+      margin-top: 0;
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      background: rgba(0,0,0,0.3);
+      padding: 5px;
+      border-radius: 12px;
+    }
+    
+    .tab-btn {
+      flex: 1;
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      color: #888;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-btn.active {
+      background: rgba(0, 255, 255, 0.15);
+      color: #00ffff;
+    }
+    
+    .tab-btn:hover:not(.active) {
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #666;
+      margin-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+      
+      .btn, .actions, .modal-overlay, .header {
+        display: none !important;
+      }
+      
+      .content-section {
+        border: 1px solid #ddd;
+        break-inside: avoid;
+      }
+      
+      .spec-value, .resultado-header, h2 {
+        color: #0066cc !important;
+      }
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      cursor: help;
+    }
+    
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a2e;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 100;
+      border: 1px solid rgba(0,255,255,0.3);
+    }
+    
+    .tooltip:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    /* Comparison Mode */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    
+    .comparison-card {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 20px;
+      border: 2px solid rgba(0,255,255,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .comparison-card:hover {
+      border-color: rgba(0,255,255,0.3);
+    }
+    
+    .comparison-card.best {
+      border-color: #28a745;
+      background: rgba(40, 167, 69, 0.1);
+    }
+    
+    .comparison-card h4 {
+      color: #00ffff;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    
+    .badge-success {
+      background: rgba(40, 167, 69, 0.2);
+      color: #28a745;
+    }
+    
+    .badge-warning {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+    }
+    
+    /* Loading Animation */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(0,255,255,0.1);
+      border-top-color: #00ffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <h1>🏠 Dimensionamento de Telhados</h1>
+    <p>Calcule materiais, custos e visualize seu projeto de cobertura</p>
+  </header>
+
+  <!-- Action Buttons -->
+  <div class="actions">
+    <button class="btn btn-primary" id="btnCalcular">
+      <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+      </svg>
+      Calcular
+    </button>
+    <button class="btn btn-outline" id="btnConfigurarPrecos">⚙️ Configurar Preços</button>
+    <button class="btn btn-outline" id="btnComparar">📊 Comparar Telhas</button>
+    <button class="btn btn-outline" id="btnImprimir">🖨️ Imprimir</button>
+    <button class="btn btn-outline" id="btnReset">🗑️ Limpar</button>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="main-grid">
+    <!-- Left Column - Inputs -->
+    <div class="left-column">
+      <!-- Dados da Cobertura -->
+      <section class="content-section">
+        <h2>📐 Dados da Cobertura</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Tipo de Telhado</label>
+            <select class="form-select" id="tipo-telhado">
+              <option value="duas-aguas">Duas Águas</option>
+              <option value="quatro-aguas">Quatro Águas</option>
+              <option value="uma-agua">Uma Água (Shed)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Largura do Vão</label>
+            <div class="input-with-unit">
+              <input class="form-control" id="largura-vao" type="number" step="0.1" value="6" min="1"/>
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Comprimento da Casa</label>
+            <div class="input-with-unit">
+              <input class="form-control" id="comp-casa" type="number" step="0.1" value="10" min="1"/>
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label tooltip" data-tooltip="Projeção horizontal do beiral nas laterais">Beiral (Caída d'água)</label>
+            <div class="input-with-unit">
+              <input class="form-control" id="beiral-agua" type="number" step="0.1" value="0.5" min="0"/>
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label tooltip" data-tooltip="Projeção horizontal do beiral frontal/traseiro">Beiral (Frontal/Oitão)</label>
+            <div class="input-with-unit">
+              <input class="form-control" id="beiral-oitao" type="number" step="0.1" value="0.5" min="0"/>
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label tooltip" data-tooltip="Inclinação recomendada varia por tipo de telha">Inclinação</label>
+            <div class="input-with-unit">
+              <input class="form-control" id="inclinacao" type="number" step="1" value="30" min="5" max="60"/>
+              <span class="input-unit">%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Materiais -->
+      <section class="content-section">
+        <h2>🧱 Materiais</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Tipo de Telha</label>
+            <select class="form-select" id="tipo-telha">
+              <option value="ceramica">Cerâmica (Romana/Colonial)</option>
+              <option value="concreto">Concreto</option>
+              <option value="fibrocimento">Fibrocimento (Ondulada)</option>
+              <option value="metalica">Metálica (Trapézio)</option>
+              <option value="shingle">Shingle (Asfáltica)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label tooltip" data-tooltip="Distância entre os caibros (geralmente 0.5m)">Espaçamento Caibros</label>
+            <div class="input-with-unit">
+              <input class="form-control" id="esp-caibros" type="number" step="0.05" value="0.5" min="0.3" max="1.5"/>
+              <span class="input-unit">m</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="waste-toggle">
+          <label>⚠️ Adicionar perda/desperdício:</label>
+          <input type="number" id="fator-perda" value="10" min="0" max="30"/>
+          <span style="color: #ffc107;">%</span>
+        </div>
+      </section>
+
+      <!-- Preview do Telhado -->
+      <section class="content-section">
+        <h2>👁️ Visualização</h2>
+        <div class="roof-preview" id="roof-preview">
+          <svg id="roof-svg" viewBox="0 0 400 250" width="100%" height="250">
+            <!-- Será gerado dinamicamente -->
+          </svg>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right Column - Results -->
+    <div class="right-column">
+      <section class="content-section">
+        <h2>📊 Resultados</h2>
+        
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="resumo">Resumo</button>
+          <button class="tab-btn" data-tab="materiais">Materiais</button>
+          <button class="tab-btn" data-tab="custos">Custos</button>
+        </div>
+        
+        <div id="tab-resumo" class="tab-content active">
+          <div id="resultado-resumo"></div>
+        </div>
+        
+        <div id="tab-materiais" class="tab-content">
+          <div id="resultado-materiais"></div>
+        </div>
+        
+        <div id="tab-custos" class="tab-content">
+          <div id="resultado-custos"></div>
+        </div>
+      </section>
+
+      <!-- Referências -->
+      <section class="content-section">
+        <h2>📚 Referências Normativas</h2>
+        <ul class="info-list">
+          <li>
+            <span class="label">NBR 15310</span>
+            <span class="value">Telhas Cerâmicas</span>
+          </li>
+          <li>
+            <span class="label">NBR 13858-2</span>
+            <span class="value">Telhas de Concreto</span>
+          </li>
+          <li>
+            <span class="label">NBR 7196</span>
+            <span class="value">Fibrocimento</span>
+          </li>
+          <li>
+            <span class="label">NBR 14514</span>
+            <span class="value">Telhas Metálicas</span>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Preços -->
+<div id="modalPrecos" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">⚙️ Configurar Preços de Materiais</h3>
+      <button class="modal-close" onclick="fecharModalPrecos()">×</button>
+    </div>
+    
+    <div class="categoria-header">🧱 Telhas</div>
+    <div class="precos-grid">
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Telha Cerâmica (un)</div>
+          <div class="preco-descricao">Preço por unidade</div>
+        </div>
+        <input type="number" id="preco-telha-ceramica" class="preco-input" step="0.1" min="0" value="2.50">
+      </div>
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Telha Concreto (un)</div>
+          <div class="preco-descricao">Preço por unidade</div>
+        </div>
+        <input type="number" id="preco-telha-concreto" class="preco-input" step="0.1" min="0" value="4.00">
+      </div>
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Telha Fibrocimento (m²)</div>
+          <div class="preco-descricao">Preço por m² (chapa)</div>
+        </div>
+        <input type="number" id="preco-telha-fibrocimento" class="preco-input" step="1" min="0" value="45.00">
+      </div>
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Telha Metálica (m²)</div>
+          <div class="preco-descricao">Preço por m² (chapa)</div>
+        </div>
+        <input type="number" id="preco-telha-metalica" class="preco-input" step="1" min="0" value="75.00">
+      </div>
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Telha Shingle (m²)</div>
+          <div class="preco-descricao">Preço por m²</div>
+        </div>
+        <input type="number" id="preco-telha-shingle" class="preco-input" step="1" min="0" value="95.00">
+      </div>
+    </div>
+    
+    <div class="categoria-header">🪵 Madeiramento (Metro Linear)</div>
+    <div class="precos-grid">
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Ripa (m)</div>
+          <div class="preco-descricao">Preço por metro linear</div>
+        </div>
+        <input type="number" id="preco-ripa" class="preco-input" step="0.1" min="0" value="3.00">
+      </div>
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Caibro (m)</div>
+          <div class="preco-descricao">Preço por metro linear</div>
+        </div>
+        <input type="number" id="preco-caibro" class="preco-input" step="0.1" min="0" value="6.50">
+      </div>
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Terça (m)</div>
+          <div class="preco-descricao">Preço por metro linear</div>
+        </div>
+        <input type="number" id="preco-terca" class="preco-input" step="0.1" min="0" value="15.00">
+      </div>
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Cumeeira / Espigão (m)</div>
+          <div class="preco-descricao">Peça de acabamento</div>
+        </div>
+        <input type="number" id="preco-cumeeira" class="preco-input" step="0.1" min="0" value="12.00">
+      </div>
+    </div>
+
+    <div class="categoria-header">👷 Serviços</div>
+    <div class="precos-grid">
+      <div class="preco-item">
+        <div>
+          <div class="preco-label">Mão de Obra (por m²)</div>
+          <div class="preco-descricao">Custo de instalação por m² de telhado</div>
+        </div>
+        <input type="number" id="preco-mao-de-obra" class="preco-input" step="1" min="0" value="50.00">
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="restaurarPrecosTelhados()">Restaurar Padrão</button>
+      <button class="btn btn-primary" onclick="salvarPrecosTelhados()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Comparação -->
+<div id="modalComparacao" class="modal-overlay">
+  <div class="modal-content" style="max-width: 1100px;">
+    <div class="modal-header">
+      <h3 class="modal-title">📊 Comparação de Tipos de Telha</h3>
+      <button class="modal-close" onclick="fecharModalComparacao()">×</button>
+    </div>
+    
+    <div id="comparacao-content"></div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="fecharModalComparacao()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  &copy; <span id="ano"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia
+</footer>
+
+<script>
+// ============================================
+// CONFIGURAÇÃO DE PREÇOS
+// ============================================
+const precosTelhadosPadrao = {
+  precoTelhaCeramica: 3.80,
+  precoTelhaConcreto: 6.20,
+  precoTelhaFibrocimento: 75.00,
+  precoTelhaMetalica: 115.00,
+  precoTelhaShingle: 155.00,
+  precoRipa: 5.50,
+  precoCaibro: 11.50,
+  precoTerca: 26.00,
+  precoCumeeira: 12.00,
+  precoMaoDeObra: 85.00
+};
+
+let precosTelhados = JSON.parse(localStorage.getItem('precosTelhados')) || { ...precosTelhadosPadrao };
+
+// ============================================
+// DADOS DAS TELHAS
+// ============================================
+const TILE_DATA = {
+  'ceramica': {
+    nome: 'Cerâmica (Romana/Colonial)',
+    consumo: 16,
+    peso: 42,
+    espRipas: 0.35,
+    minIncl: 30,
+    maxIncl: 50,
+    unit: 'un',
+    precoKey: 'precoTelhaCeramica',
+    durabilidade: 'Alta',
+    manutencao: 'Média',
+    isolamento: 'Bom',
+    cor: '#c9834e'
+  },
+  'concreto': {
+    nome: 'Concreto',
+    consumo: 11,
+    peso: 49,
+    espRipas: 0.38,
+    minIncl: 30,
+    maxIncl: 50,
+    unit: 'un',
+    precoKey: 'precoTelhaConcreto',
+    durabilidade: 'Muito Alta',
+    manutencao: 'Baixa',
+    isolamento: 'Bom',
+    cor: '#808080'
+  },
+  'fibrocimento': {
+    nome: 'Fibrocimento (Ondulada)',
+    consumo: 1.15,
+    peso: 16,
+    espRipas: 0.54,
+    minIncl: 15,
+    maxIncl: 35,
+    unit: 'm²',
+    precoKey: 'precoTelhaFibrocimento',
+    durabilidade: 'Média',
+    manutencao: 'Baixa',
+    isolamento: 'Médio',
+    cor: '#9e9e9e'
+  },
+  'metalica': {
+    nome: 'Metálica (Trapézio)',
+    consumo: 1.08,
+    peso: 6,
+    espRipas: 1.50,
+    minIncl: 10,
+    maxIncl: 30,
+    unit: 'm²',
+    precoKey: 'precoTelhaMetalica',
+    durabilidade: 'Alta',
+    manutencao: 'Baixa',
+    isolamento: 'Baixo',
+    cor: '#607d8b'
+  },
+  'shingle': {
+    nome: 'Shingle (Asfáltica)',
+    consumo: 1.00,
+    peso: 12,
+    espRipas: 0,
+    minIncl: 20,
+    maxIncl: 85,
+    unit: 'm²',
+    precoKey: 'precoTelhaShingle',
+    durabilidade: 'Alta',
+    manutencao: 'Muito Baixa',
+    isolamento: 'Médio',
+    cor: '#3e4551'
+  }
+};
+
+// ============================================
+// FUNÇÕES PRINCIPAIS
+// ============================================
+function calcular() {
+  // Obter valores dos inputs
+  const tipoTelhado = document.getElementById('tipo-telhado').value;
+  const larguraVao = parseFloat(document.getElementById('largura-vao').value) || 0;
+  const compCasa = parseFloat(document.getElementById('comp-casa').value) || 0;
+  const beiralAgua = parseFloat(document.getElementById('beiral-agua').value) || 0;
+  const beiralOitao = parseFloat(document.getElementById('beiral-oitao').value) || 0;
+  const inclinacaoPerc = parseFloat(document.getElementById('inclinacao').value) || 30;
+  const tipoTelhaKey = document.getElementById('tipo-telha').value;
+  const espCaibros = parseFloat(document.getElementById('esp-caibros').value) || 0.5;
+  const fatorPerda = parseFloat(document.getElementById('fator-perda').value) || 0;
+
+  const telha = TILE_DATA[tipoTelhaKey];
+
+  // Validação
+  if (!larguraVao || !compCasa) {
+    document.getElementById('resultado-resumo').innerHTML = `
+      <div class="alert alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <span>Por favor, preencha as dimensões do telhado.</span>
+      </div>
+    `;
+    return;
+  }
+
+  // Cálculos geométricos
+  const inclinacaoRad = Math.atan(inclinacaoPerc / 100);
+  const inclinacaoAng = inclinacaoRad * (180 / Math.PI);
+  const fatorInclinacao = 1 / Math.cos(inclinacaoRad);
+
+  const larguraTotalTelhado = larguraVao + (2 * beiralAgua);
+  const compTotalTelhado = compCasa + (2 * beiralOitao);
+
+  let alturaCumeeira = 0;
+  let areaTotal = 0;
+  let totalCumeeira = 0;
+  let totalEspigao = 0;
+  let numAguas = 1;
+
+  const larguraPlanoInclinado = (tipoTelhado === 'uma-agua' ? larguraTotalTelhado : larguraTotalTelhado / 2) * fatorInclinacao;
+
+  switch(tipoTelhado) {
+    case 'uma-agua':
+      alturaCumeeira = larguraTotalTelhado * (inclinacaoPerc / 100);
+      areaTotal = (larguraTotalTelhado * fatorInclinacao) * compTotalTelhado;
+      totalCumeeira = 0;
+      numAguas = 1;
+      break;
+      
+    case 'duas-aguas':
+      alturaCumeeira = (larguraTotalTelhado / 2) * (inclinacaoPerc / 100);
+      areaTotal = 2 * (larguraPlanoInclinado * compTotalTelhado);
+      totalCumeeira = compTotalTelhado;
+      numAguas = 2;
+      break;
+      
+    case 'quatro-aguas':
+      const L = Math.max(compTotalTelhado, larguraTotalTelhado);
+      const W = Math.min(compTotalTelhado, larguraTotalTelhado);
+      alturaCumeeira = (W / 2) * (inclinacaoPerc / 100);
+      const compCumeeiraCalc = L - W;
+      const alturaInclinada = (W / 2) * fatorInclinacao;
+      areaTotal = alturaInclinada * (L + W + compCumeeiraCalc);
+      totalCumeeira = compCumeeiraCalc;
+      totalEspigao = 4 * alturaInclinada;
+      numAguas = 4;
+      break;
+  }
+
+  // Cálculos de materiais
+  const areaComPerda = areaTotal * (1 + fatorPerda / 100);
+  const totalTelhas = areaComPerda * telha.consumo;
+  const totalPeso = areaTotal * telha.peso;
+  const totalRipas = areaComPerda / (telha.espRipas || 0.35);
+  const totalCaibros = areaComPerda / espCaibros;
+  const totalTercas = areaTotal / 1.5; // Espaçamento típico de 1.5m
+
+  // Cálculos de custos
+  const precoTelha = precosTelhados[telha.precoKey];
+  const custoTelha = totalTelhas * precoTelha;
+  const custoRipas = totalRipas * precosTelhados.precoRipa;
+  const custoCaibros = totalCaibros * precosTelhados.precoCaibro;
+  const custoTercas = totalTercas * precosTelhados.precoTerca;
+  const custoCumeeiraEspigao = (totalCumeeira + totalEspigao) * precosTelhados.precoCumeeira;
+  const custoMadeiramento = custoRipas + custoCaibros + custoTercas + custoCumeeiraEspigao;
+  const custoMaoDeObra = areaTotal * precosTelhados.precoMaoDeObra;
+  const custoTotalGeral = custoTelha + custoMadeiramento + custoMaoDeObra;
+
+  // Armazenar dados para uso posterior
+  window.dadosCalculados = {
+    tipoTelhado,
+    larguraTotalTelhado,
+    compTotalTelhado,
+    areaTotal,
+    areaComPerda,
+    inclinacaoAng,
+    inclinacaoPerc,
+    alturaCumeeira,
+    totalPeso,
+    telha,
+    tipoTelhaKey,
+    totalTelhas,
+    totalRipas,
+    totalCaibros,
+    totalTercas,
+    totalCumeeira,
+    totalEspigao,
+    numAguas,
+    fatorPerda,
+    custos: {
+      custoTelha,
+      custoRipas,
+      custoCaibros,
+      custoTercas,
+      custoCumeeiraEspigao,
+      custoMadeiramento,
+      custoMaoDeObra,
+      custoTotalGeral
+    }
+  };
+
+  // Renderizar resultados
+  renderizarResumo(window.dadosCalculados);
+  renderizarMateriais(window.dadosCalculados);
+  renderizarCustos(window.dadosCalculados);
+  renderizarPreview(window.dadosCalculados);
+}
+
+function renderizarResumo(dados) {
+  const { areaTotal, inclinacaoAng, inclinacaoPerc, alturaCumeeira, totalPeso, telha, numAguas, fatorPerda } = dados;
+  
+  // Verificar inclinação
+  const inclinacaoOk = inclinacaoPerc >= telha.minIncl && inclinacaoPerc <= telha.maxIncl;
+  
+  let html = `
+    <div class="specs-grid">
+      <div class="spec-item">
+        <div class="spec-label">Área Total</div>
+        <div class="spec-value">${areaTotal.toFixed(1)} <small>m²</small></div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Inclinação</div>
+        <div class="spec-value">${inclinacaoAng.toFixed(1)}<small>°</small></div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Alt. Cumeeira</div>
+        <div class="spec-value">${alturaCumeeira.toFixed(2)} <small>m</small></div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Peso Total</div>
+        <div class="spec-value">${(totalPeso / 1000).toFixed(2)} <small>ton</small></div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Nº de Águas</div>
+        <div class="spec-value">${numAguas}</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Perda</div>
+        <div class="spec-value">${fatorPerda} <small>%</small></div>
+      </div>
+    </div>
+    
+    <div class="alert ${inclinacaoOk ? 'alert-success' : 'alert-warning'}" style="margin-top: 20px;">
+      <span class="alert-icon">${inclinacaoOk ? '✅' : '⚠️'}</span>
+      <div>
+        <strong>Inclinação ${inclinacaoOk ? 'adequada' : 'fora do recomendado'}!</strong><br>
+        <span style="font-size: 0.9rem; opacity: 0.9;">
+          Para ${telha.nome}, recomenda-se entre <strong>${telha.minIncl}%</strong> e <strong>${telha.maxIncl}%</strong>.
+        </span>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('resultado-resumo').innerHTML = html;
+}
+
+function renderizarMateriais(dados) {
+  const { telha, totalTelhas, totalRipas, totalCaibros, totalTercas, totalCumeeira, totalEspigao, areaTotal, areaComPerda } = dados;
+  
+  let html = `
+    <div class="resultado-header">🧱 Telhas (${telha.nome})</div>
+    <div class="specs-grid">
+      <div class="spec-item">
+        <div class="spec-label">Quantidade</div>
+        <div class="spec-value">${Math.ceil(totalTelhas)} <small>${telha.unit}</small></div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Consumo</div>
+        <div class="spec-value">${telha.consumo} <small>${telha.unit}/m²</small></div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Peso/m²</div>
+        <div class="spec-value">${telha.peso} <small>kg</small></div>
+      </div>
+    </div>
+    
+    <div class="resultado-header" style="margin-top: 25px;">🪵 Madeiramento</div>
+    <ul class="info-list">
+      <li>
+        <span class="label">Ripas</span>
+        <span class="value">${Math.ceil(totalRipas)} m</span>
+      </li>
+      <li>
+        <span class="label">Caibros</span>
+        <span class="value">${Math.ceil(totalCaibros)} m</span>
+      </li>
+      <li>
+        <span class="label">Terças</span>
+        <span class="value">${Math.ceil(totalTercas)} m</span>
+      </li>
+      <li>
+        <span class="label">Cumeeira</span>
+        <span class="value">${Math.ceil(totalCumeeira)} m</span>
+      </li>
+      ${totalEspigao > 0 ? `
+      <li>
+        <span class="label">Espigões</span>
+        <span class="value">${Math.ceil(totalEspigao)} m</span>
+      </li>
+      ` : ''}
+    </ul>
+    
+    <div class="alert alert-info" style="margin-top: 20px;">
+      <span class="alert-icon">📐</span>
+      <div>
+        <strong>Área líquida:</strong> ${areaTotal.toFixed(1)} m²<br>
+        <strong>Área com perda:</strong> ${areaComPerda.toFixed(1)} m²
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('resultado-materiais').innerHTML = html;
+}
+
+function renderizarCustos(dados) {
+  const { custos, areaTotal } = dados;
+  const custoPorM2 = custos.custoTotalGeral / areaTotal;
+  
+  let html = `
+    <table class="costs-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th style="text-align: right;">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🧱 Telhas</td>
+          <td class="cost-value">R$ ${custos.custoTelha.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>🪵 Ripas</td>
+          <td class="cost-value">R$ ${custos.custoRipas.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>🪵 Caibros</td>
+          <td class="cost-value">R$ ${custos.custoCaibros.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>🪵 Terças</td>
+          <td class="cost-value">R$ ${custos.custoTercas.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>🏠 Cumeeira/Espigões</td>
+          <td class="cost-value">R$ ${custos.custoCumeeiraEspigao.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>👷 Mão de Obra</td>
+          <td class="cost-value">R$ ${custos.custoMaoDeObra.toFixed(2)}</td>
+        </tr>
+        <tr class="total-row">
+          <td><strong>💰 TOTAL</strong></td>
+          <td class="cost-value">R$ ${custos.custoTotalGeral.toFixed(2)}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="specs-grid" style="margin-top: 20px;">
+      <div class="spec-item">
+        <div class="spec-label">Custo por m²</div>
+        <div class="spec-value">R$ ${custoPorM2.toFixed(2)}</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Material</div>
+        <div class="spec-value">R$ ${(custos.custoTelha + custos.custoMadeiramento).toFixed(0)}</div>
+      </div>
+    </div>
+    
+    <div class="alert alert-info" style="margin-top: 20px; text-align: center;">
+      <span>💡 Valores estimados para orçamento. Consulte fornecedores locais para valores atualizados.</span>
+    </div>
+  `;
+  
+  document.getElementById('resultado-custos').innerHTML = html;
+}
+
+function renderizarPreview(dados) {
+  const { tipoTelhado, larguraTotalTelhado, compTotalTelhado, alturaCumeeira, telha } = dados;
+  const svg = document.getElementById('roof-svg');
+  
+  // Dimensões do SVG
+  const width = 400;
+  const height = 250;
+  const padding = 30;
+  
+  // Escala
+  const maxDim = Math.max(larguraTotalTelhado, compTotalTelhado, alturaCumeeira * 2);
+  const scale = (width - 2 * padding) / maxDim * 0.7;
+  
+  const centerX = width / 2;
+  const baseY = height - padding - 30;
+  
+  let svgContent = '';
+  
+  // Grade de fundo
+  svgContent += `
+    <defs>
+      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,255,255,0.1)" stroke-width="0.5"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#grid)"/>
+  `;
+  
+  const roofColor = telha.cor || '#00aaaa';
+  const shadowColor = 'rgba(0,0,0,0.3)';
+  
+  switch(tipoTelhado) {
+    case 'uma-agua':
+      // Vista frontal - uma água
+      const w1 = larguraTotalTelhado * scale;
+      const h1 = alturaCumeeira * scale;
+      
+      svgContent += `
+        <polygon points="${centerX - w1/2},${baseY} ${centerX + w1/2},${baseY} ${centerX + w1/2},${baseY - h1} ${centerX - w1/2},${baseY}"
+                 fill="${roofColor}" stroke="#00ffff" stroke-width="2"/>
+        <line x1="${centerX - w1/2}" y1="${baseY}" x2="${centerX + w1/2}" y2="${baseY}" stroke="#fff" stroke-width="3"/>
+      `;
+      break;
+      
+    case 'duas-aguas':
+      // Vista frontal - duas águas
+      const w2 = larguraTotalTelhado * scale;
+      const h2 = alturaCumeeira * scale;
+      
+      svgContent += `
+        <!-- Sombra -->
+        <polygon points="${centerX - w2/2 + 5},${baseY + 5} ${centerX + 5},${baseY - h2 + 5} ${centerX + w2/2 + 5},${baseY + 5}"
+                 fill="${shadowColor}"/>
+        <!-- Lado esquerdo -->
+        <polygon points="${centerX - w2/2},${baseY} ${centerX},${baseY - h2} ${centerX},${baseY}"
+                 fill="${roofColor}" stroke="#00ffff" stroke-width="2"/>
+        <!-- Lado direito -->
+        <polygon points="${centerX},${baseY} ${centerX},${baseY - h2} ${centerX + w2/2},${baseY}"
+                 fill="${roofColor}" stroke="#00ffff" stroke-width="2" opacity="0.85"/>
+        <!-- Base -->
+        <line x1="${centerX - w2/2}" y1="${baseY}" x2="${centerX + w2/2}" y2="${baseY}" stroke="#fff" stroke-width="3"/>
+        <!-- Cumeeira -->
+        <circle cx="${centerX}" cy="${baseY - h2}" r="4" fill="#00ffff"/>
+      `;
+      break;
+      
+    case 'quatro-aguas':
+      // Vista isométrica simplificada - quatro águas
+      const w4 = larguraTotalTelhado * scale * 0.8;
+      const l4 = compTotalTelhado * scale * 0.5;
+      const h4 = alturaCumeeira * scale;
+      
+      const offsetY = 30;
+      const cumLen = (compTotalTelhado - larguraTotalTelhado) * scale * 0.5;
+      
+      svgContent += `
+        <!-- Face traseira esquerda -->
+        <polygon points="${centerX - w4/2},${baseY - offsetY} ${centerX - cumLen/2},${baseY - h4 - offsetY/2} ${centerX},${baseY - h4 - offsetY/2} ${centerX - w4/2 + l4/2},${baseY - offsetY - l4}"
+                 fill="${roofColor}" stroke="#00ffff" stroke-width="1.5" opacity="0.6"/>
+        <!-- Face traseira direita -->
+        <polygon points="${centerX + w4/2},${baseY - offsetY} ${centerX + cumLen/2},${baseY - h4 - offsetY/2} ${centerX},${baseY - h4 - offsetY/2} ${centerX + w4/2 - l4/2},${baseY - offsetY - l4}"
+                 fill="${roofColor}" stroke="#00ffff" stroke-width="1.5" opacity="0.6"/>
+        <!-- Face frontal esquerda -->
+        <polygon points="${centerX - w4/2},${baseY} ${centerX - cumLen/2},${baseY - h4} ${centerX},${baseY - h4} ${centerX - w4/2 + l4/2},${baseY + l4}"
+                 fill="${roofColor}" stroke="#00ffff" stroke-width="2" opacity="0.9"/>
+        <!-- Face frontal direita -->
+        <polygon points="${centerX + w4/2},${baseY} ${centerX + cumLen/2},${baseY - h4} ${centerX},${baseY - h4} ${centerX + w4/2 - l4/2},${baseY + l4}"
+                 fill="${roofColor}" stroke="#00ffff" stroke-width="2"/>
+        <!-- Cumeeira -->
+        <line x1="${centerX - cumLen/2}" y1="${baseY - h4}" x2="${centerX + cumLen/2}" y2="${baseY - h4}" stroke="#00ffff" stroke-width="3"/>
+      `;
+      break;
+  }
+  
+  // Dimensões
+  svgContent += `
+    <text x="${centerX}" y="${height - 5}" text-anchor="middle" fill="#888" font-size="11">
+      ${larguraTotalTelhado.toFixed(1)}m × ${compTotalTelhado.toFixed(1)}m | Altura: ${alturaCumeeira.toFixed(2)}m
+    </text>
+  `;
+  
+  svg.innerHTML = svgContent;
+}
+
+// ============================================
+// COMPARAÇÃO DE TELHAS
+// ============================================
+function compararTelhas() {
+  if (!window.dadosCalculados) {
+    alert('Por favor, calcule primeiro os dados do telhado.');
+    return;
+  }
+  
+  const { areaTotal, areaComPerda } = window.dadosCalculados;
+  let comparacoes = [];
+  
+  // Calcular para cada tipo de telha
+  Object.keys(TILE_DATA).forEach(key => {
+    const telha = TILE_DATA[key];
+    const qtdTelhas = areaComPerda * telha.consumo;
+    const peso = areaTotal * telha.peso;
+    const custoTelha = qtdTelhas * precosTelhados[telha.precoKey];
+    const custoMaoDeObra = areaTotal * precosTelhados.precoMaoDeObra;
+    const custoTotal = custoTelha + custoMaoDeObra;
+    
+    comparacoes.push({
+      key,
+      nome: telha.nome,
+      qtdTelhas: Math.ceil(qtdTelhas),
+      unit: telha.unit,
+      peso,
+      custoTotal,
+      custoM2: custoTotal / areaTotal,
+      durabilidade: telha.durabilidade,
+      manutencao: telha.manutencao,
+      isolamento: telha.isolamento,
+      minIncl: telha.minIncl,
+      maxIncl: telha.maxIncl
+    });
+  });
+  
+  // Ordenar por custo
+  comparacoes.sort((a, b) => a.custoTotal - b.custoTotal);
+  
+  let html = '<div class="comparison-grid">';
+  
+  comparacoes.forEach((comp, index) => {
+    const isBest = index === 0;
+    const isSelected = comp.key === window.dadosCalculados.tipoTelhaKey;
+    
+    html += `
+      <div class="comparison-card ${isBest ? 'best' : ''}" style="${isSelected ? 'border-color: #00ffff;' : ''}">
+        <h4>
+          ${comp.nome}
+          ${isBest ? '<span class="badge badge-success">Mais Econômico</span>' : ''}
+          ${isSelected ? '<span class="badge badge-warning">Selecionado</span>' : ''}
+        </h4>
+        <ul class="info-list" style="font-size: 0.9rem;">
+          <li>
+            <span class="label">Quantidade</span>
+            <span class="value">${comp.qtdTelhas} ${comp.unit}</span>
+          </li>
+          <li>
+            <span class="label">Peso Total</span>
+            <span class="value">${(comp.peso / 1000).toFixed(2)} ton</span>
+          </li>
+          <li>
+            <span class="label">Custo Total</span>
+            <span class="value">R$ ${comp.custoTotal.toFixed(2)}</span>
+          </li>
+          <li>
+            <span class="label">Custo/m²</span>
+            <span class="value">R$ ${comp.custoM2.toFixed(2)}</span>
+          </li>
+          <li>
+            <span class="label">Inclinação</span>
+            <span class="value">${comp.minIncl}% - ${comp.maxIncl}%</span>
+          </li>
+          <li>
+            <span class="label">Durabilidade</span>
+            <span class="value">${comp.durabilidade}</span>
+          </li>
+          <li>
+            <span class="label">Manutenção</span>
+            <span class="value">${comp.manutencao}</span>
+          </li>
+          <li>
+            <span class="label">Isolamento</span>
+            <span class="value">${comp.isolamento}</span>
+          </li>
+        </ul>
+        <button class="btn btn-outline" style="width: 100%; margin-top: 15px;" onclick="selecionarTelha('${comp.key}')">
+          Selecionar
+        </button>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  
+  document.getElementById('comparacao-content').innerHTML = html;
+  document.getElementById('modalComparacao').classList.add('active');
+}
+
+function selecionarTelha(key) {
+  document.getElementById('tipo-telha').value = key;
+  fecharModalComparacao();
+  calcular();
+}
+
+// ============================================
+// MODAIS
+// ============================================
+function abrirModalPrecos() {
+  document.getElementById('preco-telha-ceramica').value = precosTelhados.precoTelhaCeramica.toFixed(2);
+  document.getElementById('preco-telha-concreto').value = precosTelhados.precoTelhaConcreto.toFixed(2);
+  document.getElementById('preco-telha-fibrocimento').value = precosTelhados.precoTelhaFibrocimento.toFixed(2);
+  document.getElementById('preco-telha-metalica').value = precosTelhados.precoTelhaMetalica.toFixed(2);
+  document.getElementById('preco-telha-shingle').value = precosTelhados.precoTelhaShingle.toFixed(2);
+  document.getElementById('preco-ripa').value = precosTelhados.precoRipa.toFixed(2);
+  document.getElementById('preco-caibro').value = precosTelhados.precoCaibro.toFixed(2);
+  document.getElementById('preco-terca').value = precosTelhados.precoTerca.toFixed(2);
+  document.getElementById('preco-cumeeira').value = precosTelhados.precoCumeeira.toFixed(2);
+  document.getElementById('preco-mao-de-obra').value = precosTelhados.precoMaoDeObra.toFixed(2);
+  document.getElementById('modalPrecos').classList.add('active');
+}
+
+function fecharModalPrecos() {
+  document.getElementById('modalPrecos').classList.remove('active');
+}
+
+function fecharModalComparacao() {
+  document.getElementById('modalComparacao').classList.remove('active');
+}
+
+function salvarPrecosTelhados() {
+  precosTelhados = {
+    precoTelhaCeramica: parseFloat(document.getElementById('preco-telha-ceramica').value) || 0,
+    precoTelhaConcreto: parseFloat(document.getElementById('preco-telha-concreto').value) || 0,
+    precoTelhaFibrocimento: parseFloat(document.getElementById('preco-telha-fibrocimento').value) || 0,
+    precoTelhaMetalica: parseFloat(document.getElementById('preco-telha-metalica').value) || 0,
+    precoTelhaShingle: parseFloat(document.getElementById('preco-telha-shingle').value) || 0,
+    precoRipa: parseFloat(document.getElementById('preco-ripa').value) || 0,
+    precoCaibro: parseFloat(document.getElementById('preco-caibro').value) || 0,
+    precoTerca: parseFloat(document.getElementById('preco-terca').value) || 0,
+    precoCumeeira: parseFloat(document.getElementById('preco-cumeeira').value) || 0,
+    precoMaoDeObra: parseFloat(document.getElementById('preco-mao-de-obra').value) || 0
+  };
+  
+  localStorage.setItem('precosTelhados', JSON.stringify(precosTelhados));
+  calcular();
+  fecharModalPrecos();
+  
+  // Feedback visual
+  const btn = document.getElementById('btnConfigurarPrecos');
+  const textoOriginal = btn.innerHTML;
+  btn.innerHTML = '✓ Salvo!';
+  btn.classList.remove('btn-outline');
+  btn.classList.add('btn-success');
+  
+  setTimeout(() => {
+    btn.innerHTML = textoOriginal;
+    btn.classList.remove('btn-success');
+    btn.classList.add('btn-outline');
+  }, 2000);
+}
+
+function restaurarPrecosTelhados() {
+  if (confirm('Deseja restaurar os preços padrão?')) {
+    precosTelhados = { ...precosTelhadosPadrao };
+    localStorage.setItem('precosTelhados', JSON.stringify(precosTelhados));
+    abrirModalPrecos();
+    calcular();
+  }
+}
+
+// ============================================
+// TABS
+// ============================================
+function initTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.dataset.tab;
+      
+      // Remover active de todos
+      tabBtns.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      // Adicionar active ao clicado
+      btn.classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    });
+  });
+}
+
+// ============================================
+// RESET
+// ============================================
+function resetForm() {
+  document.getElementById('tipo-telhado').value = 'duas-aguas';
+  document.getElementById('largura-vao').value = '6';
+  document.getElementById('comp-casa').value = '10';
+  document.getElementById('beiral-agua').value = '0.5';
+  document.getElementById('beiral-oitao').value = '0.5';
+  document.getElementById('inclinacao').value = '30';
+  document.getElementById('tipo-telha').value = 'ceramica';
+  document.getElementById('esp-caibros').value = '0.5';
+  document.getElementById('fator-perda').value = '10';
+  
+  calcular();
+}
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Inicializar tabs
+  initTabs();
+  
+  // Botões principais
+  document.getElementById('btnCalcular').addEventListener('click', calcular);
+  document.getElementById('btnReset').addEventListener('click', resetForm);
+  document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
+  document.getElementById('btnComparar').addEventListener('click', compararTelhas);
+  document.getElementById('btnImprimir').addEventListener('click', () => window.print());
+  
+  // Cálculo automático ao mudar inputs
+  const inputs = ['tipo-telhado', 'largura-vao', 'comp-casa', 'beiral-agua', 'beiral-oitao', 
+                  'inclinacao', 'tipo-telha', 'esp-caibros', 'fator-perda'];
+  
+  inputs.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('input', calcular);
+      element.addEventListener('change', calcular);
+    }
+  });
+  
+  // Fechar modais ao clicar fora
+  document.getElementById('modalPrecos').addEventListener('click', (e) => {
+    if (e.target.id === 'modalPrecos') fecharModalPrecos();
+  });
+  
+  document.getElementById('modalComparacao').addEventListener('click', (e) => {
+    if (e.target.id === 'modalComparacao') fecharModalComparacao();
+  });
+  
+  // Fechar modais com ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      fecharModalPrecos();
+      fecharModalComparacao();
+    }
+  });
+  
+  // Ano no footer
+  document.getElementById('ano').textContent = new Date().getFullYear();
+  
+  // Calcular inicialmente
+  calcular();
+});
+</script>
+</body>
+</html>
