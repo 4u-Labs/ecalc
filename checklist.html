@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#050512" />
+  <title>Checklist de Fiscalização | Ferramentas de Engenharia</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    :root{
+      --bg0:#050512;
+      --bg1:#07071a;
+      --card: rgba(255,255,255,.04);
+      --card2: rgba(10,10,30,.55);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(0,255,255,.25);
+      --txt: rgba(232,232,240,.92);
+      --muted: rgba(160,160,180,.85);
+      --muted2: rgba(120,120,140,.85);
+      --shadow: 0 16px 50px rgba(0,0,0,.45);
+      --shadow2: 0 10px 40px rgba(0,255,255,.12);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      background: radial-gradient(1200px 700px at 18% 86%, rgba(0,255,255,.10), transparent 60%),
+                  radial-gradient(1200px 700px at 84% 18%, rgba(139,27,247,.10), transparent 58%),
+                  radial-gradient(900px 500px at 50% 50%, rgba(20, 20, 50, 0.65), transparent 70%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      color: var(--txt);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    /* Animated background layer */
+    .bg-animation{
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 80%, rgba(0,255,255,0.06) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 50% at 80% 20%, rgba(139,27,247,0.06) 0%, transparent 55%);
+    }
+    .bg-animation::before{
+      content:'';
+      position:absolute; inset:-50%;
+      background:
+        radial-gradient(circle at 30% 70%, rgba(0,255,255,0.03) 0%, transparent 42%),
+        radial-gradient(circle at 70% 30%, rgba(139,27,247,0.03) 0%, transparent 42%);
+      filter: blur(0.2px);
+      animation: rotate 70s linear infinite;
+    }
+    @keyframes rotate{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+    /* Subtle noise */
+    .noise{
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".65" numOctaves="2" stitchTiles="stitch"/></filter><rect width="160" height="160" filter="url(%23n)" opacity=".10"/></svg>');
+      mix-blend-mode: overlay;
+      opacity:.14;
+    }
+
+    .main-wrapper{ position:relative; z-index:1; }
+
+    .glass{
+      background: var(--card);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+    }
+    .glass-dark{
+      background: var(--card2);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--stroke);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar{ width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track{ background: rgba(0,0,0,.22); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb{ background: linear-gradient(180deg, #00d4d4, #8b1bf7); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover{ background: linear-gradient(180deg, #00ffff, #a855f7); }
+
+    .gradient-text{
+      background: linear-gradient(135deg, #00ffff 0%, #8b1bf7 50%, #ff00ff 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .logo-icon{ animation: logoFloat 3.2s ease-in-out infinite; }
+    @keyframes logoFloat{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+    /* Circular progress */
+    .circular-progress{ position:relative; width:96px; height:96px; }
+    .circular-progress svg{ transform:rotate(-90deg); width:96px; height:96px; }
+    .circular-progress .progress-ring{ transition: stroke-dashoffset .8s cubic-bezier(.4,0,.2,1); }
+    .circular-progress .progress-value{
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      font-size:1.15rem; font-weight:800; letter-spacing:-.02em;
+    }
+
+    /* Cards + interactions */
+    .stat-card{ position:relative; overflow:hidden; }
+    .stat-card::before{
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background: linear-gradient(90deg, #00ffff, #8b1bf7);
+      opacity:.9;
+    }
+
+    .etapa-card{
+      transition: all .25s cubic-bezier(.4,0,.2,1);
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+    }
+    .etapa-card::before{
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(135deg, rgba(0,255,255,.12), rgba(139,27,247,.12));
+      opacity:0; transition: opacity .25s ease;
+    }
+    .etapa-card:hover{ transform: translateY(-3px); box-shadow: var(--shadow2); border-color: rgba(0,255,255,.30); }
+    .etapa-card:hover::before{ opacity:1; }
+    .etapa-card.active{
+      background: linear-gradient(135deg, rgba(0,255,255,.16), rgba(139,27,247,.16));
+      border-color: rgba(0,255,255,.52);
+      box-shadow: 0 0 30px rgba(0,255,255,.18), inset 0 0 30px rgba(0,255,255,.05);
+    }
+    .etapa-card.active .etapa-icon{ animation: pulse 2s infinite; }
+    @keyframes pulse{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+
+    /* Checklist items */
+    .checklist-item{ transition: all .18s ease; animation: slideIn .35s ease forwards; opacity:0; }
+    @keyframes slideIn{ from{opacity:0; transform: translateX(-16px)} to{opacity:1; transform: translateX(0)} }
+    .checklist-item:hover{ transform: translateX(3px); background: rgba(255,255,255,.05); }
+    .checklist-item.checked{ background: rgba(0,255,136,.08) !important; border-left-color:#00ff88 !important; }
+
+    .custom-checkbox{
+      width: 26px; height: 26px; min-width: 26px;
+      border:2px solid rgba(0,255,255,.40);
+      border-radius: 9px;
+      cursor:pointer;
+      transition: all .22s ease;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(0,0,0,.28);
+    }
+    .custom-checkbox:hover{ border-color:#00ffff; box-shadow: 0 0 15px rgba(0,255,255,.38); transform: scale(1.05); }
+    .custom-checkbox.checked{ background: linear-gradient(135deg,#00ff88,#00cc6a); border-color:#00ff88; box-shadow: 0 0 20px rgba(0,255,136,.38); }
+    .custom-checkbox.checked::after{ content:'✓'; color:#000; font-weight:900; font-size:14px; animation: checkmark .25s ease; }
+    @keyframes checkmark{ from{transform:scale(0) rotate(-45deg)} to{transform:scale(1) rotate(0)} }
+
+    /* Buttons */
+    .btn-primary{
+      background: linear-gradient(135deg, #00ffff, #00cccc);
+      color:#000; font-weight:700; border:none;
+      transition: all .22s ease;
+    }
+    .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,255,255,.34); filter: brightness(1.08); }
+
+    .btn-secondary{
+      background: linear-gradient(135deg, #8b1bf7, #6a11cb);
+      color:#fff; font-weight:700; border:none;
+      transition: all .22s ease;
+    }
+    .btn-secondary:hover{ transform: translateY(-2px); box-shadow: 0 10px 30px rgba(139,27,247,.34); filter: brightness(1.08); }
+
+    .btn-outline{
+      border: 1px solid rgba(0,255,255,.35);
+      color:#00ffff;
+      background: rgba(255,255,255,.02);
+      transition: all .22s ease;
+    }
+    .btn-outline:hover{ background: rgba(0,255,255,.14); border-color:#00ffff; box-shadow: 0 0 22px rgba(0,255,255,.18); }
+
+    .progress-bar{ background: rgba(0,255,255,.08); overflow:hidden; border-radius: 999px; }
+    .progress-fill{
+      background: linear-gradient(90deg,#00ffff,#8b1bf7);
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+      border-radius: 999px;
+      position:relative;
+    }
+    .progress-fill::after{
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.26), transparent);
+      animation: shimmer 2s infinite;
+    }
+    @keyframes shimmer{ 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+    .badge-critical{
+      background: linear-gradient(135deg,#ff4444,#cc0000);
+      color:#fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,.35);
+      animation: criticalPulse 2s infinite;
+    }
+    @keyframes criticalPulse{ 0%,100%{opacity:1; box-shadow:0 0 10px rgba(255,68,68,.45)} 50%{opacity:.86; box-shadow:0 0 20px rgba(255,68,68,.70)} }
+
+    .badge-nbr{
+      background: rgba(0,255,255,.12);
+      color:#00ffff;
+      border: 1px solid rgba(0,255,255,.26);
+    }
+
+    .modal-backdrop{ background: rgba(0,0,0,.85); backdrop-filter: blur(8px); }
+    .modal-content{ animation: modalSlide .28s ease; }
+    @keyframes modalSlide{ from{opacity:0; transform: translateY(-24px) scale(.97)} to{opacity:1; transform: translateY(0) scale(1)} }
+
+    .toast{ animation: toastSlide .35s cubic-bezier(.4,0,.2,1); }
+    @keyframes toastSlide{ from{opacity:0; transform: translateX(100%) scale(.95)} to{opacity:1; transform: translateX(0) scale(1)} }
+
+    .filter-tab{ transition: all .22s ease; border: 1px solid transparent; }
+    .filter-tab:hover{ background: rgba(255,255,255,.08); }
+    .filter-tab.active{ background: linear-gradient(135deg,#00ffff,#8b1bf7); color:#000; font-weight:800; border-color: transparent; }
+
+    .form-input{
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      transition: all .2s ease;
+    }
+    .form-input:focus{
+      border-color:#00ffff;
+      box-shadow: 0 0 0 3px rgba(0,255,255,.12);
+      outline:none;
+      background: rgba(255,255,255,.07);
+    }
+
+    .search-input:focus{
+      box-shadow: 0 0 0 3px rgba(0,255,255,.18);
+      border-color:#00ffff;
+      outline:none;
+    }
+
+    .grupo-card{ position:relative; overflow:hidden; }
+    .grupo-card::before{
+      content:'';
+      position:absolute; top:0; left:0; width:4px; height:100%;
+      background: linear-gradient(180deg,#00ffff,#8b1bf7);
+      border-radius: 4px 0 0 4px;
+      opacity:.9;
+    }
+
+    /* Keyboard focus */
+    :focus-visible{ outline: 2px solid rgba(0,255,255,.7); outline-offset: 2px; }
+
+    /* Print */
+    @media print{
+      body{ background:#fff !important; color:#000 !important; }
+      .no-print{ display:none !important; }
+      .glass, .glass-dark{ background:#fff !important; border: 1px solid #ddd !important; box-shadow:none !important; backdrop-filter:none !important; }
+      .bg-animation, .noise{ display:none !important; }
+    }
+
+    @media (max-width: 640px){
+      .circular-progress{ width:80px; height:80px; }
+      .circular-progress svg{ width:80px; height:80px; }
+      .circular-progress .progress-value{ font-size:1rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-xl focus:bg-black focus:text-white">Pular para o conteúdo</a>
+
+  <div class="bg-animation"></div>
+  <div class="noise"></div>
+
+  <div class="main-wrapper">
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-3"></div>
+
+    <!-- Header -->
+    <header class="glass-dark sticky top-0 z-40 border-b border-white/10 no-print">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <div class="flex items-center justify-between gap-4">
+          <a href="#" class="flex items-center gap-3 hover:opacity-90 transition group">
+            <div class="logo-icon w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+              <i class="fas fa-hard-hat text-white text-lg"></i>
+            </div>
+            <div class="leading-tight">
+              <div class="text-xl font-extrabold gradient-text">4U.IA.BR</div>
+              <div class="text-[11px] text-gray-500 -mt-0.5 hidden sm:block">Checklist de fiscalização • NBR</div>
+            </div>
+          </a>
+
+          <div class="flex items-center gap-2 sm:gap-3">
+            <button type="button" onclick="window.print()" class="btn-outline px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 text-sm">
+              <i class="fas fa-print"></i>
+              <span class="hidden sm:inline">Imprimir</span>
+            </button>
+            <button type="button" id="btnExportar" class="btn-primary px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 text-sm">
+              <i class="fas fa-file-export"></i>
+              <span class="hidden sm:inline">Exportar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="conteudo" class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <!-- Hero -->
+      <section class="mb-8">
+        <div class="glass rounded-[22px] p-6 sm:p-8 border-white/10">
+          <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div class="max-w-2xl">
+              <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
+                <span class="gradient-text">Checklist de Fiscalização</span>
+              </h1>
+              <p class="text-gray-400 mt-2 text-sm sm:text-base leading-relaxed">
+                Sistema para verificação de conformidade em obras civis conforme referências NBR — com filtros, busca, observações e exportação.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10">
+                <i class="fas fa-shield-check text-cyan-300"></i>
+                <span class="text-sm text-gray-300">Salva automaticamente</span>
+              </div>
+              <a href="#checklist" class="btn-outline px-4 py-2 rounded-xl text-sm">
+                Ir para o checklist
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats Cards -->
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card glass rounded-2xl p-4 sm:p-6 text-center">
+          <div class="circular-progress mx-auto mb-3" id="progress-circle">
+            <svg viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#00ffff" />
+                  <stop offset="100%" stop-color="#8b1bf7" />
+                </linearGradient>
+              </defs>
+              <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,255,255,0.1)" stroke-width="8" />
+              <circle cx="50" cy="50" r="42" fill="none" stroke="url(#progressGradient)" stroke-width="8"
+                stroke-linecap="round" class="progress-ring" stroke-dasharray="263.89" stroke-dashoffset="263.89"
+                id="progress-ring" />
+            </svg>
+            <div class="progress-value gradient-text" id="stat-total">0%</div>
+          </div>
+          <div class="text-sm text-gray-400">Progresso total</div>
+        </div>
+
+        <div class="stat-card glass rounded-2xl p-4 sm:p-6 text-center flex flex-col justify-center">
+          <div class="text-3xl sm:text-4xl font-extrabold text-cyan-300 mb-2" id="stat-verificados">0</div>
+          <div class="text-sm text-gray-400">Itens verificados</div>
+          <div class="text-xs text-gray-500 mt-1">de <span id="stat-total-items">0</span> itens</div>
+        </div>
+
+        <div class="stat-card glass rounded-2xl p-4 sm:p-6 text-center flex flex-col justify-center">
+          <div class="text-3xl sm:text-4xl font-extrabold text-red-300 mb-2" id="stat-criticos">0/0</div>
+          <div class="text-sm text-gray-400">Itens críticos</div>
+          <div class="text-xs text-gray-500 mt-1">conformidade obrigatória</div>
+        </div>
+
+        <div class="stat-card glass rounded-2xl p-4 sm:p-6 text-center flex flex-col justify-center">
+          <div class="text-3xl sm:text-4xl font-extrabold text-green-300 mb-2" id="stat-conformidade">0%</div>
+          <div class="text-sm text-gray-400">Conformidade</div>
+          <div class="text-xs text-gray-500 mt-1">itens críticos OK</div>
+        </div>
+      </section>
+
+      <!-- App Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Sidebar -->
+        <aside class="lg:col-span-4 xl:col-span-3 space-y-6 no-print lg:sticky lg:top-24 h-fit">
+          <!-- Project Info -->
+          <section class="glass rounded-2xl p-5 sm:p-6">
+            <h2 class="text-base font-semibold mb-5 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center border border-white/10">
+                <i class="fas fa-building text-cyan-300"></i>
+              </div>
+              Informações do projeto
+            </h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm text-gray-400 mb-2 font-medium">Nome da obra</label>
+                <input type="text" id="input-obra" placeholder="Ex: Residencial Vista Mar"
+                  class="form-input w-full rounded-xl px-4 py-3 text-white placeholder-gray-500" />
+              </div>
+              <div>
+                <label class="block text-sm text-gray-400 mb-2 font-medium">Responsável técnico</label>
+                <input type="text" id="input-responsavel" placeholder="Ex: Eng. João Silva"
+                  class="form-input w-full rounded-xl px-4 py-3 text-white placeholder-gray-500" />
+              </div>
+              <div>
+                <label class="block text-sm text-gray-400 mb-2 font-medium">Data da inspeção</label>
+                <input type="date" id="input-data" class="form-input w-full rounded-xl px-4 py-3 text-white" />
+              </div>
+            </div>
+          </section>
+
+          <!-- Etapas -->
+          <section class="glass rounded-2xl p-5 sm:p-6">
+            <div class="flex items-center justify-between gap-3 mb-5">
+              <h2 class="text-base font-semibold flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center border border-white/10">
+                  <i class="fas fa-layer-group text-cyan-300"></i>
+                </div>
+                Etapas
+              </h2>
+              <div class="text-xs text-gray-500">clique para trocar</div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-3" id="etapas-container">
+              <!-- Generated by JS -->
+            </div>
+          </section>
+
+          <!-- Filters & Search -->
+          <section class="glass rounded-2xl p-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-semibold flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center border border-white/10">
+                  <i class="fas fa-filter text-cyan-300"></i>
+                </div>
+                Filtros
+              </h2>
+              <button type="button" id="btnReset" class="btn-outline px-3 py-2 rounded-xl text-xs flex items-center gap-2">
+                <i class="fas fa-redo"></i> Resetar
+              </button>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button type="button" class="filter-tab active px-3 py-2 rounded-xl text-xs font-semibold" data-filter="all">
+                <i class="fas fa-list mr-2"></i>Todos
+              </button>
+              <button type="button" class="filter-tab px-3 py-2 rounded-xl text-xs font-semibold bg-white/5" data-filter="pending">
+                <i class="fas fa-clock mr-2"></i>Pendentes
+              </button>
+              <button type="button" class="filter-tab px-3 py-2 rounded-xl text-xs font-semibold bg-white/5" data-filter="completed">
+                <i class="fas fa-check mr-2"></i>Concluídos
+              </button>
+              <button type="button" class="filter-tab px-3 py-2 rounded-xl text-xs font-semibold bg-white/5" data-filter="critical">
+                <i class="fas fa-exclamation-triangle mr-2"></i>Críticos
+              </button>
+            </div>
+
+            <div class="relative mt-4">
+              <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+              <input type="text" id="search-input" placeholder="Buscar item..."
+                class="search-input form-input w-full pl-11 pr-4 py-2.5 rounded-xl text-white placeholder-gray-500" />
+            </div>
+          </section>
+
+          <!-- Actions -->
+          <section class="glass rounded-2xl p-5 sm:p-6">
+            <h2 class="text-base font-semibold mb-4 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center border border-white/10">
+                <i class="fas fa-bolt text-cyan-300"></i>
+              </div>
+              Ações
+            </h2>
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button" onclick="exportarPDF()" class="btn-primary py-3 rounded-xl flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <i class="fas fa-file-pdf"></i> <span>PDF</span>
+              </button>
+              <button type="button" onclick="exportarTXT()" class="btn-secondary py-3 rounded-xl flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <i class="fas fa-file-alt"></i> <span>TXT</span>
+              </button>
+              <button type="button" onclick="compartilhar()" class="btn-outline py-3 rounded-xl flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <i class="fas fa-share-alt"></i> <span>Compartilhar</span>
+              </button>
+              <button type="button" onclick="salvarBackup()" class="btn-outline py-3 rounded-xl flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <i class="fas fa-download"></i> <span>Backup</span>
+              </button>
+            </div>
+
+            <div class="mt-4 text-xs text-gray-500 leading-relaxed">
+              Dica: as marcações e observações ficam salvas automaticamente no seu navegador.
+            </div>
+          </section>
+        </aside>
+
+        <!-- Main content -->
+        <section class="lg:col-span-8 xl:col-span-9 space-y-6">
+          <!-- Legend -->
+          <section class="glass rounded-2xl p-5 sm:p-6" id="checklist">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center border border-white/10">
+                  <i class="fas fa-clipboard-check text-cyan-300"></i>
+                </div>
+                <span>Checklist</span>
+                <span class="text-sm font-normal text-gray-400" id="etapa-atual-nome"></span>
+              </h2>
+
+              <div class="flex items-center gap-2">
+                <div class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-400">
+                  <i class="fas fa-circle-info text-cyan-300"></i>
+                  Clique no quadrado para marcar; use o balão para observações.
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 text-sm">
+              <div class="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10">
+                <span class="w-4 h-4 rounded bg-gradient-to-r from-red-500 to-red-700"></span>
+                <span class="text-gray-400">Item crítico</span>
+              </div>
+              <div class="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10">
+                <span class="px-2 py-0.5 rounded text-xs badge-nbr">NBR</span>
+                <span class="text-gray-400">Referência normativa</span>
+              </div>
+              <div class="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10">
+                <i class="fas fa-sticky-note text-yellow-300"></i>
+                <span class="text-gray-400">Observação adicionada</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Checklist container -->
+          <section class="space-y-6">
+            <div id="checklist-container" class="space-y-6">
+              <!-- Generated by JS -->
+            </div>
+          </section>
+        </section>
+      </div>
+
+      <!-- Mobile quick bar -->
+      <div class="no-print fixed bottom-4 left-1/2 -translate-x-1/2 z-40 lg:hidden">
+        <div class="glass-dark border border-white/10 rounded-2xl px-3 py-2 flex items-center gap-2 shadow-2xl">
+          <button type="button" onclick="exportarPDF()" class="btn-outline px-3 py-2 rounded-xl text-xs"><i class="fas fa-file-pdf mr-1"></i>PDF</button>
+          <button type="button" onclick="exportarTXT()" class="btn-outline px-3 py-2 rounded-xl text-xs"><i class="fas fa-file-alt mr-1"></i>TXT</button>
+          <button type="button" id="btnResetMobile" class="btn-outline px-3 py-2 rounded-xl text-xs"><i class="fas fa-redo mr-1"></i>Reset</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-dark mt-12 py-8 text-center border-t border-white/10 no-print">
+      <div class="max-w-7xl mx-auto px-4">
+        <p class="text-gray-400">&copy; <span id="ano"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+        <p class="mt-2 text-xs text-gray-600">Desenvolvido para profissionais de engenharia e arquitetura</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Notes Modal -->
+  <div id="modal-notes" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="modal-backdrop absolute inset-0" onclick="fecharModal()"></div>
+    <div class="modal-content glass rounded-2xl p-6 w-full max-w-lg relative z-10 border border-white/20">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold gradient-text">Adicionar observação</h3>
+        <button type="button" onclick="fecharModal()" class="text-gray-400 hover:text-white transition w-9 h-9 rounded-xl hover:bg-white/10 flex items-center justify-center">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+      <p class="text-sm text-gray-400 mb-4 p-3 bg-white/5 rounded-xl border border-white/10" id="modal-item-text"></p>
+      <textarea id="modal-note-input" rows="4" class="form-input w-full rounded-xl px-4 py-3 text-white placeholder-gray-500 resize-none"
+        placeholder="Digite suas observações aqui..."></textarea>
+      <div class="flex gap-3 mt-5">
+        <button type="button" onclick="salvarNota()" class="btn-primary flex-1 py-3 rounded-xl font-extrabold">
+          <i class="fas fa-save mr-2"></i> Salvar
+        </button>
+        <button type="button" onclick="fecharModal()" class="btn-outline flex-1 py-3 rounded-xl font-extrabold">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== DATA ====================
+    let etapaAtual = 'fundacao';
+    let checklistState = {};
+    let notesState = {};
+    let filtroAtual = 'all';
+    let termoBusca = '';
+    let itemAtualNota = null;
+
+    const etapasInfo = {
+      fundacao: { nome: 'Fundação', icon: 'fa-anchor', cor: 'from-blue-500 to-blue-700' },
+      estrutura: { nome: 'Estrutura', icon: 'fa-building', cor: 'from-purple-500 to-purple-700' },
+      alvenaria: { nome: 'Alvenaria', icon: 'fa-cubes', cor: 'from-orange-500 to-orange-700' },
+      instalacoes: { nome: 'Instalações', icon: 'fa-bolt', cor: 'from-yellow-500 to-yellow-700' },
+      revestimentos: { nome: 'Revestimentos', icon: 'fa-paint-roller', cor: 'from-pink-500 to-pink-700' },
+      acabamento: { nome: 'Acabamento', icon: 'fa-star', cor: 'from-green-500 to-green-700' }
+    };
+
+    const checklists = {
+      'fundacao': {
+        nome: 'Fundação',
+        grupos: [
+          {
+            nome: 'Locação e Escavação',
+            icon: 'fa-map-marked-alt',
+            items: [
+              { texto: 'Conferir cotas e alinhamentos conforme projeto', critico: true, nbr: 'NBR 6122' },
+              { texto: 'Verificar profundidade de escavação conforme sondagem SPT', critico: true, nbr: 'NBR 6122' },
+              { texto: 'Conferir dimensões das sapatas/blocos', critico: true, nbr: 'NBR 6122' },
+              { texto: 'Verificar estabilidade de taludes e escoramentos', critico: true, nbr: 'NBR 9061' },
+              { texto: 'Conferir nível do fundo da escavação', critico: false, nbr: '' },
+              { texto: 'Verificar ausência de água na cava', critico: false, nbr: '' }
+            ]
+          },
+          {
+            nome: 'Armação',
+            icon: 'fa-grip-lines',
+            items: [
+              { texto: 'Conferir bitolas de aço conforme projeto', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar espaçamento entre barras', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Conferir cobrimento mínimo (5cm em fundações)', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar amarração das armaduras', critico: false, nbr: 'NBR 6118' },
+              { texto: 'Conferir posicionamento de arranque de pilares', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar espaçadores plásticos', critico: false, nbr: '' }
+            ]
+          },
+          {
+            nome: 'Concretagem',
+            icon: 'fa-truck-loading',
+            items: [
+              { texto: 'Conferir resistência do concreto (fck)', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar slump test na chegada', critico: true, nbr: 'NBR 12655' },
+              { texto: 'Coletar corpo de prova (mínimo 2 por betonada)', critico: true, nbr: 'NBR 12655' },
+              { texto: 'Verificar limpeza da cava antes da concretagem', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Conferir adensamento com vibrador', critico: true, nbr: 'NBR 12655' },
+              { texto: 'Verificar cura adequada (mínimo 7 dias)', critico: true, nbr: 'NBR 12655' }
+            ]
+          }
+        ]
+      },
+      'estrutura': {
+        nome: 'Estrutura',
+        grupos: [
+          {
+            nome: 'Pilares',
+            icon: 'fa-columns',
+            items: [
+              { texto: 'Conferir dimensões dos pilares', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar armadura longitudinal (mínimo 4 barras)', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Conferir espaçamento de estribos', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar cobrimento (3cm interno, 4cm externo)', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Conferir prumo e alinhamento', critico: true, nbr: '' },
+              { texto: 'Verificar emendas de armadura (50Ø)', critico: true, nbr: 'NBR 6118' }
+            ]
+          },
+          {
+            nome: 'Vigas',
+            icon: 'fa-minus',
+            items: [
+              { texto: 'Conferir altura e largura das vigas', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar armadura positiva e negativa', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Conferir estribos (fechados em pilares)', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar cobrimento das armaduras', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Conferir ancoragem das barras', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar emendas (fora de momentos máximos)', critico: true, nbr: 'NBR 6118' }
+            ]
+          },
+          {
+            nome: 'Lajes',
+            icon: 'fa-square',
+            items: [
+              { texto: 'Conferir espessura da laje conforme projeto', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar armadura positiva (em baixo)', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Verificar armadura negativa (em cima)', critico: true, nbr: 'NBR 6118' },
+              { texto: 'Conferir espaçadores e cadeirinhas', critico: false, nbr: '' },
+              { texto: 'Verificar instalações embutidas', critico: false, nbr: '' },
+              { texto: 'Conferir escoramento adequado', critico: true, nbr: 'NBR 15696' }
+            ]
+          },
+          {
+            nome: 'Formas e Desforma',
+            icon: 'fa-box-open',
+            items: [
+              { texto: 'Verificar alinhamento e prumo das formas', critico: true, nbr: '' },
+              { texto: 'Conferir travamento e escoramento', critico: true, nbr: 'NBR 15696' },
+              { texto: 'Verificar estanqueidade das formas', critico: false, nbr: '' },
+              { texto: 'Conferir prazo mínimo de desforma', critico: true, nbr: 'NBR 15696' },
+              { texto: 'Verificar reescoramento se necessário', critico: true, nbr: 'NBR 15696' }
+            ]
+          }
+        ]
+      },
+      'alvenaria': {
+        nome: 'Alvenaria',
+        grupos: [
+          {
+            nome: 'Execução',
+            icon: 'fa-cubes',
+            items: [
+              { texto: 'Verificar primeira fiada sobre impermeabilização', critico: true, nbr: 'NBR 8545' },
+              { texto: 'Conferir prumo e alinhamento das paredes', critico: true, nbr: 'NBR 13281' },
+              { texto: 'Verificar espessura das juntas (10-15mm)', critico: false, nbr: 'NBR 8545' },
+              { texto: 'Conferir amarração nos encontros de paredes', critico: true, nbr: 'NBR 8545' },
+              { texto: 'Verificar vergas e contra-vergas nos vãos', critico: true, nbr: 'NBR 8545' },
+              { texto: 'Conferir encunhamento (mínimo 7 dias após)', critico: true, nbr: '' }
+            ]
+          },
+          {
+            nome: 'Qualidade',
+            icon: 'fa-check-double',
+            items: [
+              { texto: 'Verificar qualidade dos blocos (sem trincas)', critico: false, nbr: 'NBR 15270' },
+              { texto: 'Conferir argamassa de assentamento', critico: false, nbr: 'NBR 13281' },
+              { texto: 'Verificar umedecimento dos blocos', critico: false, nbr: '' },
+              { texto: 'Conferir amarração com pilares (tela/ferro cabelo)', critico: true, nbr: '' },
+              { texto: 'Verificar modulação conforme projeto', critico: false, nbr: '' }
+            ]
+          }
+        ]
+      },
+      'instalacoes': {
+        nome: 'Instalações',
+        grupos: [
+          {
+            nome: 'Elétrica',
+            icon: 'fa-bolt',
+            items: [
+              { texto: 'Conferir circuitos conforme projeto elétrico', critico: true, nbr: 'NBR 5410' },
+              { texto: 'Verificar seção dos condutores', critico: true, nbr: 'NBR 5410' },
+              { texto: 'Conferir aterramento (mínimo 10Ω)', critico: true, nbr: 'NBR 5410' },
+              { texto: 'Verificar disjuntores e DR', critico: true, nbr: 'NBR 5410' },
+              { texto: 'Conferir altura de interruptores (1,10m)', critico: false, nbr: 'NBR 5410' },
+              { texto: 'Verificar altura de tomadas (30cm piso)', critico: false, nbr: 'NBR 5410' },
+              { texto: 'Conferir identificação dos circuitos', critico: false, nbr: 'NBR 5410' }
+            ]
+          },
+          {
+            nome: 'Hidráulica',
+            icon: 'fa-tint',
+            items: [
+              { texto: 'Verificar teste de pressão (1,5x pressão trabalho)', critico: true, nbr: 'NBR 5626' },
+              { texto: 'Conferir diâmetro de tubulações', critico: true, nbr: 'NBR 5626' },
+              { texto: 'Verificar caimento de esgoto (mínimo 2%)', critico: true, nbr: 'NBR 8160' },
+              { texto: 'Conferir ventilação de esgoto', critico: true, nbr: 'NBR 8160' },
+              { texto: 'Verificar caixas de inspeção', critico: true, nbr: 'NBR 8160' },
+              { texto: 'Conferir registros e válvulas', critico: false, nbr: '' },
+              { texto: 'Verificar isolamento água quente', critico: false, nbr: '' }
+            ]
+          },
+          {
+            nome: 'Gás',
+            icon: 'fa-fire',
+            items: [
+              { texto: 'Verificar teste de estanqueidade', critico: true, nbr: 'NBR 15526' },
+              { texto: 'Conferir ventilação adequada', critico: true, nbr: 'NBR 15526' },
+              { texto: 'Verificar registro de corte', critico: true, nbr: 'NBR 15526' },
+              { texto: 'Conferir detector de gás', critico: true, nbr: 'NBR 15526' }
+            ]
+          }
+        ]
+      },
+      'revestimentos': {
+        nome: 'Revestimentos',
+        grupos: [
+          {
+            nome: 'Reboco/Emboço',
+            icon: 'fa-paint-roller',
+            items: [
+              { texto: 'Verificar chapisco aplicado', critico: false, nbr: 'NBR 13749' },
+              { texto: 'Conferir espessura do emboço (máx 25mm/camada)', critico: false, nbr: 'NBR 13749' },
+              { texto: 'Verificar sarrafeamento e desempeno', critico: false, nbr: '' },
+              { texto: 'Conferir prumo e alinhamento', critico: true, nbr: '' },
+              { texto: 'Verificar cura adequada', critico: false, nbr: '' }
+            ]
+          },
+          {
+            nome: 'Cerâmica',
+            icon: 'fa-th',
+            items: [
+              { texto: 'Verificar argamassa colante apropriada', critico: false, nbr: 'NBR 14081' },
+              { texto: 'Conferir alinhamento e prumo', critico: true, nbr: '' },
+              { texto: 'Verificar juntas de dilatação', critico: true, nbr: 'NBR 13755' },
+              { texto: 'Conferir caimento em áreas molhadas', critico: true, nbr: '' },
+              { texto: 'Verificar rejuntamento completo', critico: false, nbr: '' },
+              { texto: 'Conferir ausência de peças soltas (teste percussão)', critico: true, nbr: '' }
+            ]
+          },
+          {
+            nome: 'Impermeabilização',
+            icon: 'fa-water',
+            items: [
+              { texto: 'Verificar teste de estanqueidade (24h)', critico: true, nbr: 'NBR 9575' },
+              { texto: 'Conferir rodapé (mín 20cm)', critico: true, nbr: 'NBR 9575' },
+              { texto: 'Verificar arredondamento de cantos', critico: true, nbr: 'NBR 9575' },
+              { texto: 'Conferir proteção mecânica', critico: false, nbr: 'NBR 9575' }
+            ]
+          }
+        ]
+      },
+      'acabamento': {
+        nome: 'Acabamento Final',
+        grupos: [
+          {
+            nome: 'Pintura',
+            icon: 'fa-brush',
+            items: [
+              { texto: 'Verificar massa corrida/textura aplicada', critico: false, nbr: '' },
+              { texto: 'Conferir número de demãos (mínimo 2)', critico: false, nbr: '' },
+              { texto: 'Verificar acabamento uniforme', critico: false, nbr: '' },
+              { texto: 'Conferir proteção de esquadrias', critico: false, nbr: '' }
+            ]
+          },
+          {
+            nome: 'Esquadrias',
+            icon: 'fa-door-open',
+            items: [
+              { texto: 'Verificar prumo e nível das esquadrias', critico: true, nbr: '' },
+              { texto: 'Conferir funcionamento de abertura/fechamento', critico: true, nbr: '' },
+              { texto: 'Verificar vedação e estanqueidade', critico: true, nbr: 'NBR 10821' },
+              { texto: 'Conferir acabamento de peitoril', critico: false, nbr: '' },
+              { texto: 'Verificar vidros e ferragens', critico: false, nbr: '' }
+            ]
+          },
+          {
+            nome: 'Louças e Metais',
+            icon: 'fa-sink',
+            items: [
+              { texto: 'Verificar fixação adequada', critico: true, nbr: '' },
+              { texto: 'Conferir funcionamento e vedação', critico: true, nbr: '' },
+              { texto: 'Verificar ausência de vazamentos', critico: true, nbr: '' },
+              { texto: 'Conferir alinhamento e nivelamento', critico: false, nbr: '' }
+            ]
+          },
+          {
+            nome: 'Limpeza e Entrega',
+            icon: 'fa-broom',
+            items: [
+              { texto: 'Verificar limpeza geral da obra', critico: false, nbr: '' },
+              { texto: 'Conferir funcionamento de todos os sistemas', critico: true, nbr: '' },
+              { texto: 'Verificar manual do proprietário', critico: false, nbr: 'NBR 14037' },
+              { texto: 'Conferir ART e documentação técnica', critico: true, nbr: '' },
+              { texto: 'Verificar habite-se', critico: true, nbr: '' }
+            ]
+          }
+        ]
+      }
+    };
+
+    // ==================== INITIALIZATION ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('ano').textContent = new Date().getFullYear();
+      const inputData = document.getElementById('input-data');
+      if (inputData && !inputData.value) inputData.valueAsDate = new Date();
+
+      carregarDados();
+      renderizarEtapas();
+      renderizarChecklist();
+      atualizarEstatisticas();
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      // Export button
+      document.getElementById('btnExportar').addEventListener('click', exportarTXT);
+
+      // Reset buttons
+      document.getElementById('btnReset').addEventListener('click', resetarTodos);
+      const btnResetMobile = document.getElementById('btnResetMobile');
+      if (btnResetMobile) btnResetMobile.addEventListener('click', resetarTodos);
+
+      // Filter tabs
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.filter-tab').forEach(t => {
+            t.classList.remove('active');
+            t.classList.add('bg-white/5');
+          });
+          tab.classList.add('active');
+          tab.classList.remove('bg-white/5');
+          filtroAtual = tab.dataset.filter;
+          renderizarChecklist();
+        });
+      });
+
+      // Search input
+      document.getElementById('search-input').addEventListener('input', (e) => {
+        termoBusca = e.target.value.toLowerCase();
+        renderizarChecklist();
+      });
+
+      // Project info inputs
+      ['input-obra', 'input-responsavel', 'input-data'].forEach(id => {
+        document.getElementById(id).addEventListener('change', salvarDados);
+      });
+
+      // Close modal on ESC
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const modal = document.getElementById('modal-notes');
+          if (modal && !modal.classList.contains('hidden')) fecharModal();
+        }
+      });
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    function renderizarEtapas() {
+      const container = document.getElementById('etapas-container');
+      let html = '';
+
+      Object.entries(etapasInfo).forEach(([key, info]) => {
+        const isActive = key === etapaAtual;
+        const progresso = calcularProgressoEtapa(key);
+
+        html += `
+          <div class="etapa-card glass rounded-2xl p-4 border border-white/10 ${isActive ? 'active' : ''}" onclick="selecionarEtapa('${key}')" role="button" tabindex="0">
+            <div class="relative z-10 flex items-center gap-4">
+              <div class="etapa-icon w-12 h-12 rounded-2xl bg-gradient-to-br ${info.cor} flex items-center justify-center shadow-lg">
+                <i class="fas ${info.icon} text-white text-base"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-semibold truncate">${info.nome}</div>
+                <div class="mt-2">
+                  <div class="progress-bar h-2 rounded-full">
+                    <div class="progress-fill h-full" style="width:${progresso}%"></div>
+                  </div>
+                  <div class="text-[11px] text-gray-500 mt-1 font-semibold">${progresso}%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      // Keyboard activate
+      container.querySelectorAll('[role="button"]').forEach(el => {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            el.click();
+          }
+        });
+      });
+    }
+
+    function renderizarChecklist() {
+      const checklist = checklists[etapaAtual];
+      const container = document.getElementById('checklist-container');
+      document.getElementById('etapa-atual-nome').textContent = `- ${checklist.nome}`;
+
+      let html = '';
+      let delay = 0;
+
+      checklist.grupos.forEach((grupo, grupoIdx) => {
+        const grupoId = `${etapaAtual}-${grupoIdx}`;
+        const itemsFiltrados = filtrarItems(grupo.items, grupoIdx);
+        if (itemsFiltrados.length === 0) return;
+
+        const checkedCount = grupo.items.filter((_, idx) => checklistState[`${grupoId}-${idx}`]).length;
+        const totalCount = grupo.items.length;
+        const progresso = Math.round((checkedCount / totalCount) * 100);
+
+        html += `
+          <div class="grupo-card glass rounded-2xl p-5 sm:p-6 border border-white/10">
+            <div class="flex items-start sm:items-center justify-between gap-4 mb-5">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                  <i class="fas ${grupo.icon || 'fa-tasks'} text-white text-lg"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-base sm:text-lg leading-tight">${grupo.nome}</h3>
+                  <p class="text-xs sm:text-sm text-gray-500 mt-1">${checkedCount} de ${totalCount} verificados</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="hidden sm:block text-xs text-gray-500 font-semibold">${progresso}%</div>
+                ${progresso === 100 ? '<span class="text-green-300 text-2xl"><i class="fas fa-check-circle"></i></span>' : ''}
+              </div>
+            </div>
+
+            <div class="progress-bar h-2.5 rounded-full mb-5">
+              <div class="progress-fill h-full" style="width:${progresso}%"></div>
+            </div>
+
+            <div class="space-y-3">
+        `;
+
+        itemsFiltrados.forEach(({ item, originalIdx }) => {
+          const itemId = `${grupoId}-${originalIdx}`;
+          const isChecked = checklistState[itemId] || false;
+          const hasNote = notesState[itemId];
+
+          const bgClass = isChecked
+            ? 'bg-green-500/10 border-green-500'
+            : item.critico
+              ? 'bg-red-500/8 border-red-500/60'
+              : 'bg-white/5 border-cyan-500/20';
+
+          const safeText = (item.texto || '').replace(/'/g, "\\'");
+
+          html += `
+            <div class="checklist-item flex items-start gap-4 p-4 rounded-2xl border-l-4 ${bgClass}" style="animation-delay:${delay}ms">
+              <div class="custom-checkbox ${isChecked ? 'checked' : ''}" onclick="toggleItem('${itemId}')" title="Marcar/Desmarcar" role="checkbox" aria-checked="${isChecked}"></div>
+              <div class="flex-1 min-w-0">
+                <div class="item-text text-sm leading-relaxed ${isChecked ? 'line-through opacity-50' : ''}">${item.texto}</div>
+                <div class="flex flex-wrap gap-2 mt-3">
+                  ${item.critico ? '<span class="badge-critical px-2.5 py-1 rounded-xl text-[11px] font-extrabold">CRÍTICO</span>' : ''}
+                  ${item.nbr ? `<span class="badge-nbr px-2.5 py-1 rounded-xl text-[11px] font-semibold">${item.nbr}</span>` : ''}
+                  ${hasNote ? '<span class="text-yellow-300 text-[11px] flex items-center gap-1 font-semibold"><i class="fas fa-sticky-note"></i> Observação</span>' : ''}
+                </div>
+                ${hasNote ? `<div class="mt-3 text-xs text-gray-300/80 italic bg-white/5 p-3 rounded-xl border border-white/10">${hasNote}</div>` : ''}
+              </div>
+              <button type="button" onclick="abrirModalNota('${itemId}', '${safeText}')" class="text-gray-500 hover:text-cyan-300 transition p-2 rounded-xl hover:bg-white/10 no-print" title="Adicionar observação">
+                <i class="fas fa-comment-alt"></i>
+              </button>
+            </div>
+          `;
+          delay += 35;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+
+      if (html === '') {
+        html = `
+          <div class="glass rounded-2xl p-12 text-center text-gray-500">
+            <i class="fas fa-search text-5xl mb-4 opacity-50"></i>
+            <p class="text-lg">Nenhum item encontrado com os filtros atuais.</p>
+            <p class="text-sm mt-2 text-gray-600">Tente limpar a busca ou trocar o filtro.</p>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function filtrarItems(items, grupoIdx) {
+      return items.map((item, idx) => ({ item, originalIdx: idx }))
+        .filter(({ item, originalIdx }) => {
+          const itemId = `${etapaAtual}-${grupoIdx}-${originalIdx}`;
+          const isChecked = checklistState[itemId] || false;
+
+          if (filtroAtual === 'pending' && isChecked) return false;
+          if (filtroAtual === 'completed' && !isChecked) return false;
+          if (filtroAtual === 'critical' && !item.critico) return false;
+
+          if (termoBusca && !item.texto.toLowerCase().includes(termoBusca)) return false;
+
+          return true;
+        });
+    }
+
+    // ==================== INTERACTIONS ====================
+    function selecionarEtapa(etapa) {
+      etapaAtual = etapa;
+      renderizarEtapas();
+      renderizarChecklist();
+      atualizarEstatisticas();
+
+      setTimeout(() => {
+        const target = document.getElementById('checklist');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+
+    function toggleItem(itemId) {
+      checklistState[itemId] = !checklistState[itemId];
+      const isChecked = checklistState[itemId];
+      mostrarToast(isChecked ? 'Item verificado ✓' : 'Verificação removida', isChecked ? 'success' : 'info');
+
+      renderizarChecklist();
+      renderizarEtapas();
+      atualizarEstatisticas();
+      salvarDados();
+    }
+
+    function abrirModalNota(itemId, texto) {
+      itemAtualNota = itemId;
+      document.getElementById('modal-item-text').textContent = texto;
+      document.getElementById('modal-note-input').value = notesState[itemId] || '';
+      const modal = document.getElementById('modal-notes');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => document.getElementById('modal-note-input').focus(), 100);
+    }
+
+    function fecharModal() {
+      const modal = document.getElementById('modal-notes');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      itemAtualNota = null;
+    }
+
+    function salvarNota() {
+      const nota = document.getElementById('modal-note-input').value.trim();
+      if (nota) {
+        notesState[itemAtualNota] = nota;
+        mostrarToast('Observação salva!', 'success');
+      } else {
+        delete notesState[itemAtualNota];
+        mostrarToast('Observação removida', 'info');
+      }
+      salvarDados();
+      renderizarChecklist();
+      fecharModal();
+    }
+
+    // ==================== STATISTICS ====================
+    function calcularProgressoEtapa(etapa) {
+      const checklist = checklists[etapa];
+      let total = 0;
+      let checked = 0;
+
+      checklist.grupos.forEach((grupo, grupoIdx) => {
+        grupo.items.forEach((_, itemIdx) => {
+          total++;
+          if (checklistState[`${etapa}-${grupoIdx}-${itemIdx}`]) checked++;
+        });
+      });
+
+      return total > 0 ? Math.round((checked / total) * 100) : 0;
+    }
+
+    function atualizarEstatisticas() {
+      let totalItems = 0;
+      let totalChecked = 0;
+      let totalCriticos = 0;
+      let criticosChecked = 0;
+
+      Object.entries(checklists).forEach(([etapa, checklist]) => {
+        checklist.grupos.forEach((grupo, grupoIdx) => {
+          grupo.items.forEach((item, itemIdx) => {
+            const itemId = `${etapa}-${grupoIdx}-${itemIdx}`;
+            totalItems++;
+            if (item.critico) totalCriticos++;
+
+            if (checklistState[itemId]) {
+              totalChecked++;
+              if (item.critico) criticosChecked++;
+            }
+          });
+        });
+      });
+
+      const percentualTotal = totalItems > 0 ? Math.round((totalChecked / totalItems) * 100) : 0;
+      const percentualConformidade = totalCriticos > 0 ? Math.round((criticosChecked / totalCriticos) * 100) : 0;
+
+      const circumference = 2 * Math.PI * 42;
+      const offset = circumference - (percentualTotal / 100) * circumference;
+      document.getElementById('progress-ring').style.strokeDashoffset = offset;
+
+      document.getElementById('stat-total').textContent = `${percentualTotal}%`;
+      document.getElementById('stat-verificados').textContent = totalChecked;
+      document.getElementById('stat-total-items').textContent = totalItems;
+      document.getElementById('stat-criticos').textContent = `${criticosChecked}/${totalCriticos}`;
+      document.getElementById('stat-conformidade').textContent = `${percentualConformidade}%`;
+    }
+
+    // ==================== DATA PERSISTENCE ====================
+    function salvarDados() {
+      const dados = {
+        checklistState,
+        notesState,
+        projetoInfo: {
+          obra: document.getElementById('input-obra').value,
+          responsavel: document.getElementById('input-responsavel').value,
+          data: document.getElementById('input-data').value
+        }
+      };
+      localStorage.setItem('checklist-fiscalizacao', JSON.stringify(dados));
+    }
+
+    function carregarDados() {
+      const saved = localStorage.getItem('checklist-fiscalizacao');
+      if (saved) {
+        const dados = JSON.parse(saved);
+        checklistState = dados.checklistState || {};
+        notesState = dados.notesState || {};
+
+        if (dados.projetoInfo) {
+          document.getElementById('input-obra').value = dados.projetoInfo.obra || '';
+          document.getElementById('input-responsavel').value = dados.projetoInfo.responsavel || '';
+          if (dados.projetoInfo.data) document.getElementById('input-data').value = dados.projetoInfo.data;
+        }
+      }
+    }
+
+    function resetarTodos() {
+      if (confirm('⚠️ Tem certeza que deseja resetar TODOS os checklists?\n\nEsta ação não pode ser desfeita.')) {
+        checklistState = {};
+        notesState = {};
+        localStorage.removeItem('checklist-fiscalizacao');
+        renderizarEtapas();
+        renderizarChecklist();
+        atualizarEstatisticas();
+        mostrarToast('Todos os dados foram resetados', 'info');
+      }
+    }
+
+    // ==================== EXPORT FUNCTIONS ====================
+    function exportarTXT() {
+      const obra = document.getElementById('input-obra').value || 'Não informada';
+      const responsavel = document.getElementById('input-responsavel').value || 'Não informado';
+      const data = document.getElementById('input-data').value || new Date().toLocaleDateString('pt-BR');
+
+      let relatorio = `╔════════════════════════════════════════════════════════════╗\n`;
+      relatorio += `║          RELATÓRIO DE FISCALIZAÇÃO DE OBRA                 ║\n`;
+      relatorio += `╚════════════════════════════════════════════════════════════╝\n\n`;
+      relatorio += `📋 INFORMAÇÕES DO PROJETO\n`;
+      relatorio += `${'─'.repeat(60)}\n`;
+      relatorio += `Obra: ${obra}\n`;
+      relatorio += `Responsável Técnico: ${responsavel}\n`;
+      relatorio += `Data da Inspeção: ${data}\n`;
+      relatorio += `Gerado em: ${new Date().toLocaleString('pt-BR')}\n\n`;
+
+      Object.entries(checklists).forEach(([etapa, checklist]) => {
+        const progresso = calcularProgressoEtapa(etapa);
+        relatorio += `\n${'═'.repeat(60)}\n`;
+        relatorio += `📌 ${checklist.nome.toUpperCase()} (${progresso}% concluído)\n`;
+        relatorio += `${'═'.repeat(60)}\n`;
+
+        checklist.grupos.forEach((grupo, grupoIdx) => {
+          relatorio += `\n▶ ${grupo.nome}\n`;
+          relatorio += `${'─'.repeat(40)}\n`;
+
+          grupo.items.forEach((item, itemIdx) => {
+            const itemId = `${etapa}-${grupoIdx}-${itemIdx}`;
+            const status = checklistState[itemId] ? '✅' : '⬜';
+            const critico = item.critico ? ' ⚠️' : '';
+            const nbr = item.nbr ? ` [${item.nbr}]` : '';
+            const nota = notesState[itemId] ? `\n   📝 Obs: ${notesState[itemId]}` : '';
+
+            relatorio += `${status} ${item.texto}${critico}${nbr}${nota}\n`;
+          });
+        });
+      });
+
+      relatorio += `\n\n${'═'.repeat(60)}\n`;
+      relatorio += `📊 RESUMO GERAL\n`;
+      relatorio += `${'═'.repeat(60)}\n`;
+
+      let totalItems = 0, totalChecked = 0, totalCriticos = 0, criticosChecked = 0;
+      Object.entries(checklists).forEach(([etapa, checklist]) => {
+        checklist.grupos.forEach((grupo, grupoIdx) => {
+          grupo.items.forEach((item, itemIdx) => {
+            const itemId = `${etapa}-${grupoIdx}-${itemIdx}`;
+            totalItems++;
+            if (item.critico) totalCriticos++;
+            if (checklistState[itemId]) {
+              totalChecked++;
+              if (item.critico) criticosChecked++;
+            }
+          });
+        });
+      });
+
+      relatorio += `Total de itens verificados: ${totalChecked}/${totalItems}\n`;
+      relatorio += `Itens críticos conformes: ${criticosChecked}/${totalCriticos}\n`;
+      relatorio += `Percentual de conformidade: ${totalCriticos > 0 ? Math.round((criticosChecked / totalCriticos) * 100) : 0}%\n\n`;
+
+      relatorio += `\n${'─'.repeat(60)}\n`;
+      relatorio += `OBSERVAÇÕES GERAIS:\n`;
+      relatorio += `_______________________________________________________________\n\n\n`;
+      relatorio += `RESPONSÁVEL TÉCNICO: _________________________________________\n`;
+      relatorio += `CREA/CAU: ______________ Assinatura: _________________________\n`;
+
+      const blob = new Blob([relatorio], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Checklist_Fiscalizacao_${new Date().toISOString().split('T')[0]}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      mostrarToast('Relatório TXT exportado!', 'success');
+    }
+
+    function exportarPDF() {
+      window.print();
+      mostrarToast('Use Ctrl+P ou o diálogo de impressão para salvar como PDF', 'info');
+    }
+
+    function compartilhar() {
+      const texto = `Checklist de Fiscalização - ${calcularProgressoEtapa(etapaAtual)}% concluído`;
+      if (navigator.share) {
+        navigator.share({ title: 'Checklist de Fiscalização', text: texto, url: window.location.href });
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        mostrarToast('Link copiado para a área de transferência!', 'success');
+      }
+    }
+
+    function salvarBackup() {
+      const dados = {
+        checklistState,
+        notesState,
+        projetoInfo: {
+          obra: document.getElementById('input-obra').value,
+          responsavel: document.getElementById('input-responsavel').value,
+          data: document.getElementById('input-data').value
+        },
+        exportadoEm: new Date().toISOString()
+      };
+
+      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `backup_checklist_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      mostrarToast('Backup salvo com sucesso!', 'success');
+    }
+
+    // ==================== TOAST NOTIFICATIONS ====================
+    function mostrarToast(mensagem, tipo = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      const cores = {
+        success: 'from-green-500 to-green-600',
+        error: 'from-red-500 to-red-600',
+        info: 'from-cyan-500 to-cyan-600',
+        warning: 'from-yellow-500 to-yellow-600'
+      };
+
+      const icones = {
+        success: 'fa-check-circle',
+        error: 'fa-times-circle',
+        info: 'fa-info-circle',
+        warning: 'fa-exclamation-circle'
+      };
+
+      toast.className = `toast bg-gradient-to-r ${cores[tipo]} text-white px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[280px]`;
+      toast.innerHTML = `
+        <i class="fas ${icones[tipo]} text-lg"></i>
+        <span class="font-semibold">${mensagem}</span>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
