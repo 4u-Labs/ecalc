@@ -1,0 +1,63 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# PROTEÇÃO DE ARQUIVOS SENSÍVEIS
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Bloqueia acesso ao arquivo .env
+<FilesMatch "^\.env$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Bloqueia acesso a arquivos que começam com ponto
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Bloqueia acesso a arquivos de configuração e backup
+<FilesMatch "\.(env|ini|log|bak|config|sql|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONFIGURAÇÕES DE SEGURANÇA
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Desabilita listagem de diretórios
+Options -Indexes
+
+# Protege contra clickjacking
+Header always set X-Frame-Options "SAMEORIGIN"
+
+# Protege contra XSS
+Header always set X-XSS-Protection "1; mode=block"
+
+# Protege contra MIME sniffing
+Header always set X-Content-Type-Options "nosniff"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CHARSET E COMPRESSÃO
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Define charset padrão
+AddDefaultCharset UTF-8
+
+# Habilita compressão gzip (se mod_deflate estiver disponível)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/json application/javascript text/javascript
+</IfModule>
+
+# ═══════════════════════════════════════════════════════════════════════════
+# REWRITE RULES (opcional)
+# ═══════════════════════════════════════════════════════════════════════════
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Bloqueia acesso direto ao .env via URL
+    RewriteRule ^\.env$ - [F,L]
+    
+    # Bloqueia acesso a arquivos de configuração
+    RewriteRule ^CONFIGURACAO-API\.md$ - [F,L]
+</IfModule>
