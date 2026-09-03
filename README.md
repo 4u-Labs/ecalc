@@ -2,6 +2,7 @@
 
 <div align="center">
 
+[![ORCID](https://img.shields.io/badge/ORCID-0009--0004--5936--5060-A6CE39?style=for-the-badge&logo=orcid&logoColor=white)](https://orcid.org/0009-0004-5936-5060)
 ![ΞCALC](https://img.shields.io/badge/ΞCALC-v2.0_Engenharia-00d2ff?style=for-the-badge&logo=blueprint&logoColor=white)
 ![NBR Standards](https://img.shields.io/badge/ABNT-Normas_NBR-0066ff?style=for-the-badge)
 ![PWA](https://img.shields.io/badge/PWA-OLED_Dark_UI-10b981?style=for-the-badge&logo=pwa&logoColor=white)
@@ -18,7 +19,7 @@
 
 O **ΞCALC** é uma suíte técnica de alta precisão desenvolvida para engenheiros civis, arquitetos, mestres de obras e projetistas. Reúne **38 calculadoras, dimensionadores e ferramentas de gestão técnica** em uma interface fluida, responsiva e otimizada para uso em campo e escritório.
 
-> *"Desenvolvido pelo time da **4U.IA.BR**, liderado por engenheiro civil por formação que iniciou sua jornada na programação em **BASIC nos anos 80 em um clássico Microcomputador TK-2000 / TK-200**, unindo quatro décadas de paixão por computação ao rigor técnico da engenharia estrutural."*
+> *"Desenvolvido pelo time da **4U.IA.BR**, liderado por **Fabiano Braga** ([ORCID: 0009-0004-5936-5060](https://orcid.org/0009-0004-5936-5060)), engenheiro civil por formação que iniciou sua jornada na programação em **BASIC nos anos 80 em um clássico Microcomputador TK-2000 / TK-200**, unindo quatro décadas de paixão por computação ao rigor técnico da engenharia estrutural."*
 
 ---
 
@@ -74,4 +75,4 @@ O **ΞCALC** é uma suíte técnica de alta precisão desenvolvida para engenhei
 ## 📄 Licença & Direitos
 
 © 2026 **4U.IA.BR**. Todos os direitos reservados.  
-Este repositório é publicado para fins de portfólio, documentação técnica e vitrine de engenharia.
+Autor: **Fabiano Braga** ([ORCID: 0009-0004-5936-5060](https://orcid.org/0009-0004-5936-5060)).
