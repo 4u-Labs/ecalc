@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Braga"
+    given-names: "Fabiano"
+    orcid: "https://orcid.org/0009-0004-5936-5060"
+title: "ΞCALC - Suíte Completa de Engenharia Civil & Calculadoras Técnicas"
+version: 2.0.0
+date-released: 2026-09-02
+url: "https://4u.ia.br/app/engenharia/"
+repository-code: "https://github.com/4u-Labs/ecalc"
+license: "Proprietary"
