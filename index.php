@@ -346,7 +346,7 @@ $v = time();
 
     <!-- Navigation/Logo Area -->
     <nav class="w-full flex justify-center py-8 animate-fade-in opacity-0" style="animation-delay: 0.1s;">
-        <a href="index.html" id="logo-link" class="flex items-center gap-2 group cursor-pointer no-underline">
+        <a href="./" id="logo-link" class="flex items-center gap-2 group cursor-pointer no-underline">
             <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_20px_rgba(0,210,255,0.4)] group-hover:shadow-[0_0_30px_rgba(0,210,255,0.65)] transition-all duration-300">
                 Ξ
             </div>
@@ -365,7 +365,7 @@ $v = time();
         </p>
         
         <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full badge-count mb-4">
-            <span class="font-['Orbitron'] text-lg font-bold" id="toolCount">38</span>
+            <span class="font-['Orbitron'] text-lg font-bold" id="toolCount">40</span>
             <span class="text-sm uppercase tracking-wider font-medium">Ferramentas Disponíveis</span>
         </div>
         <div class="flex justify-center mb-12">
@@ -376,7 +376,7 @@ $v = time();
 
         <div class="flex flex-wrap justify-center gap-8 md:gap-16 mt-4">
             <div class="text-center group">
-                <span class="block text-4xl md:text-5xl font-['Orbitron'] font-bold text-cyan-400 mb-2 group-hover:text-cyan-300 transition-colors stat-number" data-count="38">0</span>
+                <span class="block text-4xl md:text-5xl font-['Orbitron'] font-bold text-cyan-400 mb-2 group-hover:text-cyan-300 transition-colors stat-number" data-count="40">0</span>
                 <span class="text-xs uppercase tracking-[0.2em] text-slate-500">Calculadoras</span>
             </div>
             <div class="text-center group">
@@ -589,6 +589,26 @@ $v = time();
                 <p class="text-sm text-slate-400 font-light leading-relaxed">Planejamento de áreas de vivência e armazenagem.</p>
             </a>
 
+            <!-- CADClone - Software CAD 2D Profissional (PWA) -->
+            <a href="../cadclone/" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="outros estrutural" style="animation-delay: 0.74s">
+                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Projetos</span>
+                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">
+                    <img src="../cadclone/icon-192.png" alt="CADClone" class="w-12 h-12 rounded-xl object-contain shadow-lg" onerror="this.outerHTML='📐'">
+                </div>
+                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">CADClone</h2>
+                <p class="text-sm text-slate-400 font-light leading-relaxed">Software de CAD 2D no navegador. Comandos AutoCAD, DXF, calco PDF e PWA offline.</p>
+            </a>
+
+            <!-- FotoLaudo - Câmera Técnica & Relatórios de Engenharia (PWA) -->
+            <a href="../fotolaudo/" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="outros estrutural" style="animation-delay: 0.745s">
+                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Vistorias</span>
+                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">
+                    <img src="../fotolaudo/assets/icon-192.png" alt="FotoLaudo" class="w-12 h-12 rounded-xl object-contain shadow-lg" onerror="this.outerHTML='📷'">
+                </div>
+                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">FotoLaudo</h2>
+                <p class="text-sm text-slate-400 font-light leading-relaxed">Câmera técnica pericial com GPS, coordenadas UTM, azimute, cotas CAD e emissão de laudos em PDF.</p>
+            </a>
+
             <!-- PowerCalc - Calculadora Científica & Engenharia (PWA) -->
             <a href="powercalc/index.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.75s;">
                 <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Cálculos</span>
@@ -762,7 +782,7 @@ $v = time();
                 const cardCat = card.dataset.category;
                 
                 const matchesSearch = title.includes(term) || desc.includes(term);
-                const matchesCategory = category === 'all' || cardCat === category;
+                const matchesCategory = category === 'all' || cardCat === category || cardCat.includes(category);
 
                 if (matchesSearch && matchesCategory) {
                     card.classList.remove('hidden', 'absolute');

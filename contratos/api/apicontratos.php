@@ -205,7 +205,8 @@ switch ($action) {
 
     case 'activate_bonus':
         $pass = $body['password'] ?? $_POST['password'] ?? '';
-        if ($pass === 'Fbr4g4@') {
+        $devHash = $_ENV['DEV_PASSWORD_HASH'] ?? '$2y$10$IShoqroV6IsvH6H96Mx7Xuhf515fsBRQM2TzJg0dYWhhnh3fT0HLy';
+        if (!empty($pass) && password_verify($pass, $devHash)) {
             $kpdo->prepare("UPDATE users SET credits = credits + 50, updated_at = datetime('now') WHERE id = ?")
                  ->execute([$keepaiUser['id']]);
             echo json_encode(['status' => 'success']);
