@@ -207,6 +207,144 @@
     .eco-badge {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     }
+
+    /* ==========================================================================
+       TEMA CLARO (LIGHT THEME)
+       ========================================================================== */
+    body.light-theme {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%) !important;
+      color: #1e293b !important;
+    }
+    body.light-theme header.glass-dark {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-color: rgba(226, 232, 240, 0.9) !important;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+    body.light-theme .glass {
+      background: rgba(255, 255, 255, 0.92) !important;
+      backdrop-filter: blur(16px);
+      border-color: rgba(226, 232, 240, 0.9) !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    }
+    body.light-theme .glass-dark {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-color: rgba(226, 232, 240, 0.9) !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
+    body.light-theme .stat-card {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    }
+    body.light-theme .stat-card div.text-gray-400 {
+      color: #64748b !important;
+    }
+    body.light-theme .input-field {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    body.light-theme .input-field option {
+      background: #ffffff !important;
+      color: #0f172a !important;
+    }
+    body.light-theme .input-field:focus {
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    }
+    body.light-theme .btn-outline {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #334155 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    body.light-theme .btn-outline:hover {
+      background: #f8fafc !important;
+      border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+    body.light-theme .result-box {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    }
+    body.light-theme h1, 
+    body.light-theme h2, 
+    body.light-theme h3, 
+    body.light-theme h4 {
+      color: #0f172a !important;
+    }
+    body.light-theme p.text-gray-400, 
+    body.light-theme span.text-gray-400, 
+    body.light-theme label.text-gray-400,
+    body.light-theme .text-gray-400 {
+      color: #64748b !important;
+    }
+    body.light-theme .text-gray-500 {
+      color: #64748b !important;
+    }
+    body.light-theme .text-gray-300 {
+      color: #475569 !important;
+    }
+    body.light-theme .text-gray-200 {
+      color: #334155 !important;
+    }
+    body.light-theme .text-gray-100 {
+      color: #1e293b !important;
+    }
+    body.light-theme .text-white {
+      color: #0f172a !important;
+    }
+    body.light-theme .btn-primary,
+    body.light-theme .btn-primary .text-white,
+    body.light-theme .btn-primary svg,
+    body.light-theme .btn-accent,
+    body.light-theme .btn-accent .text-white,
+    body.light-theme .btn-accent svg,
+    body.light-theme .tab-active,
+    body.light-theme .tab-active .text-white {
+      color: #ffffff !important;
+    }
+    body.light-theme pre#resultado {
+      background: #f8fafc !important;
+      color: #1e293b !important;
+      border-color: #cbd5e1 !important;
+    }
+    body.light-theme table {
+      color: #0f172a !important;
+    }
+    body.light-theme th {
+      background: #f1f5f9 !important;
+      color: #334155 !important;
+    }
+    body.light-theme tr:hover {
+      background: rgba(241, 245, 249, 0.7) !important;
+    }
+    body.light-theme td {
+      border-color: #e2e8f0 !important;
+    }
+    body.light-theme .bg-blue-500\/10 {
+      background: rgba(59, 130, 246, 0.08) !important;
+      border-color: rgba(59, 130, 246, 0.25) !important;
+    }
+    body.light-theme .bg-slate-800\/80 {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+    }
+    body.light-theme .border-slate-700 {
+      border-color: #cbd5e1 !important;
+    }
+    body.light-theme #tracoCanteiroCard > div {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, #ffffff 100%) !important;
+      border-color: rgba(245, 158, 11, 0.4) !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06);
+    }
+    body.light-theme footer.glass-dark {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-color: rgba(226, 232, 240, 0.8) !important;
+      color: #64748b !important;
+    }
   </style>
 </head>
 <body class="text-gray-100">
@@ -702,9 +840,30 @@
       showToast(autoCalc ? 'Auto-cálculo ativado' : 'Auto-cálculo desativado', 'info');
     }
 
+    function applyTheme(isLight) {
+      const themeIcon = document.getElementById('themeIcon');
+      if (isLight) {
+        document.body.classList.add('light-theme');
+        if (themeIcon) {
+          themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
+        }
+        localStorage.setItem('ecalc_theme', 'light');
+      } else {
+        document.body.classList.remove('light-theme');
+        if (themeIcon) {
+          themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>';
+        }
+        localStorage.setItem('ecalc_theme', 'dark');
+      }
+      if (typeof calculoAtual !== 'undefined' && calculoAtual) {
+        desenharGraficos(calculoAtual);
+      }
+    }
+
     function toggleTheme() {
-      document.body.classList.toggle('light-theme');
-      showToast('Tema alternado', 'info');
+      const isLight = !document.body.classList.contains('light-theme');
+      applyTheme(isLight);
+      showToast(isLight ? 'Modo claro ativado ☀️' : 'Modo escuro ativado 🌙', 'info');
     }
 
     // ===== MÉTODOS DE CÁLCULO =====
@@ -1048,10 +1207,11 @@
         return;
       }
 
+      const isLight = document.body.classList.contains('light-theme');
       const layoutBase = {
         paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(15,23,42,0.5)',
-        font: { color: '#e0e0e0', size: 11, family: 'Inter' },
+        plot_bgcolor: isLight ? 'rgba(241,245,249,0.8)' : 'rgba(15,23,42,0.5)',
+        font: { color: isLight ? '#1e293b' : '#e0e0e0', size: 11, family: 'Inter' },
         margin: { t: 30, b: 40, l: 50, r: 20 }
       };
 
@@ -1728,6 +1888,10 @@ Traço Unitário: ${d.traco}`;
     // Init
     document.getElementById('year').textContent = new Date().getFullYear();
     renderHistorico();
+    const savedTheme = localStorage.getItem('ecalc_theme');
+    if (savedTheme === 'light') {
+      applyTheme(true);
+    }
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>

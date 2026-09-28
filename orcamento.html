@@ -1439,6 +1439,11 @@
       window.open('../office/excel/', '_blank');
     }
 
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      showToast(isDark ? 'Modo escuro ativado 🌙' : 'Modo claro ativado ☀️', 'info');
+    }
+
     // ===================== COPIAR MEMORIAL =====================
     function copiarMemorial() {
       const texto = $('resultado').textContent;

@@ -1973,8 +1973,11 @@
     }
 
     function toggleTheme() {
-      // Placeholder para tema claro/escuro
-      alert('Funcionalidade de tema em desenvolvimento!');
+      const isDark = document.documentElement.classList.toggle('dark');
+      document.body.classList.toggle('light-theme', !isDark);
+      if (typeof mostrarNotificacao === 'function') {
+        mostrarNotificacao(isDark ? 'Modo escuro ativado 🌙' : 'Modo claro ativado ☀️', 'info');
+      }
     }
 
     // ==================== EVENT LISTENERS ====================

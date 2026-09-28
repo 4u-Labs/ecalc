@@ -35,10 +35,19 @@
     color: var(--ecalc-text);
 }
 
-.ecalc-bar-left, .ecalc-bar-right {
+.ecalc-bar-left {
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+.ecalc-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
 }
 
 .ecalc-brand {
@@ -147,7 +156,9 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    max-width: 260px;
+    max-width: 200px;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .ecalc-project-pill:hover {
