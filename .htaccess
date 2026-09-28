@@ -1,0 +1,3 @@
+DirectoryIndex index.php index.html
+RewriteEngine On
+RewriteRule ^index\.html$ index.php [L,QSA]
