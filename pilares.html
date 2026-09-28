@@ -67,6 +67,7 @@
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
       mask-composite: exclude;
+      pointer-events: none;
     }
     
     @keyframes gradientMove {
@@ -196,6 +197,10 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .hidden {
+      display: none !important;
     }
     
     /* Print styles */
@@ -536,12 +541,12 @@
   </main>
 
   <!-- Modal de Preços -->
-  <div id="modalPrecos" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="glass rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto gradient-border">
-      <div class="p-6">
+  <div id="modalPrecos" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 items-center justify-center p-4 hidden" style="display: none;">
+    <div class="glass rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto gradient-border relative z-10">
+      <div class="p-6 relative z-10">
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-xl font-bold text-cyan-400">⚙️ Configurar Preços</h3>
-          <button onclick="fecharModalPrecos()" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center text-2xl transition-all">×</button>
+          <button type="button" onclick="fecharModalPrecos()" aria-label="Fechar" class="w-10 h-10 rounded-full hover:bg-white/10 active:bg-white/20 flex items-center justify-center text-2xl transition-all cursor-pointer relative z-20">×</button>
         </div>
         
         <div class="space-y-4">
@@ -549,7 +554,7 @@
             <label class="text-sm text-gray-400">Aço CA-50/60 (por kg)</label>
             <div class="relative mt-2">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
-              <input type="number" id="preco-aco" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="0.50" value="7.50">
+              <input type="number" id="preco-aco" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="0.50" value="9.80">
             </div>
           </div>
           
@@ -557,7 +562,7 @@
             <label class="text-sm text-gray-400">Concreto Base C20 (por m³)</label>
             <div class="relative mt-2">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
-              <input type="number" id="preco-concreto-base" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="10" value="350">
+              <input type="number" id="preco-concreto-base" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="10" value="480">
             </div>
           </div>
           
@@ -565,7 +570,7 @@
             <label class="text-sm text-gray-400">Adicional por MPa (acima de C20)</label>
             <div class="relative mt-2">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
-              <input type="number" id="preco-adicional-fck" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="1" value="15">
+              <input type="number" id="preco-adicional-fck" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="1" value="20">
             </div>
           </div>
           
@@ -573,16 +578,16 @@
             <label class="text-sm text-gray-400">Forma e Escoramento (por m²)</label>
             <div class="relative mt-2">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
-              <input type="number" id="preco-forma" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="5" value="45">
+              <input type="number" id="preco-forma" class="input-cyber w-full pl-12 pr-4 py-3 rounded-xl" step="5" value="95">
             </div>
           </div>
         </div>
         
         <div class="flex gap-3 mt-6">
-          <button onclick="restaurarPrecosPilares()" class="flex-1 py-3 rounded-xl border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 transition-all">
+          <button type="button" onclick="restaurarPrecosPilares()" class="flex-1 py-3 rounded-xl border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 transition-all cursor-pointer">
             🔄 Restaurar
           </button>
-          <button onclick="salvarPrecosPilares()" class="flex-1 py-3 rounded-xl btn-cyber">
+          <button type="button" onclick="salvarPrecosPilares()" class="flex-1 py-3 rounded-xl btn-cyber cursor-pointer">
             ✓ Salvar
           </button>
         </div>
@@ -591,21 +596,21 @@
   </div>
 
   <!-- Modal de Histórico -->
-  <div id="modalHistorico" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="glass rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto gradient-border">
-      <div class="p-6">
+  <div id="modalHistorico" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 items-center justify-center p-4 hidden" style="display: none;">
+    <div class="glass rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto gradient-border relative z-10">
+      <div class="p-6 relative z-10">
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-xl font-bold text-cyan-400">📊 Histórico de Cálculos</h3>
-          <button onclick="fecharHistorico()" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center text-2xl transition-all">×</button>
+          <button type="button" onclick="fecharHistorico()" aria-label="Fechar" class="w-10 h-10 rounded-full hover:bg-white/10 active:bg-white/20 flex items-center justify-center text-2xl transition-all cursor-pointer relative z-20">×</button>
         </div>
         <div id="lista-historico" class="space-y-3">
           <p class="text-gray-500 text-center py-8">Nenhum cálculo salvo ainda.</p>
         </div>
         <div class="flex gap-3 mt-6">
-          <button onclick="limparHistorico()" class="flex-1 py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all">
+          <button type="button" onclick="limparHistorico()" class="flex-1 py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all cursor-pointer">
             🗑️ Limpar Tudo
           </button>
-          <button onclick="fecharHistorico()" class="flex-1 py-3 rounded-xl btn-cyber">
+          <button type="button" onclick="fecharHistorico()" class="flex-1 py-3 rounded-xl btn-cyber cursor-pointer">
             ✓ Fechar
           </button>
         </div>
@@ -1757,18 +1762,24 @@ Classificação: ${classificacao}</pre>
       document.getElementById('preco-concreto-base').value = precosPilares.concretoBase.toFixed(0);
       document.getElementById('preco-adicional-fck').value = precosPilares.adicionalFck.toFixed(0);
       document.getElementById('preco-forma').value = precosPilares.forma.toFixed(0);
-      document.getElementById('modalPrecos').classList.remove('hidden');
+      const modal = document.getElementById('modalPrecos');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      modal.style.display = 'flex';
     }
     
     function fecharModalPrecos() {
-      document.getElementById('modalPrecos').classList.add('hidden');
+      const modal = document.getElementById('modalPrecos');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      modal.style.display = 'none';
     }
     
     function salvarPrecosPilares() {
-      precosPilares.acoKg = parseFloat(document.getElementById('preco-aco').value) || 7.50;
-      precosPilares.concretoBase = parseFloat(document.getElementById('preco-concreto-base').value) || 350;
-      precosPilares.adicionalFck = parseFloat(document.getElementById('preco-adicional-fck').value) || 15;
-      precosPilares.forma = parseFloat(document.getElementById('preco-forma').value) || 45;
+      precosPilares.acoKg = parseFloat(document.getElementById('preco-aco').value) || precosPilaresPadrao.acoKg;
+      precosPilares.concretoBase = parseFloat(document.getElementById('preco-concreto-base').value) || precosPilaresPadrao.concretoBase;
+      precosPilares.adicionalFck = parseFloat(document.getElementById('preco-adicional-fck').value) || precosPilaresPadrao.adicionalFck;
+      precosPilares.forma = parseFloat(document.getElementById('preco-forma').value) || precosPilaresPadrao.forma;
       
       localStorage.setItem('precosPilares', JSON.stringify(precosPilares));
       fecharModalPrecos();
@@ -1788,11 +1799,17 @@ Classificação: ${classificacao}</pre>
     
     function abrirHistorico() {
       renderizarHistorico();
-      document.getElementById('modalHistorico').classList.remove('hidden');
+      const modal = document.getElementById('modalHistorico');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      modal.style.display = 'flex';
     }
     
     function fecharHistorico() {
-      document.getElementById('modalHistorico').classList.add('hidden');
+      const modal = document.getElementById('modalHistorico');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      modal.style.display = 'none';
     }
     
     function salvarHistorico() {
