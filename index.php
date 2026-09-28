@@ -588,11 +588,15 @@ $v = time();
                 <p class="text-sm text-slate-400 font-light leading-relaxed">Cálculo de carga térmica em BTUs.</p>
             </a>
 
-            <a href="reservatorios.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="hidraulica" style="animation-delay: 0.52s">
-                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Hidráulica</span>
-                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">💧</div>
-                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">Reservatórios</h2>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Volume de consumo diário e reserva técnica.</p>
+            <a href="reservatorios.html" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="hidraulica" style="animation-delay: 0.52s">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/reservatorios.webp" type="image/webp">
+                    <img src="assets/cards/reservatorios.jpg" alt="Reservatórios" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>Reservatórios</h2>
+                    <p>Volume de consumo diário e reserva técnica.</p>
+                </div>
             </a>
 
             <a href="tubulacoes.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="hidraulica" style="animation-delay: 0.55s">
