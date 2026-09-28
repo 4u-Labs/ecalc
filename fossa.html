@@ -1069,19 +1069,18 @@
       // Contribuição diária
       const contribuicaoDiaria = numPessoas * contribuicao;
       
-      // Ajuste do tempo de detenção conforme NBR 7229
+      // Ajuste do tempo de detenção conforme NBR 7229 Tabela 1
       let tempoDetencaoAjustado = tempoDetencao;
       if (contribuicaoDiaria <= 1500) tempoDetencaoAjustado = Math.max(tempoDetencao, 1.0);
-      else if (contribuicaoDiaria <= 3000) tempoDetencaoAjustado = Math.max(tempoDetencao, 1.17);
-      else if (contribuicaoDiaria <= 4500) tempoDetencaoAjustado = Math.max(tempoDetencao, 1.33);
-      else if (contribuicaoDiaria <= 6000) tempoDetencaoAjustado = Math.max(tempoDetencao, 1.50);
-      else tempoDetencaoAjustado = Math.max(tempoDetencao, 1.67);
+      else if (contribuicaoDiaria <= 3000) tempoDetencaoAjustado = Math.max(tempoDetencao, 0.92);
+      else if (contribuicaoDiaria <= 4500) tempoDetencaoAjustado = Math.max(tempoDetencao, 0.83);
+      else if (contribuicaoDiaria <= 6000) tempoDetencaoAjustado = Math.max(tempoDetencao, 0.75);
+      else tempoDetencaoAjustado = Math.max(tempoDetencao, 0.67);
       
-      // Volume útil e volume de lodo
+      // Volume útil conforme ABNT NBR 7229 item 5.7: V = 1000 + N * (C * T + K * Lf)
       const volumeUtil = contribuicaoDiaria * tempoDetencaoAjustado;
-      const taxaLodo = numPessoas <= 10 ? 0.30 : numPessoas <= 20 ? 0.25 : 0.20;
-      const volumeLodo = numPessoas * 65 * 1; // 65 L/pessoa para 1 ano de acúmulo
-      const volumeTotal = volumeUtil + volumeLodo;
+      const volumeLodo = numPessoas * 65 * 1; // 65 L/pessoa para 1 ano de acúmulo (K=65, Lf=1.0)
+      const volumeTotal = Math.max(1000, 1000 + volumeUtil + volumeLodo);
       const volumeTotalM3 = volumeTotal / 1000;
       
       // Dimensões da fossa

@@ -1023,10 +1023,11 @@
       // Altura manométrica estimada (considerando 3m por pavimento + perdas)
       const alturaManometrica = 15; // metros (valor típico residencial)
       
-      // Potência aproximada: P = (Q * H) / (75 * n)
-      // Q em m³/h, H em m, n = rendimento (0.5 a 0.7)
+      // Potência métrica da bomba: P = (gamma * Q * H) / (75 * n) com Q em m³/s
+      // Para Q em m³/h: P = (Q * H) / (270 * n), onde 270 = 75 * 3.6
       const vazaoM3h = (vazaoMinima * 60) / 1000;
-      const potenciaCV = (vazaoM3h * alturaManometrica) / (75 * 0.5);
+      const rendimentoBomba = 0.50; // rendimento hidráulico típico de pequenas bombas
+      const potenciaCV = (vazaoM3h * alturaManometrica) / (270 * rendimentoBomba);
       
       // Arredondar para valores comerciais
       const potenciasComerciais = [0.25, 0.33, 0.5, 0.75, 1, 1.5, 2, 3, 5];

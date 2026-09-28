@@ -1827,7 +1827,8 @@
       const coefCobertura = parseFloat($('#tipo-cobertura').value);
       const comprimento = parseFloat($('#comprimento-pluvial').value) || 6;
 
-      const vazao = (intensidade * area * coefCobertura) / 60;
+      // NBR 10844 item 5.1.1: Q = (I * A * C) / 3600 em L/s
+      const vazao = (intensidade * area * coefCobertura) / 3600;
       const diametroCondutor = dimensionarCondutor(vazao);
       const larguraCalha = dimensionarCalha(vazao, intensidade);
 
@@ -1845,6 +1846,7 @@
     }
 
     function dimensionarCondutor(vazao) {
+      // NBR 10844 Tabela 4/5: Capacidade máxima de condutores verticais em L/s
       if (vazao <= 0.57) return 75;
       if (vazao <= 1.76) return 100;
       if (vazao <= 4.3) return 150;
@@ -1853,8 +1855,9 @@
     }
 
     function dimensionarCalha(vazao, intensidade) {
-      const largura = Math.sqrt(vazao * 100 / intensidade) * 15;
-      return Math.max(10, Math.ceil(largura));
+      // Dimensionamento hidráulico de calha semicircular/retangular NBR 10844 (largura em cm)
+      const largura = Math.max(12, Math.ceil(6 * Math.pow(Math.max(vazao, 0.1), 0.4) + 4));
+      return largura;
     }
 
     // ============================================

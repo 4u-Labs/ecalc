@@ -855,7 +855,10 @@
         base = parseFloat(document.getElementById('base')?.value || 20);
         altura = parseFloat(document.getElementById('altura')?.value || 40);
         area = base * altura;
-        inercia = base * Math.pow(altura, 3) / 12;
+        const menorLado = Math.min(base, altura);
+        const maiorLado = Math.max(base, altura);
+        // Flambagem no eixo crítico (menor momento de inércia governa a esbeltez e estabilidade)
+        inercia = (maiorLado * Math.pow(menorLado, 3)) / 12;
       }
       
       // Verificações dimensionais
@@ -926,19 +929,27 @@
       const verificacoes = [];
       const menorDimensao = Math.min(base, altura);
       
-      // Dimensão mínima NBR 6118
-      if (menorDimensao < 19) {
+      // Dimensão mínima NBR 6118 item 13.2.3
+      if (menorDimensao < 14) {
         verificacoes.push({
           tipo: 'erro',
-          titulo: 'Dimensão Mínima',
-          msg: `Não atende NBR 6118. Mínimo 19 cm (atual: ${menorDimensao.toFixed(1)} cm)`,
+          titulo: 'Dimensão Proibitiva',
+          msg: `Dimensão menor que 14 cm é proibida pela NBR 6118. Mínimo absoluto: 14 cm (atual: ${menorDimensao.toFixed(1)} cm)`,
+          referencia: 'NBR 6118 item 13.2.3'
+        });
+      } else if (menorDimensao < 19) {
+        const gammaN = (1.95 - 0.05 * menorDimensao).toFixed(2);
+        verificacoes.push({
+          tipo: 'aviso',
+          titulo: 'Dimensão com Coeficiente γn',
+          msg: `Dimensão entre 14 e 19 cm permitida com coeficiente adicional γn = ${gammaN} multiplicando os esforços de cálculo.`,
           referencia: 'NBR 6118 item 13.2.3'
         });
       } else {
         verificacoes.push({
           tipo: 'sucesso',
-          titulo: 'Dimensão Mínima',
-          msg: `OK - ${menorDimensao.toFixed(1)} cm ≥ 19 cm`,
+          titulo: 'Dimensão Plena',
+          msg: `OK - ${menorDimensao.toFixed(1)} cm ≥ 19 cm (coeficiente γn = 1.0)`,
           referencia: 'NBR 6118 item 13.2.3'
         });
       }
@@ -1047,19 +1058,35 @@
       };
     }
     
-    function verificarCapacidade(base, altura, area, Nd, Md, fck, As) {
-      // Cálculo simplificado da capacidade
+    function verificarCapacidade(base, altura, area, Nk, Mk, fck, As) {
+      // Dimensionamento à flexo-compressão NBR 6118 item 15.8
       const fcd = fck / 1.4;
       const fyd = 500 / 1.15;
+      const Nd = 1.4 * Nk;
+      const Md = 1.4 * (Mk || 0); // kN·m
       
-      // Capacidade à compressão centrada
-      const Nrd = 0.85 * fcd * (area / 10) + As * fyd / 10;
+      const menorLado = Math.min(base, altura);
+      // Excentricidade de 1ª ordem em cm: e1 = (Md / Nd) * 100
+      const e1 = Nd > 0 ? (Md * 100) / Nd : 0;
+      // Excentricidade mínima acidental NBR 6118 item 15.8.3.3: e1,min = 1.5 + 0.03 * h (cm)
+      const eMin = 1.5 + 0.03 * menorLado;
+      const eTotal = Math.max(e1, eMin);
+      
+      // Capacidade à compressão centrada pura Nrd0 (kN)
+      const Nrd0 = 0.85 * fcd * (area / 10) + As * (fyd / 10);
+      
+      // Efeito redutor da flexo-compressão por excentricidade relativa e / h
+      const fatorReducaoM = 1 / (1 + 2.5 * (eTotal / menorLado));
+      const Nrd = Nrd0 * fatorReducaoM;
+      
       const taxaUtilizacao = (Nd / Nrd) * 100;
       
       return {
         Nrd: Nrd,
         taxaUtilizacao: Math.min(taxaUtilizacao, 100),
-        status: taxaUtilizacao <= 100 ? 'ok' : 'excedido'
+        status: taxaUtilizacao <= 100 ? 'ok' : 'excedido',
+        eTotal: eTotal,
+        Nd: Nd
       };
     }
     

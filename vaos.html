@@ -1071,27 +1071,28 @@
             const modulo = getModuloElastico(material);
             const inercia = getInercia(bFinal, hFinal);
             const L = vao * 100; // em cm
+            const carga_cm = carga / 100; // Converter kN/m para kN/cm (1 kN/m = 0.01 kN/cm)
 
             switch(apoio) {
                 case 'simples':
                     momentoMax = (carga * vao * vao) / 8;
                     cortanteMax = (carga * vao) / 2;
-                    flechaEstimada = (5 * carga * Math.pow(L, 4)) / (384 * modulo * inercia);
+                    flechaEstimada = (5 * carga_cm * Math.pow(L, 4)) / (384 * modulo * inercia);
                     break;
                 case 'continua':
                     momentoMax = (carga * vao * vao) / 10; // Momento no apoio central
                     cortanteMax = (5 * carga * vao) / 8;
-                    flechaEstimada = (carga * Math.pow(L, 4)) / (185 * modulo * inercia);
+                    flechaEstimada = (carga_cm * Math.pow(L, 4)) / (185 * modulo * inercia);
                     break;
                 case 'balanco':
                     momentoMax = (carga * vao * vao) / 2;
                     cortanteMax = carga * vao;
-                    flechaEstimada = (carga * Math.pow(L, 4)) / (8 * modulo * inercia);
+                    flechaEstimada = (carga_cm * Math.pow(L, 4)) / (8 * modulo * inercia);
                     break;
                 case 'engastada':
                     momentoMax = (carga * vao * vao) / 12;
                     cortanteMax = (carga * vao) / 2;
-                    flechaEstimada = (carga * Math.pow(L, 4)) / (384 * modulo * inercia);
+                    flechaEstimada = (carga_cm * Math.pow(L, 4)) / (384 * modulo * inercia);
                     break;
             }
 

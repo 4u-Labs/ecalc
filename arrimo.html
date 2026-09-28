@@ -409,7 +409,7 @@
         mdFuste = 1.4 * mtFuste; // kNm/m
 
         const dFuste = Math.max(0.15, eBase - 0.04); // 4cm cobrimento
-        const asCalc = (mdFuste / (0.85 * dFuste * (fyd / 1.15) * 1000)) * 10000; // cm²/m
+        const asCalc = (mdFuste / (0.85 * dFuste * fyd * 1000)) * 10000; // cm²/m
         asMin = 0.0015 * 100 * (eBase * 100); // 0.15% da seção
         asFuste = Math.max(asCalc, asMin);
 

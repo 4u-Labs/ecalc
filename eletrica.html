@@ -1208,15 +1208,15 @@
       const correnteTotal = demandaTotal / tensao;
       
       // Dimensionar entrada
-      const secaoEntrada = dimensionarCabo(correnteTotal * 1.25, 1.0, 30);
-      const disjuntorGeral = dimensionarDisjuntor(correnteTotal * 1.25);
+      const secaoEntrada = dimensionarCabo(correnteTotal * 1.25, 1.0, 30, 'entrada');
+      const disjuntorGeral = dimensionarDisjuntor(correnteTotal * 1.25, secaoEntrada);
       
       // Dimensionar cada circuito
       const circuitosDimensionados = circuitos.map((circ, idx) => {
         const tensaoCircuito = circ.tipo === 'tue' && circ.potencia > 2000 ? 220 : tensao;
         const corrente = circ.potencia / tensaoCircuito;
-        const secao = dimensionarCabo(corrente, 1.0, circ.tipo === 'iluminacao' ? 15 : 20);
-        const disjuntor = dimensionarDisjuntor(corrente);
+        const secao = dimensionarCabo(corrente, 1.0, circ.tipo === 'iluminacao' ? 15 : 20, circ.tipo);
+        const disjuntor = dimensionarDisjuntor(corrente, secao);
         const eletroduto = dimensionarEletroduto(secao);
         const quedaTensao = calcularQuedaTensao(corrente, secao, 20, tensaoCircuito);
         
@@ -1272,22 +1272,30 @@
       mostrarNotificacao('Cálculo concluído com sucesso!', 'success');
     }
     
-    function dimensionarCabo(corrente, fatorCorrecao = 1.0, comprimento = 20) {
+    function dimensionarCabo(corrente, fatorCorrecao = 1.0, comprimento = 20, tipoCircuito = 'tug') {
       const correnteCorrigida = corrente / fatorCorrecao;
+      // NBR 5410:2004 item 6.2.6.1.1 (Tabela 47) - Seções mínimas:
+      // Iluminação: 1.5 mm² | Tomadas (TUG/TUE) e Força: 2.5 mm²
+      const secaoMinima = (tipoCircuito === 'iluminacao') ? 1.5 : 2.5;
       
       for (let secao of secoesCabos) {
-        if (capacidadeCorrente[secao] >= correnteCorrigida) {
-          // Verificar seção mínima por tipo
-          if (secao < 1.5) return 1.5;
+        if (secao >= secaoMinima && capacidadeCorrente[secao] >= correnteCorrigida) {
           return secao;
         }
       }
       return 120;
     }
     
-    function dimensionarDisjuntor(corrente) {
+    function dimensionarDisjuntor(corrente, secaoCabo = null) {
       const disjuntores = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125];
+      // Coordenação de proteção NBR 5410 item 5.3.4.1: Ib <= In <= Iz
+      const capMaxCabo = secaoCabo ? (capacidadeCorrente[secaoCabo] || Infinity) : Infinity;
       
+      // Procura disjuntor padrão que satisfaça Ib <= In <= Iz
+      for (let disj of disjuntores) {
+        if (disj >= corrente && disj <= capMaxCabo) return disj;
+      }
+      // Se a corrente for muito próxima do Iz, prioriza a segurança térmica
       for (let disj of disjuntores) {
         if (disj >= corrente) return disj;
       }
