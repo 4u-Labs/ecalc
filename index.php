@@ -11,30 +11,32 @@ $v = time();
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <title>Ferramentas de Engenharia | 4U.IA.BR</title>
+    <title>ECALC - Cálculos Técnicos para Engenharia | 4U.IA.BR</title>
+    <meta name="description" content="ECALC - Plataforma com 40 ferramentas técnicas, calculadoras especializadas, normas ABNT NBR e relatórios para engenharia civil.">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="ΞCALC - Ferramentas de Engenharia">
-    <meta property="og:description" content="Plataforma completa com calculadoras e dimensionamentos técnicos profissionais.">
+    <meta property="og:title" content="ECALC - Cálculos Técnicos para Engenharia">
+    <meta property="og:description" content="Obras mais seguras, rápidas e precisas. 40 calculadoras e ferramentas técnicas profissionais.">
+    <meta property="og:image" content="https://4u.ia.br/app/engenharia/assets/banner-ecalc.png">
     
     <style>
         :root {
             --primary: #00D2FF; /* Electric Cyan */
             --secondary: #0066FF; /* Electric Blue */
-            --accent: #00D2FF; /* Electric Cyan */
-            --bg-dark: #030508; /* OLED-Black (PowerCalc style) */
-            --bg-card: rgba(12, 17, 26, 0.75); /* Deep Dark Blue Slate */
-            --text-main: #ffffff;
-            --text-muted: #7d90a6;
+            --accent-amber: #F59E0B; /* Industrial Amber Gold (ECALC Ruler) */
+            --bg-dark: #030611; /* Obsidian Navy */
+            --bg-card: rgba(11, 18, 33, 0.75);
+            --text-main: #f8fafc;
+            --text-muted: #8da2ba;
             --transition-speed: 250ms;
             --transition-curve: cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -42,7 +44,7 @@ $v = time();
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-dark);
-            background: radial-gradient(circle at center, #0c121d 0%, #030508 100%);
+            background: radial-gradient(circle at 50% 10%, #0d172e 0%, #030611 100%);
             color: var(--text-main);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
@@ -57,9 +59,10 @@ $v = time();
             height: 100%;
             z-index: -2;
             background: 
-                radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.05) 0%, transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(0, 102, 255, 0.05) 0%, transparent 25%),
-                radial-gradient(ellipse at 50% 80%, rgba(0, 210, 255, 0.03) 0%, transparent 60%);
+                radial-gradient(circle at 15% 35%, rgba(0, 210, 255, 0.08) 0%, transparent 35%),
+                radial-gradient(circle at 85% 25%, rgba(0, 102, 255, 0.08) 0%, transparent 35%),
+                radial-gradient(ellipse at 50% 60%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 50% 90%, rgba(0, 210, 255, 0.04) 0%, transparent 60%);
         }
 
         .bg-grid {
@@ -70,11 +73,11 @@ $v = time();
             height: 100%;
             z-index: -1;
             background-image: 
-                linear-gradient(rgba(0, 210, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 210, 255, 0.02) 1px, transparent 1px);
-            background-size: 50px 50px;
-            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+                linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
         }
 
         /* Floating particles */
@@ -105,74 +108,135 @@ $v = time();
             100% { transform: translateY(-20vh) translateX(20px); opacity: 0; }
         }
 
-        /* Hero Typography */
-        .hero-title {
-            font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(135deg, #00D2FF 0%, #0066FF 50%, #00D2FF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-            filter: drop-shadow(0 0 30px rgba(0, 210, 255, 0.35));
-        }
-
-        .hero-title::after {
-            content: 'ΞCΛLC';
+        /* Hero Banner Showcase */
+        .hero-banner-glow {
             position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            background: inherit;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: blur(40px);
-            opacity: 0.45;
-            z-index: -1;
-            width: 100%;
+            inset: -15px;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 210, 255, 0.28) 0%, transparent 60%),
+                        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.22) 0%, transparent 55%),
+                        radial-gradient(circle at 80% 50%, rgba(0, 102, 255, 0.28) 0%, transparent 60%);
+            filter: blur(35px);
+            z-index: 0;
+            opacity: 0.85;
+            pointer-events: none;
+            animation: pulseGlow 6s ease-in-out infinite alternate;
         }
 
-        .badge-count {
-            background: rgba(0, 210, 255, 0.08);
-            border: 1px solid rgba(0, 210, 255, 0.3);
-            color: #00D2FF;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.12);
+        @keyframes pulseGlow {
+            0% { opacity: 0.65; transform: scale(0.98); }
+            100% { opacity: 0.95; transform: scale(1.02); }
+        }
+
+        .hero-banner-wrapper {
+            position: relative;
+            border-radius: 28px;
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.4) 0%, rgba(245, 158, 11, 0.35) 50%, rgba(0, 102, 255, 0.45) 100%);
+            box-shadow: 0 25px 60px -15px rgba(0, 102, 255, 0.35), 0 0 35px rgba(0, 210, 255, 0.15);
+        }
+
+        .hero-banner-inner {
+            border-radius: 26px;
+            overflow: hidden;
+            background: #030611;
+            position: relative;
+        }
+
+        /* Feature Pillars (from Banner Badges) */
+        .feature-pillar {
+            background: rgba(11, 18, 33, 0.6);
+            border: 1px solid rgba(0, 210, 255, 0.16);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 0.75rem 0.6rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .feature-pillar:hover {
+            background: rgba(0, 210, 255, 0.12);
+            border-color: rgba(0, 210, 255, 0.55);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 210, 255, 0.25);
+        }
+
+        .feature-pillar:active {
+            transform: translateY(-1px);
         }
 
         /* Inputs */
         .search-input {
-            background: rgba(3, 5, 8, 0.65);
+            background: rgba(8, 13, 25, 0.75);
             border: 1px solid rgba(0, 210, 255, 0.25);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
             transition: all var(--transition-speed) var(--transition-curve);
             color: #ffffff;
         }
 
         .search-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.2), 0 0 20px rgba(0, 210, 255, 0.15);
-            background: rgba(3, 5, 8, 0.85);
+            box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.2), 0 0 25px rgba(0, 210, 255, 0.2);
+            background: rgba(8, 13, 25, 0.95);
         }
 
         /* Filters */
         .filter-btn {
-            background: rgba(12, 17, 26, 0.4);
-            border: 1px solid rgba(0, 210, 255, 0.15);
-            color: #c2d2e3;
+            background: rgba(11, 18, 33, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
             transition: all var(--transition-speed) ease;
         }
 
         .filter-btn:hover {
             background: rgba(0, 210, 255, 0.08);
-            border-color: rgba(0, 210, 255, 0.45);
+            border-color: rgba(0, 210, 255, 0.4);
             color: #ffffff;
+            transform: translateY(-1px);
         }
 
         .filter-btn.active {
-            background: linear-gradient(135deg, rgba(0, 102, 255, 0.2) 0%, rgba(0, 210, 255, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.25) 0%, rgba(0, 210, 255, 0.25) 100%);
             border-color: #00D2FF;
             color: #00D2FF;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.25);
+        }
+
+        .filter-btn[data-filter="estrutural"].active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%);
+            border-color: #3b82f6;
+            color: #93c5fd;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
+        }
+        .filter-btn[data-filter="hidraulica"].active {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(8, 145, 178, 0.35) 100%);
+            border-color: #06b6d4;
+            color: #67e8f9;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+        }
+        .filter-btn[data-filter="materiais"].active {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.35) 100%);
+            border-color: #10b981;
+            color: #6ee7b7;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+        }
+        .filter-btn[data-filter="eletrica"].active {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.35) 100%);
+            border-color: #f59e0b;
+            color: #fde68a;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+        }
+        .filter-btn[data-filter="orcamento"].active {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.35) 100%);
+            border-color: #22c55e;
+            color: #86efac;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.25);
+        }
+        .filter-btn[data-filter="outros"].active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(79, 70, 229, 0.35) 100%);
+            border-color: #6366f1;
+            color: #a5b4fc;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
         }
 
         /* Cards */
@@ -366,69 +430,140 @@ $v = time();
     <div class="bg-grid"></div>
     <div class="particles" id="particles"></div>
 
-    <!-- Navigation/Logo Area -->
-    <nav class="w-full flex justify-center py-8 animate-fade-in opacity-0" style="animation-delay: 0.1s;">
-        <a href="./" id="logo-link" class="flex items-center gap-2 group cursor-pointer no-underline">
-            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_20px_rgba(0,210,255,0.4)] group-hover:shadow-[0_0_30px_rgba(0,210,255,0.65)] transition-all duration-300">
-                Ξ
-            </div>
-            <span class="text-2xl font-bold tracking-wider font-['Orbitron'] text-slate-100 group-hover:text-cyan-300 transition-colors">4U.IA.BR</span>
-        </a>
-    </nav>
+    <!-- Floating Navigation Bar -->
+    <header class="w-full sticky top-0 z-40 backdrop-blur-xl bg-[#030611]/85 border-b border-cyan-500/15 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Link with 5-click easter egg preserved -->
+            <a href="./" id="logo-link" class="flex items-center gap-3.5 group cursor-pointer no-underline select-none">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 via-blue-600 to-cyan-400 p-[2px] shadow-[0_0_20px_rgba(0,210,255,0.35)] group-hover:shadow-[0_0_30px_rgba(245,158,11,0.55)] transition-all duration-300">
+                    <div class="w-full h-full bg-[#030611] rounded-[10px] flex items-center justify-center font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-cyan-300 to-white font-['Orbitron']">
+                        Ξ
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-black tracking-wider font-['Orbitron'] text-white group-hover:text-cyan-300 transition-colors">
+                            <span class="text-amber-400">E</span>CALC
+                        </span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">PRO</span>
+                    </div>
+                    <span class="text-[11px] text-slate-400 font-medium tracking-wide block -mt-1">Cálculos Técnicos para Engenharia</span>
+                </div>
+            </a>
 
-    <!-- Hero Section -->
-    <section class="relative px-4 pt-10 pb-20 text-center max-w-5xl mx-auto animate-fade-in opacity-0" style="animation-delay: 0.2s;">
-        <h1 class="hero-title text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tight">
-            ΞCΛLC
-        </h1>
-        <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-            Plataforma completa com ferramentas técnicas e calculadoras especializadas para engenharia civil.
-            Precisão, normas NBR e metodologia profissional.
-        </p>
-        
-        <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full badge-count mb-4">
-            <span class="font-['Orbitron'] text-lg font-bold" id="toolCount">40</span>
-            <span class="text-sm uppercase tracking-wider font-medium">Ferramentas Disponíveis</span>
+            <!-- Quick Badges & Links -->
+            <div class="flex items-center gap-3 sm:gap-4">
+                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/60 text-xs text-slate-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span class="font-medium">40 Ferramentas Ativas</span>
+                </div>
+
+                <a href="https://4u.ia.br" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-slate-200 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-400 transition-all duration-200 group">
+                    <span>4U.IA.BR</span>
+                    <svg class="w-3.5 h-3.5 text-cyan-400 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </a>
+            </div>
         </div>
-        <div class="flex justify-center mb-12">
-            <span class="px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-widest animate-pulse">
-                ✓ SINAPI 2025 Atualizado
+    </header>
+
+    <!-- Hero Showcase Section with Banner -->
+    <section class="relative px-4 pt-6 pb-8 text-center max-w-6xl mx-auto animate-fade-in opacity-0" style="animation-delay: 0.15s;">
+        <!-- Banner Showcase Card -->
+        <div class="relative mx-auto mb-8 max-w-5xl">
+            <div class="hero-banner-glow"></div>
+            <div class="hero-banner-wrapper">
+                <div class="hero-banner-inner">
+                    <picture class="w-full block">
+                        <source srcset="assets/banner-ecalc.webp" type="image/webp">
+                        <img src="assets/banner-ecalc.png" 
+                             alt="ECALC - Cálculos Técnicos para Engenharia - Obras mais seguras, rápidas e precisas" 
+                             class="w-full h-auto block select-none" 
+                             width="1024" 
+                             height="376" 
+                             loading="eager" 
+                             fetchpriority="high">
+                    </picture>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trust & Compliance Badges -->
+        <div class="flex flex-wrap justify-center items-center gap-2.5 sm:gap-3.5 mb-8">
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                SINAPI 2025 Integrado
+            </span>
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold tracking-wide">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                Normas ABNT NBR em Dia
+            </span>
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold tracking-wide">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Memoriais de Cálculo & PDFs
+            </span>
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold tracking-wide">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                100% PWA & Acesso Offline
             </span>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-8 md:gap-16 mt-4">
-            <div class="text-center group">
-                <span class="block text-4xl md:text-5xl font-['Orbitron'] font-bold text-cyan-400 mb-2 group-hover:text-cyan-300 transition-colors stat-number" data-count="40">0</span>
-                <span class="text-xs uppercase tracking-[0.2em] text-slate-500">Calculadoras</span>
-            </div>
-            <div class="text-center group">
-                <span class="block text-4xl md:text-5xl font-['Orbitron'] font-bold text-cyan-400 mb-2 group-hover:text-cyan-300 transition-colors stat-number" data-count="20">0</span>
-                <span class="text-xs uppercase tracking-[0.2em] text-slate-500">Normas NBR</span>
-            </div>
-            <div class="text-center group">
-                <span class="block text-4xl md:text-5xl font-['Orbitron'] font-bold text-cyan-400 mb-2 group-hover:text-cyan-300 transition-colors stat-number" data-count="8">0</span>
-                <span class="text-xs uppercase tracking-[0.2em] text-slate-500">Categorias</span>
-            </div>
+        <!-- 6 Interactive Feature Pillars (Directly from the Banner Badges!) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 max-w-5xl mx-auto mb-6">
+            <button type="button" class="feature-pillar group" data-feature-action="formula">
+                <span class="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">🧮</span>
+                <span class="text-xs font-bold text-slate-200 group-hover:text-cyan-300 block">57+ Fórmulas</span>
+                <span class="text-[10px] text-slate-400 block">PowerCalc & Mat</span>
+            </button>
+            <button type="button" class="feature-pillar group" data-feature-action="estrutural">
+                <span class="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">🏗️</span>
+                <span class="text-xs font-bold text-slate-200 group-hover:text-blue-300 block">Obras & Estruturas</span>
+                <span class="text-[10px] text-slate-400 block">Vigas, Pilares, Lajes</span>
+            </button>
+            <button type="button" class="feature-pillar group" data-feature-action="materiais">
+                <span class="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">🧱</span>
+                <span class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 block">Materiais & Consumo</span>
+                <span class="text-[10px] text-slate-400 block">Concreto & Traço</span>
+            </button>
+            <button type="button" class="feature-pillar group" data-feature-action="dimension">
+                <span class="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">📐</span>
+                <span class="text-xs font-bold text-slate-200 group-hover:text-purple-300 block">Dimensionamentos</span>
+                <span class="text-[10px] text-slate-400 block">Tubulações & Gás</span>
+            </button>
+            <button type="button" class="feature-pillar group" data-feature-action="reports">
+                <span class="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">📄</span>
+                <span class="text-xs font-bold text-slate-200 group-hover:text-rose-300 block">Relatórios Técnicos</span>
+                <span class="text-[10px] text-slate-400 block">Laudos, PGR & Diário</span>
+            </button>
+            <button type="button" class="feature-pillar group" data-feature-action="nbr">
+                <span class="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">⚙️</span>
+                <span class="text-xs font-bold text-slate-200 group-hover:text-amber-300 block">Normas NBR</span>
+                <span class="text-[10px] text-slate-400 block">Guia ABNT & Regras</span>
+            </button>
         </div>
     </section>
 
-    <!-- Filter Section -->
-    <div class="px-4 pb-12 animate-fade-in opacity-0" style="animation-delay: 0.3s;">
-        <div class="max-w-xl mx-auto relative mb-8">
+    <!-- Search and Category Filter Section -->
+    <div class="px-4 pb-10 animate-fade-in opacity-0" style="animation-delay: 0.25s;" id="searchSection">
+        <div class="max-w-2xl mx-auto relative mb-6">
             <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                 <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
-            <input type="text" id="searchInput" class="search-input w-full py-4 pl-12 pr-6 rounded-2xl text-slate-100 placeholder-slate-500 focus:outline-none" placeholder="O que você precisa calcular hoje?">
+            <input type="text" id="searchInput" class="search-input w-full py-4 pl-12 pr-24 rounded-2xl text-slate-100 placeholder-slate-400 focus:outline-none text-base" placeholder="O que você precisa calcular hoje? (Pressione '/' para buscar)">
+            <div class="absolute inset-y-0 right-4 flex items-center gap-2">
+                <button type="button" id="clearSearch" class="hidden text-slate-400 hover:text-white p-1 rounded-md transition-colors" title="Limpar pesquisa">✕</button>
+                <kbd class="hidden sm:inline-block px-2 py-1 text-[11px] font-mono text-slate-400 bg-slate-800/80 rounded border border-slate-700/80 select-none">/</kbd>
+            </div>
         </div>
 
+        <!-- Filter Category Buttons -->
         <div class="flex flex-wrap justify-center gap-2 md:gap-3 max-w-4xl mx-auto category-filters">
-            <button class="filter-btn active px-5 py-2 rounded-full text-sm font-medium" data-filter="all">Todas</button>
-            <button class="filter-btn px-5 py-2 rounded-full text-sm font-medium" data-filter="estrutural">Estrutural</button>
-            <button class="filter-btn px-5 py-2 rounded-full text-sm font-medium" data-filter="hidraulica">Hidráulica</button>
-            <button class="filter-btn px-5 py-2 rounded-full text-sm font-medium" data-filter="materiais">Materiais</button>
-            <button class="filter-btn px-5 py-2 rounded-full text-sm font-medium" data-filter="eletrica">Elétrica</button>
-            <button class="filter-btn px-5 py-2 rounded-full text-sm font-medium" data-filter="orcamento">Orçamento</button>
-            <button class="filter-btn px-5 py-2 rounded-full text-sm font-medium" data-filter="outros">Outros</button>
+            <button class="filter-btn active px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide" data-filter="all">Todas (<span id="toolCount">40</span>)</button>
+            <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="estrutural">🏗️ Estrutural</button>
+            <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="hidraulica">💧 Hidráulica</button>
+            <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="materiais">🧱 Materiais</button>
+            <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="eletrica">⚡ Elétrica</button>
+            <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="orcamento">💰 Orçamento</button>
+            <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="outros">🛠️ Outros & Gestão</button>
         </div>
     </div>
 
@@ -889,15 +1024,20 @@ $v = time();
             </a>
         </div>
 
-        <div id="noResults" class="hidden text-center py-20">
-            <div class="text-6xl mb-4 opacity-50">🔍</div>
-            <h3 class="text-xl font-bold text-slate-300">Nenhuma ferramenta encontrada</h3>
-            <p class="text-slate-500">Tente buscar por outro termo.</p>
+        <!-- No Results State -->
+        <div id="noResults" class="hidden text-center py-16 px-6 bg-slate-900/40 rounded-3xl border border-cyan-500/20 max-w-lg mx-auto my-12 backdrop-blur-md">
+            <div class="text-5xl mb-3 animate-bounce">🔍</div>
+            <h3 class="text-xl font-bold text-slate-100 mb-1 font-['Orbitron']">Nenhuma ferramenta encontrada</h3>
+            <p class="text-sm text-slate-400 mb-6">Não encontramos resultados para sua busca ou categoria selecionada.</p>
+            <button type="button" id="btnResetSearch" class="px-6 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-semibold uppercase tracking-wider transition-all duration-200 shadow-[0_0_15px_rgba(0,210,255,0.2)]">
+                Limpar Pesquisa e Ver Todas (40)
+            </button>
         </div>
     </main>
 
-    <footer class="footer-clean py-8 text-center text-gray-500/50">
-        <p class="text-[10px] uppercase tracking-[0.2em] opacity-50">&copy; 2026 4U.IA.BR. Todos os direitos reservados. Feito com amor por <a href="https://4u.ia.br" target="_blank" class="footer-owner-link text-blue-400/80 hover:text-blue-300 hover:underline transition-all">4u.ia.br</a>.</p>
+    <footer class="footer-clean py-10 text-center text-slate-500/60 border-t border-slate-800/40 mt-12">
+        <p class="text-[11px] uppercase tracking-[0.2em] font-medium">&copy; 2026 4U.IA.BR &bull; ECALC Engenharia. Todos os direitos reservados.</p>
+        <p class="text-[10px] tracking-wider mt-1 text-slate-500/80">Desenvolvido com tecnologia de ponta por <a href="https://4u.ia.br" target="_blank" class="text-cyan-400 hover:text-cyan-300 hover:underline transition-colors font-semibold">4u.ia.br</a>.</p>
     </footer>
 
     <!-- Back to top -->
@@ -906,59 +1046,49 @@ $v = time();
     </button>
 
     <script>
-
         // Particles
         const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 25; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 20 + 's';
-            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
-            particle.style.opacity = Math.random() * 0.5;
-            particlesContainer.appendChild(particle);
+        if (particlesContainer) {
+            for (let i = 0; i < 25; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particle.style.opacity = Math.random() * 0.5;
+                particlesContainer.appendChild(particle);
+            }
         }
 
-        // Animated Counters
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                document.querySelectorAll('.stat-number').forEach(counter => {
-                    const target = parseInt(counter.dataset.count);
-                    let current = 0;
-                    const increment = target / 50;
-                    const timer = setInterval(() => {
-                        current += increment;
-                        if (current >= target) {
-                            counter.textContent = target;
-                            clearInterval(timer);
-                        } else {
-                            counter.textContent = Math.ceil(current);
-                        }
-                    }, 30);
-                });
-                observer.disconnect();
-            }
-        });
-        observer.observe(document.querySelector('.stat-number').parentElement);
-
-        // Search & Filter
+        // Search & Filter Elements
         const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const btnResetSearch = document.getElementById('btnResetSearch');
         const toolCards = document.querySelectorAll('.tool-card');
         const filterBtns = document.querySelectorAll('.filter-btn');
         const noResults = document.getElementById('noResults');
         const toolCountSpan = document.getElementById('toolCount');
 
         function filterTools() {
-            const term = searchInput.value.toLowerCase();
-            const category = document.querySelector('.filter-btn.active').dataset.filter;
+            const term = searchInput.value.toLowerCase().trim();
+            const activeFilterBtn = document.querySelector('.filter-btn.active');
+            const category = activeFilterBtn ? activeFilterBtn.dataset.filter : 'all';
             let count = 0;
 
+            if (clearSearchBtn) {
+                if (term.length > 0) {
+                    clearSearchBtn.classList.remove('hidden');
+                } else {
+                    clearSearchBtn.classList.add('hidden');
+                }
+            }
+
             toolCards.forEach(card => {
-                const title = card.querySelector('h2').textContent.toLowerCase();
-                const desc = card.querySelector('p').textContent.toLowerCase();
-                const cardCat = card.dataset.category;
+                const title = (card.querySelector('h2')?.textContent || '').toLowerCase();
+                const desc = (card.querySelector('p')?.textContent || '').toLowerCase();
+                const cardCat = card.dataset.category || '';
                 
-                const matchesSearch = title.includes(term) || desc.includes(term);
+                const matchesSearch = term === '' || title.includes(term) || desc.includes(term);
                 const matchesCategory = category === 'all' || cardCat === category || cardCat.includes(category);
 
                 if (matchesSearch && matchesCategory) {
@@ -966,21 +1096,43 @@ $v = time();
                     card.classList.add('flex');
                     count++;
                 } else {
-                    card.classList.add('hidden', 'absolute'); // absolute prevents layout shift gaps
+                    card.classList.add('hidden', 'absolute');
                     card.classList.remove('flex');
                 }
             });
 
-            toolCountSpan.textContent = count;
+            if (toolCountSpan) {
+                toolCountSpan.textContent = count;
+            }
             
             if (count === 0) {
-                noResults.classList.remove('hidden');
+                noResults?.classList.remove('hidden');
             } else {
-                noResults.classList.add('hidden');
+                noResults?.classList.add('hidden');
             }
         }
 
-        searchInput.addEventListener('input', filterTools);
+        if (searchInput) {
+            searchInput.addEventListener('input', filterTools);
+        }
+
+        if (clearSearchBtn) {
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                clearSearchBtn.classList.add('hidden');
+                searchInput.focus();
+                filterTools();
+            });
+        }
+
+        if (btnResetSearch) {
+            btnResetSearch.addEventListener('click', () => {
+                searchInput.value = '';
+                if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
+                filterBtns.forEach(b => b.dataset.filter === 'all' ? b.classList.add('active') : b.classList.remove('active'));
+                filterTools();
+            });
+        }
 
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -990,21 +1142,86 @@ $v = time();
             });
         });
 
+        // 6 Interactive Feature Pillars (from banner)
+        document.querySelectorAll('.feature-pillar').forEach(pillar => {
+            pillar.addEventListener('click', () => {
+                const action = pillar.dataset.featureAction;
+                if (!action) return;
+
+                if (action === 'estrutural' || action === 'materiais') {
+                    if (searchInput) searchInput.value = '';
+                    if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
+                    filterBtns.forEach(b => {
+                        if (b.dataset.filter === action) b.classList.add('active');
+                        else b.classList.remove('active');
+                    });
+                    filterTools();
+                } else if (action === 'formula') {
+                    filterBtns.forEach(b => b.dataset.filter === 'all' ? b.classList.add('active') : b.classList.remove('active'));
+                    if (searchInput) {
+                        searchInput.value = 'cálculo';
+                        if (clearSearchBtn) clearSearchBtn.classList.remove('hidden');
+                    }
+                    filterTools();
+                } else if (action === 'dimension') {
+                    if (searchInput) searchInput.value = '';
+                    if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
+                    filterBtns.forEach(b => b.dataset.filter === 'hidraulica' ? b.classList.add('active') : b.classList.remove('active'));
+                    filterTools();
+                } else if (action === 'reports') {
+                    filterBtns.forEach(b => b.dataset.filter === 'all' ? b.classList.add('active') : b.classList.remove('active'));
+                    if (searchInput) {
+                        searchInput.value = 'relatório';
+                        if (clearSearchBtn) clearSearchBtn.classList.remove('hidden');
+                    }
+                    filterTools();
+                } else if (action === 'nbr') {
+                    filterBtns.forEach(b => b.dataset.filter === 'all' ? b.classList.add('active') : b.classList.remove('active'));
+                    if (searchInput) {
+                        searchInput.value = 'nbr';
+                        if (clearSearchBtn) clearSearchBtn.classList.remove('hidden');
+                    }
+                    filterTools();
+                }
+
+                // Smooth scroll to search/grid
+                const targetElem = document.getElementById('searchSection') || document.getElementById('toolsGrid');
+                if (targetElem) {
+                    const topPos = targetElem.getBoundingClientRect().top + window.pageYOffset - 90;
+                    window.scrollTo({ top: topPos, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Keyboard Shortcut: '/' to focus search, 'Esc' to clear
+        window.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput?.focus();
+                searchInput?.select();
+            } else if (e.key === 'Escape' && document.activeElement === searchInput) {
+                searchInput.value = '';
+                if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
+                filterTools();
+                searchInput.blur();
+            }
+        });
+
         // Back to Top
         const btnTop = document.getElementById('backToTop');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
-                btnTop.classList.remove('opacity-0', 'invisible');
+                btnTop?.classList.remove('opacity-0', 'invisible');
             } else {
-                btnTop.classList.add('opacity-0', 'invisible');
+                btnTop?.classList.add('opacity-0', 'invisible');
             }
         });
 
-        btnTop.addEventListener('click', () => {
+        btnTop?.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // --- MOUSE MOVE GLOW EFFECT ON CARDS ---
+        // Mouse Move Glow Effect on Cards
         const toolsGrid = document.getElementById('toolsGrid');
         if (toolsGrid) {
             toolsGrid.addEventListener('mousemove', (e) => {
@@ -1019,7 +1236,7 @@ $v = time();
             });
         }
 
-        // --- EASTER EGG LOGO (5 CLIQUES PARA O LOGIN ADMIN) ---
+        // Easter Egg Logo (5 cliques para o login admin)
         const logoLink = document.getElementById('logo-link');
         if (logoLink) {
             logoLink.addEventListener('click', function(e) {
@@ -1027,7 +1244,6 @@ $v = time();
                 let clicks = parseInt(localStorage.getItem('logo_clicks') || '0');
                 let lastClick = parseInt(localStorage.getItem('logo_last_click') || '0');
 
-                // Incrementa se o clique anterior ocorreu em até 2 segundos
                 if (now - lastClick < 2000) {
                     clicks++;
                 } else {
@@ -1045,7 +1261,6 @@ $v = time();
                     return;
                 }
 
-                // Evita recargas desnecessárias e perda de cliques se o usuário já estiver na Home
                 const targetUrl = this.href;
                 const currentUrl = window.location.href;
                 
