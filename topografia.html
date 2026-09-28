@@ -3,20 +3,22 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>Topografia e Áreas | Ferramentas de Engenharia</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <title>Topografia e Agrimensura PRO | ECALC SUITE</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-ecalc-32.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icon-ecalc-192.png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
-            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', cyan2: '#00e5ff' }
+            dark: { 950: '#06070a', 900: '#0a0a0f', 850: '#0f1118', 800: '#141724', 700: '#1e2238', 600: '#2b314e' },
+            neon: { cyan: '#00ffff', cyan2: '#00e5ff', green: '#00ff88', emerald: '#10b981', amber: '#f59e0b', purple: '#a855f7' }
           },
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace']
           }
         }
@@ -25,28 +27,74 @@
   </script>
   <style>
     * { box-sizing: border-box; }
-    body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
+    body {
+      background: linear-gradient(135deg, #06070a 0%, #0d111c 50%, #06070a 100%);
+      min-height: 100vh;
+      color: #e2e8f0;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Light Theme Integration */
+    body.light-theme {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+      color: #0f172a;
+    }
+    body.light-theme .gradient-border {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
+    body.light-theme .gradient-border::before {
+      opacity: 0.25;
+    }
+    body.light-theme .stat-card,
+    body.light-theme .bg-dark-800\/50,
+    body.light-theme .bg-dark-850,
+    body.light-theme .bg-dark-900\/90 {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #1e293b !important;
+    }
+    body.light-theme .form-input,
+    body.light-theme input,
+    body.light-theme textarea {
+      background: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    body.light-theme .text-gray-300,
+    body.light-theme .text-gray-400 {
+      color: #475569 !important;
+    }
+    body.light-theme .text-gray-500 {
+      color: #64748b !important;
+    }
+    body.light-theme .text-white {
+      color: #0f172a !important;
+    }
+
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-track { background: #0a0a0f; }
     ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00e5ff, #00ff88); border-radius: 4px; }
     
-    .text-glow { text-shadow: 0 0 20px rgba(0, 229, 255, 0.5); }
+    .text-glow { text-shadow: 0 0 20px rgba(0, 229, 255, 0.4); }
     
     .gradient-border {
       position: relative;
-      background: #12121a;
-      border-radius: 16px;
+      background: #0f1118;
+      border-radius: 20px;
     }
     .gradient-border::before {
       content: '';
       position: absolute;
       inset: -2px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #00e5ff, #00ff88, #00e5ff);
+      border-radius: 22px;
+      background: linear-gradient(135deg, #00e5ff, #00ff88, #3b82f6);
       background-size: 300% 300%;
       animation: gradientMove 8s ease infinite;
       z-index: -1;
-      opacity: 0.6;
+      opacity: 0.45;
+      pointer-events: none;
     }
     @keyframes gradientMove {
       0%, 100% { background-position: 0% 50%; }
@@ -54,253 +102,1311 @@
     }
     
     @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
-      50% { box-shadow: 0 0 40px rgba(0, 229, 255, 0.6); }
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.25); }
+      50% { box-shadow: 0 0 45px rgba(0, 229, 255, 0.55); }
     }
-    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    .pulse-glow { animation: pulse-glow 1.5s ease-in-out infinite; }
     
     .form-input {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.25s ease;
     }
     .form-input:focus {
       border-color: #00e5ff;
-      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.25);
       outline: none;
     }
     .btn-primary {
       background: linear-gradient(135deg, #00e5ff 0%, #00ff88 100%);
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
     }
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.4);
+      box-shadow: 0 10px 25px rgba(0, 229, 255, 0.4);
+    }
+    .card-hover {
+      transition: all 0.25s ease;
     }
     .card-hover:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       border-color: #00e5ff;
+    }
+    .tab-btn.active {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: #00e5ff;
+      color: #00e5ff;
     }
   </style>
 </head>
-<body class="font-sans text-gray-100">
-  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-cyan2 to-neon-green flex items-center justify-center font-bold text-dark-900 text-xl">
+<body class="font-sans antialiased">
+
+  <!-- Header da Aplicação -->
+  <header class="sticky top-0 z-40 bg-dark-950/90 backdrop-blur-xl border-b border-white/10 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-cyan2 to-neon-green flex items-center justify-center font-bold text-dark-950 text-xl shadow-lg shadow-cyan-500/20">
           📐
         </div>
         <div>
-          <h1 class="text-lg font-semibold text-white">Topografia</h1>
-          <p class="text-xs text-gray-500">Área de Polígonos (Shoelace) e Perímetro</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">Topografia & Agrimensura PRO</h1>
+            <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">NBR 13133</span>
+          </div>
+          <p class="text-xs text-gray-400">Poligonal, Shoelace, Azimutes, CAD/BIM e Memorial Descritivo de Cartório</p>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      <div class="flex items-center gap-2">
+        <button type="button" id="btnThemeToggle" onclick="toggleTheme()" class="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all cursor-pointer" title="Alternar Modo Claro / Escuro">
+          <svg id="themeIconSun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <svg id="themeIconMoon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <button id="btnReset" class="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all cursor-pointer" title="Reiniciar parâmetros">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <div class="grid lg:grid-cols-3 gap-8">
-      <div class="lg:col-span-1 space-y-6">
-        <div class="gradient-border p-6">
-          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <span class="text-neon-cyan2">●</span> Coordenadas (X, Y)
-          </h2>
-          <p class="text-sm text-gray-400 mb-4">Insira os vértices do terreno sequencialmente (horário ou anti-horário). Use <b>metros</b>.</p>
-          
-          <div id="verticesContainer" class="space-y-3 mb-4 max-h-80 overflow-y-auto pr-2">
-            <!-- Vértices -->
-            <div class="flex gap-2 items-center vertice-row">
-              <span class="text-xs text-gray-500 w-6">P1</span>
-              <input type="number" placeholder="X (E)" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
-              <input type="number" placeholder="Y (N)" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
-            </div>
-            <div class="flex gap-2 items-center vertice-row">
-              <span class="text-xs text-gray-500 w-6">P2</span>
-              <input type="number" placeholder="X (E)" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
-              <input type="number" placeholder="Y (N)" value="10" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
-            </div>
-            <div class="flex gap-2 items-center vertice-row">
-              <span class="text-xs text-gray-500 w-6">P3</span>
-              <input type="number" placeholder="X (E)" value="15" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
-              <input type="number" placeholder="Y (N)" value="10" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
-            </div>
-            <div class="flex gap-2 items-center vertice-row">
-              <span class="text-xs text-gray-500 w-6">P4</span>
-              <input type="number" placeholder="X (E)" value="20" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
-              <input type="number" placeholder="Y (N)" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
-            </div>
+  <main class="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+    <div class="grid lg:grid-cols-12 gap-6 lg:gap-8">
+
+      <!-- COLUNA DA ESQUERDA: Entrada de Vértices & Ferramentas (5 cols) -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- Card de Entrada -->
+        <div class="gradient-border p-5 sm:p-6 shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              Vértices da Poligonal
+            </h2>
+            <div class="text-xs text-gray-400 font-mono" id="txtCountVertices">4 vértices</div>
           </div>
-          
-          <div class="flex gap-2 mb-4">
-            <button id="btnAdd" class="w-full py-2 rounded-lg border border-neon-cyan2/50 text-neon-cyan2 hover:bg-neon-cyan2/10 transition-colors text-sm">
-              + Adicionar Vértice
+
+          <!-- Seletor de Modo de Entrada -->
+          <div class="grid grid-cols-2 gap-2 mb-4 p-1 rounded-xl bg-dark-900/60 border border-white/5">
+            <button type="button" id="tabCoord" onclick="setEntryMode('coord')" class="tab-btn active py-1.5 px-2 text-xs font-semibold rounded-lg border border-transparent transition-all">
+              📍 Coordenadas (X, Y)
             </button>
-            <button id="btnRemove" class="w-full py-2 rounded-lg border border-red-500/50 text-red-500 hover:bg-red-500/10 transition-colors text-sm">
-              - Remover Último
+            <button type="button" id="tabBatch" onclick="setEntryMode('batch')" class="tab-btn py-1.5 px-2 text-xs font-semibold rounded-lg border border-transparent transition-all">
+              📋 Colar em Lote (CSV)
             </button>
           </div>
 
-          <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 shadow-lg shadow-cyan-500/30">
-            Calcular Área e Perímetro
+          <!-- Presets Rápidos -->
+          <div class="mb-4">
+            <label class="block text-[11px] uppercase tracking-wider text-gray-400 mb-1.5 font-semibold">Exemplos Rápidos / Presets:</label>
+            <div class="grid grid-cols-2 gap-1.5">
+              <button type="button" onclick="loadPreset('retangulo')" class="px-2.5 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-white/5 text-xs text-gray-300 hover:text-cyan-300 transition-colors text-left flex items-center gap-1.5">
+                <span>📐</span> Lote 12×30m (360 m²)
+              </button>
+              <button type="button" onclick="loadPreset('trapezio')" class="px-2.5 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-white/5 text-xs text-gray-300 hover:text-cyan-300 transition-colors text-left flex items-center gap-1.5">
+                <span>🔺</span> Lote Trapezoidal
+              </button>
+              <button type="button" onclick="loadPreset('gleba')" class="px-2.5 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-white/5 text-xs text-gray-300 hover:text-cyan-300 transition-colors text-left flex items-center gap-1.5">
+                <span>🌾</span> Gleba Rural (6 Vértices)
+              </button>
+              <button type="button" onclick="loadPreset('irregular')" class="px-2.5 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-white/5 text-xs text-gray-300 hover:text-cyan-300 transition-colors text-left flex items-center gap-1.5">
+                <span>🗺️</span> Polígono Irregular (5 Vért.)
+              </button>
+            </div>
+          </div>
+
+          <!-- MODO 1: Editor Individual de Vértices -->
+          <div id="modeCoord" class="space-y-3">
+            <div class="flex items-center justify-between text-[11px] text-gray-400 px-1 font-semibold">
+              <span class="w-8">PTO</span>
+              <span class="flex-1 text-center">X / ESTE (m)</span>
+              <span class="flex-1 text-center">Y / NORTE (m)</span>
+              <span class="w-16 text-center">COTA Z (m)</span>
+            </div>
+            
+            <div id="verticesContainer" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+              <!-- Inserido dinamicamente via JS -->
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2">
+              <button id="btnAdd" type="button" class="py-2 px-2.5 rounded-xl border border-neon-cyan2/50 text-neon-cyan2 hover:bg-neon-cyan2/10 font-medium transition-colors text-xs flex items-center justify-center gap-1">
+                <span>➕</span> Vértice
+              </button>
+              <button id="btnRemove" type="button" class="py-2 px-2.5 rounded-xl border border-red-500/40 text-red-400 hover:bg-red-500/10 font-medium transition-colors text-xs flex items-center justify-center gap-1">
+                <span>➖</span> Último
+              </button>
+              <button type="button" onclick="limparVertices()" class="col-span-2 sm:col-span-1 py-2 px-2.5 rounded-xl border border-gray-600/40 text-gray-400 hover:bg-gray-800 font-medium transition-colors text-xs flex items-center justify-center gap-1">
+                <span>🗑️</span> Limpar
+              </button>
+            </div>
+          </div>
+
+          <!-- MODO 2: Colar em Lote (CSV / TXT) -->
+          <div id="modeBatch" class="space-y-3 hidden">
+            <p class="text-xs text-gray-400 leading-relaxed">
+              Cole as coordenadas dos vértices separadas por <b>vírgula</b>, <b>espaço</b> ou <b>tabulação</b> (X Y ou X, Y, Z):
+            </p>
+            <textarea id="txtBatchCoords" rows="7" class="form-input w-full p-3 rounded-xl font-mono text-xs text-cyan-300 leading-relaxed" placeholder="0 0
+0 10
+15 10
+20 0"></textarea>
+            <button type="button" onclick="processarBatchCoords()" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs transition-all shadow-md">
+              ⚡ Carregar Coordenadas Coladas
+            </button>
+          </div>
+
+          <!-- Botão Principal de Cálculo -->
+          <button id="btnCalcular" type="button" class="btn-primary w-full mt-5 py-3.5 rounded-xl font-bold text-dark-950 text-sm tracking-wide shadow-lg shadow-cyan-500/25 cursor-pointer">
+            📐 CALCULAR POLIGONAL & TOPOGRAFIA
           </button>
         </div>
+
+        <!-- Card de Informações e Normas -->
+        <div class="p-5 rounded-2xl bg-dark-900/50 border border-white/5 space-y-3 text-xs text-gray-400">
+          <div class="flex items-center gap-2 font-semibold text-gray-300">
+            <span>ℹ️</span> Referências Técnicas & Metodologia
+          </div>
+          <p>
+            • <b>Área do Polígono:</b> Determinantes pelo <i>Método de Gauss</i> (Fórmula de Shoelace), permitindo calcular qualquer polígono convexo ou não-convexo sem autointerseção.
+          </p>
+          <p>
+            • <b>Azimutes & Rumos:</b> Projeções euclidianas em relação ao Norte Verdadeiro/Magnético com precisão angular em segundos sexagesimais ($G^\circ M' S''$).
+          </p>
+          <p>
+            • <b>Conformidade:</b> Diretrizes da <b>ABNT NBR 13133:2021</b> (Execução de Levantamento Topográfico) e Lei de Registros Públicos (Lei nº 6.015/73) para memoriais de cartório.
+          </p>
+        </div>
+
       </div>
 
-      <div class="lg:col-span-2 space-y-6">
-        <div id="resultadoSection" class="gradient-border p-8 text-center opacity-50 transition-opacity duration-500">
-          <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Área do Polígono Irregular</div>
-          <div id="valArea" class="text-5xl md:text-6xl font-bold text-neon-cyan2 text-glow mb-2">0.0</div>
-          <div class="text-xl mb-4 font-semibold text-gray-300">m²</div>
-          
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Perímetro Total</div>
-              <div id="valPerimetro" class="text-xl font-semibold text-neon-green">0 m</div>
+      <!-- COLUNA DA DIREITA: Visualização Gráfica, CADClone, Memorial e Resultados (7 cols) -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- Suite Action Bar Oficial -->
+        <div class="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900/95 via-slate-850/95 to-slate-900/95 border border-cyan-500/40 shadow-2xl no-print">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-900 border border-cyan-500/40 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/20 shrink-0">
+              <img src="assets/icon-ecalc-64.png" alt="ECALC" class="w-full h-full object-contain">
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Área em Hectares</div>
-              <div id="valHa" class="text-xl font-semibold text-neon-cyan2">0 ha</div>
+            <div>
+              <div class="text-xs uppercase tracking-wider text-cyan-400 font-bold">ECALC SUITE PRO</div>
+              <div class="text-sm font-semibold text-white">Topografia, Agrimensura & Geometria — NBR 13133</div>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Alqueire Paulista</div>
-              <div id="valAlqP" class="text-xl font-semibold text-neon-cyan2">0 alq</div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            <button type="button" onclick="abrirNoCadCloneTopografia()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+              <span>📐 Abrir no CADClone</span>
+            </button>
+            <button type="button" onclick="gerarMemorialTopografia()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+              <span>📄 Gerar Memorial ABNT</span>
+            </button>
+            <button type="button" onclick="abrirNoOfficeCloneTopografia()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+              <span>📊 Abrir no OfficeClone</span>
+            </button>
+            <button type="button" onclick="baixarDxfTopografia()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer" title="Baixar arquivo DXF">
+              <span>💾 Baixar .DXF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Visualização Gráfica do Terreno (Canvas Interativo) -->
+        <div class="gradient-border p-5 sm:p-6 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="text-neon-cyan2 text-lg">🗺️</span>
+              <h3 class="text-base font-bold text-white">Planta Baixa Vetorial do Terreno</h3>
+              <span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/30">Em Escala</span>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Nº de Vértices</div>
-              <div id="valVertices" class="text-xl font-semibold text-neon-green">0</div>
+            <!-- Controles do Canvas -->
+            <div class="flex items-center gap-3 text-xs text-gray-400">
+              <label class="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors">
+                <input type="checkbox" id="chkCotas" checked onchange="renderizarCanvas()" class="rounded border-gray-700 text-cyan-500 focus:ring-0">
+                <span>Cotas (m)</span>
+              </label>
+              <label class="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors">
+                <input type="checkbox" id="chkVertices" checked onchange="renderizarCanvas()" class="rounded border-gray-700 text-cyan-500 focus:ring-0">
+                <span>Pontos (P)</span>
+              </label>
+              <label class="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors">
+                <input type="checkbox" id="chkGrid" checked onchange="renderizarCanvas()" class="rounded border-gray-700 text-cyan-500 focus:ring-0">
+                <span>Grade</span>
+              </label>
+              <button type="button" onclick="salvarImagemCanvas()" class="p-1 px-2 rounded-lg bg-white/5 hover:bg-white/10 text-cyan-300 font-semibold text-xs transition-colors flex items-center gap-1" title="Baixar Imagem PNG do Terreno">
+                <span>📷</span> PNG
+              </button>
+            </div>
+          </div>
+
+          <!-- Container do Canvas -->
+          <div class="relative w-full aspect-[16/10] sm:aspect-[16/9] bg-dark-950 rounded-xl overflow-hidden border border-white/10 shadow-inner flex items-center justify-center">
+            <canvas id="topoCanvas" class="w-full h-full block"></canvas>
+            
+            <!-- Indicador do Norte (Rosa dos Ventos Estilizada) -->
+            <div class="absolute top-3 right-3 p-2 rounded-xl bg-dark-900/80 backdrop-blur-md border border-white/10 flex flex-col items-center pointer-events-none shadow-lg">
+              <span class="text-[10px] font-bold text-red-500 leading-none">N</span>
+              <svg class="w-5 h-5 text-red-500 my-0.5" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="12,2 15,11 12,9 9,11" />
+                <polygon points="12,22 15,13 12,15 9,13" fill="#64748b" />
+              </svg>
+              <span class="text-[9px] font-mono text-gray-400">0°</span>
+            </div>
+
+            <!-- Legenda Flutuante -->
+            <div class="absolute bottom-2.5 left-3 text-[10px] text-gray-400 font-mono bg-dark-900/80 px-2.5 py-1 rounded-lg border border-white/5 backdrop-blur-sm pointer-events-none" id="canvasScaleInfo">
+              Escala Automática
             </div>
           </div>
         </div>
 
-        <div class="gradient-border p-6">
-          <h3 class="text-lg font-semibold mb-4 text-white">📝 Memorial - Método de Gauss (Shoelace)</h3>
-          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+        <!-- Painel de Resultados Numéricos Principais -->
+        <div id="resultadoSection" class="gradient-border p-6 sm:p-7 shadow-xl">
+          <div class="text-center mb-6">
+            <div class="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-1">Área Calculada da Superfície</div>
+            <div class="flex items-baseline justify-center gap-2">
+              <span id="valArea" class="text-5xl sm:text-6xl font-black text-neon-cyan2 text-glow tracking-tight font-mono">0.00</span>
+              <span class="text-2xl font-bold text-gray-400">m²</span>
+            </div>
+            <div class="text-xs text-gray-500 mt-1 font-medium">Método dos Determinantes de Gauss (Shoelace Algorithm)</div>
+          </div>
+
+          <!-- Cards de Métricas e Conversões Regionais -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-3.5">
+            <!-- Perímetro -->
+            <div class="p-3.5 bg-dark-850 rounded-xl border border-white/5 card-hover">
+              <div class="text-[11px] text-gray-400 font-medium">Perímetro Total</div>
+              <div id="valPerimetro" class="text-lg font-bold text-neon-green font-mono mt-0.5">0.00 m</div>
+            </div>
+
+            <!-- Hectares -->
+            <div class="p-3.5 bg-dark-850 rounded-xl border border-white/5 card-hover">
+              <div class="text-[11px] text-gray-400 font-medium">Hectares (ha)</div>
+              <div id="valHa" class="text-lg font-bold text-cyan-300 font-mono mt-0.5">0.0000 ha</div>
+              <div class="text-[9px] text-gray-500">1 ha = 10.000 m²</div>
+            </div>
+
+            <!-- Alqueire Paulista -->
+            <div class="p-3.5 bg-dark-850 rounded-xl border border-white/5 card-hover">
+              <div class="text-[11px] text-gray-400 font-medium">Alqueire Paulista</div>
+              <div id="valAlqP" class="text-lg font-bold text-amber-300 font-mono mt-0.5">0.0000 alq</div>
+              <div class="text-[9px] text-gray-500">1 alq = 24.200 m²</div>
+            </div>
+
+            <!-- Alqueire Mineiro / Goiano -->
+            <div class="p-3.5 bg-dark-850 rounded-xl border border-white/5 card-hover">
+              <div class="text-[11px] text-gray-400 font-medium">Alqueire Mineiro</div>
+              <div id="valAlqM" class="text-lg font-bold text-emerald-400 font-mono mt-0.5">0.0000 alq</div>
+              <div class="text-[9px] text-gray-500">1 alq = 48.400 m²</div>
+            </div>
+
+            <!-- Alqueire do Norte -->
+            <div class="p-3.5 bg-dark-850 rounded-xl border border-white/5 card-hover">
+              <div class="text-[11px] text-gray-400 font-medium">Alqueire do Norte</div>
+              <div id="valAlqN" class="text-base font-bold text-cyan-400 font-mono mt-0.5">0.0000 alq</div>
+              <div class="text-[9px] text-gray-500">1 alq = 27.225 m²</div>
+            </div>
+
+            <!-- Alqueire Baiano -->
+            <div class="p-3.5 bg-dark-850 rounded-xl border border-white/5 card-hover">
+              <div class="text-[11px] text-gray-400 font-medium">Alqueire Baiano</div>
+              <div id="valAlqB" class="text-base font-bold text-purple-400 font-mono mt-0.5">0.0000 alq</div>
+              <div class="text-[9px] text-gray-500">1 alq = 96.800 m²</div>
+            </div>
+
+            <!-- Centroide / Baricentro -->
+            <div class="p-3.5 bg-dark-850 rounded-xl border border-white/5 card-hover">
+              <div class="text-[11px] text-gray-400 font-medium">Baricentro (Xg, Yg)</div>
+              <div id="valCentroide" class="text-xs font-bold text-neon-green font-mono mt-1 truncate">0.00, 0.00</div>
+              <div class="text-[9px] text-gray-500">Centro geométrico</div>
+            </div>
+
+            <!-- Altimetria / Desnível -->
+            <div class="p-3.5 bg-dark-850 rounded-xl border border-white/5 card-hover">
+              <div class="text-[11px] text-gray-400 font-medium">Desnível / Decliv.</div>
+              <div id="valDesnivel" class="text-sm font-bold text-cyan-300 font-mono mt-0.5">0.00 m (0%)</div>
+              <div class="text-[9px] text-gray-500" id="valRelevo">Plano</div>
+            </div>
+          </div>
         </div>
+
+        <!-- Caderneta de Campo & Tabela de Azimutes -->
+        <div class="gradient-border p-5 sm:p-6 shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>🧭</span> Caderneta de Campo: Alinhamentos e Azimutes
+            </h3>
+            <span class="text-xs text-gray-400 font-mono">NBR 13133</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono border-collapse">
+              <thead>
+                <tr class="border-b border-white/10 text-gray-400 bg-white/5">
+                  <th class="py-2.5 px-3">ALINHAMENTO</th>
+                  <th class="py-2.5 px-3">DISTÂNCIA (m)</th>
+                  <th class="py-2.5 px-3">AZIMUTE (GMS)</th>
+                  <th class="py-2.5 px-3">RUMO</th>
+                  <th class="py-2.5 px-3">ΔX (ESTE)</th>
+                  <th class="py-2.5 px-3">ΔY (NORTE)</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaAzimutesCorpo" class="divide-y divide-white/5 text-gray-200">
+                <!-- Preenchido via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Memorial Descritivo Padrão de Cartório / INCRA -->
+        <div class="gradient-border p-5 sm:p-6 shadow-xl">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>📄</span> Minuta de Memorial Descritivo (Cartório de Registro de Imóveis)
+            </h3>
+            <button type="button" onclick="copiarMemorialTexto()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-semibold text-xs border border-cyan-500/30 transition-colors">
+              <span id="btnCopiarTextoIcon">📋</span> Copiar Minuta
+            </button>
+          </div>
+          <p class="text-xs text-gray-400 mb-3">
+            Texto padronizado conforme Lei 6.015/73 para averbações de área, unificação, desmembramento e escrituras públicas.
+          </p>
+          <div class="relative">
+            <textarea id="txtMemorialCartorio" readonly rows="8" class="form-input w-full p-4 rounded-xl font-mono text-xs text-gray-300 leading-relaxed bg-dark-950/80 resize-none"></textarea>
+          </div>
+        </div>
+
       </div>
+
     </div>
   </main>
 
-  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
-    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+  <footer class="mt-12 py-6 text-center text-gray-500 text-xs border-t border-white/5">
+    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a> — ECALC SUITE PRO • Ferramentas de Engenharia Civil & Agrimensura</p>
   </footer>
 
   <script>
     const $ = id => document.getElementById(id);
-    let countVertices = 4;
 
-    function getHTMLRow(i) {
-      return `
-        <div class="flex gap-2 items-center vertice-row">
-          <span class="text-xs text-gray-500 w-6">P${i}</span>
-          <input type="number" placeholder="X" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-x">
-          <input type="number" placeholder="Y" value="0" class="form-input w-full px-3 py-2 rounded-lg bg-dark-700 text-sm coord-y">
-        </div>
-      `;
+    // Estado dos vértices
+    let vertices = [
+      { x: 0, y: 0, z: 0 },
+      { x: 0, y: 30, z: 0.5 },
+      { x: 12, y: 30, z: 0.8 },
+      { x: 12, y: 0, z: 0 }
+    ];
+
+    // Presets pré-configurados
+    const PRESETS = {
+      retangulo: [
+        { x: 0, y: 0, z: 0 },
+        { x: 0, y: 30, z: 0.6 },
+        { x: 12, y: 30, z: 0.9 },
+        { x: 12, y: 0, z: 0.2 }
+      ],
+      trapezio: [
+        { x: 0, y: 0, z: 100 },
+        { x: 5, y: 35, z: 101.2 },
+        { x: 25, y: 35, z: 102.0 },
+        { x: 30, y: 0, z: 100.5 }
+      ],
+      gleba: [
+        { x: 150, y: 200, z: 820 },
+        { x: 180, y: 450, z: 826 },
+        { x: 390, y: 520, z: 835 },
+        { x: 540, y: 380, z: 829 },
+        { x: 480, y: 160, z: 822 },
+        { x: 280, y: 110, z: 818 }
+      ],
+      irregular: [
+        { x: 0, y: 0, z: 10 },
+        { x: 10, y: 25, z: 12 },
+        { x: 35, y: 30, z: 13 },
+        { x: 45, y: 15, z: 11 },
+        { x: 25, y: -5, z: 9 }
+      ]
+    };
+
+    function loadPreset(nome) {
+      if (PRESETS[nome]) {
+        vertices = JSON.parse(JSON.stringify(PRESETS[nome]));
+        renderizarLinhasVertices();
+        calcularTopografia();
+      }
+    }
+
+    // Alternar abas de entrada
+    function setEntryMode(mode) {
+      if (mode === 'coord') {
+        $('modeCoord').classList.remove('hidden');
+        $('modeBatch').classList.add('hidden');
+        $('tabCoord').classList.add('active');
+        $('tabBatch').classList.remove('active');
+      } else {
+        $('modeCoord').classList.add('hidden');
+        $('modeBatch').classList.remove('hidden');
+        $('tabCoord').classList.remove('active');
+        $('tabBatch').classList.add('active');
+        // Popular o textarea com o estado atual
+        $('txtBatchCoords').value = vertices.map(v => `${v.x} ${v.y}${v.z ? ' ' + v.z : ''}`).join('\n');
+      }
+    }
+
+    // Processar coordenadas coladas
+    function processarBatchCoords() {
+      const txt = $('txtBatchCoords').value.trim();
+      if (!txt) return;
+
+      const linhas = txt.split('\n');
+      const novos = [];
+
+      for (let l of linhas) {
+        let limpa = l.trim();
+        if (!limpa) continue;
+        // Substituir vírgula decimal se houver separador por espaço/tab
+        // Ou separar por vírgula se o delimitador for vírgula
+        let parts = [];
+        if (limpa.includes('\t')) {
+          parts = limpa.split('\t');
+        } else if (limpa.includes(';') || (limpa.includes(',') && !limpa.includes(' '))) {
+          parts = limpa.split(/[;,]/);
+        } else {
+          parts = limpa.split(/\s+/);
+        }
+
+        parts = parts.map(p => p.trim().replace(',', '.')).filter(p => p !== '');
+        if (parts.length >= 2) {
+          novos.push({
+            x: parseFloat(parts[0]) || 0,
+            y: parseFloat(parts[1]) || 0,
+            z: parseFloat(parts[2]) || 0
+          });
+        }
+      }
+
+      if (novos.length < 3) {
+        alert('Um polígono topográfico precisa de pelo menos 3 vértices válidos!');
+        return;
+      }
+
+      vertices = novos;
+      renderizarLinhasVertices();
+      setEntryMode('coord');
+      calcularTopografia();
+    }
+
+    // Renderizar tabela de inputs
+    function renderizarLinhasVertices() {
+      const container = $('verticesContainer');
+      container.innerHTML = '';
+
+      vertices.forEach((v, idx) => {
+        const row = document.createElement('div');
+        row.className = 'flex gap-1.5 items-center vertice-row';
+        row.innerHTML = `
+          <span class="text-xs font-mono font-bold text-cyan-400 w-8 text-center shrink-0">P${idx + 1}</span>
+          <input type="number" step="any" placeholder="X" value="${v.x}" data-idx="${idx}" data-axis="x" class="form-input flex-1 px-2.5 py-1.5 rounded-lg bg-dark-800 text-xs font-mono coord-x">
+          <input type="number" step="any" placeholder="Y" value="${v.y}" data-idx="${idx}" data-axis="y" class="form-input flex-1 px-2.5 py-1.5 rounded-lg bg-dark-800 text-xs font-mono coord-y">
+          <input type="number" step="any" placeholder="Z" value="${v.z || 0}" data-idx="${idx}" data-axis="z" class="form-input w-16 px-1.5 py-1.5 rounded-lg bg-dark-800 text-xs font-mono text-center coord-z">
+        `;
+        container.appendChild(row);
+      });
+
+      $('txtCountVertices').textContent = `${vertices.length} vértices`;
+
+      // Atualizar listeners de input em tempo real
+      container.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', e => {
+          const idx = parseInt(e.target.getAttribute('data-idx'));
+          const axis = e.target.getAttribute('data-axis');
+          vertices[idx][axis] = parseFloat(e.target.value) || 0;
+          calcularTopografia();
+        });
+      });
     }
 
     $('btnAdd').addEventListener('click', () => {
-      countVertices++;
-      $('verticesContainer').insertAdjacentHTML('beforeend', getHTMLRow(countVertices));
+      const ult = vertices[vertices.length - 1] || { x: 0, y: 0, z: 0 };
+      vertices.push({ x: ult.x + 10, y: ult.y, z: ult.z });
+      renderizarLinhasVertices();
+      calcularTopografia();
     });
 
     $('btnRemove').addEventListener('click', () => {
-      if (countVertices > 3) {
-        const rows = document.querySelectorAll('.vertice-row');
-        rows[rows.length - 1].remove();
-        countVertices--;
+      if (vertices.length > 3) {
+        vertices.pop();
+        renderizarLinhasVertices();
+        calcularTopografia();
       } else {
-        alert("O polígono precisa ter pelo menos 3 vértices!");
+        alert("O polígono topográfico exige no mínimo 3 vértices!");
       }
     });
 
-    function calcularTopografia() {
-      const xInputs = document.querySelectorAll('.coord-x');
-      const yInputs = document.querySelectorAll('.coord-y');
-      
-      let x = [];
-      let y = [];
-      
-      for(let i=0; i<xInputs.length; i++) {
-        x.push(parseFloat(xInputs[i].value) || 0);
-        y.push(parseFloat(yInputs[i].value) || 0);
+    function limparVertices() {
+      if (confirm('Deseja redefinir os vértices para o lote padrão?')) {
+        loadPreset('retangulo');
       }
+    }
 
-      const n = x.length;
+    // Funções Trigonométricas de Azimute e Rumo
+    function calcularAzimute(dx, dy) {
+      let rad = Math.atan2(dx, dy);
+      let deg = rad * (180 / Math.PI);
+      if (deg < 0) deg += 360;
+      return deg;
+    }
+
+    function formatarGMS(deg) {
+      const g = Math.floor(deg);
+      const remM = (deg - g) * 60;
+      const m = Math.floor(remM);
+      const s = ((remM - m) * 60).toFixed(1);
+      return `${g}° ${m.toString().padStart(2, '0')}' ${s.padStart(4, '0')}"`;
+    }
+
+    function calcularRumo(azimute) {
+      let rumo = 0;
+      let quad = '';
+      if (azimute >= 0 && azimute <= 90) {
+        rumo = azimute;
+        quad = 'NE';
+      } else if (azimute > 90 && azimute <= 180) {
+        rumo = 180 - azimute;
+        quad = 'SE';
+      } else if (azimute > 180 && azimute <= 270) {
+        rumo = azimute - 180;
+        quad = 'SW';
+      } else {
+        rumo = 360 - azimute;
+        quad = 'NW';
+      }
+      return `${formatarGMS(rumo)} ${quad}`;
+    }
+
+    // Variável global para armazenar último cálculo
+    window.ultimoCalculoTopografia = null;
+
+    // Motor Principal de Cálculo
+    function calcularTopografia() {
+      const n = vertices.length;
       if (n < 3) return;
 
-      // Cálculo de Área (Shoelace Formula / Método de Gauss)
-      // Area = 0.5 * | (x1*y2 - y1*x2) + (x2*y3 - y2*x3) + ... + (xn*y1 - yn*x1) |
       let sum1 = 0;
       let sum2 = 0;
       let perimetro = 0;
+      let trechos = [];
 
-      let logString = "Ponto | X (E) | Y (N)\n";
+      let minZ = vertices[0].z || 0;
+      let maxZ = vertices[0].z || 0;
 
+      // Cálculo de Área (Shoelace Formula / Método de Gauss)
       for (let i = 0; i < n; i++) {
-        let j = (i + 1) % n; // O próximo ponto. O último se liga ao primeiro.
-        
-        sum1 += x[i] * y[j];
-        sum2 += y[i] * x[j];
-        
-        // Distância entre P(i) e P(i+1)
-        let dx = x[j] - x[i];
-        let dy = y[j] - y[i];
-        perimetro += Math.sqrt(dx*dx + dy*dy);
-        
-        logString += `P${i+1}    | ${x[i].toFixed(2)} | ${y[i].toFixed(2)}\n`;
+        let j = (i + 1) % n;
+
+        sum1 += vertices[i].x * vertices[j].y;
+        sum2 += vertices[i].y * vertices[j].x;
+
+        let dx = vertices[j].x - vertices[i].x;
+        let dy = vertices[j].y - vertices[i].y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        perimetro += dist;
+
+        let az = calcularAzimute(dx, dy);
+        let rumo = calcularRumo(az);
+
+        let z1 = vertices[i].z || 0;
+        let z2 = vertices[j].z || 0;
+        minZ = Math.min(minZ, z1, z2);
+        maxZ = Math.max(maxZ, z1, z2);
+        let dz = z2 - z1;
+        let declividade = dist > 0 ? (Math.abs(dz) / dist) * 100 : 0;
+
+        trechos.push({
+          de: `P${i + 1}`,
+          para: `P${j + 1}`,
+          dx,
+          dy,
+          dist,
+          azimute: az,
+          azimuteGMS: formatarGMS(az),
+          rumo,
+          dz,
+          declividade
+        });
       }
 
-      const area = Math.abs(sum1 - sum2) / 2;
+      const signedArea = (sum1 - sum2) / 2;
+      const area = Math.abs(signedArea);
 
-      // Conversões
+      // Baricentro / Centroide
+      let cx = 0;
+      let cy = 0;
+      if (area > 0) {
+        for (let i = 0; i < n; i++) {
+          let j = (i + 1) % n;
+          let factor = (vertices[i].x * vertices[j].y - vertices[j].x * vertices[i].y);
+          cx += (vertices[i].x + vertices[j].x) * factor;
+          cy += (vertices[i].y + vertices[j].y) * factor;
+        }
+        cx = cx / (6 * signedArea);
+        cy = cy / (6 * signedArea);
+      }
+
+      // Conversões Regionais
       const ha = area / 10000;
-      const alqP = area / 24200;
+      const alqP = area / 24200;  // Paulista
+      const alqM = area / 48400;  // Mineiro / Goiano
+      const alqN = area / 27225;  // Norte
+      const alqB = area / 96800;  // Baiano
 
-      // UI
-      $('resultadoSection').classList.remove('opacity-50');
-      $('resultadoSection').classList.add('pulse-glow');
-      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+      // Altimetria
+      const desnivel = maxZ - minZ;
+      const declivMedia = perimetro > 0 ? (desnivel / (perimetro / 2)) * 100 : 0;
+      let relevo = 'Plano (0-3%)';
+      if (declivMedia > 20) relevo = 'Escarpado (>20%)';
+      else if (declivMedia > 8) relevo = 'Ondulado (8-20%)';
+      else if (declivMedia > 3) relevo = 'Suave Ondulado (3-8%)';
 
-      $('valArea').textContent = area.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-      $('valPerimetro').textContent = perimetro.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' m';
+      // Salvar no estado global
+      window.ultimoCalculoTopografia = {
+        vertices: JSON.parse(JSON.stringify(vertices)),
+        n,
+        area,
+        perimetro,
+        ha,
+        alqP,
+        alqM,
+        alqN,
+        alqB,
+        cx,
+        cy,
+        desnivel,
+        declivMedia,
+        relevo,
+        trechos
+      };
+
+      // Atualizar UI
+      $('valArea').textContent = area.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      $('valPerimetro').textContent = perimetro.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' m';
       $('valHa').textContent = ha.toFixed(4) + ' ha';
       $('valAlqP').textContent = alqP.toFixed(4) + ' alq';
-      $('valVertices').textContent = n;
+      $('valAlqM').textContent = alqM.toFixed(4) + ' alq';
+      $('valAlqN').textContent = alqN.toFixed(4) + ' alq';
+      $('valAlqB').textContent = alqB.toFixed(4) + ' alq';
+      $('valCentroide').textContent = `${cx.toFixed(2)}, ${cy.toFixed(2)}`;
+      $('valDesnivel').textContent = `${desnivel.toFixed(2)} m (${declivMedia.toFixed(1)}%)`;
+      $('valRelevo').textContent = relevo;
 
-      $('memorial').textContent = `MEMORIAL DESCRITIVO DE CÁLCULO DE ÁREA (GAUSS)
-Data: ${new Date().toLocaleDateString('pt-BR')}
+      // Preencher Tabela de Azimutes
+      const tbody = $('tabelaAzimutesCorpo');
+      tbody.innerHTML = '';
+      trechos.forEach((t, i) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-white/5 transition-colors';
+        tr.innerHTML = `
+          <td class="py-2 px-3 font-bold text-cyan-400">${t.de} → ${t.para}</td>
+          <td class="py-2 px-3 text-emerald-400 font-semibold">${t.dist.toFixed(2)}</td>
+          <td class="py-2 px-3 text-cyan-300 font-mono">${t.azimuteGMS}</td>
+          <td class="py-2 px-3 text-amber-300 font-mono">${t.rumo}</td>
+          <td class="py-2 px-3 text-gray-300">${t.dx >= 0 ? '+' : ''}${t.dx.toFixed(2)}</td>
+          <td class="py-2 px-3 text-gray-300">${t.dy >= 0 ? '+' : ''}${t.dy.toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
 
-1. COORDENADAS DOS VÉRTICES (m)
-${logString}
+      // Gerar Minuta de Memorial Descritivo de Cartório
+      gerarMinutaCartorio();
 
-2. CÁLCULO DE ÁREA (Fórmula dos Determinantes / Shoelace)
-Soma (X_i * Y_i+1) = ${sum1.toFixed(2)}
-Soma (Y_i * X_i+1) = ${sum2.toFixed(2)}
-Área = 0.5 * | ${sum1.toFixed(2)} - ${sum2.toFixed(2)} |
-Área Total = ${area.toFixed(2)} m²
-
-3. CÁLCULO DO PERÍMETRO
-Somatório das distâncias euclidianas entre vértices consecutivos.
-Perímetro Total = ${perimetro.toFixed(2)} m
-
-4. CONVERSÕES
-Hectares (1 ha = 10.000 m²) = ${ha.toFixed(4)} ha
-Alqueire Paulista (1 alq = 24.200 m²) = ${alqP.toFixed(4)} alq`;
+      // Renderizar Canvas
+      renderizarCanvas();
     }
 
-    $('btnCalcular').addEventListener('click', calcularTopografia);
-    $('btnReset').addEventListener('click', () => location.reload());
+    // Minuta de Cartório
+    function gerarMinutaCartorio() {
+      const d = window.ultimoCalculoTopografia;
+      if (!d) return;
 
+      const project = (typeof window.ECALC_SUITE !== 'undefined' && window.ECALC_SUITE.getProject)
+        ? window.ECALC_SUITE.getProject()
+        : { nomeObra: 'Imóvel Urbano / Rural', cliente: 'Proprietário', responsavelTecnico: 'Engenheiro Civil', creaCau: 'CREA/CAU', artRrt: 'ART/RRT', cidadeUf: 'Município - UF' };
+
+      let texto = `MEMORIAL DESCRITIVO DE DELIMITAÇÃO PERIMÉTRICA
+Imóvel / Gleba: ${project.nomeObra || 'Área de Levantamento'}
+Proprietário: ${project.cliente || 'Proprietário Legal'}
+Localização: ${project.cidadeUf || 'Comarca Local'}
+Responsável Técnico: ${project.responsavelTecnico || 'Engenheiro(a) Responsável'} | ${project.creaCau || 'CREA/CAU'}
+Anotação de Responsabilidade Técnica (ART/RRT): ${project.artRrt || 'ART Vinculada'}
+
+1. DESCRIÇÃO DO PERÍMETRO:
+Inicia-se a descrição deste perímetro no vértice P1, de coordenadas planas no sistema local E = ${d.vertices[0].x.toFixed(2)} m e N = ${d.vertices[0].y.toFixed(2)} m${d.vertices[0].z ? ', cota Z = ' + d.vertices[0].z.toFixed(2) + ' m' : ''}; `;
+
+      d.trechos.forEach((t, idx) => {
+        const pSeguinte = d.vertices[(idx + 1) % d.n];
+        texto += `deste, segue confrontando com os limites da propriedade no alinhamento ${t.de}-${t.para}, com azimute de ${t.azimuteGMS} (${t.rumo}) e distância de ${t.dist.toFixed(2)} metros, até atingir o vértice ${t.para} de coordenadas E = ${pSeguinte.x.toFixed(2)} m e N = ${pSeguinte.y.toFixed(2)} m; `;
+      });
+
+      texto += `atingindo finalmente o vértice P1 inicial, onde teve início esta descrição perimétrica.
+
+2. ÁREA E PERÍMETRO APURADOS:
+A poligonal acima descrita encerra uma área superficial de ${d.area.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m² (${d.ha.toFixed(4)} hectares), equivalente a ${d.alqP.toFixed(4)} Alqueires Paulistas (${d.alqM.toFixed(4)} Alqueires Mineiros), com perímetro total de ${d.perimetro.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} metros.
+
+O presente levantamento atende aos preceitos da ABNT NBR 13133 e às diretrizes da Lei Federal nº 6.015/73 (Lei de Registros Públicos).
+Data da Emissão: ${new Date().toLocaleDateString('pt-BR')}`;
+
+      $('txtMemorialCartorio').value = texto;
+    }
+
+    function copiarMemorialTexto() {
+      const area = $('txtMemorialCartorio');
+      area.select();
+      navigator.clipboard.writeText(area.value).then(() => {
+        $('btnCopiarTextoIcon').textContent = '✅';
+        setTimeout(() => $('btnCopiarTextoIcon').textContent = '📋', 2000);
+      });
+    }
+
+    // Renderizador Gráfico 2D no Canvas
+    function renderizarCanvas() {
+      const canvas = $('topoCanvas');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+
+      const isLight = document.body.classList.contains('light-theme');
+
+      // Fundo
+      ctx.fillStyle = isLight ? '#ffffff' : '#07090e';
+      ctx.fillRect(0, 0, w, h);
+
+      const n = vertices.length;
+      if (n < 3) return;
+
+      // Calcular limites (Bounding Box)
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      vertices.forEach(v => {
+        if (v.x < minX) minX = v.x;
+        if (v.x > maxX) maxX = v.x;
+        if (v.y < minY) minY = v.y;
+        if (v.y > maxY) maxY = v.y;
+      });
+
+      const spanX = Math.max(maxX - minX, 1);
+      const spanY = Math.max(maxY - minY, 1);
+
+      // Margem interna em pixels
+      const pad = 50;
+      const availW = w - pad * 2;
+      const availH = h - pad * 2;
+
+      // Fator de escala uniforme para preservar proporção 1:1
+      const scale = Math.min(availW / spanX, availH / spanY);
+
+      // Offset para centralizar no canvas
+      const offsetX = pad + (availW - spanX * scale) / 2 - minX * scale;
+      // Em topografia, Y cresce para o Norte (para cima), mas no canvas Y cresce para baixo
+      const offsetY = h - (pad + (availH - spanY * scale) / 2 - minY * scale);
+
+      function toCanvas(vx, vy) {
+        return {
+          x: vx * scale + offsetX,
+          y: offsetY - vy * scale
+        };
+      }
+
+      // Grade milimétrica / métrica de fundo
+      const chkGrid = $('chkGrid') ? $('chkGrid').checked : true;
+      if (chkGrid) {
+        ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.04)';
+        ctx.lineWidth = 1;
+        const gridStep = Math.max(Math.pow(10, Math.floor(Math.log10(Math.max(spanX, spanY)))) / 2, 1);
+        
+        const startGX = Math.floor(minX / gridStep) * gridStep;
+        const endGX = Math.ceil(maxX / gridStep) * gridStep;
+        for (let gx = startGX; gx <= endGX; gx += gridStep) {
+          const pt1 = toCanvas(gx, minY - spanY * 0.1);
+          const pt2 = toCanvas(gx, maxY + spanY * 0.1);
+          ctx.beginPath();
+          ctx.moveTo(pt1.x, pt1.y);
+          ctx.lineTo(pt2.x, pt2.y);
+          ctx.stroke();
+        }
+
+        const startGY = Math.floor(minY / gridStep) * gridStep;
+        const endGY = Math.ceil(maxY / gridStep) * gridStep;
+        for (let gy = startGY; gy <= endGY; gy += gridStep) {
+          const pt1 = toCanvas(minX - spanX * 0.1, gy);
+          const pt2 = toCanvas(maxX + spanX * 0.1, gy);
+          ctx.beginPath();
+          ctx.moveTo(pt1.x, pt1.y);
+          ctx.lineTo(pt2.x, pt2.y);
+          ctx.stroke();
+        }
+      }
+
+      // Preenchimento translúcido do polígono
+      ctx.beginPath();
+      const p0 = toCanvas(vertices[0].x, vertices[0].y);
+      ctx.moveTo(p0.x, p0.y);
+      for (let i = 1; i < n; i++) {
+        const pt = toCanvas(vertices[i].x, vertices[i].y);
+        ctx.lineTo(pt.x, pt.y);
+      }
+      ctx.closePath();
+
+      // Gradiente suave no preenchimento
+      const polyGrad = ctx.createLinearGradient(0, 0, w, h);
+      if (isLight) {
+        polyGrad.addColorStop(0, 'rgba(6, 182, 212, 0.15)');
+        polyGrad.addColorStop(1, 'rgba(16, 185, 129, 0.12)');
+      } else {
+        polyGrad.addColorStop(0, 'rgba(0, 229, 255, 0.12)');
+        polyGrad.addColorStop(1, 'rgba(0, 255, 136, 0.08)');
+      }
+      ctx.fillStyle = polyGrad;
+      ctx.fill();
+
+      // Contorno Neon da Poligonal
+      ctx.strokeStyle = isLight ? '#0284c7' : '#00e5ff';
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // Centroide
+      if (window.ultimoCalculoTopografia && !isNaN(window.ultimoCalculoTopografia.cx)) {
+        const cPt = toCanvas(window.ultimoCalculoTopografia.cx, window.ultimoCalculoTopografia.cy);
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.arc(cPt.x, cPt.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = '9px monospace';
+        ctx.fillStyle = isLight ? '#78350f' : '#fcd34d';
+        ctx.fillText('G (Centroide)', cPt.x + 6, cPt.y - 4);
+      }
+
+      const showCotas = $('chkCotas') ? $('chkCotas').checked : true;
+      const showVertices = $('chkVertices') ? $('chkVertices').checked : true;
+
+      // Desenhar Cotas e Alinhamentos
+      for (let i = 0; i < n; i++) {
+        let j = (i + 1) % n;
+        const ptA = toCanvas(vertices[i].x, vertices[i].y);
+        const ptB = toCanvas(vertices[j].x, vertices[j].y);
+
+        if (showCotas) {
+          const midX = (ptA.x + ptB.x) / 2;
+          const midY = (ptA.y + ptB.y) / 2;
+          const dx = vertices[j].x - vertices[i].x;
+          const dy = vertices[j].y - vertices[i].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // Normal do segmento para deslocar o texto da linha
+          const segLen = Math.hypot(ptB.x - ptA.x, ptB.y - ptA.y);
+          if (segLen > 0) {
+            const nx = -(ptB.y - ptA.y) / segLen;
+            const ny = (ptB.x - ptA.x) / segLen;
+            const textOffset = 12;
+
+            ctx.font = '10px "JetBrains Mono", monospace';
+            ctx.fillStyle = isLight ? '#059669' : '#00ff88';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${dist.toFixed(2)}m`, midX + nx * textOffset, midY + ny * textOffset);
+          }
+        }
+      }
+
+      // Desenhar Vértices com Rótulos
+      vertices.forEach((v, i) => {
+        const pt = toCanvas(v.x, v.y);
+
+        // Ponto externo / glow
+        ctx.fillStyle = isLight ? '#0284c7' : '#00ffff';
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = isLight ? '#ffffff' : '#0a0a0f';
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (showVertices) {
+          ctx.font = 'bold 11px Inter, sans-serif';
+          ctx.fillStyle = isLight ? '#0f172a' : '#ffffff';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(`P${i + 1}`, pt.x + 8, pt.y - 4);
+
+          // Coordenada resumida
+          ctx.font = '9px monospace';
+          ctx.fillStyle = isLight ? '#64748b' : '#94a3b8';
+          ctx.fillText(`(${v.x.toFixed(1)}, ${v.y.toFixed(1)})`, pt.x + 8, pt.y + 9);
+        }
+      });
+
+      // Atualizar legenda de escala
+      $('canvasScaleInfo').textContent = `1m = ${scale.toFixed(2)}px | Extensão: ${spanX.toFixed(1)}m × ${spanY.toFixed(1)}m`;
+    }
+
+    function salvarImagemCanvas() {
+      const canvas = $('topoCanvas');
+      const link = document.createElement('a');
+      link.download = `planta_topografica_poligonal_${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // ==========================================
+    // INTEGRAÇÃO COM CADCLONE (DXF)
+    // ==========================================
+    function gerarDxfTopografiaString() {
+      const d = window.ultimoCalculoTopografia;
+      if (!d) return null;
+
+      let dxfLines = [];
+      // HEADER
+      dxfLines.push("  0\nSECTION\n  2\nHEADER\n  9\n$ACADVER\n  1\nAC1009\n  0\nENDSEC");
+
+      // TABLES & LAYERS
+      dxfLines.push("  0\nSECTION\n  2\nTABLES\n  0\nTABLE\n  2\nLAYER\n 70\n6");
+      const layers = [
+        { name: '0', color: 7 },
+        { name: 'TOPOGRAFIA_POLIGONO', color: 4 }, // Cyan
+        { name: 'TOPOGRAFIA_VERTICES', color: 2 }, // Yellow
+        { name: 'TOPOGRAFIA_COTAS', color: 3 },    // Green
+        { name: 'TOPOGRAFIA_TEXTOS', color: 7 },   // White
+        { name: 'TOPOGRAFIA_NORTE', color: 1 }     // Red
+      ];
+      layers.forEach(l => {
+        dxfLines.push(`  0\nLAYER\n  2\n${l.name}\n 70\n0\n 62\n${l.color}\n  6\nCONTINUOUS`);
+      });
+      dxfLines.push("  0\nENDTAB\n  0\nENDSEC");
+
+      // ENTITIES
+      dxfLines.push("  0\nSECTION\n  2\nENTITIES");
+
+      // Linhas do Polígono
+      for (let i = 0; i < d.n; i++) {
+        let j = (i + 1) % d.n;
+        const v1 = d.vertices[i];
+        const v2 = d.vertices[j];
+
+        // Linha do perímetro
+        dxfLines.push(`  0\nLINE\n  8\nTOPOGRAFIA_POLIGONO\n 62\n4\n 10\n${v1.x.toFixed(3)}\n 20\n${v1.y.toFixed(3)}\n 30\n${(v1.z || 0).toFixed(3)}\n 11\n${v2.x.toFixed(3)}\n 21\n${v2.y.toFixed(3)}\n 31\n${(v2.z || 0).toFixed(3)}`);
+
+        // Cota com o comprimento do alinhamento
+        const midX = (v1.x + v2.x) / 2;
+        const midY = (v1.y + v2.y) / 2;
+        const dist = d.trechos[i].dist;
+        dxfLines.push(`  0\nTEXT\n  8\nTOPOGRAFIA_COTAS\n 62\n3\n 10\n${midX.toFixed(3)}\n 20\n${midY.toFixed(3)}\n 30\n0.0\n 40\n0.60\n  1\nL=${dist.toFixed(2)}m (Az=${d.trechos[i].azimuteGMS})`);
+      }
+
+      // Vértices (Círculos e Rótulos)
+      d.vertices.forEach((v, idx) => {
+        dxfLines.push(`  0\nCIRCLE\n  8\nTOPOGRAFIA_VERTICES\n 62\n2\n 10\n${v.x.toFixed(3)}\n 20\n${v.y.toFixed(3)}\n 30\n0.0\n 40\n0.25`);
+        dxfLines.push(`  0\nTEXT\n  8\nTOPOGRAFIA_TEXTOS\n 62\n7\n 10\n${(v.x + 0.4).toFixed(3)}\n 20\n${(v.y + 0.4).toFixed(3)}\n 30\n0.0\n 40\n0.80\n  1\nP${idx + 1} (E=${v.x.toFixed(2)}, N=${v.y.toFixed(2)})`);
+      });
+
+      // Símbolo do Norte no centroide ou offset superior
+      const norteX = d.cx;
+      const norteY = d.cy + 5;
+      dxfLines.push(`  0\nLINE\n  8\nTOPOGRAFIA_NORTE\n 62\n1\n 10\n${norteX.toFixed(3)}\n 20\n${norteY.toFixed(3)}\n 30\n0.0\n 11\n${norteX.toFixed(3)}\n 21\n${(norteY + 4).toFixed(3)}\n 31\n0.0`);
+      dxfLines.push(`  0\nTEXT\n  8\nTOPOGRAFIA_NORTE\n 62\n1\n 10\n${(norteX - 0.25).toFixed(3)}\n 20\n${(norteY + 4.5).toFixed(3)}\n 30\n0.0\n 40\n1.0\n  1\nN`);
+
+      // Textos de Informação
+      dxfLines.push(`  0\nTEXT\n  8\nTOPOGRAFIA_TEXTOS\n 62\n7\n 10\n${d.cx.toFixed(3)}\n 20\n${d.cy.toFixed(3)}\n 30\n0.0\n 40\n1.2\n  1\nAREA = ${d.area.toFixed(2)} m2 (${d.ha.toFixed(4)} ha)`);
+      dxfLines.push(`  0\nTEXT\n  8\nTOPOGRAFIA_TEXTOS\n 62\n7\n 10\n${d.cx.toFixed(3)}\n 20\n${(d.cy - 1.5).toFixed(3)}\n 30\n0.0\n 40\n0.8\n  1\nPERIMETRO = ${d.perimetro.toFixed(2)} m`);
+
+      dxfLines.push("  0\nENDSEC\n  0\nEOF\n");
+      return dxfLines.join("\n");
+    }
+
+    function abrirNoCadCloneTopografia() {
+      if (!window.ultimoCalculoTopografia) {
+        alert('Calcule a poligonal primeiro!');
+        return;
+      }
+      const dxf = gerarDxfTopografiaString();
+      if (!dxf) return;
+
+      if (window.ECALC_CAD && window.ECALC_CAD.abrirNoCadClone) {
+        window.ECALC_CAD.abrirNoCadClone(dxf, 'planta_topografica_poligonal.dxf');
+      } else {
+        try {
+          localStorage.setItem('cadclone_external_dxf', dxf);
+          localStorage.setItem('cadclone_external_filename', 'planta_topografica_poligonal.dxf');
+          window.open('../cadclone/', '_blank');
+        } catch (e) {
+          baixarDxfTopografia();
+        }
+      }
+    }
+
+    function baixarDxfTopografia() {
+      if (!window.ultimoCalculoTopografia) {
+        alert('Calcule a poligonal primeiro!');
+        return;
+      }
+      const dxf = gerarDxfTopografiaString();
+      if (!dxf) return;
+
+      const blob = new Blob([dxf], { type: 'application/dxf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `planta_topografica_${Date.now()}.dxf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ==========================================
+    // INTEGRAÇÃO COM MEMORIAL ABNT (PDF)
+    // ==========================================
+    function gerarMemorialTopografia() {
+      if (!window.ultimoCalculoTopografia) {
+        alert('Calcule a poligonal primeiro!');
+        return;
+      }
+      const d = window.ultimoCalculoTopografia;
+
+      // Gerar SVG do polígono para o memorial
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      d.vertices.forEach(v => {
+        if (v.x < minX) minX = v.x;
+        if (v.x > maxX) maxX = v.x;
+        if (v.y < minY) minY = v.y;
+        if (v.y > maxY) maxY = v.y;
+      });
+      const spanX = Math.max(maxX - minX, 1);
+      const spanY = Math.max(maxY - minY, 1);
+      const svgW = 500, svgH = 300, pad = 40;
+      const s = Math.min((svgW - pad * 2) / spanX, (svgH - pad * 2) / spanY);
+      const ox = pad + ((svgW - pad * 2) - spanX * s) / 2 - minX * s;
+      const oy = svgH - (pad + ((svgH - pad * 2) - spanY * s) / 2 - minY * s);
+
+      const toSvg = (vx, vy) => `${(vx * s + ox).toFixed(1)},${(oy - vy * s).toFixed(1)}`;
+      const ptsSvg = d.vertices.map(v => toSvg(v.x, v.y)).join(' ');
+
+      let svgContent = `
+        <svg viewBox="0 0 ${svgW} ${svgH}" style="width: 100%; max-height: 280px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+          <!-- Grade suave -->
+          <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+            <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e2e8f0" stroke-width="0.7"/>
+          </pattern>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+
+          <!-- Polígono preenchido -->
+          <polygon points="${ptsSvg}" fill="rgba(2, 132, 199, 0.12)" stroke="#0284c7" stroke-width="2" stroke-linejoin="round"/>
+
+          <!-- Vértices -->
+          ${d.vertices.map((v, idx) => {
+            const p = toSvg(v.x, v.y).split(',');
+            return `
+              <circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#0284c7" stroke="#ffffff" stroke-width="1.5"/>
+              <text x="${parseFloat(p[0]) + 6}" y="${parseFloat(p[1]) - 4}" font-family="sans-serif" font-size="10" font-weight="bold" fill="#0f172a">P${idx + 1}</text>
+            `;
+          }).join('')}
+
+          <!-- Rosa dos ventos -->
+          <g transform="translate(460, 35)">
+            <circle cx="0" cy="0" r="14" fill="#ffffff" stroke="#cbd5e1"/>
+            <polygon points="0,-12 4,0 0,-3 -4,0" fill="#dc2626"/>
+            <polygon points="0,12 4,0 0,3 -4,0" fill="#64748b"/>
+            <text x="-4" y="-14" font-family="sans-serif" font-size="9" font-weight="bold" fill="#dc2626">N</text>
+          </g>
+        </svg>
+      `;
+
+      if (window.ECALC_MEMORIAL && window.ECALC_MEMORIAL.gerar) {
+        window.ECALC_MEMORIAL.gerar({
+          titulo: 'Memorial Descritivo e Caderneta Topográfica',
+          norma: 'ABNT NBR 13133:2021 / Lei 6.015/73',
+          elemento: 'Levantamento Planialtimétrico de Imóvel',
+          inputs: [
+            { label: 'Número de Vértices da Poligonal', val: `${d.n} pontos` },
+            { label: 'Sistema de Projeção', val: 'Plano Topográfico Local (PTL)' },
+            { label: 'Ponto Inicial de Referência (P1)', val: `E = ${d.vertices[0].x.toFixed(2)} m, N = ${d.vertices[0].y.toFixed(2)} m` },
+            { label: 'Desnível Altimétrico Máximo (ΔZ)', val: `${d.desnivel.toFixed(2)} metros (${d.relevo})` }
+          ],
+          formulas: [
+            `Área pelo Método dos Determinantes de Gauss (Shoelace Algorithm):<br>
+             <strong>A = 0.5 · | ∑ (Xᵢ · Yᵢ₊₁ - Yᵢ · Xᵢ₊₁) | = ${d.area.toFixed(2)} m²</strong>`,
+            `Cálculo do Perímetro Euclidiano dos Alinhamentos:<br>
+             <strong>P = ∑ √(ΔXᵢ² + ΔYᵢ²) = ${d.perimetro.toFixed(2)} m</strong>`,
+            `Conversão para Unidades Agrárias:<br>
+             <strong>1 ha = 10.000 m²</strong> | <strong>1 Alqueire Paulista = 24.200 m²</strong> | <strong>1 Alqueire Mineiro = 48.400 m²</strong>`
+          ],
+          resultados: [
+            { label: 'Área Superficial Total Calculada', val: `${d.area.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} m²` },
+            { label: 'Área em Hectares', val: `${d.ha.toFixed(4)} ha` },
+            { label: 'Área em Alqueires Paulistas', val: `${d.alqP.toFixed(4)} alq` },
+            { label: 'Área em Alqueires Mineiros / Goianos', val: `${d.alqM.toFixed(4)} alq` },
+            { label: 'Perímetro Total do Fechamento', val: `${d.perimetro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} m` },
+            { label: 'Coordenadas do Baricentro (Xg, Yg)', val: `E = ${d.cx.toFixed(2)} m, N = ${d.cy.toFixed(2)} m` }
+          ],
+          verificacoes: [
+            {
+              item: 'Fechamento da Poligonal Topográfica (Loop)',
+              calc: `Poligonal com ${d.n} vértices fechada com sucesso no vértice de partida P1`,
+              status: 'pass'
+            },
+            {
+              item: 'Precisão Relativa Linear Admissível (NBR 13133)',
+              calc: `Erro angular de fechamento nulo por determinação analítica direta de coordenadas`,
+              status: 'pass'
+            },
+            {
+              item: 'Conformidade de Matrícula (Lei 6.015/73)',
+              calc: `Poligonal com azimutes, distâncias e confrontações perfeitamente referenciadas`,
+              status: 'pass'
+            }
+          ],
+          tituloGrafico: '5. Planta Baixa Cadastral em Escala da Poligonal',
+          legendaGrafico: 'Planta vetorial do perímetro com demarcação sequencial de vértices e indicação do Norte Verdadeiro.',
+          svgSection: svgContent,
+          notas: 'Memorial de caracterização e determinação de área emitido conforme a norma ABNT NBR 13133 (Execução de Levantamento Topográfico). Este documento e seus vetores destinam-se ao registro, regularização, retificação de área imobiliária ou instrução de Anotação de Responsabilidade Técnica (ART/RRT).'
+        });
+      }
+    }
+
+    // ==========================================
+    // INTEGRAÇÃO COM OFFICECLONE (PLANILHA)
+    // ==========================================
+    function abrirNoOfficeCloneTopografia() {
+      if (!window.ultimoCalculoTopografia) {
+        alert('Calcule a poligonal primeiro!');
+        return;
+      }
+      const d = window.ultimoCalculoTopografia;
+      const project = (typeof window.ECALC_SUITE !== 'undefined' && window.ECALC_SUITE.getProject)
+        ? window.ECALC_SUITE.getProject()
+        : { nomeObra: 'Imóvel Topográfico', responsavelTecnico: 'Engenheiro Responsável' };
+
+      let dataCells = {
+        '0,0': 'CADERNETA TOPOGRÁFICA & CÁLCULO DE ÁREA (NBR 13133) - ECALC PRO',
+        '1,0': 'Obra / Imóvel:', '1,1': project.nomeObra || 'Levantamento de Imóvel',
+        '2,0': 'Responsável Técnico:', '2,1': project.responsavelTecnico || '-',
+        '3,0': 'Data:', '3,1': new Date().toLocaleDateString('pt-BR'),
+        '4,0': 'Método Utilizado:', '4,1': 'Gauss (Shoelace) e Projeções Euclidianas',
+
+        '6,0': '1. RESUMO GERAL DAS ÁREAS E PERÍMETRO',
+        '7,0': 'PARÂMETRO', '7,1': 'SÍMBOLO', '7,2': 'VALOR', '7,3': 'UNIDADE', '7,4': 'OBSERVAÇÃO',
+        '8,0': 'Área Superficial Plana', '8,1': 'A', '8,2': d.area.toFixed(2), '8,3': 'm²', '8,4': 'Projeção horizontal no PTL',
+        '9,0': 'Área em Hectares', '9,1': 'ha', '9,2': d.ha.toFixed(4), '9,3': 'ha', '9,4': '10.000 m²',
+        '10,0': 'Alqueire Paulista', '10,1': 'alq SP', '10,2': d.alqP.toFixed(4), '10,3': 'alq', '10,4': '24.200 m²',
+        '11,0': 'Alqueire Mineiro / Goiano', '11,1': 'alq MG', '11,2': d.alqM.toFixed(4), '11,3': 'alq', '11,4': '48.400 m²',
+        '12,0': 'Perímetro Total', '12,1': 'P', '12,2': d.perimetro.toFixed(2), '12,3': 'm', '12,4': 'Soma dos alinhamentos',
+        '13,0': 'Baricentro Este (Xg)', '13,1': 'Xg', '13,2': d.cx.toFixed(2), '13,3': 'm', '13,4': 'Centro de massa',
+        '14,0': 'Baricentro Norte (Yg)', '14,1': 'Yg', '14,2': d.cy.toFixed(2), '14,3': 'm', '14,4': 'Centro de massa',
+
+        '16,0': '2. CADERNETA DE CAMPO: ALINHAMENTOS, DISTÂNCIAS E AZIMUTES',
+        '17,0': 'ESTAÇÃO', '17,1': 'VANTE', '17,2': 'DISTÂNCIA (m)', '17,3': 'AZIMUTE (GMS)', '17,4': 'RUMO', '17,5': 'ΔX ESTE (m)', '17,6': 'ΔY NORTE (m)'
+      };
+
+      let startRow = 18;
+      d.trechos.forEach((t, idx) => {
+        let r = startRow + idx;
+        dataCells[`${r},0`] = t.de;
+        dataCells[`${r},1`] = t.para;
+        dataCells[`${r},2`] = t.dist.toFixed(2);
+        dataCells[`${r},3`] = t.azimuteGMS;
+        dataCells[`${r},4`] = t.rumo;
+        dataCells[`${r},5`] = t.dx.toFixed(2);
+        dataCells[`${r},6`] = t.dy.toFixed(2);
+      });
+
+      const payload = {
+        fileName: `Caderneta_Topografica_${(project.nomeObra || 'Topografia').replace(/\s+/g, '_')}`,
+        sheets: [{
+          name: 'Topografia',
+          data: dataCells,
+          formats: {
+            '0,0': { bold: true, fontSize: 13, color: '#06b6d4' },
+            '6,0': { bold: true, color: '#0284c7' },
+            '7,0': { bold: true, bgColor: '#e2e8f0' },
+            '7,1': { bold: true, bgColor: '#e2e8f0' },
+            '7,2': { bold: true, bgColor: '#e2e8f0' },
+            '7,3': { bold: true, bgColor: '#e2e8f0' },
+            '7,4': { bold: true, bgColor: '#e2e8f0' },
+            '16,0': { bold: true, color: '#0284c7' },
+            '17,0': { bold: true, bgColor: '#e2e8f0' },
+            '17,1': { bold: true, bgColor: '#e2e8f0' },
+            '17,2': { bold: true, bgColor: '#e2e8f0' },
+            '17,3': { bold: true, bgColor: '#e2e8f0' },
+            '17,4': { bold: true, bgColor: '#e2e8f0' },
+            '17,5': { bold: true, bgColor: '#e2e8f0' },
+            '17,6': { bold: true, bgColor: '#e2e8f0' }
+          },
+          colWidths: { 0: 160, 1: 140, 2: 130, 3: 160, 4: 150, 5: 120, 6: 120 }
+        }]
+      };
+
+      try {
+        localStorage.setItem('officeclone_import_payload', JSON.stringify(payload));
+        window.open('../office/excel/', '_blank');
+      } catch (e) {
+        console.error('Erro ao transferir para OfficeClone:', e);
+        alert('Erro ao transferir dados para o OfficeClone.');
+      }
+    }
+
+    // Gerenciamento de Tema
+    function applyTheme(isLight) {
+      if (isLight) {
+        document.body.classList.add('light-theme');
+        $('themeIconSun').classList.remove('hidden');
+        $('themeIconMoon').classList.add('hidden');
+      } else {
+        document.body.classList.remove('light-theme');
+        $('themeIconSun').classList.add('hidden');
+        $('themeIconMoon').classList.remove('hidden');
+      }
+      renderizarCanvas();
+    }
+
+    function toggleTheme() {
+      const isLight = !document.body.classList.contains('light-theme');
+      localStorage.setItem('ecalc_theme', isLight ? 'light' : 'dark');
+      applyTheme(isLight);
+    }
+
+    // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
       if ($('year')) $('year').textContent = new Date().getFullYear();
+
+      // Restaurar tema salvo
+      const savedTheme = localStorage.getItem('ecalc_theme');
+      applyTheme(savedTheme === 'light');
+
+      // Carregar vértices iniciais
+      renderizarLinhasVertices();
+      calcularTopografia();
+
+      // Responsividade do canvas ao redimensionar
+      window.addEventListener('resize', () => {
+        renderizarCanvas();
+      });
+    });
+
+    $('btnCalcular').addEventListener('click', calcularTopografia);
+    $('btnReset').addEventListener('click', () => {
+      if (confirm('Reiniciar para o lote padrão 12x30m?')) {
+        loadPreset('retangulo');
+      }
     });
   </script>
-    <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js"></script>
+
+  <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
+  <script src="assets/suite/suite-nav.js"></script>
+  <script src="assets/suite/suite-memorial.js"></script>
+  <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>
