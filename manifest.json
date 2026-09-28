@@ -1,0 +1,23 @@
+{
+  "name": "ECALC - Cálculos Técnicos para Engenharia",
+  "short_name": "ECALC PRO",
+  "description": "Plataforma com 41 ferramentas técnicas, calculadoras especializadas, normas ABNT NBR e relatórios para engenharia civil.",
+  "start_url": "./index.php",
+  "display": "standalone",
+  "background_color": "#030611",
+  "theme_color": "#00D2FF",
+  "icons": [
+    {
+      "src": "assets/icon-ecalc-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-ecalc-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

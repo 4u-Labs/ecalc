@@ -364,8 +364,13 @@
                 <!-- Cabeçalho Oficial -->
                 <div class="ecalc-sheet-header">
                     <div class="ecalc-sheet-logo">
-                        <span>ECALC</span>
-                        <span style="font-size: 8pt; display: block; color: #475569; font-weight: 600;">ENGENHARIA PRO</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <img src="${(window.location.pathname.includes('/seguranca/') ? '../' : './')}assets/icon-ecalc-64.png" alt="ECALC" style="width: 34px; height: 34px; border-radius: 7px; object-fit: cover; box-shadow: 0 1px 4px rgba(0,0,0,0.15);">
+                            <div>
+                                <span style="font-size: 1.15rem; font-weight: 900; color: #0284c7; letter-spacing: -0.02em;">ECALC</span>
+                                <span style="font-size: 7.5pt; display: block; color: #475569; font-weight: 600;">ENGENHARIA PRO</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="ecalc-sheet-title">
                         <h1>${options.titulo || 'Memorial de Cálculo Técnico'}</h1>

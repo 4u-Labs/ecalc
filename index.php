@@ -14,6 +14,14 @@ $v = time();
     <title>ECALC - Cálculos Técnicos para Engenharia | 4U.IA.BR</title>
     <meta name="description" content="ECALC - Plataforma com 40 ferramentas técnicas, calculadoras especializadas, normas ABNT NBR e relatórios para engenharia civil.">
 
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-ecalc-32.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="assets/icon-ecalc-64.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-ecalc-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-ecalc-192.png">
+    <link rel="shortcut icon" href="assets/favicon.ico">
+    <link rel="manifest" href="manifest.json">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -445,9 +453,7 @@ $v = time();
             <!-- Brand Link with 5-click easter egg preserved -->
             <a href="./" id="logo-link" class="flex items-center gap-3.5 group cursor-pointer no-underline select-none">
                 <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 via-blue-600 to-cyan-400 p-[2px] shadow-[0_0_20px_rgba(0,210,255,0.35)] group-hover:shadow-[0_0_30px_rgba(245,158,11,0.55)] transition-all duration-300">
-                    <div class="w-full h-full bg-[#030611] rounded-[10px] flex items-center justify-center font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-cyan-300 to-white font-['Orbitron']">
-                        Ξ
-                    </div>
+                    <img src="assets/icon-ecalc-192.png" alt="ECALC" class="w-full h-full object-cover rounded-[10px] shadow-inner">
                 </div>
                 <div>
                     <div class="flex items-center gap-2">

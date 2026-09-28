@@ -73,6 +73,15 @@
     box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
 }
 
+.ecalc-brand-icon-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+    flex-shrink: 0;
+}
+
 .ecalc-brand-tag {
     font-size: 0.65rem;
     padding: 1px 5px;

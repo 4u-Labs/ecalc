@@ -128,7 +128,7 @@
         bar.innerHTML = `
             <div class="ecalc-bar-left">
                 <a href="${rootPath}index.php" class="ecalc-brand" title="Voltar ao Hub ECALC">
-                    <div class="ecalc-brand-icon">Ξ</div>
+                    <img src="${rootPath}assets/icon-ecalc-64.png" alt="ECALC" class="ecalc-brand-icon-img">
                     <span>ECALC</span>
                     <span class="ecalc-brand-tag">SUITE</span>
                 </a>
@@ -438,8 +438,30 @@
         initSuite();
     }
 
+    function ensureFavicon() {
+        const isSubdir = window.location.pathname.includes('/seguranca/');
+        const rootPath = isSubdir ? '../' : './';
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'icon';
+            document.head.appendChild(link);
+        }
+        link.type = 'image/png';
+        link.href = rootPath + 'assets/icon-ecalc-32.png';
+
+        let apple = document.querySelector("link[rel='apple-touch-icon']");
+        if (!apple) {
+            apple = document.createElement('link');
+            apple.rel = 'apple-touch-icon';
+            document.head.appendChild(apple);
+        }
+        apple.href = rootPath + 'assets/icon-ecalc-192.png';
+    }
+
     function initSuite() {
         injectStyles();
+        ensureFavicon();
         injectSuiteBar();
         injectAppSwitcherModal();
         injectProjectDrawer();
