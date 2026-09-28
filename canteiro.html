@@ -848,6 +848,33 @@
   </header>
 
   <main class="main-container">
+    <!-- SUITE ACTION BAR -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-700/60 shadow-xl backdrop-blur-md">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white text-lg shadow-lg shadow-cyan-500/30">
+          <i class="fas fa-hard-hat"></i>
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-wider text-cyan-400 font-bold">ECALC SUITE PRO</div>
+          <div class="text-sm font-semibold text-white">Canteiro de Obras & Vivência — Norma Regulamentadora NR-18</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="abrirNoCadCloneCanteiro()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-drafting-compass"></i> 📐 Abrir no CADClone
+        </button>
+        <button type="button" onclick="gerarMemorialCanteiro()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-file-alt text-cyan-400"></i> 📄 Gerar Memorial NR-18
+        </button>
+        <button type="button" onclick="abrirNoOfficeCloneCanteiro()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-table"></i> 📊 Abrir no OfficeClone
+        </button>
+        <button type="button" onclick="baixarDxfCanteiro()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-download"></i> 💾 Baixar .DXF
+        </button>
+      </div>
+    </div>
+
     <!-- Page Title -->
     <div class="page-title fade-in">
       <h1><i class="fas fa-building"></i> Dimensionamento de Canteiro</h1>
@@ -1233,6 +1260,8 @@
     // Container padrão (6x2.4m = 14.4m²)
     const CONTAINER_PADRAO = 14.4;
 
+    let ultimoCalculoCanteiro = null;
+
     // ==================== FUNÇÕES PRINCIPAIS ====================
     function calcular() {
       const numFuncionarios = parseInt(document.getElementById('num-funcionarios').value) || 0;
@@ -1373,8 +1402,7 @@
         custoBebedouros + custoCozinha + custoAmbulatorio + custoLavanderia;
       if (dadosAlojamento) custoTotalGeral += dadosAlojamento.custoTotal;
 
-      // Gerar resultado
-      gerarResultado({
+      ultimoCalculoCanteiro = {
         numFuncionarios,
         funcMasculino,
         funcFeminino,
@@ -1408,7 +1436,10 @@
         },
         custoTotalGeral,
         pcd
-      });
+      };
+
+      // Gerar resultado
+      gerarResultado(ultimoCalculoCanteiro);
     }
 
     function gerarResultado(dados) {
@@ -1963,6 +1994,346 @@
       document.getElementById('resultado').innerHTML = '';
     });
 
+    // ==================== ECALC SUITE INTEGRATION (CAD, MEMORIAL & OFFICE) ====================
+    function gerarDxfConteudoCanteiro(d) {
+      d = d || ultimoCalculoCanteiro || {};
+      const numFunc = d.numFuncionarios || 30;
+      const containers = d.containers || { vestiario: 3, refeitorio: 2, alojamento: 0, ambulatorio: 0, total: 5 };
+      const sanitarios = {
+        vasos: d.totalVasos || 2,
+        mictorios: d.totalMictorios || 2,
+        lavatorios: d.totalLavatorios || 2,
+        chuveiros: d.totalChuveiros || 3
+      };
+
+      let dxf = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n`;
+      dxf += `0\nLAYER\n2\nCIVIL\n70\n0\n62\n8\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nCONTAINER\n70\n0\n62\n4\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nEQUIPAMENTOS\n70\n0\n62\n3\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nCIRCULACAO\n70\n0\n62\n6\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nCOTAS\n70\n0\n62\n7\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nTEXTO\n70\n0\n62\n2\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nENDTAB\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nENTITIES\n`;
+
+      function line(x1, y1, x2, y2, lay) {
+        return `0\nLINE\n8\n${lay}\n10\n${x1.toFixed(1)}\n20\n${y1.toFixed(1)}\n30\n0.0\n11\n${x2.toFixed(1)}\n21\n${y2.toFixed(1)}\n31\n0.0\n`;
+      }
+      function text(x, y, h, str, lay) {
+        return `0\nTEXT\n8\n${lay}\n10\n${x.toFixed(1)}\n20\n${y.toFixed(1)}\n30\n0.0\n40\n${h}\n1\n${str}\n`;
+      }
+      function rect(x, y, w, h, lay) {
+        return line(x, y, x + w, y, lay) +
+               line(x + w, y, x + w, y + h, lay) +
+               line(x + w, y + h, x, y + h, lay) +
+               line(x, y + h, x, y, lay);
+      }
+      function circle(cx, cy, r, lay) {
+        return `0\nCIRCLE\n8\n${lay}\n10\n${cx.toFixed(1)}\n20\n${cy.toFixed(1)}\n30\n0.0\n40\n${r.toFixed(1)}\n`;
+      }
+
+      // 1. TAPUME PERIMETRAL DO CANTEIRO (Dimensões em cm: 3600 x 2400 = 36 x 24m)
+      const wCanteiro = 3600;
+      const hCanteiro = 2400;
+      dxf += rect(0, 0, wCanteiro, hCanteiro, 'CIVIL');
+      dxf += text(100, hCanteiro + 60, 25, 'CANTEIRO DE OBRAS - PLANTA BAIXA MODULAR (NR-18)', 'TEXTO');
+      dxf += text(100, hCanteiro + 25, 14, `Efetivo de Pico: ${numFunc} trabalhadores | Total de Modulos Container: ${containers.total + 2} un`, 'TEXTO');
+
+      // Portão de acesso no tapume
+      dxf += line(200, 0, 200, -50, 'CIVIL');
+      dxf += line(700, 0, 700, -50, 'CIVIL');
+      dxf += text(300, -35, 12, 'PORTAO VEICULOS E PEDESTRES', 'TEXTO');
+
+      // Calçada / Acesso
+      dxf += rect(150, 0, 600, 150, 'CIRCULACAO');
+
+      // 2. MÓDULO 1: PORTARIA / GUARITA (300 x 240cm)
+      dxf += rect(200, 150, 300, 240, 'CONTAINER');
+      dxf += text(230, 280, 12, 'GUARITA / CONTROLE', 'TEXTO');
+      dxf += text(230, 240, 10, 'A = 7.20 m²', 'TEXTO');
+      dxf += circle(350, 270, 20, 'EQUIPAMENTOS'); // catraca
+
+      // 3. MÓDULO 2: ADMINISTRAÇÃO E REUNIÕES (600 x 240cm)
+      dxf += rect(550, 150, 600, 240, 'CONTAINER');
+      dxf += text(650, 280, 14, 'ADMINISTRACAO / REUNIAO', 'TEXTO');
+      dxf += text(720, 240, 10, 'A = 14.40 m²', 'TEXTO');
+      dxf += rect(700, 230, 200, 60, 'EQUIPAMENTOS'); // mesa de reunião
+
+      // 4. MÓDULOS DE VESTIÁRIOS (Containers 600 x 240cm)
+      const numVestiarios = Math.max(1, containers.vestiario);
+      for (let i = 0; i < numVestiarios; i++) {
+        const xVest = 200 + (i * 650);
+        const yVest = 500;
+        dxf += rect(xVest, yVest, 600, 240, 'CONTAINER');
+        dxf += text(xVest + 50, yVest + 200, 14, `VESTIARIO MODULO ${i+1}`, 'TEXTO');
+        dxf += text(xVest + 50, yVest + 170, 10, `Capacidade: ${Math.round(numFunc / numVestiarios)} operarios | A=14.4m²`, 'TEXTO');
+        
+        // Simbologia de armários e bancos
+        dxf += rect(xVest + 30, yVest + 30, 540, 40, 'EQUIPAMENTOS'); // armários norte
+        dxf += rect(xVest + 30, yVest + 100, 540, 25, 'EQUIPAMENTOS'); // banco central
+        dxf += text(xVest + 150, yVest + 42, 8, 'ARMARIOS DUPLOS INDIVIDUAIS (NR-18.4)', 'EQUIPAMENTOS');
+      }
+
+      // 5. MÓDULO SANITÁRIO (600 x 240cm)
+      const xSan = 200;
+      const ySan = 850;
+      dxf += rect(xSan, ySan, 600, 240, 'CONTAINER');
+      dxf += text(xSan + 50, ySan + 200, 14, 'MODULO SANITARIO COMPLETO (NR-18.4.1)', 'TEXTO');
+      dxf += text(xSan + 50, ySan + 170, 10, `Vasos: ${sanitarios.vasos} | Mict: ${sanitarios.mictorios} | Lav: ${sanitarios.lavatorios} | Chuv: ${sanitarios.chuveiros}`, 'TEXTO');
+
+      // Representação das divisórias de bacias e chuveiros
+      for (let v = 0; v < Math.min(4, sanitarios.vasos); v++) {
+        const bx = xSan + 30 + (v * 70);
+        dxf += rect(bx, ySan + 30, 60, 80, 'EQUIPAMENTOS');
+        dxf += circle(bx + 30, ySan + 70, 15, 'EQUIPAMENTOS');
+      }
+      for (let ch = 0; ch < Math.min(4, sanitarios.chuveiros); ch++) {
+        const cx = xSan + 320 + (ch * 65);
+        dxf += rect(cx, ySan + 30, 60, 80, 'EQUIPAMENTOS');
+        dxf += circle(cx + 30, ySan + 70, 10, 'EQUIPAMENTOS'); // chuveiro
+      }
+
+      // 6. MÓDULOS DE REFEITÓRIO E COZINHA (Containers 600 x 240cm)
+      const numRefeitorios = Math.max(1, containers.refeitorio);
+      for (let r = 0; r < numRefeitorios; r++) {
+        const xRef = 900 + (r * 650);
+        const yRef = 850;
+        dxf += rect(xRef, yRef, 600, 240, 'CONTAINER');
+        dxf += text(xRef + 50, yRef + 200, 14, `REFEITORIO MODULO ${r+1} (NR-18.4.2)`, 'TEXTO');
+        dxf += text(xRef + 50, yRef + 170, 10, 'Mesas com tampo lavavel e assentos com encosto', 'TEXTO');
+
+        // Mesas com bancos
+        dxf += rect(xRef + 50, yRef + 40, 200, 80, 'EQUIPAMENTOS');
+        dxf += rect(xRef + 320, yRef + 40, 200, 80, 'EQUIPAMENTOS');
+        dxf += circle(xRef + 560, yRef + 190, 15, 'EQUIPAMENTOS'); // Bebedouro
+        dxf += text(xRef + 540, yRef + 150, 7, 'BEBEDOURO', 'EQUIPAMENTOS');
+      }
+
+      // 7. AMBULATÓRIO (se aplicável)
+      if (numFunc >= 50 || containers.ambulatorio > 0) {
+        const xAmb = 1600;
+        const yAmb = 500;
+        dxf += rect(xAmb, yAmb, 600, 240, 'CONTAINER');
+        dxf += text(xAmb + 50, yAmb + 200, 14, 'AMBULATORIO MEDICO (NR-18.4.3)', 'TEXTO');
+        dxf += text(xAmb + 50, yAmb + 170, 10, 'Obrigatorio para obras >= 50 trabalhadores', 'TEXTO');
+        dxf += rect(xAmb + 50, yAmb + 50, 180, 70, 'EQUIPAMENTOS'); // maca
+        dxf += text(xAmb + 70, yAmb + 90, 8, 'MACA HOSPITALAR', 'EQUIPAMENTOS');
+        dxf += rect(xAmb + 300, yAmb + 50, 120, 60, 'EQUIPAMENTOS'); // mesa de atendimento
+      }
+
+      // 8. ALMOXARIFADO & ÁREA DE RESÍDUOS CONAMA 307
+      const xAlmox = 200;
+      const yAlmox = 1300;
+      dxf += rect(xAlmox, yAlmox, 600, 240, 'CONTAINER');
+      dxf += text(xAlmox + 50, yAlmox + 200, 14, 'ALMOXARIFADO / FERRAMENTARIA', 'TEXTO');
+      dxf += text(xAlmox + 50, yAlmox + 170, 10, 'Guarda de ferramentas, maquinas e EPIs', 'TEXTO');
+
+      // Baia de Coleta Seletiva (CONAMA 307)
+      const xRes = 900;
+      const yRes = 1300;
+      dxf += rect(xRes, yRes, 800, 240, 'CIVIL');
+      dxf += text(xRes + 30, yRes + 200, 14, 'CENTRAL DE RESIDUOS (CONAMA 307)', 'TEXTO');
+      dxf += line(xRes + 200, yRes, xRes + 200, yRes + 160, 'CIVIL');
+      dxf += line(xRes + 400, yRes, xRes + 400, yRes + 160, 'CIVIL');
+      dxf += line(xRes + 600, yRes, xRes + 600, yRes + 160, 'CIVIL');
+      dxf += text(xRes + 20, yRes + 80, 10, 'CLASSE A (Alvenaria)', 'TEXTO');
+      dxf += text(xRes + 220, yRes + 80, 10, 'CLASSE B (Madeira)', 'TEXTO');
+      dxf += text(xRes + 420, yRes + 80, 10, 'CLASSE B (Metais)', 'TEXTO');
+      dxf += text(xRes + 620, yRes + 80, 10, 'CLASSE C/D (Outros)', 'TEXTO');
+
+      // Rotas de Circulação Segura
+      dxf += line(100, 440, wCanteiro - 200, 440, 'CIRCULACAO');
+      dxf += line(100, 790, wCanteiro - 200, 790, 'CIRCULACAO');
+      dxf += line(100, 1190, wCanteiro - 200, 1190, 'CIRCULACAO');
+      dxf += text(500, 460, 10, 'FAIXA DE PEDESTRES / CIRCULACAO SEGURA (L >= 1.20m)', 'CIRCULACAO');
+
+      // Cotas Gerais
+      dxf += line(0, -100, wCanteiro, -100, 'COTAS');
+      dxf += text(wCanteiro / 2 - 100, -140, 20, `L = ${(wCanteiro/100).toFixed(2)} m`, 'COTAS');
+
+      dxf += line(-100, 0, -100, hCanteiro, 'COTAS');
+      dxf += text(-220, hCanteiro / 2 - 20, 20, `H = ${(hCanteiro/100).toFixed(2)} m`, 'COTAS');
+
+      dxf += `0\nENDSEC\n0\nEOF\n`;
+      return dxf;
+    }
+
+    function abrirNoCadCloneCanteiro() {
+      if (!ultimoCalculoCanteiro) calcular();
+      const d = ultimoCalculoCanteiro;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoCanteiro(d);
+      window.ECALC_CAD.abrirNoCadClone(dxf, `canteiro_nr18_${d.numFuncionarios}trabalhadores.dxf`);
+    }
+
+    function baixarDxfCanteiro() {
+      if (!ultimoCalculoCanteiro) calcular();
+      const d = ultimoCalculoCanteiro;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoCanteiro(d);
+      window.ECALC_CAD.baixarDXF(dxf, `canteiro_nr18_${d.numFuncionarios}trabalhadores.dxf`);
+    }
+
+    function abrirNoOfficeCloneCanteiro() {
+      if (!ultimoCalculoCanteiro) calcular();
+      const d = ultimoCalculoCanteiro;
+
+      const csvData = [
+        ['ECALC PRO - MEMÓRIA DE DIMENSIONAMENTO DE CANTEIRO DE OBRAS'],
+        ['Norma Regulamentadora', 'NR-18 (Portaria SEPRT nº 3.733/2020)'],
+        ['Data de Emissão', new Date().toLocaleDateString('pt-BR')],
+        [''],
+        ['PARÂMETROS DE CONTINGENTE', 'QUANTIDADE', 'UNIDADE'],
+        ['Efetivo Total no Pico da Obra', d.numFuncionarios, 'trabalhadores'],
+        ['Contingente Masculino', d.funcMasculino, 'trabalhadores'],
+        ['Contingente Feminino', d.funcFeminino, 'trabalhadores'],
+        ['Trabalhadores Alojados', d.alojamento ? d.alojamento.numAlojados : 0, 'trabalhadores'],
+        ['Acessibilidade PCD Prevista', d.pcd ? 'Sim (Cabine Adaptada)' : 'Não', '-'],
+        [''],
+        ['AMBIENTE DE VIVÊNCIA', 'ÁREA MÍNIMA (m²)', 'MÓDULOS (CONTAINERS 6x2.4m)'],
+        ['Vestiários (Masc + Fem)', d.vestiario.areaTotal.toFixed(2), d.containers.vestiario],
+        ['Refeitório', d.refeitorio.area.toFixed(2), d.containers.refeitorio],
+        ['Cozinha', d.cozinha ? d.cozinha.area.toFixed(2) : 0, '-'],
+        ['Ambulatório Médico', d.ambulatorio.area.toFixed(2), d.containers.ambulatorio],
+        ['Alojamento e Quartos', d.alojamento ? d.alojamento.areaAlojamento.toFixed(2) : 0, d.containers.alojamento],
+        ['Lavanderia', d.lavanderia ? d.lavanderia.area.toFixed(2) : 0, '-'],
+        ['Área Total de Vivência Requerida', d.areaTotal.toFixed(2), `${d.containers.total} containers`],
+        [''],
+        ['APARELHOS HIDROSSANITÁRIOS', 'QUANTIDADE EXIGIDA', 'PROPORÇÃO NORMATIVA NR-18'],
+        ['Bacias Sanitárias', d.totalVasos, '1 para cada 20 trabalhadores'],
+        ['Mictórios', d.totalMictorios, '1 para cada 20 homens'],
+        ['Lavatórios', d.totalLavatorios, '1 para cada 20 trabalhadores'],
+        ['Chuveiros', d.totalChuveiros, '1 para cada 10 trabalhadores'],
+        ['Bebedouros', d.bebedouros.qtd, '1 para cada 25 trabalhadores'],
+        [''],
+        ['ESTIMATIVA ORÇAMENTÁRIA', 'VALOR ESTIMADO', 'MOEDA'],
+        ['Mobiliário e Aparelhos Sanitários', d.custoSanitarios.toFixed(2), 'R$'],
+        ['Vestiário (Estrutura e Armários)', d.vestiario.custo.toFixed(2), 'R$'],
+        ['Refeitório (Estrutura e Assentos)', d.refeitorio.custo.toFixed(2), 'R$'],
+        ['Ambulatório e Outros', (d.ambulatorio.custo + (d.cozinha?.custo || 0) + (d.alojamento?.custoTotal || 0)).toFixed(2), 'R$'],
+        ['Investimento Total Estimado', d.custoTotalGeral.toFixed(2), 'R$']
+      ];
+
+      localStorage.setItem('officeclone_import_data', JSON.stringify({
+        filename: `Canteiro_NR18_${d.numFuncionarios}trabalhadores.csv`,
+        rows: csvData
+      }));
+      window.open('../office/excel/', '_blank');
+    }
+
+    function gerarMemorialCanteiro() {
+      if (!ultimoCalculoCanteiro) calcular();
+      const d = ultimoCalculoCanteiro;
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        alert('Módulo de Memorial não disponível');
+        return;
+      }
+
+      const svgSection = `
+        <svg width="280" height="190" viewBox="0 0 280 190" style="background:#fff;">
+          <rect x="5" y="5" width="270" height="180" fill="#f8fafc" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,2" rx="4"/>
+          <text x="12" y="20" font-size="8" fill="#64748b" font-weight="bold">CANTEIRO DE OBRAS NR-18</text>
+          
+          <!-- Portaria -->
+          <rect x="15" y="140" width="35" height="30" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.2" rx="2"/>
+          <text x="18" y="157" font-size="5" fill="#0f172a" font-weight="bold">PORTARIA</text>
+          
+          <!-- Vestiário -->
+          <rect x="60" y="30" width="95" height="45" fill="#bae6fd" stroke="#0284c7" stroke-width="1.2" rx="2"/>
+          <text x="65" y="48" font-size="7" fill="#0369a1" font-weight="bold">VESTIÁRIOS</text>
+          <text x="65" y="60" font-size="6" fill="#0284c7">${d.vestiario.areaTotal.toFixed(1)} m² (${d.containers.vestiario} cont.)</text>
+          
+          <!-- Sanitários -->
+          <rect x="60" y="85" width="95" height="45" fill="#bbf7d0" stroke="#16a34a" stroke-width="1.2" rx="2"/>
+          <text x="65" y="103" font-size="7" fill="#15803d" font-weight="bold">SANITÁRIOS</text>
+          <text x="65" y="115" font-size="6" fill="#16a34a">${d.totalVasos} vasos | ${d.totalChuveiros} chuv.</text>
+          
+          <!-- Refeitório -->
+          <rect x="165" y="30" width="100" height="60" fill="#fed7aa" stroke="#ea580c" stroke-width="1.2" rx="2"/>
+          <text x="170" y="50" font-size="7" fill="#c2410c" font-weight="bold">REFEITÓRIO</text>
+          <text x="170" y="62" font-size="6" fill="#ea580c">${d.refeitorio.area.toFixed(1)} m² (${d.refeitorio.assentos} assentos)</text>
+          
+          <!-- Administração / Ambulatório -->
+          <rect x="165" y="100" width="100" height="40" fill="#e9d5ff" stroke="#9333ea" stroke-width="1.2" rx="2"/>
+          <text x="170" y="118" font-size="7" fill="#7e22ce" font-weight="bold">ADMINISTRAÇÃO</text>
+          <text x="170" y="130" font-size="6" fill="#9333ea">${d.numFuncionarios >= 50 ? '+ Ambulatório Médico' : 'Sala Técnica / Reuniões'}</text>
+          
+          <!-- Faixa de pedestres -->
+          <line x1="15" y1="135" x2="265" y2="135" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4,3"/>
+          <text x="70" y="145" font-size="5" fill="#64748b">CIRCULAÇÃO DE PEDESTRES SEGURA</text>
+        </svg>
+      `;
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial Técnico de Dimensionamento do Canteiro de Obras & Áreas de Vivência',
+        norma: 'Norma Regulamentadora NR-18 (Portaria SEPRT nº 3.733/2020)',
+        elemento: `Canteiro de Obras para ${d.numFuncionarios} trabalhadores (${d.containers.total} módulos habitacionais)`,
+        inputs: [
+          { label: 'Efetivo de Pico na Obra', val: `${d.numFuncionarios} trabalhadores` },
+          { label: 'Distribuição por Gênero', val: `Masc: ${d.funcMasculino} | Fem: ${d.funcFeminino}` },
+          { label: 'Regime de Alojamento', val: d.alojamento ? `${d.alojamento.numAlojados} operários alojados` : 'Sem alojamento no canteiro' },
+          { label: 'Refeições Simultâneas', val: `${d.refeitorio.assentos} assentos no turno de pico` },
+          { label: 'Acessibilidade PCD', val: d.pcd ? 'Cabine Sanitária Adaptada com barras' : 'Padrão' }
+        ],
+        formulas: [
+          `Instalações Sanitárias (NR-18.4.1): Vasos = ⌈N / 20⌉ = ${d.totalVasos} un | Mictórios = ⌈Nmasc / 20⌉ = ${d.totalMictorios} un`,
+          `Lavatórios = ⌈N / 20⌉ = ${d.totalLavatorios} un | Chuveiros = ⌈N / 10⌉ = ${d.totalChuveiros} un`,
+          `Área Mínima de Vestiário (NR-18.4.2): Av = 1.50 m² × N = 1.50 × ${d.numFuncionarios} = ${d.vestiario.areaTotal.toFixed(2)} m²`,
+          `Área Mínima de Refeitório (NR-18.4.3): Ar = 1.00 m² × Nturno = 1.00 × ${d.refeitorio.assentos} = ${d.refeitorio.area.toFixed(2)} m²`,
+          `Modulação em Containers Padrão (6.00 × 2.40m = 14.40 m²): Ncont = ⌈Atot / 14.40⌉ = ${d.containers.total} módulos`
+        ],
+        resultados: [
+          { label: 'Área Total de Vivência Normativa', val: `${d.areaTotal.toFixed(2)} m²` },
+          { label: 'Módulos Habitacionais Sugeridos', val: `${d.containers.total} containers padrão (14.40 m² cada)` },
+          { label: 'Dimensionamento dos Vestiários', val: `${d.vestiario.areaTotal.toFixed(2)} m² (${d.containers.vestiario} containers)` },
+          { label: 'Dimensionamento do Refeitório', val: `${d.refeitorio.area.toFixed(2)} m² (${d.containers.refeitorio} containers, ${d.refeitorio.assentos} assentos)` },
+          { label: 'Aparelhos Sanitários Totais', val: `${d.totalVasos} bacias, ${d.totalLavatorios} lavatórios, ${d.totalChuveiros} chuveiros` },
+          { label: 'Investimento Estimado no Canteiro', val: `R$ ${d.custoTotalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}` }
+        ],
+        verificacoes: [
+          {
+            item: 'Proporção de Bacias Sanitárias (NR-18: 1 para cada 20 trabalhadores)',
+            calc: `${d.totalVasos} bacias para ${d.numFuncionarios} operários (${(d.numFuncionarios/d.totalVasos).toFixed(1)} trab/bacia)`,
+            status: (d.numFuncionarios / d.totalVasos) <= 20 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Proporção de Chuveiros (NR-18: 1 para cada 10 trabalhadores)',
+            calc: `${d.totalChuveiros} chuveiros para ${d.numFuncionarios} operários (${(d.numFuncionarios/d.totalChuveiros).toFixed(1)} trab/chuv)`,
+            status: (d.numFuncionarios / d.totalChuveiros) <= 10 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Área Mínima de Vestiário (NR-18 ≥ 1.50 m² por trabalhador)',
+            calc: `Área unitária = ${(d.vestiario.areaTotal / d.numFuncionarios).toFixed(2)} m²/trabalhador`,
+            status: (d.vestiario.areaTotal / d.numFuncionarios) >= 1.50 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Área Mínima de Refeitório (NR-18 ≥ 1.00 m² por assento de turno)',
+            calc: `Área unitária = ${(d.refeitorio.area / d.refeitorio.assentos).toFixed(2)} m²/assento`,
+            status: (d.refeitorio.area / d.refeitorio.assentos) >= 1.00 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Exigência de Ambulatório Médico (NR-18 obrigatório para obras ≥ 50 trabalhadores)',
+            calc: d.numFuncionarios >= 50 ? `Efetivo ${d.numFuncionarios} ≥ 50 (Ambulatório previsto)` : `Efetivo ${d.numFuncionarios} < 50 (Dispensa regulamentar)`,
+            status: 'pass'
+          },
+          {
+            item: 'Acessibilidade para PCD (Cabine e Vão Livre ≥ 0.80m)',
+            calc: d.pcd ? 'Cabine adaptada com barras e vão normativo' : 'Não exigido',
+            status: 'pass'
+          }
+        ],
+        svgSection: svgSection,
+        notas: 'Memorial emitido em estrita conformidade com a Norma Regulamentadora NR-18 (Portaria SEPRT nº 3.733/2020). As áreas de vivência devem ser mantidas em perfeito estado de higiene e conservação. É obrigatório o fornecimento de água potável e fresca aos trabalhadores em todos os postos de trabalho e refeitório.'
+      });
+    }
+
     document.getElementById('btnExportar').addEventListener('click', () => {
       window.print();
     });
@@ -1972,8 +2343,10 @@
                       'incluir-cozinha', 'incluir-lavanderia', 'pcd', 'num-alojados', 'tipo-cama'];
     inputIds.forEach(id => {
       const el = document.getElementById(id);
-      el.addEventListener('input', calcular);
-      el.addEventListener('change', calcular);
+      if (el) {
+        el.addEventListener('input', calcular);
+        el.addEventListener('change', calcular);
+      }
     });
 
     // Toggle alojamento options
@@ -2019,5 +2392,7 @@
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
+    <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>

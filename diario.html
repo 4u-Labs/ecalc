@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -138,6 +139,33 @@
     </nav>
 
     <main class="container mx-auto px-4 py-8">
+        <!-- SUITE ACTION BAR -->
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-700/60 shadow-xl backdrop-blur-md">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white text-lg shadow-lg shadow-orange-500/30">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <div class="text-xs uppercase tracking-wider text-amber-400 font-bold">ECALC SUITE PRO</div>
+                    <div class="text-sm font-semibold text-white">Diário de Obra & Relatório Diário (RDO) — CONFEA / CREA</div>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <button type="button" onclick="gerarRdoOficialDiario()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+                    <i class="fas fa-file-alt"></i> 📄 Gerar RDO Oficial ABNT
+                </button>
+                <button type="button" onclick="abrirNoOfficeCloneDiario()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+                    <i class="fas fa-table"></i> 📊 Abrir no OfficeClone
+                </button>
+                <button type="button" onclick="abrirNoCadCloneDiario()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+                    <i class="fas fa-drafting-compass"></i> 📐 Abrir no CADClone
+                </button>
+                <button type="button" onclick="baixarDxfDiario()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs shadow-md transition-all cursor-pointer">
+                    <i class="fas fa-download"></i> 💾 Baixar .DXF
+                </button>
+            </div>
+        </div>
+
         <!-- Tab: Novo Registro -->
         <section id="section-registro" class="tab-content fade-in">
             <div class="bg-white rounded-3xl shadow-xl p-8 max-w-4xl mx-auto border border-gray-100">
@@ -2704,6 +2732,328 @@ function importarJSON() {
                 historicoNext();
             }
         });
+
+        // ==================== ECALC SUITE INTEGRATION (CAD, MEMORIAL & OFFICE) ====================
+        function sincronizarComProjetoCompartilhado() {
+            try {
+                const shared = JSON.parse(localStorage.getItem('ecalc_shared_project'));
+                if (shared && typeof shared === 'object') {
+                    if (shared.nomeObra) dadosObra.nome = shared.nomeObra;
+                    if (shared.cliente) dadosObra.cliente = shared.cliente;
+                    if (shared.responsavel) dadosObra.engenheiro = shared.responsavel;
+                    if (shared.crea) dadosObra.crea = shared.crea;
+                    if (shared.local) dadosObra.endereco = shared.local;
+                    if (shared.art) dadosObra.contrato = `ART/RRT: ${shared.art}`;
+                    saveData();
+                    if (typeof updateHeaderObra === 'function') updateHeaderObra();
+                    if (typeof carregarDadosObra === 'function') carregarDadosObra();
+                }
+            } catch (e) {
+                console.warn('Erro ao sincronizar projeto compartilhado:', e);
+            }
+        }
+        window.addEventListener('ecalc:project-updated', sincronizarComProjetoCompartilhado);
+        window.addEventListener('load', sincronizarComProjetoCompartilhado);
+
+        function gerarRdoOficialDiario(regId) {
+            let reg = null;
+            if (regId !== undefined && regId !== null) {
+                reg = registros.find(r => r.id === regId);
+            }
+            if (!reg) {
+                reg = (registros && registros.length > 0) ? registros[registros.length - 1] : registroExemplo;
+            }
+            if (typeof window.ECALC_MEMORIAL === 'undefined') {
+                alert('Módulo de Memorial não disponível');
+                return;
+            }
+
+            let totalHomens = 0;
+            const equipeLinhas = [];
+            if (reg.equipe && typeof reg.equipe === 'object') {
+                for (const [func, qtd] of Object.entries(reg.equipe)) {
+                    if (qtd > 0) {
+                        totalHomens += qtd;
+                        equipeLinhas.push(`${func}: ${qtd}`);
+                    }
+                }
+            }
+
+            const equipLinhas = [];
+            if (reg.equipamentos && typeof reg.equipamentos === 'object') {
+                for (const [eq, qtd] of Object.entries(reg.equipamentos)) {
+                    if (qtd > 0) {
+                        equipLinhas.push(`${eq}: ${qtd}h/un`);
+                    }
+                }
+            }
+
+            const numStr = String(reg.numero !== undefined ? reg.numero : (reg.id || 1)).padStart(4, '0');
+
+            const svgSection = `
+                <svg width="280" height="150" viewBox="0 0 280 150" style="background:#fff;">
+                  <rect x="5" y="5" width="270" height="140" fill="#f8fafc" stroke="#64748b" stroke-width="1.2" rx="4"/>
+                  <text x="12" y="22" font-size="8" fill="#0f172a" font-weight="bold">RELATÓRIO DIÁRIO DE OBRA (RDO) #${numStr}</text>
+                  <text x="12" y="34" font-size="6" fill="#64748b">Data: ${reg.data} | Horário: ${reg.horaInicio || '07:00'} às ${reg.horaFim || '17:00'} | Clima: ${(reg.clima || 'Bom').toUpperCase()}</text>
+                  
+                  <rect x="12" y="44" width="78" height="42" fill="#eff6ff" stroke="#3b82f6" stroke-width="1" rx="2"/>
+                  <text x="18" y="58" font-size="6" fill="#1e40af" font-weight="bold">EFETIVO TOTAL</text>
+                  <text x="18" y="74" font-size="12" fill="#1d4ed8" font-weight="bold">${totalHomens}</text>
+                  <text x="38" y="74" font-size="6" fill="#60a5fa">operários</text>
+
+                  <rect x="98" y="44" width="78" height="42" fill="#f0fdf4" stroke="#22c55e" stroke-width="1" rx="2"/>
+                  <text x="104" y="58" font-size="6" fill="#166534" font-weight="bold">EQUIPAMENTOS</text>
+                  <text x="104" y="74" font-size="12" fill="#15803d" font-weight="bold">${equipLinhas.length}</text>
+                  <text x="124" y="74" font-size="6" fill="#4ade80">unidades</text>
+
+                  <rect x="184" y="44" width="85" height="42" fill="#fefce8" stroke="#eab308" stroke-width="1" rx="2"/>
+                  <text x="190" y="58" font-size="6" fill="#854d0e" font-weight="bold">CONDIÇÕES CLIMA</text>
+                  <text x="190" y="73" font-size="7" fill="#a16207" font-weight="bold">${(reg.clima || 'Praticável').toUpperCase()}</text>
+
+                  <line x1="12" y1="96" x2="268" y2="96" stroke="#cbd5e1" stroke-width="1"/>
+                  <text x="14" y="108" font-size="6" fill="#0f172a" font-weight="bold">PRINCIPAIS SERVIÇOS:</text>
+                  <text x="14" y="119" font-size="5" fill="#475569">${(reg.atividades || 'Serviços em andamento').split('\n')[0].replace(/[•\-\*]/g, '').trim().substring(0, 65)}...</text>
+                  <text x="14" y="133" font-size="5" fill="#64748b">Emissão conforme Resoluções CONFEA nº 1.024/2009 e 1.094/2017</text>
+                </svg>
+            `;
+
+            window.ECALC_MEMORIAL.gerar({
+                titulo: `Relatório Diário de Obra - RDO #${numStr}`,
+                norma: 'Resoluções CONFEA nº 1.024/2009 e 1.094/2017 / ABNT NBR 5671',
+                elemento: `${dadosObra.nome || 'Edificação'} - Registro Diário em ${reg.data}`,
+                inputs: [
+                    { label: 'Data do Apontamento', val: reg.data },
+                    { label: 'Jornada de Trabalho', val: `${reg.horaInicio || '07:00'} às ${reg.horaFim || '17:00'}` },
+                    { label: 'Condições Climáticas', val: (reg.clima || 'Ensolarado / Praticável').toUpperCase() },
+                    { label: 'Efetivo de Campo Mobilizado', val: `${totalHomens} trabalhadores no canteiro` },
+                    { label: 'Equipamentos Ativos', val: `${equipLinhas.length} máquinas/equipamentos operando` }
+                ],
+                formulas: [
+                    `Mão de Obra Total: Σ (Operários por Função) = ${totalHomens} trabalhadores`,
+                    `Homens-Hora Trabalhados: HHT = ${totalHomens} trab × 8.8h = ${(totalHomens * 8.8).toFixed(1)} HHT`,
+                    `Equipe em Campo: ${equipeLinhas.slice(0, 5).join(' | ')}${equipeLinhas.length > 5 ? ' (...)' : ''}`,
+                    `Equipamentos Mobilizados: ${equipLinhas.slice(0, 4).join(' | ')}${equipLinhas.length > 4 ? ' (...)' : ''}`
+                ],
+                resultados: [
+                    { label: 'Atividades e Frentes de Serviço', val: (reg.atividades || 'Sem registro').replace(/\n/g, ' • ') },
+                    { label: 'Insumos e Materiais Recebidos', val: (reg.materiais || 'Nenhum material no dia').replace(/\n/g, ' • ') },
+                    { label: 'Ocorrências e Interferências', val: (reg.ocorrencias || 'Sem ocorrências impeditivas').replace(/\n/g, ' • ') },
+                    { label: 'Observações do Responsável Técnico', val: (reg.observacoes || 'Serviços realizados de acordo com os projetos executivos').replace(/\n/g, ' • ') }
+                ],
+                verificacoes: [
+                    {
+                        item: 'Obrigatoriedade de Livro de Ordem / RDO (Resolução CONFEA 1.024/2009)',
+                        calc: `Registro sequencial oficial #${numStr}`,
+                        status: 'pass'
+                    },
+                    {
+                        item: 'Condições Meteorológicas e Praticabilidade dos Serviços',
+                        calc: `Clima registrado: ${reg.clima || 'Praticável'}`,
+                        status: 'pass'
+                    },
+                    {
+                        item: 'Acompanhamento do Efetivo de Mão de Obra',
+                        calc: `${totalHomens} trabalhadores em campo com registro nominal`,
+                        status: totalHomens > 0 ? 'pass' : 'fail'
+                    },
+                    {
+                        item: 'Registro de Ocorrências e Acidentes de Trabalho',
+                        calc: reg.ocorrencias ? 'Ocorrências descritas no relatório' : 'Nenhuma ocorrência adversa apontada',
+                        status: 'pass'
+                    },
+                    {
+                        item: 'Validação e Assinatura Técnica',
+                        calc: `${dadosObra.engenheiro || 'Responsável Técnico'} (${dadosObra.crea || 'CREA habilitado'})`,
+                        status: 'pass'
+                    }
+                ],
+                svgSection: svgSection,
+                notas: 'O presente Relatório Diário de Obra (RDO) constitui instrumento comprobatório da fiel execução dos trabalhos, condições climáticas, efetivo e ocorrências em atendimento às Resoluções CONFEA nº 1.024/2009 e 1.094/2017. Recomenda-se a assinatura diária pelo Engenheiro Responsável e pelo Fiscal do Contratante.'
+            });
+        }
+
+        function abrirNoOfficeCloneDiario() {
+            const reg = (registros && registros.length > 0) ? registros[registros.length - 1] : registroExemplo;
+
+            const csvData = [
+                ['ECALC PRO - RELATÓRIO DIÁRIO DE OBRA (RDO) / DIÁRIO DE CAMPO'],
+                ['Normas e Resoluções', 'CONFEA 1.024/2009 e 1.094/2017 | ABNT NBR 5671'],
+                ['Obra', dadosObra.nome || 'Edificação'],
+                ['Cliente', dadosObra.cliente || 'Contratante'],
+                ['Responsável Técnico', dadosObra.engenheiro || 'Engenheiro Civil'],
+                ['Registro Profissional', dadosObra.crea || 'CREA'],
+                ['Data do Registro', reg.data || new Date().toISOString().split('T')[0]],
+                ['Clima', reg.clima || 'Bom'],
+                [''],
+                ['EFETIVO DE MÃO DE OBRA', 'QUANTIDADE', 'HOMENS-HORA (8.8h)']
+            ];
+
+            let totalHomens = 0;
+            if (reg.equipe && typeof reg.equipe === 'object') {
+                for (const [func, qtd] of Object.entries(reg.equipe)) {
+                    if (qtd > 0) {
+                        totalHomens += qtd;
+                        csvData.push([func, qtd, (qtd * 8.8).toFixed(1)]);
+                    }
+                }
+            }
+            csvData.push(['TOTAL DE OPERÁRIOS', totalHomens, (totalHomens * 8.8).toFixed(1)]);
+            csvData.push(['']);
+
+            csvData.push(['EQUIPAMENTOS NO CANTEIRO', 'HORAS / QTD', 'STATUS']);
+            if (reg.equipamentos && typeof reg.equipamentos === 'object') {
+                for (const [eq, qtd] of Object.entries(reg.equipamentos)) {
+                    if (qtd > 0) {
+                        csvData.push([eq, qtd, 'Operacional']);
+                    }
+                }
+            }
+            csvData.push(['']);
+
+            csvData.push(['FRENTES DE SERVIÇO E ATIVIDADES DO DIA']);
+            (reg.atividades || 'Serviços em andamento').split('\n').forEach(atv => {
+                if (atv.trim()) csvData.push([atv.trim()]);
+            });
+            csvData.push(['']);
+
+            csvData.push(['MATERIAIS E INSUMOS RECEBIDOS']);
+            (reg.materiais || 'Nenhum insumo').split('\n').forEach(mat => {
+                if (mat.trim()) csvData.push([mat.trim()]);
+            });
+            csvData.push(['']);
+
+            csvData.push(['OCORRÊNCIAS E OBSERVAÇÕES']);
+            (reg.ocorrencias || 'Sem ocorrências').split('\n').forEach(oc => {
+                if (oc.trim()) csvData.push([oc.trim()]);
+            });
+
+            localStorage.setItem('officeclone_import_data', JSON.stringify({
+                filename: `RDO_Diario_${reg.data || 'obra'}.csv`,
+                rows: csvData
+            }));
+            window.open('../office/excel/', '_blank');
+        }
+
+        function gerarDxfConteudoDiario(d) {
+            d = d || (registros && registros.length > 0 ? registros[registros.length - 1] : registroExemplo);
+
+            let dxf = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n`;
+            dxf += `0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n`;
+            dxf += `0\nLAYER\n2\nQUADRO\n70\n0\n62\n7\n6\nCONTINUOUS\n0\n`;
+            dxf += `0\nLAYER\n2\nTABELAS\n70\n0\n62\n4\n6\nCONTINUOUS\n0\n`;
+            dxf += `0\nLAYER\n2\nGRAFICO\n70\n0\n62\n3\n6\nCONTINUOUS\n0\n`;
+            dxf += `0\nLAYER\n2\nCOTAS\n70\n0\n62\n1\n6\nCONTINUOUS\n0\n`;
+            dxf += `0\nLAYER\n2\nTEXTO\n70\n0\n62\n2\n6\nCONTINUOUS\n0\n`;
+            dxf += `0\nENDTAB\n0\nENDSEC\n`;
+            dxf += `0\nSECTION\n2\nENTITIES\n`;
+
+            function line(x1, y1, x2, y2, lay) {
+                return `0\nLINE\n8\n${lay}\n10\n${x1.toFixed(1)}\n20\n${y1.toFixed(1)}\n30\n0.0\n11\n${x2.toFixed(1)}\n21\n${y2.toFixed(1)}\n31\n0.0\n`;
+            }
+            function text(x, y, h, str, lay) {
+                return `0\nTEXT\n8\n${lay}\n10\n${x.toFixed(1)}\n20\n${y.toFixed(1)}\n30\n0.0\n40\n${h}\n1\n${str}\n`;
+            }
+            function rect(x, y, w, h, lay) {
+                return line(x, y, x + w, y, lay) +
+                       line(x + w, y, x + w, y + h, lay) +
+                       line(x + w, y + h, x, y + h, lay) +
+                       line(x, y + h, x, y, lay);
+            }
+
+            // Prancha Formato A3 (420 x 297 mm, unidades em cm: 420 x 297)
+            const wP = 420;
+            const hP = 297;
+            dxf += rect(0, 0, wP, hP, 'QUADRO');
+            dxf += rect(10, 10, wP - 20, hP - 20, 'QUADRO'); // margem interna
+
+            // Carimbo ABNT inferior direito
+            const xCar = wP - 180;
+            const yCar = 10;
+            const wCar = 170;
+            const hCar = 60;
+            dxf += rect(xCar, yCar, wCar, hCar, 'TABELAS');
+            dxf += line(xCar, yCar + 40, xCar + wCar, yCar + 40, 'TABELAS');
+            dxf += line(xCar, yCar + 20, xCar + wCar, yCar + 20, 'TABELAS');
+            dxf += line(xCar + 90, yCar, xCar + 90, yCar + 40, 'TABELAS');
+
+            dxf += text(xCar + 10, yCar + 48, 5, `OBRA: ${(dadosObra.nome || 'Edificação').toUpperCase()}`, 'TEXTO');
+            dxf += text(xCar + 10, yCar + 28, 4, `RESP. TECNICO: ${dadosObra.engenheiro || 'Engenheiro Civil'}`, 'TEXTO');
+            dxf += text(xCar + 10, yCar + 8, 4, `CREA: ${dadosObra.crea || 'Habilitado'}`, 'TEXTO');
+            dxf += text(xCar + 95, yCar + 28, 4, `DATA: ${d.data || '2025-01-01'}`, 'TEXTO');
+            dxf += text(xCar + 95, yCar + 8, 4, `RDO No: ${String(d.numero || 1).padStart(4, '0')}`, 'TEXTO');
+
+            // Título Principal
+            dxf += text(20, hP - 25, 8, 'RELATORIO DIARIO DE OBRA (RDO) - RESUMO EXECUTIVO', 'TEXTO');
+            dxf += text(20, hP - 35, 4, `Normas: CONFEA 1.024/2009 e 1.094/2017 | Horario: ${d.horaInicio || '07:00'} as ${d.horaFim || '17:00'} | Clima: ${(d.clima || 'Bom').toUpperCase()}`, 'TEXTO');
+
+            // Quadro 1: Mão de Obra
+            dxf += rect(20, hP - 150, 180, 100, 'TABELAS');
+            dxf += text(25, hP - 60, 5, 'EFETIVO DE MAO DE OBRA DO DIA', 'TEXTO');
+            dxf += line(20, hP - 65, 200, hP - 65, 'TABELAS');
+            let yEq = hP - 75;
+            let totHomens = 0;
+            if (d.equipe && typeof d.equipe === 'object') {
+                for (const [func, qtd] of Object.entries(d.equipe)) {
+                    if (qtd > 0 && yEq > hP - 145) {
+                        totHomens += qtd;
+                        dxf += text(25, yEq, 3.5, `${func}: ${qtd} trabalhador(es)`, 'TEXTO');
+                        yEq -= 8;
+                    }
+                }
+            }
+            dxf += line(20, hP - 140, 200, hP - 140, 'TABELAS');
+            dxf += text(25, hP - 147, 4, `TOTAL DE OPERARIOS EM CAMPO: ${totHomens}`, 'TEXTO');
+
+            // Quadro 2: Equipamentos
+            dxf += rect(215, hP - 150, 185, 100, 'TABELAS');
+            dxf += text(220, hP - 60, 5, 'EQUIPAMENTOS EM OPERACAO', 'TEXTO');
+            dxf += line(215, hP - 65, 400, hP - 65, 'TABELAS');
+            let yMac = hP - 75;
+            if (d.equipamentos && typeof d.equipamentos === 'object') {
+                for (const [eq, qtd] of Object.entries(d.equipamentos)) {
+                    if (qtd > 0 && yMac > hP - 145) {
+                        dxf += text(220, yMac, 3.5, `${eq}: ${qtd} h/un (Operacional)`, 'TEXTO');
+                        yMac -= 8;
+                    }
+                }
+            }
+
+            // Quadro 3: Atividades do Dia e Ocorrências
+            dxf += rect(20, 20, 200, 115, 'TABELAS');
+            dxf += text(25, 125, 5, 'FRENTES DE SERVICO & ATIVIDADES EXECUTADAS', 'TEXTO');
+            dxf += line(20, 120, 220, 120, 'TABELAS');
+            let yAtv = 110;
+            const atvs = (d.atividades || 'Execução de alvenaria e estruturas').split('\n');
+            atvs.slice(0, 8).forEach(linha => {
+                if (linha.trim()) {
+                    dxf += text(25, yAtv, 3.2, linha.replace(/[•\-\*]/g, '').trim().substring(0, 48), 'TEXTO');
+                    yAtv -= 8;
+                }
+            });
+
+            dxf += `0\nENDSEC\n0\nEOF\n`;
+            return dxf;
+        }
+
+        function abrirNoCadCloneDiario() {
+            const reg = (registros && registros.length > 0) ? registros[registros.length - 1] : registroExemplo;
+            if (typeof window.ECALC_CAD === 'undefined') {
+                alert('Módulo CADClone não carregado');
+                return;
+            }
+            const dxf = gerarDxfConteudoDiario(reg);
+            window.ECALC_CAD.abrirNoCadClone(dxf, `RDO_Diario_${reg.data || 'obra'}.dxf`);
+        }
+
+        function baixarDxfDiario() {
+            const reg = (registros && registros.length > 0) ? registros[registros.length - 1] : registroExemplo;
+            if (typeof window.ECALC_CAD === 'undefined') {
+                alert('Módulo CADClone não carregado');
+                return;
+            }
+            const dxf = gerarDxfConteudoDiario(reg);
+            window.ECALC_CAD.baixarDXF(dxf, `RDO_Diario_${reg.data || 'obra'}.dxf`);
+        }
     </script>
 
     <!-- Footer -->
@@ -2720,5 +3070,7 @@ function importarJSON() {
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
+    <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>
