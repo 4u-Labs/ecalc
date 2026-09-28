@@ -117,6 +117,16 @@
       box-shadow: 0 0 16px rgba(0, 229, 255, 0.25);
       outline: none;
     }
+    /* Ocultar spinners dos inputs numéricos para não cortar texto */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
     .btn-primary {
       background: linear-gradient(135deg, #00e5ff 0%, #00ff88 100%);
       transition: all 0.25s ease;
@@ -215,11 +225,11 @@
 
           <!-- MODO 1: Editor Individual de Vértices -->
           <div id="modeCoord" class="space-y-3">
-            <div class="flex items-center justify-between text-[11px] text-gray-400 px-1 font-semibold">
-              <span class="w-8">PTO</span>
-              <span class="flex-1 text-center">X / ESTE (m)</span>
-              <span class="flex-1 text-center">Y / NORTE (m)</span>
-              <span class="w-16 text-center">COTA Z (m)</span>
+            <div class="grid grid-cols-[36px_1fr_1fr_1fr] gap-2 items-center text-[11px] text-gray-400 px-1 font-semibold">
+              <span class="text-center font-bold text-gray-500">PTO</span>
+              <span class="text-center font-mono">X / ESTE (m)</span>
+              <span class="text-center font-mono">Y / NORTE (m)</span>
+              <span class="text-center font-mono">COTA Z (m)</span>
             </div>
             
             <div id="verticesContainer" class="space-y-2 max-h-72 overflow-y-auto pr-1">
@@ -598,12 +608,12 @@
 
       vertices.forEach((v, idx) => {
         const row = document.createElement('div');
-        row.className = 'flex gap-1.5 items-center vertice-row';
+        row.className = 'grid grid-cols-[36px_1fr_1fr_1fr] gap-2 items-center vertice-row';
         row.innerHTML = `
-          <span class="text-xs font-mono font-bold text-cyan-400 w-8 text-center shrink-0">P${idx + 1}</span>
-          <input type="number" step="any" placeholder="X" value="${v.x}" data-idx="${idx}" data-axis="x" class="form-input flex-1 px-2.5 py-1.5 rounded-lg bg-dark-800 text-xs font-mono coord-x">
-          <input type="number" step="any" placeholder="Y" value="${v.y}" data-idx="${idx}" data-axis="y" class="form-input flex-1 px-2.5 py-1.5 rounded-lg bg-dark-800 text-xs font-mono coord-y">
-          <input type="number" step="any" placeholder="Z" value="${v.z || 0}" data-idx="${idx}" data-axis="z" class="form-input w-16 px-1.5 py-1.5 rounded-lg bg-dark-800 text-xs font-mono text-center coord-z">
+          <span class="text-xs font-mono font-bold text-cyan-400 text-center">P${idx + 1}</span>
+          <input type="number" step="any" placeholder="X" value="${v.x}" data-idx="${idx}" data-axis="x" class="form-input w-full px-2 py-1.5 rounded-lg bg-dark-800 text-xs font-mono text-center coord-x">
+          <input type="number" step="any" placeholder="Y" value="${v.y}" data-idx="${idx}" data-axis="y" class="form-input w-full px-2 py-1.5 rounded-lg bg-dark-800 text-xs font-mono text-center coord-y">
+          <input type="number" step="any" placeholder="Z" value="${v.z || 0}" data-idx="${idx}" data-axis="z" class="form-input w-full px-2 py-1.5 rounded-lg bg-dark-800 text-xs font-mono text-center coord-z">
         `;
         container.appendChild(row);
       });
