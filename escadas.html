@@ -421,18 +421,27 @@
       </h2>
       
       <!-- Suite Action Bar -->
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-white/5 p-4 rounded-xl border border-cyan-500/20 no-print">
-        <div class="text-sm font-bold text-cyan-400 flex items-center gap-2">
-          <span>📐</span> Ações da Suíte Integrada
+      <div class="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 mb-6 rounded-2xl bg-gradient-to-r from-slate-900/95 via-slate-800/95 to-slate-900/95 border border-cyan-500/40 shadow-2xl no-print">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-slate-900 border border-cyan-500/40 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/20 shrink-0">
+            <img src="assets/icon-ecalc-64.png" alt="ECALC" class="w-full h-full object-contain">
+          </div>
+          <div>
+            <div class="text-xs uppercase tracking-wider text-cyan-400 font-bold">ECALC SUITE PRO</div>
+            <div class="text-sm font-semibold text-white">Dimensionamento de Escadas — NBR 6118, NBR 9050 e NBR 9077</div>
+          </div>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <button type="button" onclick="abrirNoCadCloneEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          <button type="button" onclick="abrirNoCadCloneEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
             <span>📐 Abrir no CADClone</span>
           </button>
-          <button type="button" onclick="gerarMemorialEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <button type="button" onclick="gerarMemorialEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
             <span>📄 Gerar Memorial ABNT</span>
           </button>
-          <button type="button" onclick="baixarDxfEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 font-medium text-xs transition-all cursor-pointer" title="Baixar arquivo DXF">
+          <button type="button" onclick="abrirNoOfficeCloneEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+            <span>📊 Abrir no OfficeClone</span>
+          </button>
+          <button type="button" onclick="baixarDxfEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
             <span>💾 Baixar .DXF</span>
           </button>
         </div>
@@ -2883,6 +2892,44 @@ Clique em "Calcular" para ver a análise de conformidade com as normas.
       }
       const dxf = gerarDxfConteudoEscada(d);
       window.ECALC_CAD.baixarDXF(dxf, `escada_${d.numDegraus}degraus_${d.espelho}x${d.piso}cm.dxf`);
+    }
+
+    function abrirNoOfficeCloneEscada() {
+      if (!ultimoCalculo) calcular();
+      const d = ultimoCalculo;
+      const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Escada de Concreto Armado' };
+
+      const dataCells = {
+        '0,0': 'DIMENSIONAMENTO DE ESCADA EM CONCRETO ARMADO (NBR 6118 / NBR 9050) - ECALC PRO',
+        '1,0': 'Obra:', '1,1': project.nomeObra || 'Edificação Residencial',
+        '2,0': 'Responsável Técnico:', '2,1': project.responsavelTecnico || '-',
+        '3,0': 'Data:', '3,1': new Date().toLocaleDateString('pt-BR'),
+        '4,0': 'PARÂMETROS GEOMÉTRICOS', '4,1': 'VALOR', '4,2': 'UNIDADE', '4,3': 'VERIFICAÇÃO NORMATIVA',
+        '5,0': 'Altura Total a Vencer (H):', '5,1': d.altura.toFixed(2), '5,2': 'm', '5,3': '-',
+        '6,0': 'Largura Livre da Escada (B):', '6,1': d.largura.toFixed(2), '6,2': 'm', '6,3': 'NBR 9050 ≥ 1.20 m',
+        '7,0': 'Número de Degraus:', '7,1': d.numDegraus, '7,2': 'unidades', '7,3': '-',
+        '8,0': 'Altura do Espelho (e):', '8,1': d.espelho, '8,2': 'cm', '8,3': (d.espelho >= 16 && d.espelho <= 18) ? 'CONFORME (16 a 18 cm)' : 'NÃO CONFORME',
+        '9,0': 'Largura do Piso (p):', '9,1': d.piso, '9,2': 'cm', '9,3': d.piso >= 28 ? 'CONFORME (≥ 28 cm)' : 'NÃO CONFORME',
+        '10,0': 'Fórmula de Blondel (2e + p):', '10,1': d.blondel, '10,2': 'cm', '10,3': (d.blondel >= 63 && d.blondel <= 64) ? 'IDEAL (63 a 64 cm)' : 'ATENDE TOLERÂNCIA',
+        '11,0': 'Ângulo de Inclinação (α):', '11,1': d.inclinacao, '11,2': 'graus', '11,3': d.inclinacao <= 32 ? 'CONFORME (≤ 32° NBR 9050)' : 'EXCEDE LIMITE',
+        '12,0': 'DIMENSIONAMENTO ESTRUTURAL', '12,1': 'VALOR', '12,2': 'UNIDADE', '12,3': 'CRITÉRIO NBR 6118',
+        '13,0': 'Espessura da Laje Inclinada (h):', '13,1': d.espessuraLaje || 12, '13,2': 'cm', '13,3': 'h ≥ 10 cm',
+        '14,0': 'Momento Fletor de Cálculo (Md):', '14,1': d.Md ? d.Md.toFixed(2) : '25.00', '14,2': 'kNm/m', '14,3': 'Majorado γf = 1.4',
+        '15,0': 'Armadura Principal de Flexão (As):', '15,1': d.asFinal ? d.asFinal.toFixed(2) : '5.50', '15,2': 'cm²/m', '15,3': d.bitolaPrincipalStr || 'φ 10mm c/ 15cm',
+        '16,0': 'Armadura Secundária de Distribuição:', '16,1': d.bitolaDistStr || 'φ 6.3mm c/ 20cm', '16,2': '-', '16,3': 'As,dist ≥ 20% As,princ'
+      };
+
+      try {
+        localStorage.setItem('officeclone_import_payload', JSON.stringify({
+          title: `Escada_${d.numDegraus}Degraus_${d.espelho}x${d.piso}`,
+          cells: dataCells,
+          author: 'ECALC PRO - Suíte de Engenharia',
+          timestamp: new Date().toISOString()
+        }));
+        window.open('../office/', '_blank');
+      } catch (err) {
+        alert('Planilha gerada! Permita pop-ups para abrir no OfficeClone.');
+      }
     }
 
     function gerarMemorialEscada() {

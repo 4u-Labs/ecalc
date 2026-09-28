@@ -14,31 +14,31 @@
             .ecalc-memorial-modal {
                 position: fixed;
                 inset: 0;
-                background: rgba(0, 0, 0, 0.85);
+                background: rgba(0, 0, 0, 0.88);
                 backdrop-filter: blur(8px);
                 z-index: 10010;
                 display: none;
                 overflow-y: auto;
-                padding: 20px 10px;
+                padding: 24px 12px 60px 12px;
                 font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                box-sizing: border-box;
             }
             .ecalc-memorial-modal.active {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+                display: block;
             }
             .ecalc-memorial-actions {
                 position: sticky;
-                top: 10px;
+                top: 15px;
                 z-index: 10015;
                 display: flex;
-                gap: 10px;
-                margin-bottom: 20px;
-                background: rgba(15, 23, 42, 0.9);
-                padding: 10px 18px;
+                gap: 12px;
+                margin: 0 auto 24px auto;
+                width: fit-content;
+                background: rgba(15, 23, 42, 0.95);
+                padding: 10px 20px;
                 border-radius: 40px;
                 border: 1px solid rgba(0, 210, 255, 0.4);
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
             }
             .ecalc-memorial-btn {
                 display: inline-flex;
@@ -73,15 +73,20 @@
             /* A4 Paper Container */
             .ecalc-a4-sheet {
                 width: 210mm;
+                max-width: 100%;
                 min-height: 297mm;
+                height: auto !important;
                 padding: 18mm 20mm;
-                margin: 0 auto 30px auto;
-                background: #ffffff;
-                color: #0f172a;
-                box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
+                margin: 0 auto 40px auto;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6);
                 box-sizing: border-box;
                 font-size: 11pt;
                 line-height: 1.5;
+                display: block;
+                position: relative;
+                overflow: visible;
             }
 
             .ecalc-sheet-header {
@@ -236,30 +241,46 @@
 
             /* Signature Block */
             .ecalc-sheet-footer {
-                margin-top: 25px;
-                padding-top: 14px;
+                margin-top: 28px;
+                padding-top: 16px;
                 border-top: 1px solid #cbd5e1;
                 display: flex;
                 align-items: flex-end;
                 justify-content: space-between;
                 font-size: 8pt;
+                color: #334155;
             }
             .ecalc-signature-line {
                 width: 250px;
                 text-align: center;
+                color: #0f172a;
             }
             .ecalc-signature-line .line {
                 border-top: 1px solid #0f172a;
                 margin-bottom: 4px;
             }
+            .ecalc-signature-line strong {
+                color: #0f172a;
+                font-size: 8.5pt;
+            }
+            .ecalc-signature-line span {
+                color: #475569;
+            }
             .ecalc-qr-code {
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 10px;
             }
             .ecalc-qr-code img {
                 width: 60px;
                 height: 60px;
+                border: 1px solid #e2e8f0;
+                border-radius: 4px;
+                padding: 2px;
+                background: #fff;
+            }
+            .ecalc-qr-code strong {
+                color: #0f172a;
             }
 
             /* PRINT CSS: Strict A4 Optimization */
@@ -272,14 +293,15 @@
                     visibility: visible;
                 }
                 .ecalc-memorial-modal {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    background: transparent !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100% !important;
+                    background: #ffffff !important;
                     padding: 0 !important;
                     margin: 0 !important;
                     display: block !important;
+                    overflow: visible !important;
                 }
                 .ecalc-memorial-actions {
                     display: none !important;
@@ -287,10 +309,19 @@
                 .ecalc-a4-sheet {
                     width: 100% !important;
                     min-height: auto !important;
+                    height: auto !important;
                     box-shadow: none !important;
-                    padding: 10mm 12mm !important;
+                    padding: 8mm 10mm !important;
                     margin: 0 !important;
-                    page-break-after: avoid;
+                    background: #ffffff !important;
+                }
+                .ecalc-sheet-header,
+                .ecalc-table-project,
+                .ecalc-sec-title,
+                .ecalc-drawing-box,
+                .ecalc-sheet-footer {
+                    break-inside: avoid;
+                    page-break-inside: avoid;
                 }
                 @page {
                     size: A4 portrait;
