@@ -260,6 +260,28 @@ $v = time();
             border: 1px solid rgba(59, 130, 246, 0.2);
         }
 
+        /* Image-based Cards */
+        .tool-card-image {
+            padding: 0 !important;
+            aspect-ratio: 4 / 3;
+            display: flex;
+            overflow: hidden;
+            border-radius: 24px;
+        }
+
+        .tool-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 24px;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tool-card-image:hover img {
+            transform: scale(1.04);
+        }
+
         /* Back to top */
         .back-to-top {
             background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
@@ -428,11 +450,15 @@ $v = time();
                 <p class="text-sm text-slate-400 font-light leading-relaxed">Cálculo de tintas, argamassas e revestimentos por m².</p>
             </a>
 
-            <a href="aco.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="estrutural" style="animation-delay: 0.18s">
-                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Estrutural</span>
-                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">⛓️</div>
-                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">Cálculo de Aço</h2>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Dimensionamento de armaduras, tabelas e pesos nominais.</p>
+            <a href="aco.html" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="estrutural" style="animation-delay: 0.18s">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/aco.webp" type="image/webp">
+                    <img src="assets/cards/aco.jpg" alt="Cálculo de Aço" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>Cálculo de Aço</h2>
+                    <p>Dimensionamento de armaduras, tabelas e pesos nominais.</p>
+                </div>
             </a>
 
             <a href="lajes.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="estrutural" style="animation-delay: 0.2s">
