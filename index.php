@@ -483,8 +483,8 @@ $v = time();
             <div class="hero-banner-wrapper">
                 <div class="hero-banner-inner">
                     <picture class="w-full block">
-                        <source srcset="assets/banner-ecalc.webp" type="image/webp">
-                        <img src="assets/banner-ecalc.png" 
+                        <source srcset="assets/banner-ecalc.webp?v=2" type="image/webp">
+                        <img src="assets/banner-ecalc.png?v=2" 
                              alt="ECALC - Cálculos Técnicos para Engenharia - Obras mais seguras, rápidas e precisas" 
                              class="w-full h-auto block select-none" 
                              width="1024" 
