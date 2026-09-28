@@ -47,6 +47,7 @@
       animation: gradientMove 8s ease infinite;
       z-index: -1;
       opacity: 0.6;
+      pointer-events: none;
     }
     @keyframes gradientMove {
       0%, 100% { background-position: 0% 50%; }
@@ -81,6 +82,7 @@
       transform: translateY(-4px);
       border-color: #ff8800;
     }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body class="font-sans text-gray-100">
@@ -91,12 +93,12 @@
           🧱
         </div>
         <div>
-          <h1 class="text-lg font-semibold text-white">Muros de Arrimo</h1>
-          <p class="text-xs text-gray-500">Empuxo e Estabilidade ao Tombamento</p>
+          <h1 class="text-lg font-semibold text-white">Muros de Arrimo & Contenções</h1>
+          <p class="text-xs text-gray-500">Estabilidade Geotécnica (NBR 11682) & Dimensionamento Estrutural (NBR 6118)</p>
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
+        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer" title="Redefinir">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
       </div>
@@ -105,77 +107,210 @@
 
   <main class="max-w-7xl mx-auto px-4 py-8">
     <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Painel de Entradas -->
       <div class="lg:col-span-1 space-y-6">
         <div class="gradient-border p-6">
           <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <span class="text-neon-orange">●</span> Geometria e Solo
+            <span class="text-neon-orange">●</span> Geometria & Solo
           </h2>
           <div class="space-y-4">
             <div>
-              <label class="block text-sm text-gray-400 mb-2">Altura do Muro (H - m)</label>
-              <input type="number" id="altura" value="3.0" min="0.5" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+              <label class="block text-sm text-gray-400 mb-1">Tipologia Estrutural</label>
+              <select id="tipoMuro" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700" onchange="toggleTipoMuro()">
+                <option value="cantilever" selected>Muro de Flexão em Concreto Armado (Cantilever)</option>
+                <option value="gravidade">Muro de Gravidade (Concreto Ciclópico / Gabião)</option>
+              </select>
             </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Largura da Base (B - m)</label>
-              <input type="number" id="base" value="1.5" min="0.3" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm text-gray-400 mb-1">Altura Total (H - m)</label>
+                <input type="number" id="altura" value="3.5" min="1.0" max="12.0" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-sm text-gray-400 mb-1">Largura Base (B - m)</label>
+                <input type="number" id="base" value="2.0" min="0.5" max="8.0" step="0.1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+              </div>
             </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Material do Muro</label>
+
+            <!-- Parâmetros Cantilever -->
+            <div id="camposCantilever" class="space-y-3 p-3.5 rounded-xl bg-white/5 border border-white/10">
+              <div class="text-xs font-bold text-orange-400 uppercase tracking-wider">Geometria da Seção em T / L</div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">Espessura Topo (m)</label>
+                  <input type="number" id="eTopo" value="0.25" min="0.15" max="0.80" step="0.05" class="form-input w-full px-3 py-2 text-sm rounded-lg text-white bg-dark-700">
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">Espessura Base Fuste (m)</label>
+                  <input type="number" id="eBase" value="0.40" min="0.20" max="1.50" step="0.05" class="form-input w-full px-3 py-2 text-sm rounded-lg text-white bg-dark-700">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">Altura da Sapata (m)</label>
+                  <input type="number" id="hSap" value="0.45" min="0.25" max="1.20" step="0.05" class="form-input w-full px-3 py-2 text-sm rounded-lg text-white bg-dark-700">
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">Biqueira / Ponta (m)</label>
+                  <input type="number" id="bPonta" value="0.40" min="0.10" max="2.00" step="0.05" class="form-input w-full px-3 py-2 text-sm rounded-lg text-white bg-dark-700">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">fck Concreto (MPa)</label>
+                  <select id="fck" class="form-input w-full px-3 py-2 text-sm rounded-lg text-white bg-dark-700">
+                    <option value="20">20 MPa</option>
+                    <option value="25" selected>25 MPa</option>
+                    <option value="30">30 MPa</option>
+                    <option value="35">35 MPa</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">Aço Armadura</label>
+                  <select id="acoFyd" class="form-input w-full px-3 py-2 text-sm rounded-lg text-white bg-dark-700">
+                    <option value="435" selected>CA-50 (fyd = 435 MPa)</option>
+                    <option value="522">CA-60 (fyd = 522 MPa)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Material Muro de Gravidade -->
+            <div id="campoGravidade" class="hidden">
+              <label class="block text-sm text-gray-400 mb-1">Material do Muro</label>
               <select id="matMuro" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
-                <option value="25">Concreto Armado (25 kN/m³)</option>
                 <option value="24" selected>Concreto Ciclópico (24 kN/m³)</option>
                 <option value="22">Alvenaria Estrutural Cheia (22 kN/m³)</option>
                 <option value="17">Gabião de Pedra (17 kN/m³)</option>
               </select>
             </div>
+
+            <!-- Dados do Solo -->
             <div>
-              <label class="block text-sm text-gray-400 mb-2">Tipo de Solo (Retido)</label>
+              <label class="block text-sm text-gray-400 mb-1">Tipo de Solo (Maciço Retido)</label>
               <select id="tipoSolo" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
-                <option value="30,18">Areia / Solo Granular (φ=30º, γ=18 kN/m³)</option>
-                <option value="35,19">Areia Densa (φ=35º, γ=19 kN/m³)</option>
-                <option value="25,17">Argila Arenosa (φ=25º, γ=17 kN/m³)</option>
-                <option value="20,16">Argila Mole (φ=20º, γ=16 kN/m³)</option>
+                <option value="30,18" selected>Areia / Solo Granular Médio (φ=30º, γ=18 kN/m³)</option>
+                <option value="35,19">Areia Densa / Silte Compacto (φ=35º, γ=19 kN/m³)</option>
+                <option value="25,17">Argila Arenosa / Solo Médio (φ=25º, γ=17 kN/m³)</option>
+                <option value="20,16">Argila Plástica / Silte Mole (φ=20º, γ=16 kN/m³)</option>
               </select>
             </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Coeficiente de Atrito Base-Solo (µ)</label>
-              <input type="number" id="atrito" value="0.5" min="0.1" max="0.8" step="0.05" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm text-gray-400 mb-1">Sobrecarga (q - kN/m²)</label>
+                <input type="number" id="sobrecarga" value="5.0" min="0" max="50" step="1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700" title="Ex: 5 kN/m² pedestres, 10 kN/m² tráfego leve, 20 kN/m² caminhões">
+              </div>
+              <div>
+                <label class="block text-sm text-gray-400 mb-1">Atrito Base (µ)</label>
+                <input type="number" id="atrito" value="0.5" min="0.2" max="0.8" step="0.05" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+              </div>
             </div>
-            <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 mt-4">
-              Analisar Estabilidade
+
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Tensão Admissível Solo (σadm - kPa)</label>
+              <input type="number" id="tensaoAdm" value="200" min="50" max="1000" step="10" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+            </div>
+
+            <button id="btnCalcular" type="button" class="btn-primary w-full py-3.5 rounded-xl font-bold text-dark-900 mt-4 cursor-pointer text-sm uppercase tracking-wider">
+              ⚡ Analisar Estabilidade & Armaduras
             </button>
           </div>
         </div>
       </div>
 
+      <!-- Painel de Resultados -->
       <div class="lg:col-span-2 space-y-6">
-        <div id="resultadoSection" class="gradient-border p-8 text-center opacity-50 transition-opacity duration-500">
-          <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Fator de Segurança ao Tombamento</div>
-          <div id="valFS" class="text-5xl md:text-6xl font-bold text-neon-orange text-glow mb-2">0.00</div>
-          <div id="statusFS" class="text-xl mb-4 font-semibold text-gray-300">-</div>
-          
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Empuxo Ativo (Ea)</div>
-              <div id="valEa" class="text-xl font-semibold text-neon-orange">0 kN/m</div>
+        <!-- Suite Action Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-white/5 p-4 rounded-xl border border-neon-orange/20 no-print">
+          <div class="text-sm font-bold text-neon-orange flex items-center gap-2">
+            <span>🧱</span> Suíte Integrada ECALC PRO
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="abrirNoCadCloneArrimo()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+              <span>📐 Abrir no CADClone</span>
+            </button>
+            <button type="button" onclick="gerarMemorialArrimo()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+              <span>📄 Gerar Memorial ABNT</span>
+            </button>
+            <button type="button" onclick="abrirNoOfficeCloneArrimo()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+              <span>📊 Abrir no OfficeClone</span>
+            </button>
+            <button type="button" onclick="baixarDxfArrimo()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-neon-orange/30 hover:bg-neon-orange/10 text-orange-300 font-medium text-xs transition-all cursor-pointer" title="Baixar arquivo DXF">
+              <span>💾 Baixar .DXF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Hero Cards -->
+        <div id="resultadoSection" class="gradient-border p-6 transition-all duration-300">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div class="p-4 rounded-xl bg-dark-800/80 border border-white/5 text-center">
+              <div class="text-xs text-gray-400 uppercase tracking-wider mb-1">F.S. Tombamento (≥ 1.5)</div>
+              <div id="valFS" class="text-4xl font-black text-neon-orange text-glow">0.00</div>
+              <div id="statusFS" class="text-xs font-bold mt-1 text-gray-400">-</div>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Peso do Muro (W)</div>
-              <div id="valW" class="text-xl font-semibold text-neon-magenta">0 kN/m</div>
+            <div class="p-4 rounded-xl bg-dark-800/80 border border-white/5 text-center">
+              <div class="text-xs text-gray-400 uppercase tracking-wider mb-1">F.S. Deslizamento (≥ 1.5)</div>
+              <div id="valFSDesl" class="text-4xl font-black text-neon-magenta">0.00</div>
+              <div id="statusFSDesl" class="text-xs font-bold mt-1 text-gray-400">-</div>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Momento Tombador</div>
-              <div id="valMt" class="text-xl font-semibold text-neon-orange">0 kN.m/m</div>
+            <div class="p-4 rounded-xl bg-dark-800/80 border border-white/5 text-center">
+              <div class="text-xs text-gray-400 uppercase tracking-wider mb-1">Tensão Máx Solo (≤ σadm)</div>
+              <div id="valSigma" class="text-4xl font-black text-cyan-400">0 kPa</div>
+              <div id="statusSigma" class="text-xs font-bold mt-1 text-gray-400">-</div>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Momento Resistente</div>
-              <div id="valMr" class="text-xl font-semibold text-neon-magenta">0 kN.m/m</div>
+          </div>
+
+          <!-- Grid de Métricas Secundárias -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Empuxo Ativo Total (Ea)</div>
+              <div id="valEa" class="text-lg font-semibold text-neon-orange">0 kN/m</div>
+            </div>
+            <div class="p-3 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Carga Normal Total (N)</div>
+              <div id="valW" class="text-lg font-semibold text-neon-magenta">0 kN/m</div>
+            </div>
+            <div class="p-3 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Momento Tombador (Mt)</div>
+              <div id="valMt" class="text-lg font-semibold text-neon-orange">0 kNm/m</div>
+            </div>
+            <div class="p-3 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
+              <div class="text-xs text-gray-500 mb-1">Momento Resistente (Mr)</div>
+              <div id="valMr" class="text-lg font-semibold text-neon-magenta">0 kNm/m</div>
+            </div>
+          </div>
+
+          <!-- Bloco Estrutural (se Cantilever) -->
+          <div id="blocoArmadura" class="mt-4 p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/20">
+            <h4 class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <span>🔩</span> Armadura Longitudinal de Flexão do Fuste (NBR 6118)
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              <div>
+                <span class="text-gray-400 text-xs">Momento de Cálculo (Md):</span>
+                <div id="valMdFuste" class="font-bold text-white text-base">0 kNm/m</div>
+              </div>
+              <div>
+                <span class="text-gray-400 text-xs">Área de Aço Requerida (As):</span>
+                <div id="valAsFuste" class="font-bold text-cyan-300 text-base">0 cm²/m</div>
+              </div>
+              <div>
+                <span class="text-gray-400 text-xs">Bitola e Espaçamento:</span>
+                <div id="valBitolaFuste" class="font-bold text-green-400 text-base">φ -- c/ -- cm</div>
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- Memorial Analítico Embutido -->
         <div class="gradient-border p-6">
-          <h3 class="text-lg font-semibold mb-4 text-white">📝 Memorial de Cálculo Analítico (Rankine / Gravidade)</h3>
+          <h3 class="text-lg font-semibold mb-4 text-white flex items-center justify-between">
+            <span>📝 Memorial de Cálculo Analítico (ABNT NBR 11682 / NBR 6118)</span>
+            <span class="text-xs text-gray-400 font-normal">Rankine + Flexão</span>
+          </h3>
           <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
         </div>
       </div>
@@ -188,112 +323,461 @@
 
   <script>
     const $ = id => document.getElementById(id);
+    let ultimoResultadoArrimo = null;
+
+    function toggleTipoMuro() {
+      const tipo = $('tipoMuro').value;
+      if (tipo === 'cantilever') {
+        $('camposCantilever').classList.remove('hidden');
+        $('campoGravidade').classList.add('hidden');
+        $('blocoArmadura').classList.remove('hidden');
+      } else {
+        $('camposCantilever').classList.add('hidden');
+        $('campoGravidade').classList.remove('hidden');
+        $('blocoArmadura').classList.add('hidden');
+      }
+      calcularEstabilidade();
+    }
 
     function calcularEstabilidade() {
-      const h = parseFloat($('altura').value) || 0;
-      const b = parseFloat($('base').value) || 0;
-      
-      const gamaMuro = parseFloat($('matMuro').value) || 24; // kN/m³
+      const tipo = $('tipoMuro').value;
+      const h = parseFloat($('altura').value) || 3.5;
+      const b = parseFloat($('base').value) || 2.0;
+      const q = parseFloat($('sobrecarga').value) || 0;
+      const mu = parseFloat($('atrito').value) || 0.5;
+      const tensaoAdm = parseFloat($('tensaoAdm').value) || 200;
+
       const soloParams = $('tipoSolo').value.split(',');
       const phiDeg = parseFloat(soloParams[0]);
-      const gamaSolo = parseFloat(soloParams[1]); // kN/m³
-      const mu = parseFloat($('atrito').value) || 0.5;
+      const gamaSolo = parseFloat(soloParams[1]);
 
-      // Cálculo do Muro (Secção Retangular Simplificada de Gravidade)
-      // W = Peso próprio = B * H * gamaMuro
-      const w = b * h * gamaMuro;
-      
-      // Braço de alavanca do peso (Centro de Gravidade)
-      const xCG = b / 2;
-      
-      // Momento Resistente (em relação ao pé do muro, ponto O)
-      const mr = w * xCG;
-
-      // Cálculo de Empuxo (Teoria de Rankine, sem coesão, sem sobrecarga, tardoz vertical)
-      // Ka = tan²(45 - φ/2)
       const phiRad = phiDeg * Math.PI / 180;
       const ka = Math.tan(Math.PI/4 - phiRad/2) * Math.tan(Math.PI/4 - phiRad/2);
-      
-      // Ea = 1/2 * Ka * gamaSolo * H²
-      const ea = 0.5 * ka * gamaSolo * h * h;
-      
-      // Braço de alavanca do empuxo (distribuição triangular, H/3 a partir da base)
-      const yEa = h / 3;
-      
-      // Momento Tombador
-      const mt = ea * yEa;
 
-      // Fator de Segurança contra Tombamento
-      let fsTomb = mr / mt;
-      
-      // Força resistente ao deslizamento
-      const forcaAtrito = w * mu;
-      
-      // Fator de Segurança contra Deslizamento
-      let fsDesliz = forcaAtrito / ea;
+      // Empuxo ativo na altura total H (Rankine)
+      const eaSolo = 0.5 * ka * gamaSolo * h * h;
+      const eaQ = ka * q * h;
+      const ea = eaSolo + eaQ;
+      const mt = (eaSolo * h / 3) + (eaQ * h / 2);
 
-      // Diagnóstico Tombamento
-      let statusT = "";
-      let statusColor = "";
-      if (fsTomb >= 1.5) {
-        statusT = "ESTÁVEL (FS ≥ 1.5)";
-        statusColor = "text-green-400";
-      } else if (fsTomb >= 1.0) {
-        statusT = "RISCO DE TOMBAMENTO (FS < 1.5)";
-        statusColor = "text-yellow-400";
+      let wTot = 0, mr = 0;
+      let eTopo = 0.25, eBase = 0.40, hSap = 0.45, bPonta = 0.40, bCalc = 0;
+      let mdFuste = 0, asFuste = 0, bitolaStr = '', asMin = 0;
+      let fck = 25, fyd = 435;
+
+      if (tipo === 'cantilever') {
+        eTopo = parseFloat($('eTopo').value) || 0.25;
+        eBase = parseFloat($('eBase').value) || 0.40;
+        hSap = parseFloat($('hSap').value) || 0.45;
+        bPonta = parseFloat($('bPonta').value) || 0.40;
+        fck = parseFloat($('fck').value) || 25;
+        fyd = parseFloat($('acoFyd').value) || 435;
+
+        const gamaConc = 25.0; // kN/m³
+        const hFuste = Math.max(0.5, h - hSap);
+        bCalc = Math.max(0.1, b - bPonta - eBase);
+
+        // Pesos e momentos estabilizadores em relação ao ponto O (borda frontal da ponta)
+        const wSap = b * hSap * gamaConc;
+        const xSap = b / 2;
+
+        const wFusteRet = eTopo * hFuste * gamaConc;
+        const xFusteRet = bPonta + (eBase - eTopo) + eTopo / 2;
+
+        const wFusteTri = 0.5 * (eBase - eTopo) * hFuste * gamaConc;
+        const xFusteTri = bPonta + (2/3) * (eBase - eTopo);
+
+        const wSolo = bCalc * hFuste * gamaSolo;
+        const xSolo = bPonta + eBase + bCalc / 2;
+
+        const wQ = bCalc * q;
+        const xQ = xSolo;
+
+        wTot = wSap + wFusteRet + wFusteTri + wSolo + wQ;
+        mr = (wSap * xSap) + (wFusteRet * xFusteRet) + (wFusteTri * xFusteTri) + (wSolo * xSolo) + (wQ * xQ);
+
+        // Dimensionamento Estrutural do Fuste sob Flexão Simples (seção na base do fuste)
+        const eaSoloF = 0.5 * ka * gamaSolo * hFuste * hFuste;
+        const eaQF = ka * q * hFuste;
+        const mtFuste = (eaSoloF * hFuste / 3) + (eaQF * hFuste / 2);
+        mdFuste = 1.4 * mtFuste; // kNm/m
+
+        const dFuste = Math.max(0.15, eBase - 0.04); // 4cm cobrimento
+        const asCalc = (mdFuste / (0.85 * dFuste * (fyd / 1.15) * 1000)) * 10000; // cm²/m
+        asMin = 0.0015 * 100 * (eBase * 100); // 0.15% da seção
+        asFuste = Math.max(asCalc, asMin);
+
+        // Seleção de bitola comercial
+        const bitolas = [
+          { phi: 10.0, area: 0.785 },
+          { phi: 12.5, area: 1.227 },
+          { phi: 16.0, area: 2.011 },
+          { phi: 20.0, area: 3.142 }
+        ];
+        let melhor = bitolas[1]; // default 12.5
+        for (const b of bitolas) {
+          const s = Math.floor((b.area / asFuste) * 100);
+          if (s >= 10 && s <= 25) {
+            melhor = { ...b, s };
+            break;
+          }
+        }
+        const sFinal = Math.min(25, Math.max(10, Math.floor((melhor.area / asFuste) * 100)));
+        bitolaStr = `φ ${melhor.phi} mm c/ ${sFinal} cm (${(melhor.area * (100 / sFinal)).toFixed(2)} cm²/m)`;
+
       } else {
-        statusT = "RUÍNA (TOMBARÁ)";
-        statusColor = "text-red-400";
+        // Muro de Gravidade
+        const gamaMuro = parseFloat($('matMuro').value) || 24;
+        wTot = b * h * gamaMuro;
+        mr = wTot * (b / 2);
       }
 
-      // UI
-      $('resultadoSection').classList.remove('opacity-50');
-      $('resultadoSection').classList.add('pulse-glow');
-      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+      // Fatores de Segurança
+      const fsTomb = mr / Math.max(0.01, mt);
+      const forcaAtrito = wTot * mu;
+      const fsDesl = forcaAtrito / Math.max(0.01, ea);
 
+      // Excentricidade e Tensões na Fundação
+      const dRes = (mr - mt) / Math.max(0.01, wTot);
+      const e = (b / 2) - dRes;
+      const eMax = b / 6;
+
+      let sigmaMax = 0, sigmaMin = 0;
+      if (Math.abs(e) <= eMax) {
+        sigmaMax = (wTot / b) * (1 + (6 * Math.abs(e)) / b);
+        sigmaMin = (wTot / b) * (1 - (6 * Math.abs(e)) / b);
+      } else {
+        sigmaMax = (2 * wTot) / (3 * Math.max(0.05, (b / 2) - Math.abs(e)));
+        sigmaMin = 0;
+      }
+
+      // Status
+      const statusT = fsTomb >= 1.5 ? 'ESTÁVEL (≥ 1.5) ✓' : 'NÃO CONFORME (< 1.5) ⚠️';
+      const statusColorT = fsTomb >= 1.5 ? 'text-green-400' : 'text-red-400';
+
+      const statusD = fsDesl >= 1.5 ? 'ESTÁVEL (≥ 1.5) ✓' : 'DESLIZA (< 1.5) ⚠️';
+      const statusColorD = fsDesl >= 1.5 ? 'text-green-400' : 'text-yellow-400';
+
+      const statusS = sigmaMax <= tensaoAdm ? 'OK (≤ σadm) ✓' : 'EXCEDE SOLO ⚠️';
+      const statusColorS = sigmaMax <= tensaoAdm ? 'text-green-400' : 'text-red-400';
+
+      // Salva estado global para pontes CAD e Memorial
+      ultimoResultadoArrimo = {
+        tipo, h, b, q, mu, tensaoAdm, phiDeg, gamaSolo, ka,
+        eaSolo, eaQ, ea, mt, wTot, mr, fsTomb, fsDesl,
+        eTopo, eBase, hSap, bPonta, bCalc,
+        e, eMax, sigmaMax, sigmaMin,
+        fck, fyd, mdFuste, asFuste, bitolaStr, asMin
+      };
+
+      // UI Update
+      $('resultadoSection').classList.remove('opacity-50');
       $('valFS').textContent = fsTomb.toFixed(2);
       $('statusFS').textContent = statusT;
-      $('statusFS').className = `text-xl mb-4 font-semibold ${statusColor}`;
-      
-      $('valEa').textContent = ea.toFixed(1) + ' kN/m';
-      $('valW').textContent = w.toFixed(1) + ' kN/m';
-      $('valMt').textContent = mt.toFixed(1) + ' kN.m/m';
-      $('valMr').textContent = mr.toFixed(1) + ' kN.m/m';
+      $('statusFS').className = `text-xs font-bold mt-1 ${statusColorT}`;
 
-      $('memorial').textContent = `MEMORIAL DE CÁLCULO DE ESTABILIDADE (MURO DE GRAVIDADE)
+      $('valFSDesl').textContent = fsDesl.toFixed(2);
+      $('statusFSDesl').textContent = statusD;
+      $('statusFSDesl').className = `text-xs font-bold mt-1 ${statusColorD}`;
+
+      $('valSigma').textContent = `${sigmaMax.toFixed(1)} kPa`;
+      $('statusSigma').textContent = `${statusS} (Adm: ${tensaoAdm} kPa)`;
+      $('statusSigma').className = `text-xs font-bold mt-1 ${statusColorS}`;
+
+      $('valEa').textContent = `${ea.toFixed(1)} kN/m`;
+      $('valW').textContent = `${wTot.toFixed(1)} kN/m`;
+      $('valMt').textContent = `${mt.toFixed(1)} kNm/m`;
+      $('valMr').textContent = `${mr.toFixed(1)} kNm/m`;
+
+      if (tipo === 'cantilever') {
+        $('valMdFuste').textContent = `${mdFuste.toFixed(1)} kNm/m`;
+        $('valAsFuste').textContent = `${asFuste.toFixed(2)} cm²/m`;
+        $('valBitolaFuste').textContent = bitolaStr;
+      }
+
+      // Memorial Analítico
+      $('memorial').textContent = `MEMORIAL DESCRITIVO DE ESTABILIDADE E DIMENSIONAMENTO DE CONTENÇÃO
+Normas Técnicas: ABNT NBR 11682:2009 (Estabilidade de Encostas) e NBR 6118:2023
 Data: ${new Date().toLocaleDateString('pt-BR')}
 
-1. PARÂMETROS
-Muro (H x B): ${h.toFixed(2)} m x ${b.toFixed(2)} m
-Gama do Muro (γm): ${gamaMuro.toFixed(2)} kN/m³
-Gama do Solo (γs): ${gamaSolo.toFixed(2)} kN/m³
-Ângulo de Atrito (φ): ${phiDeg.toFixed(1)}°
-Coef. de Atrito Base (µ): ${mu.toFixed(2)}
+1. PARÂMETROS GERAIS DO PROJETO
+Tipologia: ${tipo === 'cantilever' ? 'Muro de Flexão em Concreto Armado (Cantilever)' : 'Muro de Gravidade'}
+Altura Total do Muro (H): ${h.toFixed(2)} m
+Largura da Base da Fundação (B): ${b.toFixed(2)} m
+Sobrecarga no Topo do Terreno (q): ${q.toFixed(1)} kN/m²
+Solo Retido: φ = ${phiDeg.toFixed(1)}°, γ = ${gamaSolo.toFixed(1)} kN/m³
+Coeficiente de Atrito Base-Solo (µ): ${mu.toFixed(2)}
+Tensão Admissível do Solo de Fundação (σadm): ${tensaoAdm.toFixed(1)} kPa
 
-2. CÁLCULO DO EMPUXO (RANKINE - ATIVO)
-Coeficiente de Empuxo (Ka) = tan²(45 - φ/2) = ${ka.toFixed(3)}
-Força de Empuxo (Ea) = 0.5 * Ka * γs * H²
-Ea = 0.5 * ${ka.toFixed(3)} * ${gamaSolo.toFixed(1)} * ${h.toFixed(1)}² = ${ea.toFixed(2)} kN/m
-Ponto de Aplicação (y) = H / 3 = ${(h/3).toFixed(2)} m da base
+2. EMPUXO DE TERRA ATIVO (TEORIA DE RANKINE)
+Coeficiente de Empuxo Ativo (Ka) = tan²(45° - φ/2) = ${ka.toFixed(3)}
+Empuxo do Solo (Eas) = 0.5 · Ka · γ · H² = ${eaSolo.toFixed(2)} kN/m (atua a ${(h/3).toFixed(2)} m da base)
+Empuxo da Sobrecarga (Eaq) = Ka · q · H = ${eaQ.toFixed(2)} kN/m (atua a ${(h/2).toFixed(2)} m da base)
+Empuxo Resultante Total (Ea) = ${ea.toFixed(2)} kN/m
+Momento Tombador Total (Mt) = Eas · (H/3) + Eaq · (H/2) = ${mt.toFixed(2)} kNm/m
 
-3. CÁLCULO DO PESO (ESTABILIZADOR)
-Peso Próprio (W) = B * H * γm
-W = ${b.toFixed(2)} * ${h.toFixed(2)} * ${gamaMuro.toFixed(1)} = ${w.toFixed(2)} kN/m
-Braço de Alavanca (x) = B / 2 = ${(b/2).toFixed(2)} m (Seção retangular simplificada)
+3. CARGAS VERTICAIS E MOMENTO RESISTENTE
+Carga Vertical Normal Total (N = ΣW): ${wTot.toFixed(2)} kN/m
+Momento Estabilizador / Resistente (Mr): ${mr.toFixed(2)} kNm/m
 
-4. VERIFICAÇÃO AO TOMBAMENTO (Ponto O - Pé do muro)
-Momento Tombador (Mt) = Ea * y = ${mt.toFixed(2)} kN.m/m
-Momento Resistente (Mr) = W * x = ${mr.toFixed(2)} kN.m/m
-F.S. Tombamento = Mr / Mt = ${fsTomb.toFixed(2)} (Mínimo recomendado: 1.5)
->> Situação Tombamento: ${fsTomb >= 1.5 ? "OK" : "NÃO ATENDE"}
+4. VERIFICAÇÕES GEOTÉCNICAS DE SEGURANÇA (NBR 11682)
+• Fator de Segurança ao Tombamento: FS_tomb = Mr / Mt = ${fsTomb.toFixed(2)} (Exigido: ≥ 1.50) -> [${fsTomb >= 1.5 ? 'CONFORME' : 'NÃO CONFORME'}]
+• Fator de Segurança ao Deslizamento: FS_desl = (N · µ) / Ea = ${fsDesl.toFixed(2)} (Exigido: ≥ 1.50) -> [${fsDesl >= 1.5 ? 'CONFORME' : 'ATENÇÃO: Requer Dente de Cisalhamento'}]
+• Ponto de Passagem da Resultante (d): d = (Mr - Mt)/N = ${dRes.toFixed(3)} m
+• Excentricidade da Carga (e): e = B/2 - d = ${Math.abs(e).toFixed(3)} m (Limite do terço médio B/6 = ${eMax.toFixed(3)} m)
+• Tensão Máxima no Solo (σmax): ${sigmaMax.toFixed(1)} kPa (Limite Admissível: ${tensaoAdm.toFixed(1)} kPa) -> [${sigmaMax <= tensaoAdm ? 'CONFORME' : 'SOLO SOBRECARREGADO'}]
+• Tensão Mínima no Solo (σmin): ${sigmaMin.toFixed(1)} kPa (Tração = 0)
 
-5. VERIFICAÇÃO AO DESLIZAMENTO
-Força Mobilizadora = Ea = ${ea.toFixed(2)} kN/m
-Força Resistente (Atrito) = W * µ = ${w.toFixed(2)} * ${mu.toFixed(2)} = ${forcaAtrito.toFixed(2)} kN/m
-F.S. Deslizamento = Atrito / Ea = ${fsDesliz.toFixed(2)} (Mínimo recomendado: 1.5)
->> Situação Deslizamento: ${fsDesliz >= 1.5 ? "OK" : "NÃO ATENDE (Considere dente de cisalhamento)"}
+${tipo === 'cantilever' ? `5. DIMENSIONAMENTO DA ARMADURA DO FUSTE (NBR 6118:2023)
+Concreto: fck = ${fck} MPa (fcd = ${(fck/1.4).toFixed(2)} MPa) | Aço: CA-50 (fyd = ${fyd} MPa)
+Momento Solicitante de Cálculo: Md = 1.4 · Mt_fuste = ${mdFuste.toFixed(2)} kNm/m
+Armadura Principal Vertical Tracionada (Tardoz): As = ${asFuste.toFixed(2)} cm²/m (As,mín = ${asMin.toFixed(2)} cm²/m)
+Bitola e Espaçamento Adotados: ${bitolaStr}
+Armadura Horizontal de Distribuição e Retração: φ 8.0 mm c/ 20 cm (As,h = 2.51 cm²/m)
+Sistema de Drenagem Obrigatório: Camada drenante de brita com e = 30 cm no tardoz e tubo coletor perfurado φ 100 mm.` : '5. ESPECIFICAÇÃO DE MATERIAL\nMuro de gravidade executado em concreto ciclópico/alvenaria de pedras com junta de dilatação a cada 15m e barbacãs de alívio hidrostático a cada 1.5m.'}
+`;
+    }
 
-Nota: Modelo teórico simplificado (seção 100% retangular de gravidade, maciço seco, sem sobrecarga, tardoz vertical liso). Deve-se verificar tensões no solo e escoamento/drenagem em projetos executivos.`;
+    // ==================== PONTES COM CADCLONE E SUITE ====================
+    function gerarDxfConteudoArrimo(d) {
+      const H = d.h * 100; // cm
+      const B = d.b * 100;
+      const hSap = (d.tipo === 'cantilever' ? d.hSap : 0.40) * 100;
+      const bPonta = (d.tipo === 'cantilever' ? d.bPonta : 0.30) * 100;
+      const eBase = (d.tipo === 'cantilever' ? d.eBase : d.b * 0.5) * 100;
+      const eTopo = (d.tipo === 'cantilever' ? d.eTopo : d.b * 0.3) * 100;
+
+      let dxf = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n`;
+      dxf += `0\nLAYER\n2\nCONCRETO\n70\n0\n62\n4\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nARMADURA\n70\n0\n62\n6\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nDRENAGEM\n70\n0\n62\n2\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nSOLO\n70\n0\n62\n3\n6\nDASHED\n0\n`;
+      dxf += `0\nLAYER\n2\nCOTAS\n70\n0\n62\n7\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nTEXTO\n70\n0\n62\n1\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nENDTAB\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nENTITIES\n`;
+
+      function line(x1, y1, x2, y2, lay) {
+        return `0\nLINE\n8\n${lay}\n10\n${x1.toFixed(1)}\n20\n${y1.toFixed(1)}\n30\n0.0\n11\n${x2.toFixed(1)}\n21\n${y2.toFixed(1)}\n31\n0.0\n`;
+      }
+      function text(x, y, h, str, lay) {
+        return `0\nTEXT\n8\n${lay}\n10\n${x.toFixed(1)}\n20\n${y.toFixed(1)}\n30\n0.0\n40\n${h}\n1\n${str}\n`;
+      }
+      function circle(cx, cy, r, lay) {
+        return `0\nCIRCLE\n8\n${lay}\n10\n${cx.toFixed(1)}\n20\n${cy.toFixed(1)}\n30\n0.0\n40\n${r.toFixed(1)}\n`;
+      }
+
+      // Contorno da Sapata
+      dxf += line(0, 0, B, 0, 'CONCRETO');
+      dxf += line(B, 0, B, hSap, 'CONCRETO');
+      dxf += line(B, hSap, bPonta + eBase, hSap, 'CONCRETO');
+      dxf += line(bPonta, hSap, 0, hSap, 'CONCRETO');
+      dxf += line(0, hSap, 0, 0, 'CONCRETO');
+
+      // Contorno do Fuste
+      const xFusteTopoEsq = bPonta + (eBase - eTopo);
+      const xFusteTopoDir = bPonta + eBase;
+      dxf += line(bPonta, hSap, xFusteTopoEsq, H, 'CONCRETO');
+      dxf += line(xFusteTopoEsq, H, xFusteTopoDir, H, 'CONCRETO');
+      dxf += line(xFusteTopoDir, H, bPonta + eBase, hSap, 'CONCRETO');
+
+      // Camada Drenante e Tubo Dreno
+      const xDreno = xFusteTopoDir + 30;
+      dxf += line(xFusteTopoDir, hSap, xDreno, hSap, 'DRENAGEM');
+      dxf += line(xDreno, hSap, xDreno, H - 30, 'DRENAGEM');
+      dxf += line(xDreno, H - 30, xFusteTopoDir, H - 30, 'DRENAGEM');
+      // Tubo coletor perfurado dreno 100mm
+      dxf += circle(xFusteTopoDir + 15, hSap + 15, 5, 'DRENAGEM');
+      // Barbacã através do muro
+      dxf += line(bPonta - 5, hSap + 15, xFusteTopoDir + 10, hSap + 15, 'DRENAGEM');
+
+      // Maciço de Solo
+      dxf += line(xDreno, H, B + 100, H, 'SOLO');
+      dxf += line(0, hSap, -50, hSap, 'SOLO');
+
+      // Armaduras em Concreto Armado
+      if (d.tipo === 'cantilever') {
+        // Armadura vertical do fuste (tardoz tracionado)
+        const xAcoV = xFusteTopoDir - 4;
+        dxf += line(xAcoV, H - 5, xAcoV, 5, 'ARMADURA');
+        // Gancho horizontal na sapata (calcanhar)
+        dxf += line(xAcoV, 5, B - 5, 5, 'ARMADURA');
+        dxf += line(B - 5, 5, B - 5, hSap - 5, 'ARMADURA');
+
+        // Armadura frontal do fuste
+        dxf += line(bPonta + 4, hSap + 5, xFusteTopoEsq + 4, H - 5, 'ARMADURA');
+        dxf += line(bPonta + 4, hSap + 5, 5, 5, 'ARMADURA');
+
+        // Pontos de distribuição horizontal
+        for (let y = hSap + 25; y < H - 10; y += 25) {
+          dxf += circle(xAcoV - 2, y, 1.5, 'ARMADURA');
+        }
+      }
+
+      // Cotas e Anotações
+      dxf += line(-15, 0, -15, H, 'COTAS');
+      dxf += line(-20, 0, -10, 0, 'COTAS');
+      dxf += line(-20, H, -10, H, 'COTAS');
+      dxf += text(-45, H / 2, 7, `H = ${(H/100).toFixed(2)}m`, 'COTAS');
+
+      dxf += line(0, -15, B, -15, 'COTAS');
+      dxf += line(0, -20, 0, -10, 'COTAS');
+      dxf += line(B, -20, B, -10, 'COTAS');
+      dxf += text(B / 2 - 15, -28, 7, `B = ${(B/100).toFixed(2)}m`, 'COTAS');
+
+      // Título e Rótulos Técnicos
+      dxf += text(0, H + 25, 11, `DETALHAMENTO DE CONTENCAO - H=${(H/100).toFixed(2)}m B=${(B/100).toFixed(2)}m`, 'TEXTO');
+      dxf += text(0, H + 12, 7, `FS_tomb = ${d.fsTomb.toFixed(2)} | FS_desl = ${d.fsDesl.toFixed(2)} | Solo: ${d.phiDeg}° (Ka=${d.ka.toFixed(3)})`, 'TEXTO');
+      if (d.tipo === 'cantilever') {
+        dxf += text(0, -45, 7, `Armadura Fuste: ${d.bitolaStr} (As = ${d.asFuste.toFixed(2)} cm2/m) | fck = ${d.fck} MPa`, 'TEXTO');
+      }
+
+      dxf += `0\nENDSEC\n0\nEOF\n`;
+      return dxf;
+    }
+
+    function abrirNoCadCloneArrimo() {
+      if (!ultimoResultadoArrimo) calcularEstabilidade();
+      const d = ultimoResultadoArrimo;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoArrimo(d);
+      window.ECALC_CAD.abrirNoCadClone(dxf, `muro_arrimo_H${(d.h*100).toFixed(0)}_B${(d.b*100).toFixed(0)}.dxf`);
+    }
+
+    function baixarDxfArrimo() {
+      if (!ultimoResultadoArrimo) calcularEstabilidade();
+      const d = ultimoResultadoArrimo;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoArrimo(d);
+      window.ECALC_CAD.baixarDXF(dxf, `muro_arrimo_H${(d.h*100).toFixed(0)}_B${(d.b*100).toFixed(0)}.dxf`);
+    }
+
+    function abrirNoOfficeCloneArrimo() {
+      if (!ultimoResultadoArrimo) calcularEstabilidade();
+      const d = ultimoResultadoArrimo;
+      const csvData = [
+        ['ECALC PRO - MEMÓRIA DE CÁLCULO DE MURO DE ARRIMO'],
+        ['Data', new Date().toLocaleDateString('pt-BR')],
+        ['Tipo de Muro', d.tipo === 'cantilever' ? 'Concreto Armado (Cantilever)' : 'Gravidade'],
+        [''],
+        ['PARÂMETRO', 'VALOR', 'UNIDADE'],
+        ['Altura Total (H)', d.h.toFixed(2), 'm'],
+        ['Largura da Base (B)', d.b.toFixed(2), 'm'],
+        ['Ângulo de Atrito do Solo (φ)', d.phiDeg.toFixed(1), 'graus'],
+        ['Peso Específico do Solo (γ)', d.gamaSolo.toFixed(1), 'kN/m³'],
+        ['Sobrecarga no Topo (q)', d.q.toFixed(1), 'kN/m²'],
+        ['Coeficiente de Empuxo Ativo (Ka)', d.ka.toFixed(3), '-'],
+        ['Empuxo Ativo Total (Ea)', d.ea.toFixed(2), 'kN/m'],
+        ['Momento Tombador (Mt)', d.mt.toFixed(2), 'kNm/m'],
+        ['Carga Normal Total (N)', d.wTot.toFixed(2), 'kN/m'],
+        ['Momento Estabilizador (Mr)', d.mr.toFixed(2), 'kNm/m'],
+        ['Fator de Segurança ao Tombamento', d.fsTomb.toFixed(2), d.fsTomb >= 1.5 ? 'OK (≥ 1.5)' : 'NÃO ATENDE'],
+        ['Fator de Segurança ao Deslizamento', d.fsDesl.toFixed(2), d.fsDesl >= 1.5 ? 'OK (≥ 1.5)' : 'NÃO ATENDE'],
+        ['Tensão Máxima no Solo (σmax)', d.sigmaMax.toFixed(1), 'kPa'],
+        ['Tensão Admissível (σadm)', d.tensaoAdm.toFixed(1), 'kPa']
+      ];
+      if (d.tipo === 'cantilever') {
+        csvData.push(['Momento de Cálculo do Fuste (Md)', d.mdFuste.toFixed(2), 'kNm/m']);
+        csvData.push(['Área de Aço Requerida (As)', d.asFuste.toFixed(2), 'cm²/m']);
+        csvData.push(['Armadura Recomendada', d.bitolaStr, '-']);
+      }
+      localStorage.setItem('officeclone_import_data', JSON.stringify({
+        filename: `Estabilidade_Muro_H${d.h.toFixed(1)}m.csv`,
+        rows: csvData
+      }));
+      window.open('../office/excel/', '_blank');
+    }
+
+    function gerarMemorialArrimo() {
+      if (!ultimoResultadoArrimo) calcularEstabilidade();
+      const d = ultimoResultadoArrimo;
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        alert('Módulo de Memorial não disponível');
+        return;
+      }
+
+      const svgSection = `
+        <svg width="260" height="200" viewBox="0 0 260 200" style="background:#fff;">
+          <!-- Solo retido -->
+          <polygon points="120,30 240,30 240,170 120,170" fill="#fef3c7" opacity="0.6"/>
+          <!-- Camada drenante -->
+          <rect x="120" y="40" width="18" height="130" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+          <circle cx="129" cy="160" r="4" fill="#0284c7"/>
+          <!-- Sapata -->
+          <rect x="40" y="160" width="130" height="22" fill="#cbd5e1" stroke="#0f172a" stroke-width="2" rx="2"/>
+          <!-- Fuste -->
+          <polygon points="70,160 100,30 120,30 120,160" fill="#94a3b8" stroke="#0f172a" stroke-width="2"/>
+          <!-- Armadura tardoz -->
+          <line x1="116" y1="35" x2="116" y2="174" stroke="#dc2626" stroke-width="2"/>
+          <line x1="116" y1="174" x2="162" y2="174" stroke="#dc2626" stroke-width="2"/>
+          <!-- Setas de empuxo -->
+          <line x1="210" y1="70" x2="140" y2="70" stroke="#f97316" stroke-width="1.5"/>
+          <polygon points="140,70 148,67 148,73" fill="#f97316"/>
+          <line x1="210" y1="120" x2="140" y2="120" stroke="#f97316" stroke-width="2"/>
+          <polygon points="140,120 148,117 148,123" fill="#f97316"/>
+          <text x="175" y="65" font-size="9" fill="#c2410c" font-weight="bold">Ea (Rankine)</text>
+          <!-- Cotas -->
+          <text x="25" y="100" font-size="9" font-weight="bold" fill="#0f172a">H=${d.h.toFixed(1)}m</text>
+          <text x="105" y="195" text-anchor="middle" font-size="9" font-weight="bold" fill="#0f172a">B=${d.b.toFixed(1)}m</text>
+        </svg>
+      `;
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial de Estabilidade Geotécnica e Dimensionamento de Muro de Arrimo',
+        norma: 'ABNT NBR 11682:2009 (Estabilidade de Encostas) e NBR 6118:2023',
+        elemento: `Muro de Contenção (${d.tipo === 'cantilever' ? 'Concreto Armado Cantilever' : 'Gravidade'}) - H = ${d.h.toFixed(2)} m, Base B = ${d.b.toFixed(2)} m`,
+        inputs: [
+          { label: 'Altura Total do Muro (H)', val: `${d.h.toFixed(2)} m` },
+          { label: 'Largura da Sapata de Base (B)', val: `${d.b.toFixed(2)} m` },
+          { label: 'Ângulo de Atrito do Solo Retido (φ)', val: `${d.phiDeg.toFixed(1)}°` },
+          { label: 'Peso Específico do Solo Retido (γ)', val: `${d.gamaSolo.toFixed(1)} kN/m³` },
+          { label: 'Sobrecarga Distribuída no Topo (q)', val: `${d.q.toFixed(1)} kN/m²` },
+          { label: 'Atrito Solo-Fundação (µ)', val: `${d.mu.toFixed(2)}` },
+          { label: 'Tensão Admissível do Solo (σadm)', val: `${d.tensaoAdm.toFixed(1)} kPa (${(d.tensaoAdm/100).toFixed(2)} kgf/cm²)` }
+        ],
+        formulas: [
+          `Coeficiente de Empuxo Ativo (Rankine): Ka = tan²(45° - φ/2) = ${d.ka.toFixed(3)}`,
+          `Empuxo Ativo Total: Ea = 0.5·Ka·γ·H² + Ka·q·H = ${d.ea.toFixed(2)} kN/m (Mt = ${d.mt.toFixed(2)} kNm/m)`,
+          `Momento Estabilizador: Mr = Σ(W · x) = ${d.mr.toFixed(2)} kNm/m`,
+          `F.S. Tombamento: Mr / Mt = ${d.fsTomb.toFixed(2)} ≥ 1.50 (${d.fsTomb >= 1.5 ? 'ATENDE ✓' : 'NÃO ATENDE ⚠️'})`,
+          `F.S. Deslizamento: (N · µ) / Ea = ${d.fsDesl.toFixed(2)} ≥ 1.50 (${d.fsDesl >= 1.5 ? 'ATENDE ✓' : 'REQUER DENTE'})`,
+          `Tensão de Contato na Fundação: σmax = ${d.sigmaMax.toFixed(1)} kPa ≤ σadm = ${d.tensaoAdm.toFixed(1)} kPa`
+        ],
+        resultados: [
+          { label: 'Fator de Segurança ao Tombamento', val: `${d.fsTomb.toFixed(2)} (Mínimo: 1.50)` },
+          { label: 'Fator de Segurança ao Deslizamento', val: `${d.fsDesl.toFixed(2)} (Mínimo: 1.50)` },
+          { label: 'Tensão Máxima Aplicada ao Solo', val: `${d.sigmaMax.toFixed(1)} kPa (Uso: ${((d.sigmaMax/d.tensaoAdm)*100).toFixed(1)}%)` },
+          { label: 'Empuxo Resultante / Momento Solicitante', val: `${d.ea.toFixed(1)} kN/m / ${d.mt.toFixed(1)} kNm/m` },
+          { label: 'Armadura Principal do Fuste (Tardoz)', val: d.tipo === 'cantilever' ? `${d.bitolaStr} (As = ${d.asFuste.toFixed(2)} cm²/m)` : 'Não aplicável (Gravidade)' },
+          { label: 'Sistema de Drenagem', val: 'Camada de brita (30cm) + Tubo perfurado φ 100mm + Barbacãs c/ 1.5m' }
+        ],
+        verificacoes: [
+          {
+            item: 'Estabilidade Global - Tombamento (NBR 11682)',
+            calc: `FS_tomb = ${d.fsTomb.toFixed(2)} ≥ 1.50`,
+            status: d.fsTomb >= 1.5 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Estabilidade Global - Deslizamento da Base (NBR 11682)',
+            calc: `FS_desl = ${d.fsDesl.toFixed(2)} ≥ 1.50`,
+            status: d.fsDesl >= 1.5 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Capacidade de Carga Geotécnica da Fundação',
+            calc: `σmax = ${d.sigmaMax.toFixed(1)} kPa ≤ σadm = ${d.tensaoAdm.toFixed(1)} kPa`,
+            status: d.sigmaMax <= d.tensaoAdm ? 'pass' : 'fail'
+          }
+        ],
+        svgSection: svgSection,
+        notas: 'Memorial de cálculo emitido pela Suíte Integrada ECALC PRO em conformidade com as normas ABNT NBR 11682 e NBR 6118. A execução deve prever obrigatoriamente sistema contínuo de drenagem profunda e superficial para evitar o acúmulo de poro-pressão hidrostática no tardoz.'
+      });
     }
 
     $('btnCalcular').addEventListener('click', calcularEstabilidade);
@@ -301,9 +785,12 @@ Nota: Modelo teórico simplificado (seção 100% retangular de gravidade, maciç
 
     document.addEventListener('DOMContentLoaded', () => {
       if ($('year')) $('year').textContent = new Date().getFullYear();
+      calcularEstabilidade();
     });
   </script>
-    <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js"></script>
+  <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
+  <script src="assets/suite/suite-nav.js"></script>
+  <script src="assets/suite/suite-memorial.js"></script>
+  <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>

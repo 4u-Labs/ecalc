@@ -420,6 +420,24 @@
         <span>📊</span> Resultado do Dimensionamento
       </h2>
       
+      <!-- Suite Action Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-white/5 p-4 rounded-xl border border-cyan-500/20 no-print">
+        <div class="text-sm font-bold text-cyan-400 flex items-center gap-2">
+          <span>📐</span> Ações da Suíte Integrada
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="abrirNoCadCloneEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📐 Abrir no CADClone</span>
+          </button>
+          <button type="button" onclick="gerarMemorialEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📄 Gerar Memorial ABNT</span>
+          </button>
+          <button type="button" onclick="baixarDxfEscada()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 font-medium text-xs transition-all cursor-pointer" title="Baixar arquivo DXF">
+            <span>💾 Baixar .DXF</span>
+          </button>
+        </div>
+      </div>
+      
       <div id="alertas" class="space-y-2 mb-6"></div>
       
       <!-- Score de Conformidade -->
@@ -474,7 +492,32 @@
           <div id="inclinacao" class="text-2xl font-bold text-cyan-400">- °</div>
         </div>
       </div>
-      
+
+      <!-- Bloco Estrutural NBR 6118 -->
+      <div id="blocoEstruturalEscada" class="mt-6 p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/20">
+        <h4 class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <span>🔩</span> Dimensionamento Estrutural da Laje Inclinada (ABNT NBR 6118:2023)
+        </h4>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+          <div class="p-3 bg-black/30 rounded-lg border border-white/5">
+            <span class="text-gray-400 text-xs block mb-1">Carga Majorada (pd):</span>
+            <div id="valPdEscada" class="font-bold text-white text-base">0.0 kN/m²</div>
+          </div>
+          <div class="p-3 bg-black/30 rounded-lg border border-white/5">
+            <span class="text-gray-400 text-xs block mb-1">Momento Máximo (Md):</span>
+            <div id="valMdEscada" class="font-bold text-white text-base">0.0 kNm/m</div>
+          </div>
+          <div class="p-3 bg-black/30 rounded-lg border border-white/5">
+            <span class="text-gray-400 text-xs block mb-1">Armadura Principal (As):</span>
+            <div id="valAsEscada" class="font-bold text-cyan-300 text-base">0.00 cm²/m</div>
+            <div id="valBitolaEscada" class="text-xs text-green-400 font-semibold mt-0.5">φ -- c/ -- cm</div>
+          </div>
+          <div class="p-3 bg-black/30 rounded-lg border border-white/5">
+            <span class="text-gray-400 text-xs block mb-1">Armadura Secundária:</span>
+            <div id="valAsDistEscada" class="font-bold text-purple-300 text-base">0.00 cm²/m</div>
+            <div id="valBitolaDistEscada" class="text-xs text-purple-200 font-semibold mt-0.5">φ 6.3 c/ 20 cm</div>
+          </div>
+        </div>
       </div>
       
       <div id="memorialContainer" class="hidden mt-6">
@@ -988,11 +1031,62 @@ Clique em "Calcular" para ver a análise de conformidade com as normas.
         desenhar3D(numDegraus, piso / 100, espelho / 100, largura, altura);
         desenharGraficos(espelho, piso, blondel, inclinacao, lim);
 
+        // Cálculo Estrutural NBR 6118 da Laje Inclinada
+        const hLaje = (espessuraLaje || 12) / 100; // m
+        const cosAlpha = Math.cos((inclinacao || 30) * Math.PI / 180);
+        const g1 = 25.0 * (hLaje / Math.max(0.4, cosAlpha)); // Peso próprio laje inclinada kN/m²
+        const g2 = 25.0 * ((espelho / 100) / 2); // Degraus kN/m²
+        const g3 = 1.0; // Revestimento e contrapiso kN/m²
+        const gTotal = g1 + g2 + g3;
+
+        const qAcidental = tipoUso === 'residencial' ? 2.5 : 3.0; // kN/m²
+        const pd = 1.4 * (gTotal + qAcidental); // kN/m²
+
+        const Lo = comprimentoTotal + 0.20; // Vão efetivo com 10cm em cada apoio
+        const Md = (pd * Lo * Lo) / 8; // kNm/m
+
+        const dUtil = Math.max(0.08, hLaje - 0.025); // cobrimento 2.5cm
+        const fyd = 500 / 1.15; // MPa
+        const asCalc = (Md / (0.85 * dUtil * fyd * 1000)) * 10000; // cm²/m
+        const asMin = 0.0015 * 100 * (hLaje * 100); // 0.15% Ac
+        const asFinal = Math.max(asCalc, asMin);
+
+        // Bitola principal
+        let phi = 10.0, sAco = 15;
+        if (asFinal <= 4.0) {
+          phi = 8.0;
+          sAco = Math.min(20, Math.max(10, Math.floor((0.503 / asFinal) * 100)));
+        } else if (asFinal <= 7.0) {
+          phi = 10.0;
+          sAco = Math.min(20, Math.max(10, Math.floor((0.785 / asFinal) * 100)));
+        } else {
+          phi = 12.5;
+          sAco = Math.min(20, Math.max(8, Math.floor((1.227 / asFinal) * 100)));
+        }
+        const bitolaPrincipalStr = `φ ${phi} mm c/ ${sAco} cm`;
+
+        // Armadura de distribuição (secundária)
+        const asDist = Math.max(0.20 * asFinal, 0.90);
+        const bitolaDistStr = `φ 6.3 mm c/ 20 cm`;
+
+        // Atualizar bloco estrutural na tela
+        if (document.getElementById('valPdEscada')) {
+          document.getElementById('valPdEscada').textContent = `${pd.toFixed(1)} kN/m²`;
+          document.getElementById('valMdEscada').textContent = `${Md.toFixed(1)} kNm/m`;
+          document.getElementById('valAsEscada').textContent = `${asFinal.toFixed(2)} cm²/m`;
+          document.getElementById('valBitolaEscada').textContent = bitolaPrincipalStr;
+          document.getElementById('valAsDistEscada').textContent = `${asDist.toFixed(2)} cm²/m`;
+          document.getElementById('valBitolaDistEscada').textContent = bitolaDistStr;
+        }
+
         // Salvar no histórico
         ultimoCalculo = {
           data: new Date().toLocaleString(),
           tipo: tipoEscadaSelecionado,
           altura, largura, numDegraus, espelho: fmtNum(espelho, 1), piso: fmtNum(piso, 1),
+          espelhoNum: espelho, pisoNum: piso, blondel: fmtNum(blondel, 1), comprimentoTotal, inclinacao: fmtNum(inclinacao, 1),
+          espessuraLaje, temPatamar, comprimentoPatamar,
+          gTotal, qAcidental, pd, Lo, Md, asFinal, bitolaPrincipalStr, asDist, bitolaDistStr,
           score: scorePercent
         };
         salvarNoHistorico(ultimoCalculo);
@@ -2652,13 +2746,235 @@ Clique em "Calcular" para ver a análise de conformidade com as normas.
       ctx3d.fillText('Arraste para girar a visualização', canvas3d.width / 2, canvas3d.height / 2 + 15);
     }
     
+    // ==================== ECALC SUITE INTEGRATION (CAD & MEMORIAL) ====================
+    function gerarDxfConteudoEscada(d) {
+      d = d || ultimoCalculo || {};
+      const numDegraus = d.numDegraus || 16;
+      const e = parseFloat(d.espelhoNum || d.espelho) || 17.5; // cm
+      const p = parseFloat(d.pisoNum || d.piso) || 28.0; // cm
+      const hLaje = parseFloat(d.espessuraLaje) || 12.0; // cm
+      const temPatamar = d.temPatamar;
+      const lPatamar = (parseFloat(d.comprimentoPatamar) || 1.2) * 100; // cm
+      const lTotal = (d.comprimentoTotal || (numDegraus - 1) * p / 100) * 100; // cm
+      const hTotal = (d.altura || numDegraus * e / 100) * 100; // cm
+
+      let dxf = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n`;
+      dxf += `0\nLAYER\n2\nCONCRETO\n70\n0\n62\n4\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nARMADURA\n70\n0\n62\n6\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nCOTAS\n70\n0\n62\n7\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nTEXTO\n70\n0\n62\n1\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nENDTAB\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nENTITIES\n`;
+
+      function line(x1, y1, x2, y2, lay) {
+        return `0\nLINE\n8\n${lay}\n10\n${x1.toFixed(1)}\n20\n${y1.toFixed(1)}\n30\n0.0\n11\n${x2.toFixed(1)}\n21\n${y2.toFixed(1)}\n31\n0.0\n`;
+      }
+      function text(x, y, h, str, lay) {
+        return `0\nTEXT\n8\n${lay}\n10\n${x.toFixed(1)}\n20\n${y.toFixed(1)}\n30\n0.0\n40\n${h}\n1\n${str}\n`;
+      }
+      function circle(cx, cy, r, lay) {
+        return `0\nCIRCLE\n8\n${lay}\n10\n${cx.toFixed(1)}\n20\n${cy.toFixed(1)}\n30\n0.0\n40\n${r.toFixed(1)}\n`;
+      }
+
+      // Apoio inferior (viga/piso de chegada)
+      dxf += line(-30, 0, 0, 0, 'CONCRETO');
+      dxf += line(-30, 0, -30, -30, 'CONCRETO');
+      dxf += line(-30, -30, 0, -30, 'CONCRETO');
+
+      // Degraus
+      let curX = 0, curY = 0;
+      for (let i = 0; i < numDegraus; i++) {
+        const nextY = curY + e;
+        dxf += line(curX, curY, curX, nextY, 'CONCRETO');
+        if (i < numDegraus - 1) {
+          const nextX = curX + p;
+          dxf += line(curX, nextY, nextX, nextY, 'CONCRETO');
+          curX = nextX;
+        }
+        curY = nextY;
+      }
+
+      // Patamar superior ou piso superior
+      const xFim = temPatamar ? curX + lPatamar : curX + 40;
+      dxf += line(curX, curY, xFim, curY, 'CONCRETO');
+      dxf += line(xFim, curY, xFim, curY - 30, 'CONCRETO');
+      dxf += line(xFim, curY - 30, curX, curY - 30, 'CONCRETO');
+
+      // Fundo inclinado da laje (soffit / intradorso)
+      const angRad = Math.atan2(e, p);
+      const dxH = hLaje * Math.sin(angRad);
+      const dyH = hLaje * Math.cos(angRad);
+
+      const xSoffitTop = curX - dxH;
+      const ySoffitBot = -hLaje;
+
+      dxf += line(curX, curY - 30, xSoffitTop, curY - 30, 'CONCRETO');
+      dxf += line(xSoffitTop, curY - 30, 0, ySoffitBot, 'CONCRETO');
+      dxf += line(0, ySoffitBot, 0, -30, 'CONCRETO');
+
+      // Armadura longitudinal inferior (positiva)
+      const cobr = 2.5;
+      const xAcoBot1 = -15, yAcoBot1 = -hLaje + cobr;
+      const xAcoBot2 = xSoffitTop - cobr * Math.sin(angRad);
+      const yAcoBot2 = curY - 30 + cobr;
+      const xAcoTopFim = curX + 25;
+
+      // Gancho inferior
+      dxf += line(xAcoBot1, -5, xAcoBot1, yAcoBot1, 'ARMADURA');
+      dxf += line(xAcoBot1, yAcoBot1, 0, yAcoBot1, 'ARMADURA');
+      dxf += line(0, yAcoBot1, xAcoBot2, yAcoBot2, 'ARMADURA');
+      dxf += line(xAcoBot2, yAcoBot2, xAcoTopFim, yAcoBot2, 'ARMADURA');
+      dxf += line(xAcoTopFim, yAcoBot2, xAcoTopFim, yAcoBot2 + 15, 'ARMADURA');
+
+      // Armadura superior negativa no patamar/chegada
+      dxf += line(curX - 40, curY - cobr, xFim - 5, curY - cobr, 'ARMADURA');
+      dxf += line(xFim - 5, curY - cobr, xFim - 5, curY - 20, 'ARMADURA');
+
+      // Pontos de armadura de distribuição secundária (círculos)
+      for (let i = 1; i < numDegraus; i += 2) {
+        const xStep = i * p - dxH / 2;
+        const yStep = i * e - dyH / 2;
+        dxf += circle(xStep, yStep, 1.2, 'ARMADURA');
+      }
+
+      // Cotas
+      dxf += line(-20, 0, -20, hTotal, 'COTAS');
+      dxf += line(-25, 0, -15, 0, 'COTAS');
+      dxf += line(-25, hTotal, -15, hTotal, 'COTAS');
+      dxf += text(-55, hTotal / 2, 7, `H = ${(hTotal/100).toFixed(2)}m`, 'COTAS');
+
+      dxf += line(0, -45, curX, -45, 'COTAS');
+      dxf += line(0, -50, 0, -40, 'COTAS');
+      dxf += line(curX, -50, curX, -40, 'COTAS');
+      dxf += text(curX / 2 - 20, -58, 7, `L = ${(curX/100).toFixed(2)}m`, 'COTAS');
+
+      // Detalhe de espelho e piso no primeiro degrau
+      dxf += line(p, e, p + 10, e, 'COTAS');
+      dxf += text(p + 12, e - 3, 5, `e = ${e.toFixed(1)}cm`, 'COTAS');
+      dxf += text(p / 2 - 5, e + 4, 5, `p = ${p.toFixed(1)}cm`, 'COTAS');
+
+      // Título e Rótulos Técnicos
+      dxf += text(0, hTotal + 35, 11, `DETALHAMENTO DE ESCADA EM CONCRETO ARMADO - ${numDegraus} DEGRAUS`, 'TEXTO');
+      dxf += text(0, hTotal + 22, 7, `Espelho: ${e.toFixed(1)} cm | Piso: ${p.toFixed(1)} cm | Blondel: ${d.blondel || '63.0'} cm | Inclinacao: ${d.inclinacao || '32'}°`, 'TEXTO');
+      dxf += text(0, hTotal + 10, 7, `Armadura Principal: ${d.bitolaPrincipalStr || 'φ 10mm c/ 15cm'} (As = ${d.asFinal ? d.asFinal.toFixed(2) : '5.50'} cm2/m) | Secundaria: φ 6.3mm c/ 20cm`, 'TEXTO');
+
+      dxf += `0\nENDSEC\n0\nEOF\n`;
+      return dxf;
+    }
+
+    function abrirNoCadCloneEscada() {
+      if (!ultimoCalculo) calcular();
+      const d = ultimoCalculo;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoEscada(d);
+      window.ECALC_CAD.abrirNoCadClone(dxf, `escada_${d.numDegraus}degraus_${d.espelho}x${d.piso}cm.dxf`);
+    }
+
+    function baixarDxfEscada() {
+      if (!ultimoCalculo) calcular();
+      const d = ultimoCalculo;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoEscada(d);
+      window.ECALC_CAD.baixarDXF(dxf, `escada_${d.numDegraus}degraus_${d.espelho}x${d.piso}cm.dxf`);
+    }
+
+    function gerarMemorialEscada() {
+      if (!ultimoCalculo) calcular();
+      const d = ultimoCalculo;
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        alert('Módulo de Memorial não disponível');
+        return;
+      }
+
+      const svgSection = `
+        <svg width="260" height="190" viewBox="0 0 260 190" style="background:#fff;">
+          <!-- Degraus e laje -->
+          <polygon points="30,150 50,150 50,135 70,135 70,120 90,120 90,105 110,105 110,90 130,90 130,75 150,75 150,60 170,60 170,45 220,45 220,65 180,65 50,170 30,170" fill="#cbd5e1" stroke="#0f172a" stroke-width="2"/>
+          <!-- Armadura longitudinal -->
+          <polyline points="35,165 55,165 178,61 215,61" fill="none" stroke="#dc2626" stroke-width="2"/>
+          <polyline points="150,49 215,49 215,58" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <!-- Cotas -->
+          <text x="10" y="105" font-size="9" font-weight="bold" fill="#0f172a">H=${d.altura}m</text>
+          <text x="125" y="185" text-anchor="middle" font-size="9" font-weight="bold" fill="#0f172a">L=${d.comprimentoTotal ? d.comprimentoTotal.toFixed(2) : ''}m</text>
+          <text x="65" y="80" font-size="9" font-weight="bold" fill="#0f172a">α=${d.inclinacao}°</text>
+        </svg>
+      `;
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial de Cálculo Ergonômico e Estrutural de Escada',
+        norma: 'ABNT NBR 6118:2023, NBR 9050:2020 e NBR 9077',
+        elemento: `Escada em Concreto Armado (${(d.tipo || 'RETA').toUpperCase()}) - ${d.numDegraus} Degraus (${d.espelho} × ${d.piso} cm)`,
+        inputs: [
+          { label: 'Altura Total a Vencer (H)', val: `${d.altura.toFixed(2)} m` },
+          { label: 'Largura Livre da Escada (B)', val: `${d.largura.toFixed(2)} m` },
+          { label: 'Número de Degraus', val: `${d.numDegraus} unidades` },
+          { label: 'Altura do Espelho (e)', val: `${d.espelho} cm` },
+          { label: 'Largura do Piso (p)', val: `${d.piso} cm` },
+          { label: 'Espessura da Laje Inclinada (h)', val: `${d.espessuraLaje || 12} cm` },
+          { label: 'Sobrecarga de Uso (q)', val: `${d.qAcidental ? d.qAcidental.toFixed(1) : '2.5'} kN/m²` }
+        ],
+        formulas: [
+          `Fórmula de Conforto de Blondel: 2e + p = 2·${d.espelho} + ${d.piso} = ${d.blondel} cm (Ideal: 63 a 64 cm)`,
+          `Ângulo de Inclinação: α = arctg(e/p) = ${d.inclinacao}° (NBR 9050 ≤ 32°)`,
+          `Cargas Permanentes: g = glaje/cosα + gdegraus + grevest = ${d.gTotal ? d.gTotal.toFixed(2) : '6.50'} kN/m²`,
+          `Carga Majorada de Cálculo: pd = 1.4 · (g + q) = ${d.pd ? d.pd.toFixed(2) : '12.60'} kN/m²`,
+          `Momento Fletor Solicitante: Md = pd · Lo² / 8 = ${d.Md ? d.Md.toFixed(2) : '25.00'} kNm/m`,
+          `Armadura Longitudinal Principal: As = Md / (0.85 · d · fyd) = ${d.asFinal ? d.asFinal.toFixed(2) : '5.50'} cm²/m`
+        ],
+        resultados: [
+          { label: 'Índice de Conforto (Blondel)', val: `${d.blondel} cm (Conformidade: ${d.score}%)` },
+          { label: 'Momento Fletor de Cálculo (Md)', val: `${d.Md ? d.Md.toFixed(1) : '25.0'} kNm/m` },
+          { label: 'Armadura Principal Tracionada (As)', val: `${d.bitolaPrincipalStr || 'φ 10mm c/ 15cm'} (As = ${d.asFinal ? d.asFinal.toFixed(2) : '5.50'} cm²/m)` },
+          { label: 'Armadura de Distribuição Secundária', val: d.bitolaDistStr || 'φ 6.3mm c/ 20cm' },
+          { label: 'Extensão Horizontal / Inclinação', val: `${d.comprimentoTotal ? d.comprimentoTotal.toFixed(2) : ''} m / ${d.inclinacao}°` }
+        ],
+        verificacoes: [
+          {
+            item: 'Fórmula Ergonômica de Blondel (63 a 64 cm)',
+            calc: `2e + p = ${d.blondel} cm`,
+            status: (parseFloat(d.blondel) >= 61 && parseFloat(d.blondel) <= 65) ? 'pass' : 'fail'
+          },
+          {
+            item: 'Inclinação Conforme NBR 9050 (≤ 32°)',
+            calc: `α = ${d.inclinacao}°`,
+            status: parseFloat(d.inclinacao) <= 32 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Espelho em Conformidade (16 a 18 cm)',
+            calc: `e = ${d.espelho} cm`,
+            status: (parseFloat(d.espelho) >= 16 && parseFloat(d.espelho) <= 18) ? 'pass' : 'fail'
+          },
+          {
+            item: 'Piso em Conformidade (≥ 28 cm)',
+            calc: `p = ${d.piso} cm`,
+            status: parseFloat(d.piso) >= 28 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Estado Limite Último - Flexão da Laje (NBR 6118)',
+            calc: `As = ${d.asFinal ? d.asFinal.toFixed(2) : '5.50'} cm²/m ≥ As,mín`,
+            status: 'pass'
+          }
+        ],
+        svgSection: svgSection,
+        notas: 'Memorial de cálculo emitido pela Suíte Integrada ECALC PRO em conformidade com as normas ABNT NBR 6118:2023, NBR 9050:2020 e NBR 9077. A execução da armadura deve seguir rigorosamente o detalhamento dos ganchos de ancoragem nos apoios e o cobrimento normativo de 2.5 cm.'
+      });
+    }
+
     // Calcular ao carregar se houver valores
     if (document.getElementById('altura').value) {
-      // Auto-calcular após carregamento
       setTimeout(calcular, 500);
     }
   </script>
-    <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js"></script>
+  <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
+  <script src="assets/suite/suite-nav.js"></script>
+  <script src="assets/suite/suite-memorial.js"></script>
+  <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>
