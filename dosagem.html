@@ -1619,41 +1619,97 @@ Traço Unitário: ${d.traco}`;
       const d = calculoAtual;
       const fck = parseFloat(document.getElementById("fck").value) || 25;
       const volume = parseFloat(document.getElementById("volume").value) || 1;
+      const nomeObra = window.ECALC_SUITE ? window.ECALC_SUITE.getProject().nomeObra : 'Projeto Residencial';
+      const responsavel = window.ECALC_SUITE ? window.ECALC_SUITE.getProject().responsavelTecnico : '-';
 
       const dataCells = {
-        '0,0': 'ESTUDO DE DOSAGEM DE CONCRETO - ECALC PRO',
-        '1,0': 'Obra:', '1,1': window.ECALC_SUITE ? window.ECALC_SUITE.getProject().nomeObra : 'Projeto Residencial',
-        '2,0': 'Data:', '2,1': new Date().toLocaleDateString('pt-BR'),
-        '3,0': 'Resistência:', '3,1': `fck = ${fck} MPa`,
-        '3,2': 'Traço:', '3,3': d.traco,
-        '5,0': 'COMPONENTE', '5,1': 'CONSUMO (kg/m³)', '5,2': `TOTAL (${volume} m³)`, '5,3': 'PREÇO UNIT (R$)', '5,4': 'TOTAL (R$)',
-        '6,0': 'Cimento Portland', '6,1': d.cimento.toFixed(1), '6,2': (d.cimento * volume).toFixed(1), '6,3': '1.15/kg', '6,4': (d.custoCimento * volume).toFixed(2),
-        '7,0': 'Areia Seca', '7,1': d.areia.toFixed(1), '7,2': (d.areia * volume).toFixed(1), '7,3': '0.165/kg', '7,4': (d.custoAreia * volume).toFixed(2),
-        '8,0': 'Brita Seca', '8,1': d.brita.toFixed(1), '8,2': (d.brita * volume).toFixed(1), '8,3': '0.210/kg', '8,4': (d.custoBrita * volume).toFixed(2),
-        '9,0': 'Água Efetiva (L)', '9,1': d.aguaEfetiva.toFixed(1), '9,2': (d.aguaEfetiva * volume).toFixed(1), '9,3': '0.008/L', '9,4': (d.custoAgua * volume).toFixed(2),
-        '10,0': 'Aditivos Plastificantes', '10,1': (d.plastificante + d.superplastificante).toFixed(2), '10,2': ((d.plastificante + d.superplastificante) * volume).toFixed(2), '10,3': '18.00/kg', '10,4': ((d.custoPlast + d.custoSuperplast) * volume).toFixed(2),
-        '12,0': 'TOTAL MATERIAIS', '12,4': (d.custoFinal * volume).toFixed(2),
-        '14,0': 'TRAÇO POR SACO DE 50KG', '14,1': '1 saco cimento (50kg)', '14,2': `${(d.areiaUmida*50/d.cimento).toFixed(1)} kg areia`, '14,3': `${(d.britaUmida*50/d.cimento).toFixed(1)} kg brita`, '14,4': `${(d.aguaEfetiva*50/d.cimento).toFixed(1)} L água`
+        'A1': { value: 'ESTUDO DE DOSAGEM DE CONCRETO (NBR 12655 / ABCP) - ECALC PRO', display: 'ESTUDO DE DOSAGEM DE CONCRETO (NBR 12655 / ABCP) - ECALC PRO' },
+        'A2': { value: 'Obra:', display: 'Obra:' },
+        'B2': { value: nomeObra, display: nomeObra },
+        'D2': { value: 'Responsável:', display: 'Responsável:' },
+        'E2': { value: responsavel, display: responsavel },
+        'A3': { value: 'Data:', display: 'Data:' },
+        'B3': { value: new Date().toLocaleDateString('pt-BR'), display: new Date().toLocaleDateString('pt-BR') },
+        'A4': { value: 'Resistência Característica (fck):', display: 'Resistência Característica (fck):' },
+        'B4': { value: `fck = ${fck} MPa`, display: `fck = ${fck} MPa` },
+        'D4': { value: 'Traço Unitário em Peso:', display: 'Traço Unitário em Peso:' },
+        'E4': { value: d.traco, display: d.traco },
+
+        'A6': { value: 'COMPONENTE', display: 'COMPONENTE' },
+        'B6': { value: 'CONSUMO (kg/m³)', display: 'CONSUMO (kg/m³)' },
+        'C6': { value: `TOTAL (${volume} m³)`, display: `TOTAL (${volume} m³)` },
+        'D6': { value: 'PREÇO UNIT (R$)', display: 'PREÇO UNIT (R$)' },
+        'E6': { value: 'TOTAL (R$)', display: 'TOTAL (R$)' },
+
+        'A7': { value: 'Cimento Portland', display: 'Cimento Portland' },
+        'B7': { value: d.cimento.toFixed(1), display: d.cimento.toFixed(1) },
+        'C7': { value: (d.cimento * volume).toFixed(1), display: (d.cimento * volume).toFixed(1) },
+        'D7': { value: '1.15/kg', display: '1.15/kg' },
+        'E7': { value: (d.custoCimento * volume).toFixed(2), display: `R$ ${(d.custoCimento * volume).toFixed(2)}` },
+
+        'A8': { value: 'Areia Seca', display: 'Areia Seca' },
+        'B8': { value: d.areia.toFixed(1), display: d.areia.toFixed(1) },
+        'C8': { value: (d.areia * volume).toFixed(1), display: (d.areia * volume).toFixed(1) },
+        'D8': { value: '0.165/kg', display: '0.165/kg' },
+        'E8': { value: (d.custoAreia * volume).toFixed(2), display: `R$ ${(d.custoAreia * volume).toFixed(2)}` },
+
+        'A9': { value: 'Brita Seca', display: 'Brita Seca' },
+        'B9': { value: d.brita.toFixed(1), display: d.brita.toFixed(1) },
+        'C9': { value: (d.brita * volume).toFixed(1), display: (d.brita * volume).toFixed(1) },
+        'D9': { value: '0.210/kg', display: '0.210/kg' },
+        'E9': { value: (d.custoBrita * volume).toFixed(2), display: `R$ ${(d.custoBrita * volume).toFixed(2)}` },
+
+        'A10': { value: 'Água Efetiva (L)', display: 'Água Efetiva (L)' },
+        'B10': { value: d.aguaEfetiva.toFixed(1), display: d.aguaEfetiva.toFixed(1) },
+        'C10': { value: (d.aguaEfetiva * volume).toFixed(1), display: (d.aguaEfetiva * volume).toFixed(1) },
+        'D10': { value: '0.008/L', display: '0.008/L' },
+        'E10': { value: (d.custoAgua * volume).toFixed(2), display: `R$ ${(d.custoAgua * volume).toFixed(2)}` },
+
+        'A11': { value: 'Aditivos Plastificantes', display: 'Aditivos Plastificantes' },
+        'B11': { value: (d.plastificante + d.superplastificante).toFixed(2), display: (d.plastificante + d.superplastificante).toFixed(2) },
+        'C11': { value: ((d.plastificante + d.superplastificante) * volume).toFixed(2), display: ((d.plastificante + d.superplastificante) * volume).toFixed(2) },
+        'D11': { value: '18.00/kg', display: '18.00/kg' },
+        'E11': { value: ((d.custoPlast + d.custoSuperplast) * volume).toFixed(2), display: `R$ ${((d.custoPlast + d.custoSuperplast) * volume).toFixed(2)}` },
+
+        'A13': { value: 'TOTAL MATERIAIS', display: 'TOTAL MATERIAIS' },
+        'E13': { value: (d.custoFinal * volume).toFixed(2), display: `R$ ${(d.custoFinal * volume).toFixed(2)}` },
+
+        'A15': { value: 'TRAÇO EM MASSA POR SACO DE 50KG', display: 'TRAÇO EM MASSA POR SACO DE 50KG' },
+        'B15': { value: '1 saco cimento (50kg)', display: '1 saco cimento (50kg)' },
+        'C15': { value: `${(d.areiaUmida * 50 / d.cimento).toFixed(1)} kg areia`, display: `${(d.areiaUmida * 50 / d.cimento).toFixed(1)} kg areia` },
+        'D15': { value: `${(d.britaUmida * 50 / d.cimento).toFixed(1)} kg brita`, display: `${(d.britaUmida * 50 / d.cimento).toFixed(1)} kg brita` },
+        'E15': { value: `${(d.aguaEfetiva * 50 / d.cimento).toFixed(1)} L água`, display: `${(d.aguaEfetiva * 50 / d.cimento).toFixed(1)} L água` }
+      };
+
+      const formats = {
+        'A1': { bold: true, fontSize: 13, color: '#06b6d4' },
+        'A2': { bold: true },
+        'D2': { bold: true },
+        'A3': { bold: true },
+        'A4': { bold: true },
+        'D4': { bold: true },
+        'A6': { bold: true, backgroundColor: '#e2e8f0' },
+        'B6': { bold: true, backgroundColor: '#e2e8f0' },
+        'C6': { bold: true, backgroundColor: '#e2e8f0' },
+        'D6': { bold: true, backgroundColor: '#e2e8f0' },
+        'E6': { bold: true, backgroundColor: '#e2e8f0' },
+        'A13': { bold: true, backgroundColor: '#fef3c7' },
+        'E13': { bold: true, color: '#10b981', backgroundColor: '#fef3c7' },
+        'A15': { bold: true, backgroundColor: '#dcfce7' },
+        'B15': { backgroundColor: '#dcfce7' },
+        'C15': { backgroundColor: '#dcfce7' },
+        'D15': { backgroundColor: '#dcfce7' },
+        'E15': { backgroundColor: '#dcfce7' }
       };
 
       const payload = {
-        fileName: `Dosagem_Concreto_C${fck}`,
+        fileName: `Dosagem_Concreto_C${fck}_${volume}m3`,
         sheets: [{
-          name: 'Dosagem',
+          name: 'Dosagem Concreto',
           data: dataCells,
-          formats: {
-            '0,0': { bold: true, fontSize: 14, color: '#06b6d4' },
-            '5,0': { bold: true, bgColor: '#e2e8f0' },
-            '5,1': { bold: true, bgColor: '#e2e8f0' },
-            '5,2': { bold: true, bgColor: '#e2e8f0' },
-            '5,3': { bold: true, bgColor: '#e2e8f0' },
-            '5,4': { bold: true, bgColor: '#e2e8f0' },
-            '12,0': { bold: true },
-            '12,4': { bold: true, color: '#10b981' },
-            '14,0': { bold: true, bgColor: '#fef3c7' }
-          },
+          formats: formats,
           comments: {},
-          colWidths: { 0: 220, 1: 150, 2: 150, 3: 140, 4: 140 },
+          colWidths: { 0: 240, 1: 170, 2: 170, 3: 150, 4: 160 },
           rowHeights: {},
           hiddenRows: [],
           hiddenCols: [],
@@ -1666,7 +1722,7 @@ Traço Unitário: ${d.traco}`;
       };
 
       localStorage.setItem('excelCloneData', JSON.stringify(payload));
-      window.open('https://4u.ia.br/app/office/excel/', '_blank');
+      window.open('../office/excel/', '_blank');
     }
 
     // Init
