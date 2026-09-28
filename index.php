@@ -685,11 +685,15 @@ $v = time();
                 </div>
             </a>
 
-            <a href="checklist.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.7s">
-                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Qualidade</span>
-                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">✅</div>
-                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">Checklist de Obra</h2>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Verificação técnica de etapas construtivas e segurança.</p>
+            <a href="checklist.html" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.7s">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/checklist.webp" type="image/webp">
+                    <img src="assets/cards/checklist.jpg" alt="Checklist de Obra" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>Checklist de Obra</h2>
+                    <p>Verificação técnica de etapas construtivas e segurança.</p>
+                </div>
             </a>
 
             <a href="canteiro.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.72s">
