@@ -462,6 +462,24 @@
       </div>
     </section>
 
+    <!-- Suite Action Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-slate-800/80 p-4 rounded-2xl border border-cyan-500/20 shadow-md no-print">
+      <div class="text-sm font-bold text-cyan-400 flex items-center gap-2">
+        <span>🛠️</span> Ações da Suíte Integrada
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="gerarMemorialOrcamento()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <span>📄 Gerar Memorial ABNT</span>
+        </button>
+        <button type="button" onclick="abrirNoOfficeCloneOrcamento()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <span>📊 Abrir no OfficeClone</span>
+        </button>
+        <button type="button" onclick="exportarExcel()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 font-medium text-xs transition-all cursor-pointer">
+          <span>💾 Exportar Planilha XLSX</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Resultado Principal -->
     <section id="resultadoSection" class="mb-8 opacity-50 transition-opacity duration-500">
       <div class="gradient-border p-8 text-center">
@@ -528,6 +546,26 @@
           <span class="text-neon-magenta">📅</span> Cronograma Financeiro
         </h3>
         <div id="cronogramaContent" class="max-h-96 overflow-y-auto pr-2"></div>
+      </div>
+    </div>
+
+    <!-- Curva ABC de Etapas e Insumos (Pareto) -->
+    <div id="curvaAbcContainer" class="gradient-border p-6 mb-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+          <h3 class="text-lg font-semibold flex items-center gap-2">
+            <span class="text-amber-400">📊</span> Curva ABC de Custos por Etapa (Análise de Pareto)
+          </h3>
+          <p class="text-xs text-gray-400 mt-1">Hierarquia de criticidade financeira para compras, suprimentos e controle orçamentário</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 font-semibold">Classe A: até 80% (Crítico)</span>
+          <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold">Classe B: 80-95% (Intermediário)</span>
+          <span class="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold">Classe C: 95-100% (Secundário)</span>
+        </div>
+      </div>
+      <div id="tabelaCurvaABC" class="overflow-x-auto">
+        <p class="text-gray-500 text-sm py-4 text-center">Calcule o orçamento para visualizar a análise Curva ABC</p>
       </div>
     </div>
 
@@ -833,8 +871,37 @@
           $('valorMin').textContent = fmtBRL(custoFinal * 0.85);
           $('valorMax').textContent = fmtBRL(custoFinal * 1.20);
 
+          // Curva ABC de Etapas (Pareto 80/15/5)
+          const etapasComValores = ETAPAS_OBRA.map(etapa => ({
+            ...etapa,
+            valor: custoObra * (etapa.percentual / 100)
+          }));
+          const curvaABC = calcularCurvaABC(etapasComValores, custoObra);
+
+          window.ultimoOrcamentoData = {
+            estado,
+            tipoEdif,
+            tipoDesc: TIPOS_DESCRICAO[tipoEdif] || tipoEdif,
+            area,
+            cubBase,
+            cubAjustado,
+            custoDireto,
+            valorBDI,
+            bdiPct,
+            valorContingencia,
+            contingenciaPct,
+            custoComplementares,
+            custoObra,
+            custoFinal,
+            custoM2Final,
+            prazoObra,
+            curvaABC,
+            timestamp: new Date().toISOString()
+          };
+
           // Renderizar componentes
           renderEtapas(custoObra);
+          renderCurvaABC(curvaABC);
           renderCronograma(custoObra, prazoObra);
           renderComparacoes(estado, tipoEdif, area, custoM2Final);
           renderGraficos(custoDireto, valorBDI, valorContingencia, custoComplementares, custoObra, prazoObra, estado, tipoEdif);
@@ -1093,6 +1160,285 @@
       $('observacoes').innerHTML = obs;
     }
 
+    // ===================== CURVA ABC (PARETO 80/15/5) =====================
+    function calcularCurvaABC(etapasComValor, custoTotal) {
+      const ordenadas = [...etapasComValor].sort((a, b) => b.valor - a.valor);
+      let acumulado = 0;
+      return ordenadas.map((etapa, idx) => {
+        const pctIndividual = custoTotal > 0 ? (etapa.valor / custoTotal) * 100 : 0;
+        acumulado += pctIndividual;
+        let classe = 'C';
+        let classeBadge = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
+        let classeDesc = 'Baixo impacto financeiro (Secundário)';
+        if (acumulado <= 80.5 || (idx === 0 && pctIndividual > 80)) {
+          classe = 'A';
+          classeBadge = 'bg-red-500/20 text-red-300 border-red-500/40';
+          classeDesc = 'Crítico (Prioridade Máxima de Negociação)';
+        } else if (acumulado <= 95.5) {
+          classe = 'B';
+          classeBadge = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+          classeDesc = 'Intermediário (Impacto Médio)';
+        }
+        return {
+          rank: idx + 1,
+          ...etapa,
+          pctIndividual,
+          pctAcumulado: Math.min(acumulado, 100),
+          classe,
+          classeBadge,
+          classeDesc
+        };
+      });
+    }
+
+    function renderCurvaABC(curvaABC) {
+      const container = $('tabelaCurvaABC');
+      if (!container) return;
+
+      const totalClasseA = curvaABC.filter(c => c.classe === 'A').reduce((acc, c) => acc + c.valor, 0);
+      const totalClasseB = curvaABC.filter(c => c.classe === 'B').reduce((acc, c) => acc + c.valor, 0);
+      const totalClasseC = curvaABC.filter(c => c.classe === 'C').reduce((acc, c) => acc + c.valor, 0);
+
+      const html = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+          <div class="p-3.5 rounded-xl bg-red-950/40 border border-red-500/30 text-center">
+            <div class="text-xs text-red-300 font-bold uppercase tracking-wider">Classe A (Crítico ~80%)</div>
+            <div class="text-xl font-extrabold text-red-400 mt-1">${fmtBRL(totalClasseA)}</div>
+            <div class="text-xs text-gray-400 mt-0.5">${curvaABC.filter(c => c.classe === 'A').length} etapas sob gestão rigorosa</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-center">
+            <div class="text-xs text-amber-300 font-bold uppercase tracking-wider">Classe B (Médio ~15%)</div>
+            <div class="text-xl font-extrabold text-amber-400 mt-1">${fmtBRL(totalClasseB)}</div>
+            <div class="text-xs text-gray-400 mt-0.5">${curvaABC.filter(c => c.classe === 'B').length} etapas sob controle padrão</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-center">
+            <div class="text-xs text-cyan-300 font-bold uppercase tracking-wider">Classe C (Baixo ~5%)</div>
+            <div class="text-xl font-extrabold text-cyan-400 mt-1">${fmtBRL(totalClasseC)}</div>
+            <div class="text-xs text-gray-400 mt-0.5">${curvaABC.filter(c => c.classe === 'C').length} etapas simplificadas</div>
+          </div>
+        </div>
+
+        <table class="w-full text-sm text-left border-collapse">
+          <thead>
+            <tr class="border-b border-white/10 text-xs text-gray-400 uppercase bg-dark-800/60">
+              <th class="py-2.5 px-3">#</th>
+              <th class="py-2.5 px-3">Etapa Construtiva</th>
+              <th class="py-2.5 px-3 text-center">Classe</th>
+              <th class="py-2.5 px-3 text-right">Valor Estimado</th>
+              <th class="py-2.5 px-3 text-right">% Individual</th>
+              <th class="py-2.5 px-3 text-right">% Acumulada</th>
+              <th class="py-2.5 px-3 w-40">Pareto Acumulado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${curvaABC.map(item => `
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                <td class="py-2.5 px-3 font-mono text-xs text-gray-500">#${item.rank}</td>
+                <td class="py-2.5 px-3 font-medium text-white flex items-center gap-2">
+                  <span>${item.icone}</span> <span>${item.nome}</span>
+                </td>
+                <td class="py-2.5 px-3 text-center">
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border ${item.classeBadge}">
+                    Classe ${item.classe}
+                  </span>
+                </td>
+                <td class="py-2.5 px-3 text-right font-semibold text-neon-cyan">${fmtBRL(item.valor)}</td>
+                <td class="py-2.5 px-3 text-right text-gray-300 font-mono text-xs">${item.pctIndividual.toFixed(1)}%</td>
+                <td class="py-2.5 px-3 text-right font-bold text-xs ${item.classe === 'A' ? 'text-red-400' : item.classe === 'B' ? 'text-amber-400' : 'text-cyan-400'}">${item.pctAcumulado.toFixed(1)}%</td>
+                <td class="py-2.5 px-3">
+                  <div class="h-2 bg-dark-700 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500 ${item.classe === 'A' ? 'bg-gradient-to-r from-red-500 to-amber-500' : item.classe === 'B' ? 'bg-amber-400' : 'bg-cyan-400'}" style="width: ${item.pctAcumulado}%"></div>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      container.innerHTML = html;
+    }
+
+    // ===================== MEMORIAL E INTEGRAÇÃO SUÍTE =====================
+    function gerarMemorialOrcamento() {
+      if (!window.ultimoOrcamentoData) {
+        showToast('Calcule o orçamento primeiro', 'warning');
+        return;
+      }
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        showToast('Módulo de Memorial não disponível', 'error');
+        return;
+      }
+      const d = window.ultimoOrcamentoData;
+      const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Edificação' };
+
+      const itensClasseA = d.curvaABC
+        ? d.curvaABC.filter(c => c.classe === 'A').map(c => `${c.nome} (${c.pctIndividual.toFixed(1)}%)`).join(', ')
+        : 'Estrutura, Revestimentos, Alvenaria, Elétrica, Fundações';
+
+      const svgSection = `
+        <svg width="240" height="180" viewBox="0 0 240 180" style="background:#fff;">
+          <rect x="25" y="15" width="190" height="24" fill="#0284c7" rx="3"/>
+          <text x="120" y="31" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">Custo Direto: ${fmtBRL(d.custoDireto)}</text>
+          
+          <rect x="25" y="46" width="90" height="22" fill="#0ea5e9" rx="3"/>
+          <text x="70" y="61" text-anchor="middle" font-size="9" font-weight="bold" fill="#fff">BDI: ${fmtBRL(d.valorBDI)}</text>
+          
+          <rect x="125" y="46" width="90" height="22" fill="#f59e0b" rx="3"/>
+          <text x="170" y="61" text-anchor="middle" font-size="9" font-weight="bold" fill="#fff">Conting.: ${fmtBRL(d.valorContingencia)}</text>
+
+          <rect x="25" y="75" width="190" height="22" fill="#10b981" rx="3"/>
+          <text x="120" y="90" text-anchor="middle" font-size="9" font-weight="bold" fill="#fff">Complementares: ${fmtBRL(d.custoComplementares)}</text>
+
+          <line x1="25" y1="110" x2="215" y2="110" stroke="#0f172a" stroke-width="2"/>
+          <rect x="25" y="118" width="190" height="42" fill="#0f172a" rx="4"/>
+          <text x="120" y="136" text-anchor="middle" font-size="10" font-weight="bold" fill="#38bdf8">CUSTO GLOBAL ESTIMADO</text>
+          <text x="120" y="150" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">${fmtBRL(d.custoFinal)} (${fmtBRL(d.custoM2Final)}/m²)</text>
+        </svg>
+      `;
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial Estimativo de Custo Global de Edificação',
+        norma: 'ABNT NBR 12721:2006 / Lei Federal 4.591/64 - Custo Unitário Básico (CUB/m²)',
+        elemento: `${d.tipoDesc} - Área: ${fmtNum(d.area)} m² - SINDUSCON/${d.estado}`,
+        inputs: [
+          { label: 'Unidade Federativa (UF)', val: d.estado },
+          { label: 'Tipologia / Padrão Construtivo', val: d.tipoDesc },
+          { label: 'Área Real de Construção', val: `${fmtNum(d.area)} m²` },
+          { label: 'CUB Base SINDUSCON', val: `${fmtBRL(d.cubBase)}/m²` },
+          { label: 'CUB Ajustado (Local / Fund.)', val: `${fmtBRL(d.cubAjustado)}/m²` },
+          { label: 'Taxa de BDI Aplicada', val: `${fmtNum(d.bdiPct)}%` },
+          { label: 'Margem de Contingência', val: `${fmtNum(d.contingenciaPct)}%` },
+          { label: 'Prazo Previsto de Execução', val: `${d.prazoObra} meses` }
+        ],
+        formulas: [
+          `Custo Direto de Obra (CD) = Área × CUB Ajustado = ${fmtNum(d.area)} m² × ${fmtBRL(d.cubAjustado)}/m² = ${fmtBRL(d.custoDireto)}`,
+          `Bonificação e Despesas Indiretas (BDI) = CD × ${fmtNum(d.bdiPct)}% = ${fmtBRL(d.valorBDI)}`,
+          `Reserva de Contingência (RC) = (CD + BDI) × ${fmtNum(d.contingenciaPct)}% = ${fmtBRL(d.valorContingencia)}`,
+          `Custos Complementares (Projetos, Taxas, Fundações especiais) = ${fmtBRL(d.custoComplementares)}`,
+          `Custo Global da Edificação = CD + BDI + RC + Complementares = ${fmtBRL(d.custoFinal)}`,
+          `Custo Estimativo Unitário Final = Custo Global / Área = ${fmtBRL(d.custoM2Final)}/m²`
+        ],
+        resultados: [
+          { label: 'Custo Total Global Estimado', val: fmtBRL(d.custoFinal) },
+          { label: 'Custo Médio Unitário por m²', val: `${fmtBRL(d.custoM2Final)}/m²` },
+          { label: 'Custo Direto da Construção', val: fmtBRL(d.custoDireto) },
+          { label: 'Valor Total de BDI', val: fmtBRL(d.valorBDI) },
+          { label: 'Reserva Técnica de Contingência', val: fmtBRL(d.valorContingencia) },
+          { label: 'Faixa Mínima Provável (-15%)', val: fmtBRL(d.custoFinal * 0.85) },
+          { label: 'Faixa Máxima Provável (+20%)', val: fmtBRL(d.custoFinal * 1.20) },
+          { label: 'Itens Críticos (Curva ABC - Classe A)', val: itensClasseA }
+        ],
+        verificacoes: [
+          {
+            item: 'ABNT NBR 12721 - Validade do CUB da Região Geográfica',
+            calc: `CUB ${d.estado} (${d.tipoEdif}) = ${fmtBRL(d.cubBase)}/m² dentro dos parâmetros SINDUSCON`,
+            status: 'pass'
+          },
+          {
+            item: 'Acórdão TCU / NBR 12721 - Taxa de BDI Aplicada',
+            calc: `BDI = ${fmtNum(d.bdiPct)}% (Faixa de referência recomendada: 18% a 30%)`,
+            status: (d.bdiPct >= 15 && d.bdiPct <= 35) ? 'pass' : 'warn'
+          },
+          {
+            item: 'Análise de Risco - Margem de Contingência',
+            calc: `Contingência = ${fmtNum(d.contingenciaPct)}% (Recomendado na fase preliminar: 5% a 15%)`,
+            status: (d.contingenciaPct >= 5 && d.contingenciaPct <= 20) ? 'pass' : 'warn'
+          },
+          {
+            item: 'Classificação de Criticidade de Etapas (Pareto / Curva ABC)',
+            calc: `Itens de Classe A representam ~80% do dispêndio financeiro direto`,
+            status: 'pass'
+          }
+        ],
+        svgSection: svgSection,
+        notas: 'Orçamento estimativo de viabilidade técnico-econômica preliminar baseado na norma ABNT NBR 12721:2006. Não substitui o orçamento executivo analítico detalhado com levantamento quantitativo de projetos executivos e planilhas SINAPI/SICRO.'
+      });
+    }
+
+    function abrirNoOfficeCloneOrcamento() {
+      if (!window.ultimoOrcamentoData) {
+        showToast('Calcule o orçamento primeiro', 'warning');
+        return;
+      }
+      const d = window.ultimoOrcamentoData;
+      const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Edificação' };
+
+      const dataCells = {
+        '0,0': 'ORÇAMENTO ESTIMATIVO DE OBRA (CUB / NBR 12721) - ECALC PRO',
+        '1,0': 'Obra:', '1,1': project.nomeObra || 'Projeto Edificação',
+        '2,0': 'Responsável Técnico:', '2,1': project.responsavelTecnico || '-',
+        '3,0': 'Data:', '3,1': new Date().toLocaleDateString('pt-BR'),
+        '4,0': 'Padrão / Tipo:', '4,1': `${d.estado} - ${d.tipoDesc}`,
+        '4,3': 'Área Construída:', '4,4': `${d.area} m²`,
+        '5,0': 'CUB Base Unitário:', '5,1': `${fmtBRL(d.cubAjustado)}/m²`,
+        '5,3': 'Custo Total Estimado:', '5,4': fmtBRL(d.custoFinal),
+
+        '7,0': '1. COMPOSIÇÃO MACRO DO ORÇAMENTO',
+        '8,0': 'ITEM', '8,1': 'DESCRIÇÃO', '8,2': 'PERCENTUAL (%)', '8,3': 'VALOR TOTAL (R$)',
+        '9,0': '1.1', '9,1': 'Custo Direto da Obra (CUB)', '9,2': `${((d.custoDireto / d.custoFinal)*100).toFixed(1)}%`, '9,3': fmtBRL(d.custoDireto),
+        '10,0': '1.2', '10,1': `BDI (${d.bdiPct}%)`, '10,2': `${((d.valorBDI / d.custoFinal)*100).toFixed(1)}%`, '10,3': fmtBRL(d.valorBDI),
+        '11,0': '1.3', '11,1': `Contingência (${d.contingenciaPct}%)`, '11,2': `${((d.valorContingencia / d.custoFinal)*100).toFixed(1)}%`, '11,3': fmtBRL(d.valorContingencia),
+        '12,0': '1.4', '12,1': 'Custos Complementares e Projetos', '12,2': `${((d.custoComplementares / d.custoFinal)*100).toFixed(1)}%`, '12,3': fmtBRL(d.custoComplementares),
+        '13,0': 'TOTAL GERAL', '13,1': 'Custo Global da Edificação', '13,2': '100.0%', '13,3': fmtBRL(d.custoFinal),
+
+        '15,0': '2. CURVA ABC DE ETAPAS DA CONSTRUÇÃO (PARETO)',
+        '16,0': 'RANK', '16,1': 'ETAPA DA OBRA', '16,2': 'CLASSE', '16,3': '% INDIVIDUAL', '16,4': '% ACUMULADA', '16,5': 'VALOR (R$)'
+      };
+
+      let row = 17;
+      if (d.curvaABC) {
+        d.curvaABC.forEach((item) => {
+          dataCells[`${row},0`] = `#${item.rank}`;
+          dataCells[`${row},1`] = item.nome;
+          dataCells[`${row},2`] = `Classe ${item.classe}`;
+          dataCells[`${row},3`] = `${item.pctIndividual.toFixed(1)}%`;
+          dataCells[`${row},4`] = `${item.pctAcumulado.toFixed(1)}%`;
+          dataCells[`${row},5`] = fmtBRL(item.valor);
+          row++;
+        });
+      }
+
+      const payload = {
+        fileName: `Orcamento_${d.estado}_${d.tipoEdif}_${d.area}m2`,
+        sheets: [{
+          name: 'Orçamento CUB',
+          data: dataCells,
+          formats: {
+            '0,0': { bold: true, fontSize: 14, color: '#06b6d4' },
+            '7,0': { bold: true, color: '#2563eb' },
+            '8,0': { bold: true, bgColor: '#e2e8f0' },
+            '8,1': { bold: true, bgColor: '#e2e8f0' },
+            '8,2': { bold: true, bgColor: '#e2e8f0' },
+            '8,3': { bold: true, bgColor: '#e2e8f0' },
+            '13,0': { bold: true, bgColor: '#fef3c7' },
+            '13,1': { bold: true, bgColor: '#fef3c7' },
+            '13,2': { bold: true, bgColor: '#fef3c7' },
+            '13,3': { bold: true, color: '#10b981', bgColor: '#fef3c7' },
+            '15,0': { bold: true, color: '#2563eb' },
+            '16,0': { bold: true, bgColor: '#e2e8f0' },
+            '16,1': { bold: true, bgColor: '#e2e8f0' },
+            '16,2': { bold: true, bgColor: '#e2e8f0' },
+            '16,3': { bold: true, bgColor: '#e2e8f0' },
+            '16,4': { bold: true, bgColor: '#e2e8f0' },
+            '16,5': { bold: true, bgColor: '#e2e8f0' }
+          },
+          comments: {},
+          colWidths: { 0: 80, 1: 240, 2: 120, 3: 130, 4: 130, 5: 160 },
+          rowHeights: {},
+          hiddenRows: [],
+          hiddenCols: [],
+          frozenRow: 0,
+          frozenCol: 0,
+          conditionalFormats: [],
+          filters: {}
+        }],
+        darkMode: false
+      };
+
+      localStorage.setItem('excelCloneData', JSON.stringify(payload));
+      window.open('https://4u.ia.br/app/office/excel/', '_blank');
+    }
+
     // ===================== COPIAR MEMORIAL =====================
     function copiarMemorial() {
       const texto = $('resultado').textContent;
@@ -1310,5 +1656,6 @@
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
 </body>
 </html>

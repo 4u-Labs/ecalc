@@ -524,11 +524,32 @@
 
     <!-- Tab: Resultado -->
     <div id="tabResultado" class="tab-content hidden">
+      <!-- Suite Action Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-slate-800/80 p-4 rounded-2xl border border-cyan-500/20 shadow-md no-print">
+        <div class="text-sm font-bold text-cyan-400 flex items-center gap-2">
+          <span>🛠️</span> Ações da Suíte Integrada
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="gerarMemorialDosagem()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📄 Gerar Memorial ABNT</span>
+          </button>
+          <button type="button" onclick="abrirNoOfficeCloneDosagem()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📊 Abrir no OfficeClone</span>
+          </button>
+          <button type="button" onclick="copiarTracoCanteiro()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 font-medium text-xs transition-all cursor-pointer">
+            <span>📋 Copiar Traço Canteiro</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Receita Prática de Canteiro Card -->
+      <div id="tracoCanteiroCard" class="mb-6"></div>
+
       <div class="glass rounded-2xl p-6">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold flex items-center gap-2">
             <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400">📋</span>
-            Resultado do Cálculo
+            Resultado do Cálculo Analítico
           </h2>
           <div id="ecoIndicator" class="hidden">
             <span class="eco-badge px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
@@ -1006,8 +1027,9 @@
           ac, fck, plastificante, superplastificante
         });
 
-        // Materials cards
+        // Materials cards & Traço de Canteiro
         renderMaterialsCards(calculoAtual);
+        renderTracoCanteiro(calculoAtual, volume);
 
         showToast('Cálculo realizado com sucesso!', 'success');
         showTab('resultado');
@@ -1391,11 +1413,268 @@
       });
     });
 
+    // ===== ECALC SUITE INTEGRATION & CANTEIRO =====
+    function renderTracoCanteiro(dados, volM3) {
+      const container = document.getElementById('tracoCanteiroCard');
+      if (!container) return;
+      
+      const cimentoM3 = dados.cimento;
+      const areiaM3 = dados.areiaUmida;
+      const britaM3 = dados.britaUmida;
+      const aguaM3 = dados.aguaEfetiva;
+      
+      const fatorSaco = 50 / cimentoM3;
+      const areiaSacoKg = areiaM3 * fatorSaco;
+      const britaSacoKg = britaM3 * fatorSaco;
+      const aguaSacoL = aguaM3 * fatorSaco;
+      
+      // Latas de 18L (areia ~1.50 kg/L, brita ~1.40 kg/L)
+      const latasAreia = (areiaSacoKg / 1.50) / 18;
+      const latasBrita = (britaSacoKg / 1.40) / 18;
+      const latasAgua = aguaSacoL / 18;
+      
+      // Padiolas de 35x45 cm (se 2 padiolas para cada material)
+      const hPadiolaAreia = (areiaSacoKg / 1.50 * 1000) / (35 * 45 * 2);
+      const hPadiolaBrita = (britaSacoKg / 1.40 * 1000) / (35 * 45 * 2);
+      
+      const rendimentoLitros = (1000 / cimentoM3) * 50;
+      const totalSacos = Math.ceil((volM3 || 1) * cimentoM3 / 50);
+
+      container.innerHTML = `
+        <div class="glass rounded-2xl p-6 border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-slate-900 to-slate-900 shadow-xl animate-fade-in">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-white/10">
+            <div>
+              <span class="px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full text-xs font-bold uppercase tracking-wider">👷 Canteiro de Obras</span>
+              <h3 class="text-xl font-bold text-white mt-1">Receita Prática por Saco de Cimento (50 kg)</h3>
+              <p class="text-xs text-gray-400">Abastecimento direto de betoneira com areia corrigida em umidade</p>
+            </div>
+            <div class="text-right">
+              <div class="text-2xl font-black text-amber-400">${totalSacos} Sacos</div>
+              <div class="text-xs text-gray-400">para ${volM3 || 1} m³ de concreto</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <!-- Cimento -->
+            <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-center">
+              <div class="text-2xl mb-1">🧱</div>
+              <div class="text-xs text-gray-400 uppercase font-semibold">Cimento</div>
+              <div class="text-xl font-bold text-white mt-1">1 Saco</div>
+              <div class="text-xs text-gray-400">50 kg</div>
+            </div>
+
+            <!-- Areia -->
+            <div class="p-4 rounded-xl bg-slate-800/80 border border-amber-500/30 text-center">
+              <div class="text-2xl mb-1">🏖️</div>
+              <div class="text-xs text-amber-400 uppercase font-semibold">Areia Úmida</div>
+              <div class="text-xl font-bold text-amber-300 mt-1">${fmtNum(latasAreia, 1)} Latas</div>
+              <div class="text-xs text-gray-400">${fmtNum(areiaSacoKg, 1)} kg (18L)</div>
+              <div class="text-[10px] text-amber-400/80 mt-1">ou 2 padiolas h=${fmtNum(hPadiolaAreia, 0)}cm</div>
+            </div>
+
+            <!-- Brita -->
+            <div class="p-4 rounded-xl bg-slate-800/80 border border-blue-500/30 text-center">
+              <div class="text-2xl mb-1">🪨</div>
+              <div class="text-xs text-blue-400 uppercase font-semibold">Brita</div>
+              <div class="text-xl font-bold text-blue-300 mt-1">${fmtNum(latasBrita, 1)} Latas</div>
+              <div class="text-xs text-gray-400">${fmtNum(britaSacoKg, 1)} kg (18L)</div>
+              <div class="text-[10px] text-blue-400/80 mt-1">ou 2 padiolas h=${fmtNum(hPadiolaBrita, 0)}cm</div>
+            </div>
+
+            <!-- Água -->
+            <div class="p-4 rounded-xl bg-slate-800/80 border border-cyan-500/30 text-center">
+              <div class="text-2xl mb-1">💧</div>
+              <div class="text-xs text-cyan-400 uppercase font-semibold">Água Amassamento</div>
+              <div class="text-xl font-bold text-cyan-300 mt-1">${fmtNum(aguaSacoL, 1)} Litros</div>
+              <div class="text-xs text-gray-400">${fmtNum(latasAgua, 1)} latas (18L)</div>
+              <div class="text-[10px] text-cyan-400/80 mt-1">Rendimento: ~${fmtNum(rendimentoLitros, 0)}L concreto</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function copiarTracoCanteiro() {
+      if (!calculoAtual) {
+        showToast('Calcule a dosagem primeiro', 'warning');
+        return;
+      }
+      const d = calculoAtual;
+      const cimentoM3 = d.cimento;
+      const fatorSaco = 50 / cimentoM3;
+      const areiaSacoKg = d.areiaUmida * fatorSaco;
+      const britaSacoKg = d.britaUmida * fatorSaco;
+      const aguaSacoL = d.aguaEfetiva * fatorSaco;
+      const latasAreia = (areiaSacoKg / 1.50) / 18;
+      const latasBrita = (britaSacoKg / 1.40) / 18;
+
+      const texto = `RECEITA DE CANTEIRO (POR SACO DE 50KG DE CIMENTO):
+- 1 Saco de Cimento (50 kg)
+- Areia Úmida: ${fmtNum(areiaSacoKg, 1)} kg (${fmtNum(latasAreia, 1)} latas de 18L)
+- Brita: ${fmtNum(britaSacoKg, 1)} kg (${fmtNum(latasBrita, 1)} latas de 18L)
+- Água a colocar: ${fmtNum(aguaSacoL, 1)} Litros
+Traço Unitário: ${d.traco}`;
+
+      navigator.clipboard.writeText(texto).then(() => {
+        showToast('Receita de canteiro copiada!', 'success');
+      });
+    }
+
+    function gerarMemorialDosagem() {
+      if (!calculoAtual) {
+        showToast('Calcule a dosagem primeiro', 'warning');
+        return;
+      }
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        showToast('Módulo de Memorial não disponível', 'error');
+        return;
+      }
+      const d = calculoAtual;
+      const fck = parseFloat(document.getElementById("fck").value) || 25;
+      const metodo = document.getElementById("metodo").value;
+      const cimentoTipo = document.getElementById("cimentoTipo").value;
+      const slump = parseFloat(document.getElementById("slump").value) || 80;
+      const dmax = document.getElementById("dmax").value;
+
+      const svgSection = `
+        <svg width="240" height="180" viewBox="0 0 240 180" style="background:#fff;">
+          <rect x="20" y="30" width="45" height="60" fill="#94a3b8" stroke="#334155" stroke-width="2" rx="3"/>
+          <text x="42" y="65" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">CP 50kg</text>
+          
+          <rect x="75" y="40" width="60" height="50" fill="#f59e0b" stroke="#b45309" stroke-width="2" rx="3"/>
+          <text x="105" y="68" text-anchor="middle" font-size="9" font-weight="bold" fill="#fff">Areia</text>
+          
+          <rect x="145" y="35" width="65" height="55" fill="#64748b" stroke="#334155" stroke-width="2" rx="3"/>
+          <text x="177" y="68" text-anchor="middle" font-size="9" font-weight="bold" fill="#fff">Brita</text>
+          
+          <path d="M 70 140 Q 120 110 170 140" fill="none" stroke="#0284c7" stroke-width="4"/>
+          <circle cx="120" cy="125" r="10" fill="#0284c7"/>
+          <text x="120" y="129" text-anchor="middle" font-size="9" font-weight="bold" fill="#fff">H₂O</text>
+          <text x="120" y="165" text-anchor="middle" font-size="11" font-weight="bold" fill="#0f172a">Traço: ${d.traco}</text>
+        </svg>
+      `;
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial de Dosagem Experimental de Concreto',
+        norma: 'ABNT NBR 12655:2022 / NBR 6118:2023 - Preparo e Controle do Concreto',
+        elemento: `Concreto Estrutural C${fck} (fck = ${fck} MPa) - Método ${metodo}`,
+        inputs: [
+          { label: 'Resistência Característica (fck)', val: `${fck} MPa` },
+          { label: 'Método de Dosagem', val: `${metodo} (ABCP/ACI/IPT/NBR)` },
+          { label: 'Consistência / Abatimento (Slump)', val: `${slump} mm (± 10 mm)` },
+          { label: 'Dimensão Máxima Agregado (Dmáx)', val: `${dmax} mm (Brita 1)` },
+          { label: 'Tipo de Cimento Portland', val: `${cimentoTipo} (NBR 16697)` },
+          { label: 'Relação Água/Cimento Adotada (a/c)', val: `${d.ac.toFixed(3)}` },
+          { label: 'Umidade da Areia de Canteiro', val: `${document.getElementById("umidAreia").value || 2}% (Água compensada)` }
+        ],
+        formulas: [
+          `Resistência de Dosagem: fcj = fck + 1.65 · sd = ${(fck + 1.65 * 4).toFixed(1)} MPa (sd = 4.0 MPa condição A)`,
+          `Curva de Abrams: a/c = f(fcj) = ${d.ac.toFixed(3)} (Limitado por durabilidade NBR 6118)`,
+          `Consumo de Cimento: C = Água / (a/c) = ${d.cimento.toFixed(1)} kg/m³`,
+          `Traço Unitário em Massa Seca: 1 : ${(d.areia/d.cimento).toFixed(2)} : ${(d.brita/d.cimento).toFixed(2)} : ${d.ac.toFixed(2)}`,
+          `Correção de Umidade: Areia úmida = ${d.areiaUmida.toFixed(1)} kg | Água de amassamento = ${d.aguaEfetiva.toFixed(1)} L/m³`
+        ],
+        resultados: [
+          { label: 'Traço Unitário em Massa (Seco)', val: `1 : ${(d.areia/d.cimento).toFixed(2)} : ${(d.brita/d.cimento).toFixed(2)} : ${(d.aguaEfetiva/d.cimento).toFixed(2)}` },
+          { label: 'Consumo de Cimento por m³', val: `${d.cimento.toFixed(1)} kg/m³ (${(d.cimento/50).toFixed(1)} sacos/m³)` },
+          { label: 'Consumo de Areia Úmida / Brita', val: `${d.areiaUmida.toFixed(1)} kg / ${d.britaUmida.toFixed(1)} kg` },
+          { label: 'Água Efetiva na Betoneira', val: `${d.aguaEfetiva.toFixed(1)} L/m³` },
+          { label: 'Traço de Canteiro (por saco de 50kg)', val: `1 saco cimento : ${(d.areiaUmida*50/d.cimento).toFixed(1)}kg areia : ${(d.britaUmida*50/d.cimento).toFixed(1)}kg brita : ${(d.aguaEfetiva*50/d.cimento).toFixed(1)}L água` },
+          { label: 'Volume em Latas 18L (por saco)', val: `1 saco : ${(d.areiaUmida*50/d.cimento/1.5/18).toFixed(1)} latas areia : ${(d.britaUmida*50/d.cimento/1.4/18).toFixed(1)} latas brita` },
+          { label: 'Custo Estimado por m³', val: `R$ ${d.custoFinal.toFixed(2)}` },
+          { label: 'Emissão Estimada de CO₂', val: `${d.co2Total.toFixed(1)} kg CO₂/m³ (EcoScore: ${d.ecoScore}/100)` }
+        ],
+        verificacoes: [
+          {
+            item: 'NBR 6118 - Relação a/c Máxima (Durabilidade e Classe de Agressividade)',
+            calc: `a/c = ${d.ac.toFixed(3)} ≤ 0.60 (Classe II - Urbano)`,
+            status: d.ac <= 0.60 ? 'pass' : 'warn'
+          },
+          {
+            item: 'NBR 6118 - Consumo Mínimo de Cimento Portland',
+            calc: `C = ${d.cimento.toFixed(1)} kg/m³ ≥ 280 kg/m³`,
+            status: d.cimento >= 280 ? 'pass' : 'fail'
+          },
+          {
+            item: 'NBR NM 67 - Trabalhabilidade e Abatimento (Slump Test)',
+            calc: `Slump = ${slump} mm (Adequado para lançamento e adensamento)`,
+            status: 'pass'
+          },
+          {
+            item: 'Compensação de Água por Umidade dos Agregados',
+            calc: `Desconto de água livre = ${(d.areia * (parseFloat(document.getElementById("umidAreia").value)||0)/100).toFixed(1)} L/m³`,
+            status: 'pass'
+          }
+        ],
+        svgSection: svgSection,
+        notas: 'Estudo de dosagem experimental e traço de concreto gerado pela Suíte Integrada ECALC PRO em conformidade com as normas ABNT NBR 12655:2022 e NBR 6118:2023. A confirmação da resistência deve ser realizada por ensaios de corpos de prova (CP) aos 7 e 28 dias.'
+      });
+    }
+
+    function abrirNoOfficeCloneDosagem() {
+      if (!calculoAtual) {
+        showToast('Calcule a dosagem primeiro', 'warning');
+        return;
+      }
+      const d = calculoAtual;
+      const fck = parseFloat(document.getElementById("fck").value) || 25;
+      const volume = parseFloat(document.getElementById("volume").value) || 1;
+
+      const dataCells = {
+        '0,0': 'ESTUDO DE DOSAGEM DE CONCRETO - ECALC PRO',
+        '1,0': 'Obra:', '1,1': window.ECALC_SUITE ? window.ECALC_SUITE.getProject().nomeObra : 'Projeto Residencial',
+        '2,0': 'Data:', '2,1': new Date().toLocaleDateString('pt-BR'),
+        '3,0': 'Resistência:', '3,1': `fck = ${fck} MPa`,
+        '3,2': 'Traço:', '3,3': d.traco,
+        '5,0': 'COMPONENTE', '5,1': 'CONSUMO (kg/m³)', '5,2': `TOTAL (${volume} m³)`, '5,3': 'PREÇO UNIT (R$)', '5,4': 'TOTAL (R$)',
+        '6,0': 'Cimento Portland', '6,1': d.cimento.toFixed(1), '6,2': (d.cimento * volume).toFixed(1), '6,3': '1.15/kg', '6,4': (d.custoCimento * volume).toFixed(2),
+        '7,0': 'Areia Seca', '7,1': d.areia.toFixed(1), '7,2': (d.areia * volume).toFixed(1), '7,3': '0.165/kg', '7,4': (d.custoAreia * volume).toFixed(2),
+        '8,0': 'Brita Seca', '8,1': d.brita.toFixed(1), '8,2': (d.brita * volume).toFixed(1), '8,3': '0.210/kg', '8,4': (d.custoBrita * volume).toFixed(2),
+        '9,0': 'Água Efetiva (L)', '9,1': d.aguaEfetiva.toFixed(1), '9,2': (d.aguaEfetiva * volume).toFixed(1), '9,3': '0.008/L', '9,4': (d.custoAgua * volume).toFixed(2),
+        '10,0': 'Aditivos Plastificantes', '10,1': (d.plastificante + d.superplastificante).toFixed(2), '10,2': ((d.plastificante + d.superplastificante) * volume).toFixed(2), '10,3': '18.00/kg', '10,4': ((d.custoPlast + d.custoSuperplast) * volume).toFixed(2),
+        '12,0': 'TOTAL MATERIAIS', '12,4': (d.custoFinal * volume).toFixed(2),
+        '14,0': 'TRAÇO POR SACO DE 50KG', '14,1': '1 saco cimento (50kg)', '14,2': `${(d.areiaUmida*50/d.cimento).toFixed(1)} kg areia`, '14,3': `${(d.britaUmida*50/d.cimento).toFixed(1)} kg brita`, '14,4': `${(d.aguaEfetiva*50/d.cimento).toFixed(1)} L água`
+      };
+
+      const payload = {
+        fileName: `Dosagem_Concreto_C${fck}`,
+        sheets: [{
+          name: 'Dosagem',
+          data: dataCells,
+          formats: {
+            '0,0': { bold: true, fontSize: 14, color: '#06b6d4' },
+            '5,0': { bold: true, bgColor: '#e2e8f0' },
+            '5,1': { bold: true, bgColor: '#e2e8f0' },
+            '5,2': { bold: true, bgColor: '#e2e8f0' },
+            '5,3': { bold: true, bgColor: '#e2e8f0' },
+            '5,4': { bold: true, bgColor: '#e2e8f0' },
+            '12,0': { bold: true },
+            '12,4': { bold: true, color: '#10b981' },
+            '14,0': { bold: true, bgColor: '#fef3c7' }
+          },
+          comments: {},
+          colWidths: { 0: 220, 1: 150, 2: 150, 3: 140, 4: 140 },
+          rowHeights: {},
+          hiddenRows: [],
+          hiddenCols: [],
+          frozenRow: 0,
+          frozenCol: 0,
+          conditionalFormats: [],
+          filters: {}
+        }],
+        darkMode: false
+      };
+
+      localStorage.setItem('excelCloneData', JSON.stringify(payload));
+      window.open('https://4u.ia.br/app/office/excel/', '_blank');
+    }
+
     // Init
     document.getElementById('year').textContent = new Date().getFullYear();
     renderHistorico();
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
 </body>
 </html>
