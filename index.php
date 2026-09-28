@@ -527,11 +527,15 @@ $v = time();
                 </div>
             </a>
 
-            <a href="telhados.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="estrutural" style="animation-delay: 0.35s">
-                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Estrutural</span>
-                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">🏠</div>
-                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">Telhados</h2>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Madeiramento, inclinação e quantidade de telhas.</p>
+            <a href="telhados.html" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="estrutural" style="animation-delay: 0.35s">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/telhados.webp" type="image/webp">
+                    <img src="assets/cards/telhados.jpg" alt="Telhados" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>Telhados</h2>
+                    <p>Madeiramento, inclinação e quantidade de telhas.</p>
+                </div>
             </a>
 
             <a href="orcamento.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="orcamento" style="animation-delay: 0.38s">
