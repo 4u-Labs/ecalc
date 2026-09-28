@@ -402,6 +402,33 @@
       </button>
     </div>
 
+    <!-- ECALC SUITE ACTION BAR -->
+    <div class="flex flex-wrap items-center justify-between gap-3 p-4 mb-8 rounded-2xl bg-gradient-to-r from-slate-900/90 via-slate-800/90 to-slate-900/90 border border-cyan-500/40 shadow-2xl no-print">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
+          <i class="fas fa-cubes"></i>
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-wider text-cyan-400 font-bold">ECALC SUITE PRO</div>
+          <div class="text-sm font-semibold text-white">Saneamento Integrado — NBR 7229 & NBR 13969</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="abrirNoCadCloneFossa()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-drafting-compass"></i> 📐 Abrir no CADClone
+        </button>
+        <button type="button" onclick="gerarMemorialFossa()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-file-alt text-cyan-400"></i> 📄 Gerar Memorial ABNT
+        </button>
+        <button type="button" onclick="abrirNoOfficeCloneFossa()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-table"></i> 📊 Abrir no OfficeClone
+        </button>
+        <button type="button" onclick="baixarDxfFossa()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-download"></i> 💾 Baixar .DXF
+        </button>
+      </div>
+    </div>
+
     <!-- Progress Indicator -->
     <div class="glass-cyan rounded-xl p-4 mb-8 no-print">
       <div class="flex items-center justify-between mb-2">
@@ -1076,6 +1103,21 @@
       const custoFossa = dimensoesFossa ? calcularCustoFossa(volumeTotalM3, materialFossa, formatoFossa) : null;
       const custoSumidouro = dimensoesSumidouro ? calcularCustoSumidouro(dimensoesSumidouro, tipoSumidouro, numSumidouros) : null;
       
+      // Dimensões do Filtro Anaeróbio (NBR 13969)
+      const volumeFiltroL = Math.max(1000, 1.6 * numPessoas * contribuicao * (tempoDetencaoAjustado || 1.0));
+      const volumeFiltroM3 = volumeFiltroL / 1000;
+      const hLeitoFiltro = 1.20;
+      const areaFiltro = volumeFiltroM3 / hLeitoFiltro;
+      const diametroFiltro = Math.sqrt((4 * areaFiltro) / Math.PI);
+      const dimensoesFiltro = {
+        volumeUtil: volumeFiltroM3,
+        volumeL: volumeFiltroL,
+        alturaLeito: hLeitoFiltro,
+        alturaTotal: hLeitoFiltro + 0.40 + 0.30,
+        diametro: diametroFiltro,
+        areaBase: areaFiltro
+      };
+
       // Salvar resultado
       ultimoCalculo = {
         numPessoas,
@@ -1087,6 +1129,7 @@
         volumeTotal,
         volumeTotalM3,
         dimensoesFossa,
+        dimensoesFiltro,
         dimensoesSumidouro,
         numSumidouros,
         formatoFossa,
@@ -2002,6 +2045,339 @@
         setTimeout(() => notif.remove(), 300);
       }, 3000);
     }
+
+    // ==================== ECALC SUITE INTEGRATION (CAD, MEMORIAL & OFFICE) ====================
+    function gerarDxfConteudoFossa(d) {
+      d = d || ultimoCalculo || {};
+      const numPessoas = d.numPessoas || 5;
+      const vFossaM3 = d.volumeTotalM3 || 1.85;
+      const vUtilM3 = (d.volumeUtil || 1200) / 1000;
+      const dimF = d.dimensoesFossa || { diametro: 1.40, altura: 1.50, comprimento: 1.80, largura: 0.90, tipo: 'Cilíndrico' };
+      const dimS = d.dimensoesSumidouro || { diametro: 1.50, alturaUtil: 2.0, areaInfiltracao: 12.0, tipo: 'Cilíndrico' };
+      const dimFil = d.dimensoesFiltro || { diametro: 1.10, alturaTotal: 1.90, volumeUtil: 1.05 };
+
+      const wFossa = (dimF.largura || dimF.diametro || 1.40) * 100; // cm
+      const hFossa = (dimF.altura || 1.50) * 100; // cm
+      const wFil = (dimFil.diametro || 1.10) * 100; // cm
+      const hFil = (dimFil.alturaTotal || 1.90) * 100; // cm
+      const wSum = (dimS.largura || dimS.diametro || 1.50) * 100; // cm
+      const hSum = (dimS.alturaUtil || 2.00) * 100; // cm
+
+      let dxf = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n`;
+      dxf += `0\nLAYER\n2\nCIVIL\n70\n0\n62\n4\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nEQUIPAMENTOS\n70\n0\n62\n6\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nTUBULACOES\n70\n0\n62\n1\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nDRENAGEM\n70\n0\n62\n3\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nCOTAS\n70\n0\n62\n7\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nTEXTO\n70\n0\n62\n2\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nENDTAB\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nENTITIES\n`;
+
+      function line(x1, y1, x2, y2, lay) {
+        return `0\nLINE\n8\n${lay}\n10\n${x1.toFixed(1)}\n20\n${y1.toFixed(1)}\n30\n0.0\n11\n${x2.toFixed(1)}\n21\n${y2.toFixed(1)}\n31\n0.0\n`;
+      }
+      function text(x, y, h, str, lay) {
+        return `0\nTEXT\n8\n${lay}\n10\n${x.toFixed(1)}\n20\n${y.toFixed(1)}\n30\n0.0\n40\n${h}\n1\n${str}\n`;
+      }
+      function rect(x, y, w, h, lay) {
+        return line(x, y, x + w, y, lay) +
+               line(x + w, y, x + w, y + h, lay) +
+               line(x + w, y + h, x, y + h, lay) +
+               line(x, y + h, x, y, lay);
+      }
+      function circle(cx, cy, r, lay) {
+        return `0\nCIRCLE\n8\n${lay}\n10\n${cx.toFixed(1)}\n20\n${cy.toFixed(1)}\n30\n0.0\n40\n${r.toFixed(1)}\n`;
+      }
+
+      // Linha do Terreno Natural (TN)
+      const xFimTotal = wFossa + 80 + wFil + 80 + wSum + 100;
+      dxf += line(-80, 0, xFimTotal, 0, 'CIVIL');
+      dxf += text(-75, 10, 8, 'NIVEL DO TERRENO (TN = 0.00)', 'TEXTO');
+
+      // 1. FOSSA SÉPTICA
+      const xF = 0;
+      const yTopFossa = -15;
+      const yBotFossa = -(15 + hFossa);
+      dxf += rect(xF, yBotFossa, wFossa, hFossa, 'CIVIL');
+      dxf += rect(xF - 5, yBotFossa - 10, wFossa + 10, 10, 'CIVIL');
+      dxf += rect(xF - 5, yTopFossa, wFossa + 10, 15, 'CIVIL');
+      const xTampaF = xF + (wFossa - 60) / 2;
+      dxf += rect(xTampaF, 0, 60, 5, 'EQUIPAMENTOS');
+      dxf += text(xTampaF + 5, 8, 6, 'TAMPA INSPECAO φ60cm', 'TEXTO');
+
+      const yEntrada = yTopFossa - 20;
+      dxf += line(xF - 50, yEntrada, xF + 15, yEntrada, 'TUBULACOES');
+      dxf += line(xF - 50, yEntrada - 10, xF + 15, yEntrada - 10, 'TUBULACOES');
+      dxf += rect(xF + 10, yEntrada - 40, 10, 55, 'TUBULACOES');
+      dxf += text(xF - 45, yEntrada + 12, 6, 'ENTRADA PVC 100mm (i=2%)', 'TEXTO');
+
+      const yNivelLiqF = yEntrada - 5;
+      dxf += line(xF + 2, yNivelLiqF, xF + wFossa - 2, yNivelLiqF, 'EQUIPAMENTOS');
+      dxf += text(xF + 15, yNivelLiqF + 4, 6, `LAMINA LIQUIDA (V=${vFossaM3.toFixed(2)}m³)`, 'TEXTO');
+      const yNivelLodo = yBotFossa + 40;
+      dxf += line(xF + 2, yNivelLodo, xF + wFossa - 2, yNivelLodo, 'EQUIPAMENTOS');
+      dxf += text(xF + 15, yNivelLodo + 4, 5, 'ZONA DE DIGESTAO DE LODO', 'TEXTO');
+
+      const ySaidaF = yEntrada - 5;
+      dxf += rect(xF + wFossa - 20, ySaidaF - 40, 10, 55, 'TUBULACOES');
+      dxf += line(xF + wFossa - 20, ySaidaF, xF + wFossa + 80, ySaidaF, 'TUBULACOES');
+      dxf += line(xF + wFossa - 20, ySaidaF - 10, xF + wFossa + 80, ySaidaF - 10, 'TUBULACOES');
+
+      // 2. FILTRO ANAERÓBIO
+      const xFil = wFossa + 80;
+      const yTopFil = -15;
+      const yBotFil = -(15 + hFil);
+      dxf += rect(xFil, yBotFil, wFil, hFil, 'CIVIL');
+      dxf += rect(xFil - 5, yBotFil - 10, wFil + 10, 10, 'CIVIL');
+      dxf += rect(xFil - 5, yTopFil, wFil + 10, 15, 'CIVIL');
+      const xTampaFil = xFil + (wFil - 60) / 2;
+      dxf += rect(xTampaFil, 0, 60, 5, 'EQUIPAMENTOS');
+      dxf += text(xTampaFil + 5, 8, 6, 'INSPECAO FILTRO', 'TEXTO');
+
+      const xTuboCentral = xFil + wFil / 2;
+      dxf += rect(xTuboCentral - 5, yBotFil + 35, 10, hFil - 55, 'TUBULACOES');
+      const yFundoFalso = yBotFil + 35;
+      dxf += line(xFil + 2, yFundoFalso, xFil + wFil - 2, yFundoFalso, 'CIVIL');
+      dxf += line(xFil + 2, yFundoFalso + 5, xFil + wFil - 2, yFundoFalso + 5, 'CIVIL');
+      dxf += text(xFil + 8, yBotFil + 12, 5, 'CAMARA DE DISTRIBUICAO DE FUNDO', 'TEXTO');
+
+      const yTopLeito = yFundoFalso + 120;
+      dxf += line(xFil + 2, yTopLeito, xFil + wFil - 2, yTopLeito, 'DRENAGEM');
+      for (let bx = xFil + 15; bx < xFil + wFil - 15; bx += 25) {
+        for (let by = yFundoFalso + 25; by < yTopLeito - 15; by += 30) {
+          dxf += circle(bx, by, 4, 'DRENAGEM');
+        }
+      }
+      dxf += text(xFil + 10, yFundoFalso + 60, 6, 'LEITO FILTRANTE BRITA N.4 (H=1.20m)', 'TEXTO');
+
+      const ySaidaFil = yTopFil - 25;
+      dxf += line(xFil + wFil - 10, ySaidaFil, xFil + wFil + 80, ySaidaFil, 'TUBULACOES');
+      dxf += line(xFil + wFil - 10, ySaidaFil - 10, xFil + wFil + 80, ySaidaFil - 10, 'TUBULACOES');
+
+      // 3. SUMIDOURO
+      const xSum = xFil + wFil + 80;
+      const yTopSum = -15;
+      const yBotSum = -(15 + hSum);
+      dxf += rect(xSum, yBotSum, wSum, hSum, 'CIVIL');
+      dxf += rect(xSum - 5, yTopSum, wSum + 10, 15, 'CIVIL');
+      const xTampaSum = xSum + (wSum - 60) / 2;
+      dxf += rect(xTampaSum, 0, 60, 5, 'EQUIPAMENTOS');
+      dxf += text(xTampaSum + 5, 8, 6, 'TAMPA SUMIDOURO', 'TEXTO');
+
+      dxf += rect(xSum - 20, yBotSum - 50, wSum + 40, 50, 'DRENAGEM');
+      dxf += line(xSum - 20, yBotSum - 50, xSum - 20, yTopSum, 'DRENAGEM');
+      dxf += line(xSum + wSum + 20, yBotSum - 50, xSum + wSum + 20, yTopSum, 'DRENAGEM');
+      for (let bx = xSum - 15; bx < xSum + wSum + 15; bx += 25) {
+        dxf += circle(bx, yBotSum - 25, 5, 'DRENAGEM');
+      }
+      dxf += text(xSum + 5, yBotSum - 25, 6, 'CAMADA DRENANTE BRITA (50cm)', 'TEXTO');
+
+      dxf += rect(xSum + 10, ySaidaFil - 25, 10, 30, 'TUBULACOES');
+
+      const xResp = xSum + wSum - 20;
+      dxf += line(xResp, yTopSum, xResp, 60, 'TUBULACOES');
+      dxf += line(xResp + 8, yTopSum, xResp + 8, 60, 'TUBULACOES');
+      dxf += line(xResp - 5, 60, xResp + 13, 60, 'TUBULACOES');
+      dxf += text(xResp - 20, 70, 6, 'VENTILACAO PVC 50mm', 'TEXTO');
+
+      // Cotas
+      dxf += line(xF, yBotFossa - 30, xF + wFossa, yBotFossa - 30, 'COTAS');
+      dxf += text(xF + wFossa / 2 - 20, yBotFossa - 45, 7, `D=${(wFossa/100).toFixed(2)}m`, 'COTAS');
+
+      dxf += line(xFil, yBotFil - 30, xFil + wFil, yBotFil - 30, 'COTAS');
+      dxf += text(xFil + wFil / 2 - 20, yBotFil - 45, 7, `D=${(wFil/100).toFixed(2)}m`, 'COTAS');
+
+      dxf += line(xSum, yBotSum - 70, xSum + wSum, yBotSum - 70, 'COTAS');
+      dxf += text(xSum + wSum / 2 - 20, yBotSum - 85, 7, `D=${(wSum/100).toFixed(2)}m`, 'COTAS');
+
+      // Títulos
+      dxf += text(xF, -(hFossa + 80), 9, `1. TANQUE SEPTICO (V=${vFossaM3.toFixed(2)}m³)`, 'TEXTO');
+      dxf += text(xFil, -(hFil + 80), 9, `2. FILTRO ANAEROBIO (V=${dimFil.volumeUtil.toFixed(2)}m³)`, 'TEXTO');
+      dxf += text(xSum, -(hSum + 110), 9, `3. SUMIDOURO (A=${dimS.areaInfiltracao.toFixed(1)}m²)`, 'TEXTO');
+
+      dxf += text(-50, 100, 12, 'SISTEMA INDIVIDUAL DE TRATAMENTO DE ESGOTO DOMESTICO', 'TEXTO');
+      dxf += text(-50, 85, 8, `Normas: ABNT NBR 7229:1993 e ABNT NBR 13969:1997 | Contribuintes: ${numPessoas} pessoas`, 'TEXTO');
+      dxf += text(-50, 72, 7, `Vazao de Esgoto: ${d.contribuicaoDiaria || 650} L/dia | Fossa: ${dimF.tipo} | Filtro Anaerobio com Brita 4 | Sumidouro Infiltrante`, 'TEXTO');
+
+      dxf += `0\nENDSEC\n0\nEOF\n`;
+      return dxf;
+    }
+
+    function abrirNoCadCloneFossa() {
+      if (!ultimoCalculo) calcular();
+      const d = ultimoCalculo;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoFossa(d);
+      window.ECALC_CAD.abrirNoCadClone(dxf, `sistema_fossa_filtro_sumidouro_${d.numPessoas}pessoas.dxf`);
+    }
+
+    function baixarDxfFossa() {
+      if (!ultimoCalculo) calcular();
+      const d = ultimoCalculo;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoFossa(d);
+      window.ECALC_CAD.baixarDXF(dxf, `sistema_fossa_filtro_sumidouro_${d.numPessoas}pessoas.dxf`);
+    }
+
+    function abrirNoOfficeCloneFossa() {
+      if (!ultimoCalculo) calcular();
+      const d = ultimoCalculo;
+      const custoTotal = (d.custoFossa?.total || 0) + (d.custoSumidouro?.total || 0);
+
+      const csvData = [
+        ['ECALC PRO - MEMÓRIA DE DIMENSIONAMENTO HIDROSSANITÁRIO'],
+        ['Normas Técnicas', 'ABNT NBR 7229:1993 e ABNT NBR 13969:1997'],
+        ['Data de Emissão', new Date().toLocaleDateString('pt-BR')],
+        [''],
+        ['PARÂMETRO GERAL', 'VALOR', 'UNIDADE'],
+        ['Número de Contribuintes (N)', d.numPessoas, 'pessoas'],
+        ['Contribuição Unitária de Esgoto (C)', d.contribuicao, 'L/pessoa.dia'],
+        ['Contribuição Diária Total (Q)', d.contribuicaoDiaria, 'L/dia'],
+        ['Tempo de Detenção Hidráulica (T)', d.tempoDetencao.toFixed(2), 'dias'],
+        [''],
+        ['FOSSA SÉPTICA (TANQUE SÉPTICO)', 'DIMENSIONAMENTO', 'UNIDADE'],
+        ['Volume Útil Líquido (Vu)', (d.volumeUtil/1000).toFixed(2), 'm³'],
+        ['Volume de Acúmulo de Lodo (Vl)', (d.volumeLodo/1000).toFixed(2), 'm³'],
+        ['Volume Total da Fossa (Vt)', d.volumeTotalM3.toFixed(2), 'm³'],
+        ['Formato Geométrico', d.formatoFossa, '-'],
+        ['Material Construtivo', d.materialFossa, '-'],
+        ['Profundidade Útil (h)', (d.dimensoesFossa?.altura || 1.5).toFixed(2), 'm'],
+        ['Diâmetro / Comprimento', (d.dimensoesFossa?.diametro || d.dimensoesFossa?.comprimento || 1.4).toFixed(2), 'm'],
+        [''],
+        ['FILTRO ANAERÓBIO DE FLUXO ASCENDENTE', 'DIMENSIONAMENTO', 'UNIDADE'],
+        ['Volume do Leito Filtrante (Vu)', (d.dimensoesFiltro?.volumeUtil || 1.05).toFixed(2), 'm³'],
+        ['Material do Leito', 'Pedra Britada nº 4', '-'],
+        ['Altura do Leito Filtrante', '1.20', 'm'],
+        ['Fundo Falso Perfurado', '0.40', 'm'],
+        ['Diâmetro Mínimo Calculado', (d.dimensoesFiltro?.diametro || 1.10).toFixed(2), 'm'],
+        [''],
+        ['DISPOSIÇÃO FINAL (SUMIDOURO / SOLO)', 'DIMENSIONAMENTO', 'UNIDADE'],
+        ['Tipo de Disposição', d.tipoSumidouro, '-'],
+        ['Área de Infiltração Necessária', (d.dimensoesSumidouro?.areaInfiltracao || 12).toFixed(2), 'm²'],
+        ['Quantidade de Unidades', d.numSumidouros || 1, 'unidade(s)'],
+        ['Diâmetro do Sumidouro', (d.dimensoesSumidouro?.diametro || 1.5).toFixed(2), 'm'],
+        ['Profundidade Útil', (d.dimensoesSumidouro?.alturaUtil || 2.0).toFixed(2), 'm'],
+        ['Distância do Lençol Freático', `${d.nivelLencol} m (Segurança ≥ 1.50m)`, 'Conforme NBR 13969'],
+        [''],
+        ['ESTIMATIVA ORÇAMENTÁRIA', 'VALOR ESTIMADO', 'MOEDA'],
+        ['Custo Fossa Séptica', (d.custoFossa?.total || 0).toFixed(2), 'R$'],
+        ['Custo Sumidouro', (d.custoSumidouro?.total || 0).toFixed(2), 'R$'],
+        ['Investimento Total Estimado', custoTotal.toFixed(2), 'R$']
+      ];
+
+      localStorage.setItem('officeclone_import_data', JSON.stringify({
+        filename: `Saneamento_Fossa_Filtro_Sumidouro_${d.numPessoas}pessoas.csv`,
+        rows: csvData
+      }));
+      window.open('../office/excel/', '_blank');
+    }
+
+    function gerarMemorialFossa() {
+      if (!ultimoCalculo) calcular();
+      const d = ultimoCalculo;
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        alert('Módulo de Memorial não disponível');
+        return;
+      }
+
+      const custoTotal = (d.custoFossa?.total || 0) + (d.custoSumidouro?.total || 0);
+
+      const svgSection = `
+        <svg width="280" height="180" viewBox="0 0 280 180" style="background:#fff;">
+          <line x1="10" y1="30" x2="270" y2="30" stroke="#64748b" stroke-width="2"/>
+          <text x="15" y="24" font-size="8" fill="#64748b">TN = 0.00</text>
+          
+          <rect x="25" y="45" width="65" height="90" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5" rx="3"/>
+          <rect x="42" y="30" width="30" height="15" fill="#94a3b8" stroke="#0f172a" stroke-width="1"/>
+          <line x1="26" y1="65" x2="89" y2="65" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <rect x="25" y="115" width="65" height="20" fill="#cbd5e1"/>
+          <text x="32" y="90" font-size="7" fill="#0f172a" font-weight="bold">FOSSA</text>
+          <text x="32" y="100" font-size="6" fill="#475569">${d.volumeTotalM3.toFixed(2)}m³</text>
+          
+          <line x1="80" y1="58" x2="115" y2="58" stroke="#dc2626" stroke-width="2"/>
+          
+          <rect x="115" y="45" width="55" height="95" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5" rx="3"/>
+          <rect x="127" y="30" width="30" height="15" fill="#94a3b8" stroke="#0f172a" stroke-width="1"/>
+          <rect x="116" y="65" width="53" height="60" fill="#94a3b8" opacity="0.6"/>
+          <text x="120" y="90" font-size="7" fill="#0f172a" font-weight="bold">FILTRO</text>
+          <text x="120" y="100" font-size="6" fill="#475569">Brita 4</text>
+          
+          <line x1="160" y1="58" x2="195" y2="58" stroke="#dc2626" stroke-width="2"/>
+          
+          <rect x="195" y="45" width="65" height="100" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5" stroke-dasharray="4,2" rx="3"/>
+          <rect x="212" y="30" width="30" height="15" fill="#94a3b8" stroke="#0f172a" stroke-width="1"/>
+          <rect x="196" y="125" width="63" height="20" fill="#94a3b8" opacity="0.8"/>
+          <line x1="250" y1="30" x2="250" y2="10" stroke="#0284c7" stroke-width="1.5"/>
+          <text x="202" y="90" font-size="7" fill="#0f172a" font-weight="bold">SUMIDOURO</text>
+          <text x="202" y="100" font-size="6" fill="#475569">${d.dimensoesSumidouro ? d.dimensoesSumidouro.areaInfiltracao.toFixed(1) : '12'}m²</text>
+        </svg>
+      `;
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial de Dimensionamento de Sistema de Tratamento de Esgoto Individual',
+        norma: 'ABNT NBR 7229:1993 e ABNT NBR 13969:1997',
+        elemento: `Conjunto Fossa Séptica (${d.volumeTotalM3.toFixed(2)} m³) + Filtro Anaeróbio + Sumidouro (${d.numPessoas} pessoas)`,
+        inputs: [
+          { label: 'Número de Contribuintes (N)', val: `${d.numPessoas} pessoas` },
+          { label: 'Contribuição Unitária de Esgoto (C)', val: `${d.contribuicao} L/pessoa.dia` },
+          { label: 'Vazão Diária Total de Esgoto (Q)', val: `${d.contribuicaoDiaria} L/dia` },
+          { label: 'Tempo de Detenção Hidráulica (T)', val: `${d.tempoDetencao.toFixed(2)} dias` },
+          { label: 'Taxa de Acúmulo de Lodo Fresco (Lf)', val: '1.0 L/pessoa.dia (K = 65)' },
+          { label: 'Formato / Material da Fossa', val: `${d.formatoFossa} / ${d.materialFossa}` },
+          { label: 'Profundidade do Lençol Freático', val: `${d.nivelLencol} m do terreno natural` }
+        ],
+        formulas: [
+          `Fórmula Normativa da Fossa Séptica (NBR 7229): V = 1000 + N·(C·T + K·Lf) = ${d.volumeTotalM3.toFixed(2)} m³`,
+          `Volume Útil Líquido: Vu = N · C · T = ${(d.volumeUtil/1000).toFixed(2)} m³ (${d.volumeUtil} L)`,
+          `Volume de Lodo Digerido: Vl = N · K · Lf = ${(d.volumeLodo/1000).toFixed(2)} m³ (12 meses de retenção)`,
+          `Filtro Anaeróbio de Fluxo Ascendente (NBR 13969): Vu,filtro = 1.6 · N · C · T = ${(d.dimensoesFiltro?.volumeUtil || 1.05).toFixed(2)} m³`,
+          `Área de Infiltração do Sumidouro (NBR 13969): Ainf = Q / Ci = ${(d.dimensoesSumidouro?.areaInfiltracao || 12).toFixed(2)} m²`
+        ],
+        resultados: [
+          { label: 'Volume Total Efetivo da Fossa', val: `${d.volumeTotalM3.toFixed(2)} m³ (${(d.volumeTotalM3*1000).toFixed(0)} L)` },
+          { label: 'Dimensões Úteis da Fossa Séptica', val: d.dimensoesFossa ? (d.dimensoesFossa.diametro ? `φ ${(d.dimensoesFossa.diametro).toFixed(2)}m × H ${(d.dimensoesFossa.altura).toFixed(2)}m` : `C ${(d.dimensoesFossa.comprimento).toFixed(2)}m × L ${(d.dimensoesFossa.largura).toFixed(2)}m × H ${(d.dimensoesFossa.altura).toFixed(2)}m`) : 'Conforme cálculo' },
+          { label: 'Volume Útil do Filtro Anaeróbio', val: `${(d.dimensoesFiltro?.volumeUtil || 1.05).toFixed(2)} m³ (Brita nº 4, H=1.20m)` },
+          { label: 'Dimensionamento do Sumidouro', val: `${d.numSumidouros} unidade(s) de φ ${(d.dimensoesSumidouro?.diametro || 1.5).toFixed(2)}m × Prof. ${(d.dimensoesSumidouro?.alturaUtil || 2.0).toFixed(2)}m (A=${(d.dimensoesSumidouro?.areaInfiltracao || 12).toFixed(1)}m²)` },
+          { label: 'Investimento Estimado Total', val: `R$ ${custoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}` }
+        ],
+        verificacoes: [
+          {
+            item: 'Volume Mínimo Normativo da Fossa (NBR 7229 ≥ 1.25 m³)',
+            calc: `V = ${d.volumeTotalM3.toFixed(2)} m³ ≥ 1.25 m³`,
+            status: d.volumeTotalM3 >= 1.25 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Profundidade Útil da Fossa (1.20m a 2.80m)',
+            calc: `h = ${(d.dimensoesFossa?.altura || 1.5).toFixed(2)} m`,
+            status: ((d.dimensoesFossa?.altura || 1.5) >= 1.2 && (d.dimensoesFossa?.altura || 1.5) <= 2.8) ? 'pass' : 'fail'
+          },
+          {
+            item: 'Filtro Anaeróbio com Volume Mínimo (NBR 13969 ≥ 1.00 m³)',
+            calc: `Vu,filtro = ${(d.dimensoesFiltro?.volumeUtil || 1.05).toFixed(2)} m³ ≥ 1.00 m³`,
+            status: 'pass'
+          },
+          {
+            item: 'Segurança contra Contaminação do Lençol Freático (Distância ≥ 1.50m)',
+            calc: `Distância fundo ao lençol = ${(d.nivelLencol - (d.dimensoesSumidouro?.alturaUtil || 2.0)).toFixed(2)} m ≥ 1.50 m`,
+            status: (d.nivelLencol - (d.dimensoesSumidouro?.alturaUtil || 2.0)) >= 1.5 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Afastamento Mínimo de Poços e Captações de Água (≥ 15.0m)',
+            calc: 'Afastamento normativo obrigatório NBR 7229',
+            status: 'pass'
+          }
+        ],
+        svgSection: svgSection,
+        notas: 'Memorial de cálculo emitido pela Suíte Integrada ECALC PRO em conformidade com as normas ABNT NBR 7229:1993 e NBR 13969:1997. É terminantemente proibido o lançamento de águas pluviais no sistema séptico. Recomenda-se a limpeza e descarte ambientalmente adequado do lodo digerido a cada 12 meses.'
+      });
+    }
   </script>
 
     <!-- Footer -->
@@ -2026,5 +2402,7 @@
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
+    <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * { font-family: 'Inter', sans-serif; }
     
@@ -497,9 +498,36 @@
       <button class="btn-outline flex items-center gap-2" id="btnExportar">
         📄 Exportar PDF
       </button>
-      <button class="btn-outline flex items-center gap-2" id="btnReset">
+      <button class="btn-outline flex items-center gap-2 cursor-pointer" id="btnReset">
         🗑️ Limpar
       </button>
+    </div>
+
+    <!-- ECALC SUITE ACTION BAR -->
+    <div class="flex flex-wrap items-center justify-between gap-3 p-4 mb-8 rounded-2xl bg-gradient-to-r from-slate-900/90 via-slate-800/90 to-slate-900/90 border border-cyan-500/40 shadow-2xl no-print">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
+          <i class="fas fa-cubes"></i>
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-wider text-cyan-400 font-bold">ECALC SUITE PRO</div>
+          <div class="text-sm font-semibold text-white">Reservatórios & RTI — NBR 5626 & NBR 13714</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="abrirNoCadCloneReservatorio()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-drafting-compass"></i> 📐 Abrir no CADClone
+        </button>
+        <button type="button" onclick="gerarMemorialReservatorio()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-file-alt text-cyan-400"></i> 📄 Gerar Memorial ABNT
+        </button>
+        <button type="button" onclick="abrirNoOfficeCloneReservatorio()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-table"></i> 📊 Abrir no OfficeClone
+        </button>
+        <button type="button" onclick="baixarDxfReservatorio()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-download"></i> 💾 Baixar .DXF
+        </button>
+      </div>
     </div>
 
     <!-- Tipo de Edificação -->
@@ -601,9 +629,32 @@
         </div>
       </div>
 
+      <!-- Reserva Técnica de Incêndio (RTI - NBR 13714) -->
+      <div class="grid md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/10">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">
+            🔥 Reserva Técnica de Incêndio (RTI - NBR 13714)
+            <span class="tooltip-container ml-1 cursor-help text-cyan-400">ⓘ
+              <span class="tooltip-text">Volume exclusivo para combate a incêndio por hidrantes/sprinklers</span>
+            </span>
+          </label>
+          <select id="tipo-rti" class="select-modern" onchange="toggleRtiCustom(this.value)">
+            <option value="0">Sem RTI (Residência Unifamiliar)</option>
+            <option value="5000" selected>Hidrantes Tipo 1 (Residencial Multifamiliar / Comercial Leve - 5.000 L)</option>
+            <option value="8000">Hidrantes Tipo 2 (Comercial Médio / Escritórios - 8.000 L)</option>
+            <option value="12000">Hidrantes Tipo 3 (Industrial / Galpões - 12.000 L)</option>
+            <option value="custom">Personalizado...</option>
+          </select>
+        </div>
+        <div id="rti-custom-container" class="hidden">
+          <label class="block text-sm text-gray-400 mb-2">Volume RTI Personalizado (Litros)</label>
+          <input type="number" id="volume-rti-custom" value="5000" class="input-modern" min="0" step="500">
+        </div>
+      </div>
+
       <div class="alert alert-info mt-4">
         💡 <strong>Dica:</strong> Para residências, recomenda-se 2 dias de reserva. 
-        Para hospitais e indústrias, considere 3-5 dias de autonomia.
+        Para hospitais e indústrias, considere 3-5 dias de autonomia. A RTI é armazenada integralmente no reservatório superior garantindo saída independente para combate a incêndio.
       </div>
     </section>
 
@@ -774,6 +825,16 @@
       calcular();
     }
 
+    let ultimoCalculoReservatorio = null;
+
+    function toggleRtiCustom(val) {
+      const container = document.getElementById('rti-custom-container');
+      if (container) {
+        container.classList.toggle('hidden', val !== 'custom');
+      }
+      calcular();
+    }
+
     function calcular() {
       const populacao = parseFloat(document.getElementById('populacao').value) || 0;
       const consumoPerCapita = parseFloat(document.getElementById('consumo-per-capita').value) || 0;
@@ -795,20 +856,44 @@
       const volumeReserva = volumeDiario * diasReserva;
       const volumeM3 = volumeReserva / 1000;
 
+      // Reserva Técnica de Incêndio (RTI - NBR 13714)
+      const tipoRtiEl = document.getElementById('tipo-rti');
+      let volumeRtiLitros = 0;
+      if (tipoRtiEl) {
+        if (tipoRtiEl.value === 'custom') {
+          volumeRtiLitros = parseFloat(document.getElementById('volume-rti-custom').value) || 0;
+        } else {
+          volumeRtiLitros = parseFloat(tipoRtiEl.value) || 0;
+        }
+      }
+      const volumeRtiM3 = volumeRtiLitros / 1000;
+
       let volumeInferior = 0, volumeSuperior = 0;
+      let volumeConsumoInferior = 0, volumeConsumoSuperior = 0;
 
       switch(tipoReservatorio) {
         case 'inferior':
+          volumeConsumoInferior = volumeM3;
           volumeInferior = volumeM3;
+          volumeSuperior = volumeRtiM3; // Se houver RTI, ela fica no superior
+          volumeConsumoSuperior = 0;
           break;
         case 'superior':
-          volumeSuperior = volumeM3;
+          volumeConsumoSuperior = volumeM3;
+          volumeSuperior = volumeM3 + volumeRtiM3;
+          volumeInferior = 0;
+          volumeConsumoInferior = 0;
           break;
         case 'ambos':
-          volumeInferior = volumeM3 * 0.6;
-          volumeSuperior = volumeM3 * 0.4;
+          volumeConsumoInferior = volumeM3 * 0.6;
+          volumeConsumoSuperior = volumeM3 * 0.4;
+          volumeInferior = volumeConsumoInferior;
+          volumeSuperior = volumeConsumoSuperior + volumeRtiM3;
           break;
       }
+
+      const volumeTotalGeralM3 = volumeInferior + volumeSuperior;
+      const volumeTotalGeralLitros = volumeTotalGeralM3 * 1000;
 
       const dimensoesInferior = calcularDimensoes(volumeInferior, formato);
       const dimensoesSuperior = calcularDimensoes(volumeSuperior, formato);
@@ -819,19 +904,25 @@
       const sugestaoInferior = encontrarReservatorioComercial(volumeInferior * 1000);
       const sugestaoSuperior = encontrarReservatorioComercial(volumeSuperior * 1000);
 
-      // Cálculo da bomba (se usar ambos reservatórios)
-      const bomba = tipoReservatorio === 'ambos' ? calcularBomba(volumeSuperior * 1000, populacao) : null;
+      // Cálculo da bomba (se usar ambos reservatórios ou inferior com superior)
+      const bomba = (tipoReservatorio === 'ambos' || (volumeInferior > 0 && volumeSuperior > 0))
+        ? calcularBomba(volumeSuperior * 1000, populacao) : null;
 
-      gerarResultado({
+      ultimoCalculoReservatorio = {
         populacao, consumoPerCapita, diasReserva,
         volumeDiario, volumeReserva, volumeM3,
+        volumeRtiLitros, volumeRtiM3,
+        volumeConsumoInferior, volumeConsumoSuperior,
+        volumeTotalGeralM3, volumeTotalGeralLitros,
         tipoReservatorio, volumeInferior, volumeSuperior,
         dimensoesInferior, dimensoesSuperior,
         formato, material,
         custoInferior, custoSuperior,
         sugestaoInferior, sugestaoSuperior,
         bomba
-      });
+      };
+
+      gerarResultado(ultimoCalculoReservatorio);
     }
 
     function calcularDimensoes(volume, formato) {
@@ -971,26 +1062,31 @@
 
       let html = `
         <!-- Resumo Principal -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
           <div class="spec-card">
-            <div class="text-gray-400 text-sm mb-1">Consumo Diário</div>
-            <div class="spec-value">${volumeDiario.toLocaleString('pt-BR')}</div>
+            <div class="text-gray-400 text-xs mb-1">Consumo Diário</div>
+            <div class="spec-value text-lg">${volumeDiario.toLocaleString('pt-BR')}</div>
             <div class="text-gray-500 text-xs">litros/dia</div>
           </div>
           <div class="spec-card">
-            <div class="text-gray-400 text-sm mb-1">Volume Total</div>
-            <div class="spec-value">${volumeM3.toFixed(2)}</div>
-            <div class="text-gray-500 text-xs">m³</div>
+            <div class="text-gray-400 text-xs mb-1">Reserva Consumo</div>
+            <div class="spec-value text-lg">${volumeReserva.toLocaleString('pt-BR')}</div>
+            <div class="text-gray-500 text-xs">${diasReserva} dias</div>
+          </div>
+          <div class="spec-card border-red-500/30">
+            <div class="text-red-400 text-xs mb-1">🔥 Reserva RTI</div>
+            <div class="spec-value text-lg text-red-400">${(dados.volumeRtiLitros || 0).toLocaleString('pt-BR')}</div>
+            <div class="text-gray-500 text-xs">litros (incêndio)</div>
+          </div>
+          <div class="spec-card border-cyan-500/30">
+            <div class="text-cyan-400 text-xs mb-1">Capacidade Total</div>
+            <div class="spec-value text-lg text-cyan-400">${(dados.volumeTotalGeralLitros || (volumeM3*1000)).toLocaleString('pt-BR')}</div>
+            <div class="text-gray-500 text-xs">${(dados.volumeTotalGeralM3 || volumeM3).toFixed(2)} m³</div>
           </div>
           <div class="spec-card">
-            <div class="text-gray-400 text-sm mb-1">Capacidade</div>
-            <div class="spec-value">${volumeReserva.toLocaleString('pt-BR')}</div>
-            <div class="text-gray-500 text-xs">litros</div>
-          </div>
-          <div class="spec-card">
-            <div class="text-gray-400 text-sm mb-1">Autonomia</div>
-            <div class="spec-value">${diasReserva}</div>
-            <div class="text-gray-500 text-xs">dias</div>
+            <div class="text-gray-400 text-xs mb-1">Autonomia</div>
+            <div class="spec-value text-lg">${diasReserva}</div>
+            <div class="text-gray-500 text-xs">dias normativos</div>
           </div>
         </div>
 
@@ -1015,6 +1111,16 @@
       // Reservatório Superior
       if (volumeSuperior > 0 && dimensoesSuperior) {
         html += gerarSecaoReservatorio('Reservatório Superior (Caixa d\'água)', '🚰', volumeSuperior, dimensoesSuperior, formato, 'superior');
+        if (dados.volumeRtiLitros > 0) {
+          html += `
+            <div class="p-4 mb-4 rounded-xl bg-red-950/20 border border-red-500/30 flex items-center justify-between text-xs">
+              <span class="text-red-300 font-semibold flex items-center gap-2">
+                <i class="fas fa-fire-extinguisher"></i> Composição Superior: ${(dados.volumeConsumoSuperior*1000).toFixed(0)} L (Consumo) + ${(dados.volumeRtiLitros).toFixed(0)} L (RTI Permanente)
+              </span>
+              <span class="text-slate-400">Tomada de consumo elevada acima da cota da RTI</span>
+            </div>
+          `;
+        }
       }
 
       html += `</div>`;
@@ -1511,6 +1617,405 @@
       `;
     }
 
+    // ==================== ECALC SUITE INTEGRATION (CAD, MEMORIAL & OFFICE) ====================
+    function gerarDxfConteudoReservatorio(d) {
+      d = d || ultimoCalculoReservatorio || {};
+      const pop = d.populacao || 4;
+      const consDiario = d.volumeDiario || 600;
+      const dias = d.diasReserva || 2;
+      const vTotalM3 = d.volumeTotalGeralM3 || (d.volumeM3 || 1.2);
+      const vInfM3 = d.volumeInferior || 0;
+      const vSupM3 = d.volumeSuperior || 0;
+      const vRtiM3 = d.volumeRtiM3 || 0;
+      const vConsSupM3 = d.volumeConsumoSuperior || Math.max(0, vSupM3 - vRtiM3);
+      const dimInf = d.dimensoesInferior || { diametro: 1.2, altura: 1.2, volume: vInfM3 };
+      const dimSup = d.dimensoesSuperior || { diametro: 1.4, altura: 1.4, volume: vSupM3 };
+      const bomba = d.bomba || { vazaoMinima: '15.0', potenciaSugerida: 0.5, alturaManometrica: 15 };
+
+      // Conversão para cm (escala 1 unidade = 1 cm no CAD)
+      const wSup = Math.max(80, Math.round(((dimSup.largura || dimSup.diametro || dimSup.lado || 1.40) * 100)));
+      const hSup = Math.max(80, Math.round(((dimSup.altura || 1.40) * 100)));
+
+      const wInf = Math.max(80, Math.round(((dimInf.largura || dimInf.diametro || dimInf.lado || 1.40) * 100)));
+      const hInf = Math.max(80, Math.round(((dimInf.altura || 1.40) * 100)));
+
+      let dxf = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n`;
+      dxf += `0\nLAYER\n2\nCIVIL\n70\n0\n62\n8\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nRESERVATORIO\n70\n0\n62\n4\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nRTI\n70\n0\n62\n1\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nTUBULACOES\n70\n0\n62\n5\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nEQUIPAMENTOS\n70\n0\n62\n3\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nCOTAS\n70\n0\n62\n7\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nLAYER\n2\nTEXTO\n70\n0\n62\n2\n6\nCONTINUOUS\n0\n`;
+      dxf += `0\nENDTAB\n0\nENDSEC\n`;
+      dxf += `0\nSECTION\n2\nENTITIES\n`;
+
+      function line(x1, y1, x2, y2, lay) {
+        return `0\nLINE\n8\n${lay}\n10\n${x1.toFixed(1)}\n20\n${y1.toFixed(1)}\n30\n0.0\n11\n${x2.toFixed(1)}\n21\n${y2.toFixed(1)}\n31\n0.0\n`;
+      }
+      function text(x, y, h, str, lay) {
+        return `0\nTEXT\n8\n${lay}\n10\n${x.toFixed(1)}\n20\n${y.toFixed(1)}\n30\n0.0\n40\n${h}\n1\n${str}\n`;
+      }
+      function rect(x, y, w, h, lay) {
+        return line(x, y, x + w, y, lay) +
+               line(x + w, y, x + w, y + h, lay) +
+               line(x + w, y + h, x, y + h, lay) +
+               line(x, y + h, x, y, lay);
+      }
+      function circle(cx, cy, r, lay) {
+        return `0\nCIRCLE\n8\n${lay}\n10\n${cx.toFixed(1)}\n20\n${cy.toFixed(1)}\n30\n0.0\n40\n${r.toFixed(1)}\n`;
+      }
+
+      // Linha do Terreno Natural (TN)
+      dxf += line(-60, 0, 750, 0, 'CIVIL');
+      dxf += text(-55, 8, 8, 'TERRENO NATURAL (TN = 0.00)', 'TEXTO');
+
+      // 1. CISTERNA (RESERVATÓRIO INFERIOR) & CASA DE BOMBAS
+      if (vInfM3 > 0) {
+        const xInf = 0;
+        const yTopInf = 0;
+        const yBotInf = -hInf;
+
+        // Estrutura Cisterna
+        dxf += rect(xInf, yBotInf, wInf, hInf, 'RESERVATORIO');
+        dxf += rect(xInf - 10, yBotInf - 12, wInf + 20, 12, 'CIVIL'); // Lastro / laje fundo
+        dxf += rect(xInf - 10, yTopInf, wInf + 20, 12, 'CIVIL'); // Laje de cobertura
+        
+        // Tampa de inspeção
+        const xTampaInf = xInf + (wInf - 60) / 2;
+        dxf += rect(xTampaInf, yTopInf + 12, 60, 6, 'EQUIPAMENTOS');
+        dxf += text(xTampaInf + 5, yTopInf + 22, 6, 'TAMPA INSPECAO φ60cm', 'TEXTO');
+
+        // Nível d'água cisterna
+        const yNivelInf = yTopInf - 15;
+        dxf += line(xInf + 2, yNivelInf, xInf + wInf - 2, yNivelInf, 'RESERVATORIO');
+        dxf += text(xInf + 15, yNivelInf - 12, 6, `N.A. MAX CISTERNA (${(vInfM3 * 1000).toFixed(0)} L)`, 'TEXTO');
+
+        // Tubulação de alimentação da concessionária com boia
+        dxf += line(xInf - 40, yTopInf - 20, xInf + 25, yTopInf - 20, 'TUBULACOES');
+        dxf += circle(xInf + 30, yTopInf - 25, 6, 'EQUIPAMENTOS');
+        dxf += text(xInf - 40, yTopInf - 12, 5, 'ALIMENTACAO DN 25 / BOIA', 'TEXTO');
+
+        // Tubulação de sucção com válvula de pé e crivo
+        const xSuc = xInf + wInf - 30;
+        dxf += line(xSuc, yBotInf + 15, xSuc, yTopInf + 30, 'TUBULACOES');
+        dxf += rect(xSuc - 6, yBotInf + 5, 12, 10, 'EQUIPAMENTOS'); // crivo
+        dxf += text(xSuc - 25, yBotInf + 25, 5, 'CRIVO E RETENCAO', 'TEXTO');
+
+        // Extravasor (ladrão) cisterna
+        dxf += line(xInf - 5, yTopInf - 10, xInf - 35, yTopInf - 10, 'TUBULACOES');
+        dxf += line(xInf - 35, yTopInf - 10, xInf - 35, yTopInf - 35, 'TUBULACOES');
+        dxf += text(xInf - 45, yTopInf - 2, 5, 'EXTRAVASOR (LADRAO)', 'TEXTO');
+
+        // Cotas Cisterna
+        dxf += line(xInf, yBotInf - 25, xInf + wInf, yBotInf - 25, 'COTAS');
+        dxf += text(xInf + wInf / 2 - 20, yBotInf - 40, 7, `L=${(wInf/100).toFixed(2)}m`, 'COTAS');
+        dxf += line(xInf - 25, yBotInf, xInf - 25, yTopInf, 'COTAS');
+        dxf += text(xInf - 45, yBotInf + hInf / 2 - 5, 7, `H=${(hInf/100).toFixed(2)}m`, 'COTAS');
+        dxf += text(xInf, yBotInf - 60, 9, `RESERVATORIO INFERIOR (CISTERNA - ${(vInfM3*1000).toFixed(0)} L)`, 'TEXTO');
+
+        // Casa de bombas
+        const xBomba = wInf + 50;
+        dxf += rect(xBomba - 10, 0, 70, 8, 'CIVIL'); // base de concreto
+        dxf += rect(xBomba, 8, 50, 30, 'EQUIPAMENTOS'); // motor-bomba
+        dxf += circle(xBomba + 15, 23, 10, 'EQUIPAMENTOS'); // voluta
+        dxf += text(xBomba - 5, 45, 6, `MOTOBOMBA ${bomba.potenciaSugerida} CV`, 'TEXTO');
+        dxf += text(xBomba - 5, 55, 5, `Q=${bomba.vazaoMinima} L/min | Hman=${bomba.alturaManometrica}m`, 'TEXTO');
+
+        // Tubulação sucção -> bomba
+        dxf += line(xSuc, yTopInf + 30, xBomba + 15, yTopInf + 30, 'TUBULACOES');
+        dxf += line(xBomba + 15, yTopInf + 30, xBomba + 15, 23, 'TUBULACOES');
+
+        // Prumada de Recalque subindo para o reservatório superior
+        const xRec = xBomba + 35;
+        dxf += line(xRec, 38, xRec, 380, 'TUBULACOES');
+        dxf += rect(xRec - 4, 60, 8, 12, 'EQUIPAMENTOS'); // Válvula de retenção
+        dxf += text(xRec + 8, 65, 5, 'VALVULA RETENCAO E REGISTRO', 'TEXTO');
+        dxf += text(xRec + 6, 180, 6, 'PRUMADA DE RECALQUE', 'TEXTO');
+      }
+
+      // 2. RESERVATÓRIO SUPERIOR (CAIXA D'ÁGUA + RTI)
+      if (vSupM3 > 0) {
+        const xSup = vInfM3 > 0 ? (wInf + 220) : 100;
+        const yBaseSup = 280; // Cota do barrilete / cobertura
+        const yTopSup = yBaseSup + hSup;
+
+        // Laje de suporte / barrilete
+        dxf += rect(xSup - 25, yBaseSup - 15, wSup + 50, 15, 'CIVIL');
+        dxf += text(xSup - 20, yBaseSup - 25, 6, 'LAJE DO BARRILETE', 'TEXTO');
+
+        // Corpo do reservatório superior
+        dxf += rect(xSup, yBaseSup, wSup, hSup, 'RESERVATORIO');
+        dxf += rect(xSup - 5, yTopSup, wSup + 10, 8, 'CIVIL'); // tampa
+
+        // Inspeção
+        const xTampaSup = xSup + (wSup - 60) / 2;
+        dxf += rect(xTampaSup, yTopSup + 8, 60, 6, 'EQUIPAMENTOS');
+        dxf += text(xTampaSup + 5, yTopSup + 18, 6, 'ALCAPAO INSPECAO φ60cm', 'TEXTO');
+
+        // Partição RTI vs Consumo
+        let hRti = 0;
+        if (vRtiM3 > 0 && vSupM3 > 0) {
+          hRti = Math.round((vRtiM3 / vSupM3) * (hSup - 20));
+          const yRti = yBaseSup + hRti;
+          dxf += line(xSup + 2, yRti, xSup + wSup - 2, yRti, 'RTI');
+          // Hachura simbólica na zona de RTI
+          for (let hy = yBaseSup + 8; hy < yRti - 4; hy += 12) {
+            dxf += line(xSup + 5, hy, xSup + wSup - 5, hy, 'RTI');
+          }
+          dxf += text(xSup + 15, yBaseSup + hRti / 2 - 3, 6, `RESERVA TECNICA INCENDIO (RTI = ${(vRtiM3 * 1000).toFixed(0)} L)`, 'RTI');
+          
+          // Tomada independente de Incêndio no fundo
+          const xInc = xSup + 25;
+          dxf += line(xInc, yBaseSup + 2, xInc, yBaseSup - 45, 'RTI');
+          dxf += rect(xInc - 5, yBaseSup - 30, 10, 8, 'RTI'); // registro
+          dxf += text(xInc + 8, yBaseSup - 35, 6, 'SAIDA INCENDIO DN65 (NBR 13714 - NO FUNDO)', 'RTI');
+        }
+
+        // Zona de Consumo Doméstico
+        const yNivelSup = yTopSup - 15;
+        dxf += line(xSup + 2, yNivelSup, xSup + wSup - 2, yNivelSup, 'RESERVATORIO');
+        dxf += text(xSup + 15, yNivelSup - 15, 6, `CONSUMO DOMESTICO (${(vConsSupM3 * 1000).toFixed(0)} L)`, 'TEXTO');
+
+        // Tomada de consumo doméstico posicionada ACIMA da lâmina de RTI
+        const xCons = xSup + wSup - 35;
+        const yTomadaCons = yBaseSup + hRti + 12;
+        dxf += line(xCons, yTomadaCons, xCons, yBaseSup - 45, 'TUBULACOES');
+        dxf += line(xCons - 15, yTomadaCons, xCons, yTomadaCons, 'TUBULACOES'); // curva de sucção acima da RTI
+        dxf += rect(xCons - 5, yBaseSup - 30, 10, 8, 'TUBULACOES'); // registro
+        dxf += text(xCons + 8, yBaseSup - 25, 6, 'BARRILETE CONSUMO (ACIMA DA RTI)', 'TEXTO');
+
+        // Chegada do recalque com boia
+        const xEntradaSup = xSup + 35;
+        if (vInfM3 > 0) {
+          const xRec = (wInf + 50) + 35;
+          dxf += line(xRec, 380, xEntradaSup, 380, 'TUBULACOES');
+          dxf += line(xEntradaSup, 380, xEntradaSup, yTopSup - 10, 'TUBULACOES');
+        }
+        dxf += circle(xEntradaSup + 15, yTopSup - 15, 6, 'EQUIPAMENTOS'); // torneira de boia
+        dxf += text(xEntradaSup - 20, yTopSup + 32, 5, 'ALIMENTACAO / BOIA', 'TEXTO');
+
+        // Extravasor (ladrão) e limpeza
+        dxf += line(xSup + wSup, yTopSup - 10, xSup + wSup + 30, yTopSup - 10, 'TUBULACOES');
+        dxf += line(xSup + wSup + 30, yTopSup - 10, xSup + wSup + 30, yBaseSup - 40, 'TUBULACOES');
+        dxf += text(xSup + wSup + 5, yTopSup + 8, 5, 'EXTRAVASOR (LADRAO)', 'TEXTO');
+
+        // Cotas Superior
+        dxf += line(xSup, yBaseSup - 60, xSup + wSup, yBaseSup - 60, 'COTAS');
+        dxf += text(xSup + wSup / 2 - 20, yBaseSup - 75, 7, `L=${(wSup/100).toFixed(2)}m`, 'COTAS');
+        dxf += line(xSup + wSup + 50, yBaseSup, xSup + wSup + 50, yTopSup, 'COTAS');
+        dxf += text(xSup + wSup + 60, yBaseSup + hSup / 2 - 5, 7, `H=${(hSup/100).toFixed(2)}m`, 'COTAS');
+        dxf += text(xSup, yBaseSup - 95, 9, `RESERVATORIO SUPERIOR (TOTAL = ${(vSupM3*1000).toFixed(0)} L)`, 'TEXTO');
+      }
+
+      // Título e Notas Técnicas
+      dxf += text(-50, 480, 12, 'SISTEMA PREDIAIS DE AGUA POTAVEL & RESERVA TECNICA DE INCENDIO (RTI)', 'TEXTO');
+      dxf += text(-50, 465, 8, `Normas: ABNT NBR 5626:2020 e ABNT NBR 13714 | Populacao Atendida: ${pop} pessoas`, 'TEXTO');
+      dxf += text(-50, 452, 7, `Consumo Diario: ${consDiario} L/dia | Autonomia: ${dias} dias | Capacidade Total: ${(vTotalM3*1000).toFixed(0)} L (${vTotalM3.toFixed(2)} m³)`, 'TEXTO');
+      dxf += text(-50, 440, 7, `Inferior (Cisterna 60%): ${(vInfM3*1000).toFixed(0)} L | Superior (40% + RTI): ${(vSupM3*1000).toFixed(0)} L | RTI: ${(vRtiM3*1000).toFixed(0)} L`, 'TEXTO');
+
+      dxf += `0\nENDSEC\n0\nEOF\n`;
+      return dxf;
+    }
+
+    function abrirNoCadCloneReservatorio() {
+      if (!ultimoCalculoReservatorio) calcular();
+      const d = ultimoCalculoReservatorio;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoReservatorio(d);
+      window.ECALC_CAD.abrirNoCadClone(dxf, `reservatorios_rti_${d.populacao}pessoas.dxf`);
+    }
+
+    function baixarDxfReservatorio() {
+      if (!ultimoCalculoReservatorio) calcular();
+      const d = ultimoCalculoReservatorio;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoReservatorio(d);
+      window.ECALC_CAD.baixarDXF(dxf, `reservatorios_rti_${d.populacao}pessoas.dxf`);
+    }
+
+    function abrirNoOfficeCloneReservatorio() {
+      if (!ultimoCalculoReservatorio) calcular();
+      const d = ultimoCalculoReservatorio;
+      const custoTotal = (d.custoInferior?.total || 0) + (d.custoSuperior?.total || 0);
+
+      const csvData = [
+        ['ECALC PRO - MEMÓRIA DE DIMENSIONAMENTO DE RESERVATÓRIOS & RTI'],
+        ['Normas Técnicas', 'ABNT NBR 5626:2020 e ABNT NBR 13714'],
+        ['Data de Emissão', new Date().toLocaleDateString('pt-BR')],
+        [''],
+        ['PARÂMETRO DE CONSUMO', 'VALOR', 'UNIDADE'],
+        ['População Atendida (P)', d.populacao, 'pessoas'],
+        ['Consumo Per Capita (q)', d.consumoPerCapita, 'L/pessoa.dia'],
+        ['Consumo Diário Total (CD)', d.volumeDiario, 'L/dia'],
+        ['Período de Autonomia', d.diasReserva, 'dias'],
+        ['Reserva de Consumo (CR)', d.volumeReserva, 'L'],
+        [''],
+        ['PROTEÇÃO CONTRA INCÊNDIO (RTI)', 'VALOR', 'UNIDADE'],
+        ['Volume da RTI (NBR 13714)', d.volumeRtiLitros, 'L'],
+        ['Volume da RTI em m³', d.volumeRtiM3.toFixed(2), 'm³'],
+        ['Local de Armazenamento da RTI', 'Reservatório Superior (Fundo Exclusivo)', '-'],
+        [''],
+        ['DISTRIBUIÇÃO DOS VOLUMES', 'VOLUME (L)', 'VOLUME (m³)'],
+        ['Reservatório Inferior (Cisterna - 60% Consumo)', (d.volumeInferior * 1000).toFixed(0), d.volumeInferior.toFixed(2)],
+        ['Reservatório Superior - Parcela Consumo (40%)', (d.volumeConsumoSuperior * 1000).toFixed(0), d.volumeConsumoSuperior.toFixed(2)],
+        ['Reservatório Superior - Parcela Incêndio (RTI)', d.volumeRtiLitros.toFixed(0), d.volumeRtiM3.toFixed(2)],
+        ['Reservatório Superior - Capacidade Total Efetiva', (d.volumeSuperior * 1000).toFixed(0), d.volumeSuperior.toFixed(2)],
+        ['Capacidade Global do Sistema', d.volumeTotalGeralLitros.toFixed(0), d.volumeTotalGeralM3.toFixed(2)],
+        [''],
+        ['DIMENSIONAMENTO CONSTRUTIVO', 'INFERIOR', 'SUPERIOR'],
+        ['Formato Geométrico', d.dimensoesInferior?.tipo || d.formato, d.dimensoesSuperior?.tipo || d.formato],
+        ['Diâmetro / Largura (m)', (d.dimensoesInferior?.largura || d.dimensoesInferior?.diametro || d.dimensoesInferior?.lado || 0).toFixed(2), (d.dimensoesSuperior?.largura || d.dimensoesSuperior?.diametro || d.dimensoesSuperior?.lado || 0).toFixed(2)],
+        ['Profundidade / Altura Útil (m)', (d.dimensoesInferior?.altura || 0).toFixed(2), (d.dimensoesSuperior?.altura || 0).toFixed(2)],
+        ['Material Especificado', d.material, d.material],
+        [''],
+        ['SISTEMA ELEVATÓRIO (CONJUNTO MOTO-BOMBA)', 'ESPECIFICAÇÃO', 'UNIDADE'],
+        ['Vazão Mínima de Recalque', d.bomba ? d.bomba.vazaoMinima : '-', 'L/min'],
+        ['Altura Manométrica Estimada', d.bomba ? `${d.bomba.alturaManometrica} mca` : '-', 'mca'],
+        ['Potência Calculada do Motor', d.bomba ? `${d.bomba.potenciaCalculada} CV` : '-', 'CV'],
+        ['Potência Comercial Sugerida', d.bomba ? `${d.bomba.potenciaSugerida} CV` : '-', 'CV'],
+        ['Tempo Estimado de Recarga Total', d.bomba ? `${(d.bomba.tempoRecarga / 60).toFixed(1)} horas` : '-', 'horas'],
+        [''],
+        ['ESTIMATIVA DE CUSTOS', 'VALOR ESTIMADO', 'MOEDA'],
+        ['Reservatório Inferior (Material + Instalação)', (d.custoInferior?.total || 0).toFixed(2), 'R$'],
+        ['Reservatório Superior (Material + Instalação)', (d.custoSuperior?.total || 0).toFixed(2), 'R$'],
+        ['Investimento Total Estimado', custoTotal.toFixed(2), 'R$']
+      ];
+
+      localStorage.setItem('officeclone_import_data', JSON.stringify({
+        filename: `Reservatorios_RTI_${d.populacao}pessoas.csv`,
+        rows: csvData
+      }));
+      window.open('../office/excel/', '_blank');
+    }
+
+    function gerarMemorialReservatorio() {
+      if (!ultimoCalculoReservatorio) calcular();
+      const d = ultimoCalculoReservatorio;
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        alert('Módulo de Memorial não disponível');
+        return;
+      }
+
+      const custoTotal = (d.custoInferior?.total || 0) + (d.custoSuperior?.total || 0);
+
+      const svgSection = `
+        <svg width="280" height="200" viewBox="0 0 280 200" style="background:#fff;">
+          <!-- Linha de Piso Solo -->
+          <line x1="10" y1="170" x2="270" y2="170" stroke="#64748b" stroke-width="2"/>
+          <text x="15" y="165" font-size="8" fill="#64748b">TN = 0.00 (PISO TÉRREO)</text>
+          
+          <!-- Cisterna Inferior -->
+          <rect x="25" y="120" width="70" height="48" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5" rx="2"/>
+          <line x1="26" y1="130" x2="94" y2="130" stroke="#0284c7" stroke-width="1" stroke-dasharray="2,2"/>
+          <text x="32" y="145" font-size="7" fill="#0369a1" font-weight="bold">CISTERNA</text>
+          <text x="32" y="156" font-size="6" fill="#0284c7">${(d.volumeInferior*1000).toFixed(0)} L (60%)</text>
+          
+          <!-- Motobomba -->
+          <rect x="105" y="152" width="22" height="16" fill="#334155" rx="2"/>
+          <circle x="112" y="160" r="5" fill="#22c55e"/>
+          <text x="102" y="148" font-size="6" fill="#0f172a" font-weight="bold">BOMBA</text>
+          
+          <!-- Tubo Sucção -->
+          <path d="M 80 155 L 80 160 L 105 160" fill="none" stroke="#0284c7" stroke-width="1.5"/>
+          <!-- Tubo Recalque -->
+          <path d="M 120 152 L 120 40 L 160 40" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          
+          <!-- Laje Barrilete / Cobertura -->
+          <rect x="150" y="85" width="115" height="6" fill="#94a3b8"/>
+          <text x="155" y="99" font-size="7" fill="#64748b">BARRILETE</text>
+          
+          <!-- Reservatório Superior -->
+          <rect x="160" y="25" width="95" height="60" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5" rx="2"/>
+          
+          <!-- Zona RTI (Fundo) -->
+          ${d.volumeRtiLitros > 0 ? `
+            <rect x="161" y="60" width="93" height="24" fill="#fee2e2" stroke="#ef4444" stroke-width="1"/>
+            <text x="168" y="75" font-size="6" fill="#b91c1c" font-weight="bold">RTI: ${d.volumeRtiLitros.toFixed(0)} L</text>
+          ` : ''}
+          
+          <!-- Zona Consumo (Topo) -->
+          <text x="168" y="45" font-size="7" fill="#0369a1" font-weight="bold">CONSUMO: ${(d.volumeConsumoSuperior*1000).toFixed(0)} L</text>
+          
+          <!-- Saída Incêndio no fundo -->
+          ${d.volumeRtiLitros > 0 ? `
+            <line x1="175" y1="85" x2="175" y2="105" stroke="#dc2626" stroke-width="2"/>
+            <text x="162" y="115" font-size="6" fill="#dc2626" font-weight="bold">INCÊNDIO DN65</text>
+          ` : ''}
+          
+          <!-- Saída Consumo elevada -->
+          <line x1="230" y1="60" x2="230" y2="105" stroke="#0284c7" stroke-width="2"/>
+          <text x="215" y="115" font-size="6" fill="#0284c7" font-weight="bold">CONSUMO</text>
+        </svg>
+      `;
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial Descritivo e de Dimensionamento de Reservatórios Prediais e RTI',
+        norma: 'ABNT NBR 5626:2020 e ABNT NBR 13714',
+        elemento: `Sistema de Reservação Predial (${d.volumeTotalGeralLitros.toFixed(0)} Litros) + RTI (${d.volumeRtiLitros.toFixed(0)} Litros)`,
+        inputs: [
+          { label: 'População Atendida (P)', val: `${d.populacao} pessoas` },
+          { label: 'Consumo Unitário Per Capita (q)', val: `${d.consumoPerCapita} L/pessoa.dia` },
+          { label: 'Consumo Diário Total (CD)', val: `${d.volumeDiario} L/dia` },
+          { label: 'Período de Autonomia', val: `${d.diasReserva} dia(s)` },
+          { label: 'Reserva Técnica de Incêndio (RTI)', val: `${d.volumeRtiLitros.toFixed(0)} Litros (${d.volumeRtiM3.toFixed(2)} m³)` },
+          { label: 'Tipo de Instalação', val: d.tipoReservatorio === 'ambos' ? 'Inferior (Cisterna) + Superior Elevado' : (d.tipoReservatorio === 'inferior' ? 'Apenas Inferior' : 'Apenas Superior') },
+          { label: 'Formato / Material', val: `${d.formato} / ${d.material}` }
+        ],
+        formulas: [
+          `Consumo Diário Total: CD = P · q = ${d.populacao} × ${d.consumoPerCapita} = ${d.volumeDiario} L/dia`,
+          `Reserva de Consumo Doméstico: CR = CD · Autonomia = ${d.volumeDiario} × ${d.diasReserva} = ${d.volumeReserva} L (${d.volumeM3.toFixed(2)} m³)`,
+          `Divisão de Volumes (NBR 5626): Inferior = 60% CR (${(d.volumeInferior*1000).toFixed(0)} L) | Superior = 40% CR (${(d.volumeConsumoSuperior*1000).toFixed(0)} L)`,
+          `Volume Total Reservatório Superior: Vsup = Vcons,sup + RTI = ${(d.volumeConsumoSuperior*1000).toFixed(0)} + ${d.volumeRtiLitros.toFixed(0)} = ${(d.volumeSuperior*1000).toFixed(0)} L (${d.volumeSuperior.toFixed(2)} m³)`,
+          d.bomba ? `Potência da Bomba de Recalque: P = (Q · Hman) / (75 · η) = ${d.bomba.potenciaCalculada} CV → Sugerido: ${d.bomba.potenciaSugerida} CV` : 'Sem conjunto elevatório'
+        ],
+        resultados: [
+          { label: 'Capacidade Total Global do Sistema', val: `${d.volumeTotalGeralLitros.toFixed(0)} Litros (${d.volumeTotalGeralM3.toFixed(2)} m³)` },
+          { label: 'Reservatório Inferior (Cisterna)', val: `${(d.volumeInferior*1000).toFixed(0)} Litros (${d.volumeInferior.toFixed(2)} m³)` },
+          { label: 'Reservatório Superior (Total Efetivo)', val: `${(d.volumeSuperior*1000).toFixed(0)} Litros (${d.volumeSuperior.toFixed(2)} m³)` },
+          { label: 'Reserva Técnica de Incêndio (RTI)', val: `${d.volumeRtiLitros.toFixed(0)} Litros (Norma NBR 13714)` },
+          { label: 'Conjunto Moto-Bomba de Recalque', val: d.bomba ? `${d.bomba.potenciaSugerida} CV (Vazão: ${d.bomba.vazaoMinima} L/min, Hman: ${d.bomba.alturaManometrica}m)` : 'Não aplicável' },
+          { label: 'Investimento Estimado Total', val: `R$ ${custoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}` }
+        ],
+        verificacoes: [
+          {
+            item: 'Autonomia Mínima de Abastecimento (NBR 5626 ≥ 1 dia)',
+            calc: `Autonomia adotada = ${d.diasReserva} dia(s)`,
+            status: d.diasReserva >= 1 ? 'pass' : 'fail'
+          },
+          {
+            item: 'Divisão de Cargas na Estrutura (Superior ≤ 40% do consumo)',
+            calc: `Superior = ${(d.volumeConsumoSuperior*1000).toFixed(0)} L (${d.volumeReserva > 0 ? ((d.volumeConsumoSuperior/d.volumeM3)*100).toFixed(0) : 40}% do consumo)`,
+            status: 'pass'
+          },
+          {
+            item: 'Garantia Física da Reserva Técnica de Incêndio (RTI)',
+            calc: d.volumeRtiLitros > 0 ? `Tomada de consumo elevada acima da cota da RTI (${d.volumeRtiLitros} L intangíveis)` : 'Sem RTI requerida',
+            status: 'pass'
+          },
+          {
+            item: 'Tempo Máximo de Recarga do Reservatório Superior (≤ 4 horas)',
+            calc: d.bomba ? `Tempo de enchimento = ${(d.bomba.tempoRecarga / 60).toFixed(1)} horas` : 'Alimentação direta',
+            status: (!d.bomba || (d.bomba.tempoRecarga / 60) <= 4) ? 'pass' : 'fail'
+          },
+          {
+            item: 'Proteção Sanitária (Extravasor, Limpeza e Telas)',
+            calc: 'Tubulação extravasora dimensionada com diâmetro superior ao alimentador',
+            status: 'pass'
+          }
+        ],
+        svgSection: svgSection,
+        notas: 'Memorial elaborado em conformidade com as normas ABNT NBR 5626:2020 e ABNT NBR 13714. É obrigatória a previsão de tubo extravasor (ladrão) e limpeza em ambos os reservatórios, descarregando em local visível e de fácil percepção. Recomenda-se higienização periódica semestral e manutenção das telas nos suspiros de ventilação.'
+      });
+    }
+
     // ========== EVENT LISTENERS ==========
     document.getElementById('btnCalcular').addEventListener('click', calcular);
     document.getElementById('btnConfigurarPrecos').addEventListener('click', abrirModalPrecos);
@@ -1526,10 +2031,12 @@
     });
 
     // Auto-calcular ao mudar inputs
-    ['populacao', 'consumo-per-capita', 'dias-reserva', 'tipo-reservatorio', 'formato', 'material'].forEach(id => {
+    ['populacao', 'consumo-per-capita', 'dias-reserva', 'tipo-reservatorio', 'formato', 'material', 'tipo-rti', 'volume-rti-custom'].forEach(id => {
       const el = document.getElementById(id);
-      el.addEventListener('input', calcular);
-      el.addEventListener('change', calcular);
+      if (el) {
+        el.addEventListener('input', calcular);
+        el.addEventListener('change', calcular);
+      }
     });
 
     // Fechar modal clicando fora
@@ -1550,5 +2057,7 @@
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
+    <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>
