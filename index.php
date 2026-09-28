@@ -754,11 +754,15 @@ $v = time();
             </a>
 
             <!-- SafeWork Pro - Segurança do Trabalho -->
-            <a href="seguranca/index.php" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.82s;">
-                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Segurança</span>
-                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">🛡️</div>
-                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">SafeWork Pro</h2>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Geração de PGR (NR-01), PCMAT (NR-18), APR, Termos de EPI e Certificados.</p>
+            <a href="seguranca/index.php" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.82s;">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/safework.webp" type="image/webp">
+                    <img src="assets/cards/safework.jpg" alt="SafeWork Pro" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>SafeWork Pro</h2>
+                    <p>Geração de PGR (NR-01), PCMAT (NR-18), APR, Termos de EPI e Certificados.</p>
+                </div>
             </a>
 
             <!-- Gerador de Contratos -->
