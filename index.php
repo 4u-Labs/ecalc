@@ -333,6 +333,15 @@ $v = time();
             border-radius: 24px;
         }
 
+        /* Enforce complete hiding when filtered */
+        .tool-card.is-hidden,
+        .tool-card.hidden,
+        .tool-card-image.is-hidden,
+        .tool-card-image.hidden,
+        .tool-card[style*="display: none"] {
+            display: none !important;
+        }
+
         .tool-card-image img {
             width: 100%;
             height: 100%;
@@ -466,10 +475,10 @@ $v = time();
         </div>
     </header>
 
-    <!-- Hero Showcase Section with Banner -->
-    <section class="relative px-4 pt-6 pb-8 text-center max-w-6xl mx-auto animate-fade-in opacity-0" style="animation-delay: 0.15s;">
-        <!-- Banner Showcase Card -->
-        <div class="relative mx-auto mb-8 max-w-5xl">
+    <!-- Hero Showcase Section with Banner (Width matches Cards Grid) -->
+    <section class="container mx-auto px-4 pt-6 pb-8 text-center animate-fade-in opacity-0" style="animation-delay: 0.15s;">
+        <!-- Banner Showcase Card (w-full to span the entire container width) -->
+        <div class="relative w-full mx-auto mb-8">
             <div class="hero-banner-glow"></div>
             <div class="hero-banner-wrapper">
                 <div class="hero-banner-inner">
@@ -507,8 +516,8 @@ $v = time();
             </span>
         </div>
 
-        <!-- 6 Interactive Feature Pillars (Directly from the Banner Badges!) -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 max-w-5xl mx-auto mb-6">
+        <!-- 6 Interactive Feature Pillars (w-full to match container width) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 w-full mx-auto mb-6">
             <button type="button" class="feature-pillar group" data-feature-action="formula">
                 <span class="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">🧮</span>
                 <span class="text-xs font-bold text-slate-200 group-hover:text-cyan-300 block">57+ Fórmulas</span>
@@ -542,8 +551,8 @@ $v = time();
         </div>
     </section>
 
-    <!-- Search and Category Filter Section -->
-    <div class="px-4 pb-10 animate-fade-in opacity-0" style="animation-delay: 0.25s;" id="searchSection">
+    <!-- Search and Category Filter Section (Container width matches Cards Grid) -->
+    <div class="container mx-auto px-4 pb-10 animate-fade-in opacity-0" style="animation-delay: 0.25s;" id="searchSection">
         <div class="max-w-2xl mx-auto relative mb-6">
             <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                 <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -557,13 +566,23 @@ $v = time();
 
         <!-- Filter Category Buttons -->
         <div class="flex flex-wrap justify-center gap-2 md:gap-3 max-w-4xl mx-auto category-filters">
-            <button class="filter-btn active px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide" data-filter="all">Todas (<span id="toolCount">41</span>)</button>
+            <button class="filter-btn active px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide" data-filter="all">Todas</button>
             <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="estrutural">🏗️ Estrutural</button>
             <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="hidraulica">💧 Hidráulica</button>
             <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="materiais">🧱 Materiais</button>
             <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="eletrica">⚡ Elétrica</button>
             <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="orcamento">💰 Orçamento</button>
             <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="outros">🛠️ Outros & Gestão</button>
+        </div>
+
+        <!-- Result Status Counter Badge -->
+        <div class="text-center mt-5">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/60 text-xs text-slate-300">
+                <span>Exibindo</span>
+                <span id="toolCount" class="font-['Orbitron'] font-bold text-cyan-400 text-sm">41</span>
+                <span>ferramentas</span>
+                <span id="activeFilterLabel" class="text-slate-400 font-medium hidden"></span>
+            </span>
         </div>
     </div>
 
@@ -1080,15 +1099,25 @@ $v = time();
         const filterBtns = document.querySelectorAll('.filter-btn');
         const noResults = document.getElementById('noResults');
         const toolCountSpan = document.getElementById('toolCount');
+        const activeFilterLabel = document.getElementById('activeFilterLabel');
+
+        function normalizeText(str) {
+            return (str || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim();
+        }
 
         function filterTools() {
-            const term = searchInput.value.toLowerCase().trim();
+            const rawTerm = searchInput ? searchInput.value : '';
+            const term = normalizeText(rawTerm);
             const activeFilterBtn = document.querySelector('.filter-btn.active');
             const category = activeFilterBtn ? activeFilterBtn.dataset.filter : 'all';
             let count = 0;
 
             if (clearSearchBtn) {
-                if (term.length > 0) {
+                if (rawTerm.trim().length > 0) {
                     clearSearchBtn.classList.remove('hidden');
                 } else {
                     clearSearchBtn.classList.add('hidden');
@@ -1096,25 +1125,44 @@ $v = time();
             }
 
             toolCards.forEach(card => {
-                const title = (card.querySelector('h2')?.textContent || '').toLowerCase();
-                const desc = (card.querySelector('p')?.textContent || '').toLowerCase();
-                const cardCat = card.dataset.category || '';
+                const title = normalizeText(card.querySelector('h2')?.textContent || card.querySelector('img')?.alt || '');
+                const desc = normalizeText(card.querySelector('p')?.textContent || '');
+                const cardCat = (card.dataset.category || '').toLowerCase();
                 
                 const matchesSearch = term === '' || title.includes(term) || desc.includes(term);
-                const matchesCategory = category === 'all' || cardCat === category || cardCat.includes(category);
+                const catList = cardCat.split(/\s+/);
+                const matchesCategory = category === 'all' || catList.includes(category);
 
                 if (matchesSearch && matchesCategory) {
-                    card.classList.remove('hidden', 'absolute');
-                    card.classList.add('flex');
+                    card.classList.remove('hidden', 'is-hidden', 'absolute');
+                    card.style.setProperty('display', 'flex', 'important');
+                    card.style.opacity = '1';
                     count++;
                 } else {
-                    card.classList.add('hidden', 'absolute');
-                    card.classList.remove('flex');
+                    card.classList.add('hidden', 'is-hidden');
+                    card.classList.remove('absolute');
+                    card.style.setProperty('display', 'none', 'important');
                 }
             });
 
             if (toolCountSpan) {
                 toolCountSpan.textContent = count;
+            }
+
+            if (activeFilterLabel) {
+                let labelParts = [];
+                if (category !== 'all' && activeFilterBtn) {
+                    labelParts.push(`em ${activeFilterBtn.textContent.trim()}`);
+                }
+                if (rawTerm.trim() !== '') {
+                    labelParts.push(`para "${rawTerm.trim()}"`);
+                }
+                if (labelParts.length > 0) {
+                    activeFilterLabel.textContent = labelParts.join(' ');
+                    activeFilterLabel.classList.remove('hidden');
+                } else {
+                    activeFilterLabel.classList.add('hidden');
+                }
             }
             
             if (count === 0) {
