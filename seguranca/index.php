@@ -2619,5 +2619,7 @@ if (empty($_SESSION['api_token'])) {
             });
         }
     </script>
+    <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
+    <script src="../assets/suite/suite-nav.js"></script>
 </body>
 </html>

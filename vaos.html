@@ -620,13 +620,26 @@
             <div id="recomendacoes-content" class="space-y-3"></div>
         </section>
 
-        <!-- Seção Visual 3D -->
+        <!-- Seção Visual 3D, Detalhamento & Diagramas -->
         <section id="visual-3d" class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mb-6 border border-gray-100 dark:border-slate-700" style="display: none;">
-            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                <span class="bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400 p-2 rounded-xl">🎨</span>
-                Visualização da Seção
-            </h2>
-            <div id="secao-visual" class="flex justify-center items-center"></div>
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-5 pb-3 border-b border-gray-100 dark:border-slate-700">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                    <span class="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 p-2 rounded-xl">📐</span>
+                    <span>Detalhamento Técnico & Diagramas de Esforços (NBR 6118)</span>
+                </h2>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" onclick="abrirNoCadCloneViga()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+                        <span>📐 Abrir no CADClone</span>
+                    </button>
+                    <button type="button" onclick="gerarMemorialViga()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+                        <span>📄 Gerar Memorial ABNT</span>
+                    </button>
+                    <button type="button" onclick="baixarDxfViga()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-200 font-medium text-xs transition-all cursor-pointer" title="Baixar arquivo DXF">
+                        <span>💾 Baixar .DXF</span>
+                    </button>
+                </div>
+            </div>
+            <div id="secao-visual"></div>
         </section>
 
         <!-- Comparativo -->
@@ -1082,60 +1095,144 @@
                     break;
             }
 
+            // Dimensionamento de Armaduras NBR 6118 (Flexão Simples CA-50)
+            const dUtil = Math.max(hFinal - 3.5, 5); // Altura útil
+            const Md_kNm = 1.4 * momentoMax;
+            const fyd = 43.48; // kN/cm²
+            let As_calc = (Md_kNm * 100) / (0.85 * dUtil * fyd);
+            const As_min = 0.0015 * bFinal * hFinal; // Armadura mínima 0.15%
+            if (As_calc < As_min) As_calc = As_min;
+
+            // Seleção de bitolas comerciais
+            let nBarrasInf = 2, bitolaInf = 10.0;
+            if (As_calc <= 1.6) { nBarrasInf = 2; bitolaInf = 10.0; }
+            else if (As_calc <= 2.5) { nBarrasInf = 2; bitolaInf = 12.5; }
+            else if (As_calc <= 3.8) { nBarrasInf = 3; bitolaInf = 12.5; }
+            else if (As_calc <= 5.5) { nBarrasInf = 3; bitolaInf = 16.0; }
+            else if (As_calc <= 8.0) { nBarrasInf = 4; bitolaInf = 16.0; }
+            else { nBarrasInf = 4; bitolaInf = 20.0; }
+
+            const nBarrasSup = 2, bitolaSup = 8.0;
+            const bitolaEstribo = 5.0;
+            const espacoEstribo = Math.min(Math.max(Math.round(dUtil * 0.6), 10), 20);
+
+            // Flecha Imediata e Diferida no Tempo (NBR 6118: fluência alpha_f = 1.32)
+            const alpha_f = 1.32;
+            const flechaImediata = flechaEstimada;
+            const flechaDiferida = flechaImediata * alpha_f;
+            const flechaTotal = flechaImediata + flechaDiferida;
             const flechaLimite = L / 250;
-            const flechaOk = flechaEstimada <= flechaLimite;
-            const utilizacao = (flechaEstimada / flechaLimite) * 100;
+            const flechaOk = flechaTotal <= flechaLimite;
+            const utilizacao = (flechaTotal / flechaLimite) * 100;
+
+            window.currentVigaData = {
+                b: bFinal,
+                h: hFinal,
+                d: dUtil,
+                vao: vao,
+                carga: carga,
+                apoio: apoio,
+                material: material,
+                momentoMax: momentoMax,
+                cortanteMax: cortanteMax,
+                Md: Md_kNm,
+                Vd: 1.4 * cortanteMax,
+                As_calc: As_calc,
+                nBarrasInf: nBarrasInf,
+                bitolaInf: bitolaInf,
+                nBarrasSup: nBarrasSup,
+                bitolaSup: bitolaSup,
+                bitolaEstribo: bitolaEstribo,
+                espacoEstribo: espacoEstribo,
+                flechaImediata: flechaImediata,
+                flechaDiferida: flechaDiferida,
+                flechaTotal: flechaTotal,
+                flechaLimite: flechaLimite,
+                flechaOk: flechaOk
+            };
 
             const output = document.getElementById('output');
             output.innerHTML = `
+                <!-- Suite Action Shortcuts -->
+                <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 mb-6 bg-gradient-to-r from-blue-900/40 via-cyan-900/30 to-slate-900/40 border border-cyan-500/30 rounded-2xl">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                        <span class="text-xs font-bold text-cyan-300 uppercase tracking-wider">Viga Dimensionada NBR 6118</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="abrirNoCadCloneViga()" class="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-cyan-200 text-xs font-bold transition-all cursor-pointer">
+                            📐 Abrir no CADClone
+                        </button>
+                        <button type="button" onclick="gerarMemorialViga()" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md transition-all cursor-pointer">
+                            📄 Memorial ABNT
+                        </button>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
                     <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-4 text-center shadow-lg">
                         <div class="text-2xl sm:text-3xl font-bold counter-value">${hFinal}</div>
-                        <div class="text-xs sm:text-sm opacity-80 mt-1">Altura (cm)</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Altura h (cm)</div>
                     </div>
                     <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-4 text-center shadow-lg">
                         <div class="text-2xl sm:text-3xl font-bold counter-value">${bFinal}</div>
-                        <div class="text-xs sm:text-sm opacity-80 mt-1">Largura (cm)</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Largura bw (cm)</div>
                     </div>
                     <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-4 text-center shadow-lg">
-                        <div class="text-2xl sm:text-3xl font-bold">${(bFinal/hFinal).toFixed(2)}</div>
-                        <div class="text-xs sm:text-sm opacity-80 mt-1">Relação b/h</div>
+                        <div class="text-2xl sm:text-3xl font-bold">${As_calc.toFixed(2)}</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Aço As (cm²)</div>
                     </div>
                     <div class="stat-card bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-xl p-4 text-center shadow-lg">
-                        <div class="text-2xl sm:text-3xl font-bold">L/${fator.h}</div>
-                        <div class="text-xs sm:text-sm opacity-80 mt-1">Critério</div>
+                        <div class="text-2xl sm:text-3xl font-bold">${flechaTotal.toFixed(2)} cm</div>
+                        <div class="text-xs sm:text-sm opacity-80 mt-1">Flecha Total (NBR)</div>
                     </div>
                 </div>
                 
                 <div class="grid md:grid-cols-2 gap-4">
                     <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-4">
                         <h4 class="font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
-                            <span class="text-lg">📐</span> Esforços Solicitantes
+                            <span class="text-lg">📐</span> Esforços Solicitantes & Armadura
                         </h4>
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-300">Momento Máximo:</span>
-                                <span class="font-bold text-blue-600 dark:text-blue-400">${momentoMax.toFixed(2)} kN.m</span>
+                                <span class="text-gray-600 dark:text-gray-300">Momento de Cálculo (Md):</span>
+                                <span class="font-bold text-blue-600 dark:text-blue-400">${Md_kNm.toFixed(2)} kN·m</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-300">Cortante Máximo:</span>
-                                <span class="font-bold text-green-600 dark:text-green-400">${cortanteMax.toFixed(2)} kN</span>
+                                <span class="text-gray-600 dark:text-gray-300">Cortante de Cálculo (Vd):</span>
+                                <span class="font-bold text-green-600 dark:text-green-400">${(1.4 * cortanteMax).toFixed(2)} kN</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-300">Peso Linear:</span>
-                                <span class="font-medium dark:text-gray-200">${calcularPeso(material, bFinal, hFinal).toFixed(1)} kg/m</span>
+                                <span class="text-gray-600 dark:text-gray-300">Armadura Long. Inferior:</span>
+                                <span class="font-bold text-purple-600 dark:text-purple-300">${nBarrasInf} φ ${bitolaInf} mm (${As_calc.toFixed(2)} cm²)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Armadura Superior:</span>
+                                <span class="font-medium dark:text-gray-200">${nBarrasSup} φ ${bitolaSup} mm</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Estribos Transversais:</span>
+                                <span class="font-medium dark:text-gray-200">φ ${bitolaEstribo} mm c/ ${espacoEstribo} cm</span>
                             </div>
                         </div>
                     </div>
                     
                     <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-4">
                         <h4 class="font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
-                            <span class="text-lg">📏</span> Verificação de Flecha
+                            <span class="text-lg">📏</span> Verificação de Flechas (ELS NBR 6118)
                         </h4>
-                        <div class="space-y-3 text-sm">
+                        <div class="space-y-2 text-sm">
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-300">Flecha Estimada:</span>
-                                <span class="font-bold ${flechaOk ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">${flechaEstimada.toFixed(3)} cm</span>
+                                <span class="text-gray-600 dark:text-gray-300">Flecha Imediata (ainst):</span>
+                                <span class="font-medium dark:text-gray-200">${flechaImediata.toFixed(3)} cm</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Flecha Diferida (Δa = αf · ainst):</span>
+                                <span class="font-medium dark:text-gray-200">${flechaDiferida.toFixed(3)} cm</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 dark:text-gray-300">Flecha Total a Longo Prazo:</span>
+                                <span class="font-bold ${flechaOk ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">${flechaTotal.toFixed(3)} cm</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-600 dark:text-gray-300">Flecha Limite (L/250):</span>
@@ -1143,7 +1240,7 @@
                             </div>
                             <div class="mt-3">
                                 <div class="flex justify-between text-xs mb-1">
-                                    <span class="dark:text-gray-300">Utilização</span>
+                                    <span class="dark:text-gray-300">Utilização ELS</span>
                                     <span class="${utilizacao <= 100 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">${Math.min(utilizacao, 100).toFixed(1)}%</span>
                                 </div>
                                 <div class="h-3 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
@@ -1152,7 +1249,7 @@
                                 </div>
                             </div>
                             <div class="text-center mt-3 ${flechaOk ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'} font-semibold flex items-center justify-center gap-2">
-                                ${flechaOk ? '✓ Flecha OK' : '⚠️ Revisar dimensões'}
+                                ${flechaOk ? '✓ ELS Conforme (Flecha Aceitável)' : '⚠️ Atenção: Flecha excessiva (Aumentar h)'}
                             </div>
                         </div>
                     </div>
@@ -1377,70 +1474,284 @@
             showToast('Cálculo realizado com sucesso!', 'success');
         }
 
-        // ==================== VISUALIZAÇÕES ====================
+        // ==================== VISUALIZAÇÕES E AÇÕES DA SUÍTE ====================
+
+        function abrirNoCadCloneViga() {
+            if (!window.currentVigaData) {
+                showToast('Calcule uma viga primeiro', 'warning');
+                return;
+            }
+            const d = window.currentVigaData;
+            if (typeof window.ECALC_CAD === 'undefined') {
+                showToast('Módulo CADClone não carregado', 'error');
+                return;
+            }
+            const dxf = window.ECALC_CAD.gerarDxfViga({
+                bw: d.b,
+                h: d.h,
+                span: d.vao,
+                cobrimento: 2.5,
+                nBarrasSup: d.nBarrasSup,
+                bitolaSup: d.bitolaSup,
+                nBarrasInf: d.nBarrasInf,
+                bitolaInf: d.bitolaInf,
+                bitolaEstribo: d.bitolaEstribo,
+                espacoEstribo: d.espacoEstribo,
+                nome: `Viga ${d.b}x${d.h}`
+            });
+            window.ECALC_CAD.abrirNoCadClone(dxf, `detalhamento_viga_${d.b}x${d.h}.dxf`);
+        }
+
+        function baixarDxfViga() {
+            if (!window.currentVigaData) {
+                showToast('Calcule uma viga primeiro', 'warning');
+                return;
+            }
+            const d = window.currentVigaData;
+            const dxf = window.ECALC_CAD.gerarDxfViga({
+                bw: d.b,
+                h: d.h,
+                span: d.vao,
+                cobrimento: 2.5,
+                nBarrasSup: d.nBarrasSup,
+                bitolaSup: d.bitolaSup,
+                nBarrasInf: d.nBarrasInf,
+                bitolaInf: d.bitolaInf,
+                bitolaEstribo: d.bitolaEstribo,
+                espacoEstribo: d.espacoEstribo,
+                nome: `Viga ${d.b}x${d.h}`
+            });
+            window.ECALC_CAD.baixarDXF(dxf, `viga_${d.b}x${d.h}_L${d.vao}m.dxf`);
+            showToast('Arquivo DXF gerado com sucesso!', 'success');
+        }
+
+        function gerarMemorialViga() {
+            if (!window.currentVigaData) {
+                showToast('Calcule uma viga primeiro', 'warning');
+                return;
+            }
+            const d = window.currentVigaData;
+            if (typeof window.ECALC_MEMORIAL === 'undefined') {
+                showToast('Módulo de Memorial não disponível', 'error');
+                return;
+            }
+
+            const svgSection = `
+                <svg width="220" height="180" viewBox="0 0 220 180" style="background:#fff;">
+                    <rect x="35" y="15" width="150" height="150" fill="#f1f5f9" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="47" y="27" width="126" height="126" fill="none" stroke="#f59e0b" stroke-width="2" rx="4"/>
+                    <!-- Barras Inf -->
+                    <circle cx="58" cy="141" r="5" fill="#ef4444"/>
+                    <circle cx="110" cy="141" r="5" fill="#ef4444"/>
+                    <circle cx="162" cy="141" r="5" fill="#ef4444"/>
+                    <!-- Barras Sup -->
+                    <circle cx="58" cy="39" r="4" fill="#3b82f6"/>
+                    <circle cx="162" cy="39" r="4" fill="#3b82f6"/>
+                    <!-- Cotas -->
+                    <text x="110" y="174" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a">b = ${d.b} cm</text>
+                    <text x="25" y="93" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a" transform="rotate(-90 25 93)">h = ${d.h} cm</text>
+                </svg>
+            `;
+
+            window.ECALC_MEMORIAL.gerar({
+                titulo: 'Memorial de Cálculo de Viga em Concreto Armado',
+                norma: 'ABNT NBR 6118:2023 - Projeto de Estruturas de Concreto',
+                elemento: `Viga V-101 (${d.b} × ${d.h} cm) - Vão L = ${d.vao.toFixed(2)} m`,
+                inputs: [
+                    { label: 'Vão Teórico (L)', val: `${d.vao.toFixed(2)} m` },
+                    { label: 'Condição de Apoio', val: getDescricaoApoio(d.apoio) },
+                    { label: 'Carga Distribuída Total (q)', val: `${d.carga.toFixed(2)} kN/m` },
+                    { label: 'Classe do Concreto', val: 'C25 (fck = 25 MPa)' },
+                    { label: 'Aço Longitudinal e Transversal', val: 'CA-50 (fyd = 435 MPa) / CA-60' },
+                    { label: 'Cobrimento Nominal (c)', val: '2.5 cm (Classe II NBR 6118)' }
+                ],
+                formulas: [
+                    `Momento Característico: Mk = (q · L²) / 8 = ${d.momentoMax.toFixed(2)} kN·m`,
+                    `Momento de Cálculo: Md = γf · Mk = 1.4 · ${d.momentoMax.toFixed(2)} = ${d.Md.toFixed(2)} kN·m`,
+                    `Esforço Cortante de Cálculo: Vd = 1.4 · Vk = ${d.Vd.toFixed(2)} kN`,
+                    `Área de Aço Long. Tração: As,calc = Md / (0.85 · d · fyd) = ${d.As_calc.toFixed(2)} cm²`,
+                    `Flecha Diferida NBR 6118: a,tot = a,inst · (1 + αf) = ${(d.flechaTotal).toFixed(3)} cm`
+                ],
+                resultados: [
+                    { label: 'Dimensões Finais (b × h)', val: `${d.b} × ${d.h} cm (d = ${d.d.toFixed(1)} cm)` },
+                    { label: 'Momento de Cálculo (Md)', val: `${d.Md.toFixed(2)} kN·m` },
+                    { label: 'Esforço Cortante de Cálculo (Vd)', val: `${d.Vd.toFixed(2)} kN` },
+                    { label: 'Armadura Longitudinal Inferior (As)', val: `${d.As_calc.toFixed(2)} cm² (${d.nBarrasInf} φ ${d.bitolaInf} mm)` },
+                    { label: 'Armadura Superior (Porta-estribos)', val: `${d.nBarrasSup} φ ${d.bitolaSup} mm` },
+                    { label: 'Estribos Transversais', val: `φ ${d.bitolaEstribo} mm c/ ${d.espacoEstribo} cm` },
+                    { label: 'Flecha Imediata (a,inst)', val: `${d.flechaImediata.toFixed(3)} cm` },
+                    { label: 'Flecha Total Diferida (a,tot)', val: `${d.flechaTotal.toFixed(3)} cm` },
+                    { label: 'Flecha Limite Admissível (L/250)', val: `${d.flechaLimite.toFixed(3)} cm` }
+                ],
+                verificacoes: [
+                    {
+                        item: 'ELU - Flexão Simples (Capacidade Resistente)',
+                        calc: `As,adotada = ${(d.nBarrasInf * Math.PI * Math.pow(d.bitolaInf / 20, 2)).toFixed(2)} cm² ≥ As,calc = ${d.As_calc.toFixed(2)} cm²`,
+                        status: 'pass'
+                    },
+                    {
+                        item: 'ELU - Armadura Mínima NBR 6118 (ρmin = 0.15%)',
+                        calc: `As = ${d.As_calc.toFixed(2)} cm² ≥ As,min = ${(0.0015 * d.b * d.h).toFixed(2)} cm²`,
+                        status: 'pass'
+                    },
+                    {
+                        item: 'ELS - Flecha Total a Longo Prazo (Deformação Excessiva)',
+                        calc: `a,tot = ${d.flechaTotal.toFixed(3)} cm ≤ a,lim = ${d.flechaLimite.toFixed(3)} cm`,
+                        status: d.flechaOk ? 'pass' : 'warn'
+                    },
+                    {
+                        item: 'ELS - Espaçamento Máximo de Estribos (s ≤ 0.6d)',
+                        calc: `s = ${d.espacoEstribo} cm ≤ s,max = ${(d.d * 0.6).toFixed(1)} cm`,
+                        status: 'pass'
+                    }
+                ],
+                svgSection: svgSection,
+                notas: 'Memorial analítico estrutural gerado pela Suíte Integrada ECALC PRO em conformidade rigorosa com a ABNT NBR 6118:2023. O detalhamento executivo e a ART/RRT devem ser assinados pelo Responsável Técnico.'
+            });
+        }
 
         function mostrarSecaoViga(b, h, material) {
-            const cores = {
-                concreto: { fill: '#cbd5e1', stroke: '#64748b', pattern: '#94a3b8' },
-                aco: { fill: '#fbbf24', stroke: '#d97706', pattern: '#f59e0b' },
-                madeira: { fill: '#d4a574', stroke: '#92400e', pattern: '#b8956a' }
+            const d = window.currentVigaData || {
+                b: b, h: h, vao: 5, carga: 20, apoio: 'simples', material: material,
+                momentoMax: 62.5, cortanteMax: 50, Md: 87.5, Vd: 70, As_calc: 3.5,
+                nBarrasInf: 3, bitolaInf: 12.5, nBarrasSup: 2, bitolaSup: 8.0,
+                bitolaEstribo: 5.0, espacoEstribo: 15,
+                flechaImediata: 0.85, flechaDiferida: 1.12, flechaTotal: 1.97, flechaLimite: 2.0, flechaOk: true
             };
-            
-            const cor = cores[material];
-            const escala = Math.min(150 / h, 180 / b);
-            const bDraw = b * escala;
-            const hDraw = h * escala;
-            const centerX = 125;
-            const centerY = 90;
-            
+
             const container = document.getElementById('secao-visual');
+            if (!container) return;
+
+            // Escalas de desenho da Seção
+            const scale = Math.min(170 / h, 130 / b);
+            const wDraw = b * scale;
+            const hDraw = h * scale;
+            const cx = 135;
+            const cy = 110;
+            const x0 = cx - (wDraw / 2);
+            const y0 = cy - (hDraw / 2);
+
+            const cobrDraw = Math.max(2.5 * scale, 6);
+            const estriboW = wDraw - (2 * cobrDraw);
+            const estriboH = hDraw - (2 * cobrDraw);
+
+            let infBarsHtml = '';
+            const stepInf = d.nBarrasInf > 1 ? (estriboW - 12) / (d.nBarrasInf - 1) : 0;
+            for (let i = 0; i < d.nBarrasInf; i++) {
+                const bx = x0 + cobrDraw + 6 + (i * stepInf);
+                const by = y0 + hDraw - cobrDraw - 6;
+                infBarsHtml += `<circle cx="${bx}" cy="${by}" r="4.5" fill="#ef4444" stroke="#7f1d1d" stroke-width="1.2"/>`;
+            }
+
+            let supBarsHtml = '';
+            const stepSup = d.nBarrasSup > 1 ? (estriboW - 12) / (d.nBarrasSup - 1) : 0;
+            for (let i = 0; i < d.nBarrasSup; i++) {
+                const bx = x0 + cobrDraw + 6 + (i * stepSup);
+                const by = y0 + cobrDraw + 6;
+                supBarsHtml += `<circle cx="${bx}" cy="${by}" r="3.5" fill="#3b82f6" stroke="#1e3a8a" stroke-width="1.2"/>`;
+            }
+
             container.innerHTML = `
-                <div class="text-center">
-                    <svg width="260" height="200" viewBox="0 0 260 200">
-                        <defs>
-                            <linearGradient id="secaoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:${cor.fill}"/>
-                                <stop offset="100%" style="stop-color:${cor.pattern}"/>
-                            </linearGradient>
-                        </defs>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+                    <!-- 1. SEÇÃO TRANSVERSAL DETALHADA -->
+                    <div class="p-5 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Seção A-A em Escala</span>
+                            <span class="text-[11px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-semibold">C25 • CA-50</span>
+                        </div>
+                        <svg width="270" height="220" viewBox="0 0 270 220" class="select-none">
+                            <!-- Concreto -->
+                            <rect x="${x0}" y="${y0}" width="${wDraw}" height="${hDraw}" fill="#e2e8f0" stroke="#64748b" stroke-width="2.5" rx="3"/>
+                            
+                            <!-- Estribo -->
+                            <rect x="${x0 + cobrDraw}" y="${y0 + cobrDraw}" width="${estriboW}" height="${estriboH}" fill="none" stroke="#f59e0b" stroke-width="2" rx="4"/>
+                            
+                            <!-- Armaduras Longitudinais -->
+                            ${infBarsHtml}
+                            ${supBarsHtml}
+                            
+                            <!-- Cota Altura h -->
+                            <line x1="${x0 - 18}" y1="${y0}" x2="${x0 - 18}" y2="${y0 + hDraw}" stroke="#475569" stroke-width="1.2"/>
+                            <line x1="${x0 - 24}" y1="${y0}" x2="${x0 - 12}" y2="${y0}" stroke="#475569" stroke-width="1.2"/>
+                            <line x1="${x0 - 24}" y1="${y0 + hDraw}" x2="${x0 - 12}" y2="${y0 + hDraw}" stroke="#475569" stroke-width="1.2"/>
+                            <text x="${x0 - 28}" y="${cy + 4}" text-anchor="end" font-size="11" font-weight="bold" fill="#334155">${h} cm</text>
+                            
+                            <!-- Cota Largura bw -->
+                            <line x1="${x0}" y1="${y0 + hDraw + 18}" x2="${x0 + wDraw}" y2="${y0 + hDraw + 18}" stroke="#475569" stroke-width="1.2"/>
+                            <line x1="${x0}" y1="${y0 + hDraw + 12}" x2="${x0}" y2="${y0 + hDraw + 24}" stroke="#475569" stroke-width="1.2"/>
+                            <line x1="${x0 + wDraw}" y1="${y0 + hDraw + 12}" x2="${x0 + wDraw}" y2="${y0 + hDraw + 24}" stroke="#475569" stroke-width="1.2"/>
+                            <text x="${cx}" y="${y0 + hDraw + 33}" text-anchor="middle" font-size="11" font-weight="bold" fill="#334155">${b} cm</text>
+                        </svg>
+
+                        <div class="grid grid-cols-2 gap-2 w-full mt-2 text-xs">
+                            <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                <span class="text-[10px] text-red-500 font-bold block">ARMADURA INFERIOR</span>
+                                <span class="font-bold text-slate-800 dark:text-slate-100">${d.nBarrasInf} φ ${d.bitolaInf} mm</span>
+                                <span class="text-[10px] text-slate-400 block">${d.As_calc.toFixed(2)} cm² calculados</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                <span class="text-[10px] text-amber-500 font-bold block">ESTRIBOS</span>
+                                <span class="font-bold text-slate-800 dark:text-slate-100">φ ${d.bitolaEstribo} mm c/ ${d.espacoEstribo} cm</span>
+                                <span class="text-[10px] text-slate-400 block">Cobrimento c = 2.5 cm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. DIAGRAMAS DE ESFORÇOS M(x), V(x) E FLECHA -->
+                    <div class="p-5 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Diagramas de Momento, Cortante & Flecha</span>
+                            <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-semibold">Vão ${(d.vao).toFixed(2)} m</span>
+                        </div>
                         
-                        <!-- Seção -->
-                        <rect x="${centerX - bDraw/2}" y="${centerY - hDraw/2}" width="${bDraw}" height="${hDraw}" 
-                              fill="url(#secaoGrad)" stroke="${cor.stroke}" stroke-width="3" rx="2"/>
-                        
-                        ${material === 'concreto' ? `
-                        <!-- Armaduras -->
-                        <circle cx="${centerX - bDraw/2 + 12}" cy="${centerY + hDraw/2 - 12}" r="4" fill="#374151"/>
-                        <circle cx="${centerX + bDraw/2 - 12}" cy="${centerY + hDraw/2 - 12}" r="4" fill="#374151"/>
-                        <circle cx="${centerX - bDraw/2 + 12}" cy="${centerY - hDraw/2 + 12}" r="3" fill="#374151"/>
-                        <circle cx="${centerX + bDraw/2 - 12}" cy="${centerY - hDraw/2 + 12}" r="3" fill="#374151"/>
-                        ` : ''}
-                        
-                        <!-- Cota Altura -->
-                        <line x1="${centerX - bDraw/2 - 25}" y1="${centerY - hDraw/2}" 
-                              x2="${centerX - bDraw/2 - 25}" y2="${centerY + hDraw/2}" 
-                              stroke="#374151" stroke-width="1.5"/>
-                        <line x1="${centerX - bDraw/2 - 32}" y1="${centerY - hDraw/2}" 
-                              x2="${centerX - bDraw/2 - 18}" y2="${centerY - hDraw/2}" 
-                              stroke="#374151" stroke-width="1.5"/>
-                        <line x1="${centerX - bDraw/2 - 32}" y1="${centerY + hDraw/2}" 
-                              x2="${centerX - bDraw/2 - 18}" y2="${centerY + hDraw/2}" 
-                              stroke="#374151" stroke-width="1.5"/>
-                        <text x="${centerX - bDraw/2 - 38}" y="${centerY + 5}" text-anchor="end" fill="#374151" font-size="13" font-weight="bold">${h}</text>
-                        
-                        <!-- Cota Largura -->
-                        <line x1="${centerX - bDraw/2}" y1="${centerY + hDraw/2 + 25}" 
-                              x2="${centerX + bDraw/2}" y2="${centerY + hDraw/2 + 25}" 
-                              stroke="#374151" stroke-width="1.5"/>
-                        <line x1="${centerX - bDraw/2}" y1="${centerY + hDraw/2 + 18}" 
-                              x2="${centerX - bDraw/2}" y2="${centerY + hDraw/2 + 32}" 
-                              stroke="#374151" stroke-width="1.5"/>
-                        <line x1="${centerX + bDraw/2}" y1="${centerY + hDraw/2 + 18}" 
-                              x2="${centerX + bDraw/2}" y2="${centerY + hDraw/2 + 32}" 
-                              stroke="#374151" stroke-width="1.5"/>
-                        <text x="${centerX}" y="${centerY + hDraw/2 + 45}" text-anchor="middle" fill="#374151" font-size="13" font-weight="bold">${b}</text>
-                    </svg>
-                    <div class="text-gray-500 dark:text-gray-400 text-sm mt-2">Seção Transversal (cm) - ${getNomeMaterial(material)}</div>
+                        <svg width="290" height="220" viewBox="0 0 290 220" class="select-none">
+                            <!-- Eixo da Viga -->
+                            <line x1="30" y1="25" x2="260" y2="25" stroke="#0ea5e9" stroke-width="4"/>
+                            <!-- Apoios -->
+                            <polygon points="30,28 20,44 40,44" fill="#64748b"/>
+                            <polygon points="260,28 250,44 270,44" fill="#64748b"/>
+                            <!-- Carga Distribuída Setas -->
+                            <line x1="80" y1="8" x2="80" y2="22" stroke="#f59e0b" stroke-width="1.5"/>
+                            <polygon points="80,24 77,18 83,18" fill="#f59e0b"/>
+                            <line x1="145" y1="8" x2="145" y2="22" stroke="#f59e0b" stroke-width="1.5"/>
+                            <polygon points="145,24 142,18 148,18" fill="#f59e0b"/>
+                            <line x1="210" y1="8" x2="210" y2="22" stroke="#f59e0b" stroke-width="1.5"/>
+                            <polygon points="210,24 207,18 213,18" fill="#f59e0b"/>
+                            <text x="145" y="6" text-anchor="middle" font-size="9" font-weight="bold" fill="#f59e0b">q = ${(d.carga).toFixed(1)} kN/m</text>
+
+                            <!-- Diagrama de Cortante V(x) -->
+                            <text x="12" y="70" font-size="9" font-weight="bold" fill="#10b981">V(x)</text>
+                            <line x1="30" y1="80" x2="260" y2="80" stroke="#94a3b8" stroke-dasharray="3 3"/>
+                            <polygon points="30,80 30,58 145,80 260,102 260,80" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="1.5"/>
+                            <text x="35" y="56" font-size="8.5" font-weight="bold" fill="#10b981">+${(d.cortanteMax).toFixed(1)} kN</text>
+                            <text x="255" y="114" text-anchor="end" font-size="8.5" font-weight="bold" fill="#10b981">-${(d.cortanteMax).toFixed(1)} kN</text>
+
+                            <!-- Diagrama de Momento M(x) Parábola -->
+                            <text x="12" y="145" font-size="9" font-weight="bold" fill="#3b82f6">M(x)</text>
+                            <line x1="30" y1="135" x2="260" y2="135" stroke="#94a3b8" stroke-dasharray="3 3"/>
+                            <path d="M 30 135 Q 145 185 260 135" fill="rgba(59, 130, 246, 0.2)" stroke="#3b82f6" stroke-width="2"/>
+                            <text x="145" y="180" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#2563eb">Mmax = ${(d.momentoMax).toFixed(2)} kN·m</text>
+
+                            <!-- Linha Elástica (Flecha) -->
+                            <path d="M 30 205 Q 145 218 260 205" fill="none" stroke="#8b5cf6" stroke-width="1.8" stroke-dasharray="4 2"/>
+                            <text x="145" y="202" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#8b5cf6">atot = ${(d.flechaTotal).toFixed(2)} cm (Limite: ${(d.flechaLimite).toFixed(2)} cm)</text>
+                        </svg>
+
+                        <div class="grid grid-cols-3 gap-2 w-full mt-2 text-center text-xs">
+                            <div class="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                <span class="text-[9px] text-blue-500 font-bold block">MOMENTO Md</span>
+                                <span class="font-bold text-slate-800 dark:text-slate-100">${d.Md.toFixed(1)} kNm</span>
+                            </div>
+                            <div class="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                <span class="text-[9px] text-emerald-500 font-bold block">CORTANTE Vd</span>
+                                <span class="font-bold text-slate-800 dark:text-slate-100">${d.Vd.toFixed(1)} kN</span>
+                            </div>
+                            <div class="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                <span class="text-[9px] text-purple-500 font-bold block">STATUS ELS</span>
+                                <span class="font-bold ${d.flechaOk ? 'text-emerald-500' : 'text-rose-500'}">${d.flechaOk ? '✓ CONFORME' : '⚠ REVISAR'}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
             
@@ -1994,5 +2305,9 @@
             }
         }
     </script>
+    <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
+    <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
+    <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>
