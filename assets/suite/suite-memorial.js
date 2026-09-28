@@ -453,10 +453,10 @@
 
                 <!-- 5. Seção Gráfica em Escala -->
                 ${options.svgSection ? `
-                    <div class="ecalc-sec-title">5. Seção Gráfica e Detalhamento da Armadura</div>
+                    <div class="ecalc-sec-title">${options.tituloGrafico || options.svgTitle || ((options.norma || '').includes('6118') ? '5. Seção Gráfica e Detalhamento da Armadura' : '5. Seção Gráfica e Esquema Técnico')}</div>
                     <div class="ecalc-drawing-box">
                         ${options.svgSection}
-                        <span style="font-size: 8pt; color: #64748b; margin-top: 4px;">Detalhamento esquemático em escala (dimensões em cm e bitolas nominais).</span>
+                        <span style="font-size: 8pt; color: #64748b; margin-top: 4px;">${options.legendaGrafico || options.svgLegend || ((options.norma || '').includes('6118') ? 'Detalhamento esquemático em escala (dimensões em cm e bitolas nominais).' : 'Detalhamento esquemático em escala.')}</span>
                     </div>
                 ` : ''}
 

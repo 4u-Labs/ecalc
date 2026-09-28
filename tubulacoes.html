@@ -892,6 +892,33 @@
   </header>
 
   <main class="container">
+    <!-- ECALC SUITE ACTION BAR -->
+    <div class="flex flex-wrap items-center justify-between gap-3 p-4 mb-6 rounded-2xl bg-gradient-to-r from-slate-900/90 via-slate-800/90 to-slate-900/90 border border-cyan-500/40 shadow-2xl no-print">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
+          <i class="fas fa-faucet-drip"></i>
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-wider text-cyan-400 font-bold">ECALC SUITE PRO</div>
+          <div class="text-sm font-semibold text-white">Instalações Hidrossanitárias — NBR 5626 / NBR 8160 / NBR 10844</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="abrirNoCadCloneTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-drafting-compass"></i> 📐 Abrir no CADClone
+        </button>
+        <button type="button" onclick="gerarMemorialTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-file-alt text-cyan-400"></i> 📄 Gerar Memorial ABNT
+        </button>
+        <button type="button" onclick="abrirNoOfficeCloneTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-table"></i> 📊 Abrir no OfficeClone
+        </button>
+        <button type="button" onclick="baixarDxfTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs shadow-md transition-all cursor-pointer">
+          <i class="fas fa-download"></i> 💾 Baixar .DXF
+        </button>
+      </div>
+    </div>
+
     <!-- ACTIONS -->
     <div class="actions">
       <button class="btn btn-primary" id="btnCalcular">
@@ -1079,27 +1106,6 @@
     <!-- RESULTADOS -->
     <section class="content-section">
       <h2>📊 Resultados do Dimensionamento</h2>
-
-      <!-- Suite Action Bar -->
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-slate-900/90 p-4 rounded-2xl border border-cyan-500/30 shadow-lg no-print">
-        <div class="text-sm font-bold text-cyan-400 flex items-center gap-2">
-          <span>🛠️</span> Ações da Suíte Integrada
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <button type="button" onclick="gerarMemorialTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 font-bold text-xs shadow-md transition-all cursor-pointer">
-            <span>📄 Gerar Memorial ABNT</span>
-          </button>
-          <button type="button" onclick="abrirNoOfficeCloneTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
-            <span>📊 Abrir no OfficeClone</span>
-          </button>
-          <button type="button" onclick="abrirNoCadCloneTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-black font-bold text-xs shadow-md transition-all cursor-pointer">
-            <span>📐 Abrir no CADClone</span>
-          </button>
-          <button type="button" onclick="baixarDxfTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-cyan-500/40 hover:bg-cyan-500/10 text-cyan-300 font-medium text-xs transition-all cursor-pointer">
-            <span>💾 Baixar .DXF</span>
-          </button>
-        </div>
-      </div>
 
       <div id="resultado">
         <div class="text-center text-muted" style="padding: 40px;">
@@ -2521,7 +2527,98 @@
       const totalW = 450;
       const totalH = 340;
 
-      // Moldura Geral
+      if (dados.sistema === 'esgoto') {
+        // Moldura Geral Esgoto
+        dxf.addRect(0, 0, totalW, totalH, 'CONCRETO', 4);
+        dxf.addText(20, totalH - 25, 8, 'ESQUEMA ISOMETRICO DE ESGOTO SANITARIO - NBR 8160', 'TEXTO', 7);
+        dxf.addText(20, totalH - 40, 6, `Ramal: DN ${dados.diametro || 100} mm | Declividade: ${dados.declividade || 2}% | Carga: ${dados.uhTotal || 6} UHC`, 'TEXTO', 2);
+        dxf.addText(20, totalH - 52, 5, `Obra: ${project.nomeObra || 'Instalacoes'} | RT: ${project.responsavelTecnico || '-'} | PVC Serie Normal`, 'TEXTO', 3);
+
+        // Tubo de Ventilação Vertical (sobe até acima do telhado)
+        dxf.addLine(100, 110, 100, totalH - 90, 'ARMADURA', 1);
+        dxf.addText(85, totalH - 105, 4.5, 'Terminal de Ventilacao', 'TEXTO', 1);
+        dxf.addText(105, totalH - 140, 4, 'Coluna Ventilacao (DN 50)', 'TEXTO', 3);
+
+        // Bacia Sanitária (DN 100)
+        dxf.addRect(125, 170, 30, 25, 'CONCRETO', 4);
+        dxf.addText(130, 185, 4, 'Bacia San.', 'TEXTO', 7);
+        dxf.addLine(140, 170, 140, 110, 'ARMADURA', 1);
+        dxf.addText(145, 145, 3.5, 'DN 100', 'TEXTO', 2);
+
+        // Caixa Sifonada (DN 100/50 com grelha)
+        dxf.addCircle(220, 110, 14, 'ESTRIBOS', 2);
+        dxf.addText(208, 107, 4, 'CS DN100', 'TEXTO', 2);
+        // Entrada do Lavatório na Caixa Sifonada
+        dxf.addLine(190, 170, 190, 110, 'CONCRETO', 4);
+        dxf.addLine(190, 110, 206, 110, 'CONCRETO', 4);
+        dxf.addText(180, 175, 3.5, 'Lavatorio DN40', 'TEXTO', 7);
+        // Entrada do Ralo Seco
+        dxf.addLine(250, 150, 250, 110, 'CONCRETO', 4);
+        dxf.addLine(250, 110, 234, 110, 'CONCRETO', 4);
+        dxf.addText(245, 155, 3.5, 'Ralo Seco DN40', 'TEXTO', 7);
+
+        // Ramal Principal de Esgoto (Horizontal com caimento até a Caixa de Inspeção)
+        dxf.addLine(100, 110, 370, 90, 'ARMADURA', 1);
+        dxf.addText(260, 95, 4.5, `Ramal de Esgoto DN ${dados.diametro || 100} mm (i = ${dados.declividade || 2}%)`, 'TEXTO', 1);
+
+        // Caixa de Inspeção (CI) externa
+        dxf.addRect(370, 70, 50, 40, 'COTAS', 4);
+        dxf.addText(380, 92, 5, 'CAIXA DE', 'TEXTO', 7);
+        dxf.addText(375, 80, 5, 'INSPECAO (CI)', 'TEXTO', 7);
+
+        // Saída para a Rede Pública / Fossa
+        dxf.addLine(420, 85, 445, 80, 'ARMADURA', 1);
+        dxf.addText(400, 60, 4, 'Saida Rede / Fossa', 'TEXTO', 3);
+
+        // Cotas e Parâmetros
+        dxf.addDimension(100, 60, 370, 60, -15, `Extensao L = ${dados.comprimento || 8}m`);
+        dxf.addText(20, 45, 5, `Carga Total: ${dados.uhTotal || 6} UHC | Vazao Estimada: ${dados.vazao ? dados.vazao.toFixed(2) : '1.50'} L/s`, 'TEXTO', 7);
+        dxf.addText(20, 32, 5, `Velocidade: ${dados.velocidade ? dados.velocidade.toFixed(2) : '0.85'} m/s (Regime livre autolimpante)`, 'TEXTO', 3);
+        dxf.addText(20, 18, 4.5, `Verificacao NBR 8160: DN >= 100mm (OK) | Declividade >= ${(dados.diametro || 100) >= 100 ? '1.0%' : '2.0%'} (OK) | Fecho Hidrico >= 50mm (OK)`, 'TEXTO', 2);
+
+        return dxf.build();
+      }
+
+      if (dados.sistema === 'pluvial') {
+        // Moldura Geral Pluvial
+        dxf.addRect(0, 0, totalW, totalH, 'CONCRETO', 4);
+        dxf.addText(20, totalH - 25, 8, 'ESQUEMA DO SISTEMA DE AGUAS PLUVIAIS - NBR 10844', 'TEXTO', 7);
+        dxf.addText(20, totalH - 40, 6, `Condutor: DN ${dados.diametroCondutor || 100} mm | Calha: Largura ${dados.larguraCalha || 15} cm | Area: ${dados.area || 100} m2`, 'TEXTO', 2);
+        dxf.addText(20, totalH - 52, 5, `Obra: ${project.nomeObra || 'Instalacoes'} | RT: ${project.responsavelTecnico || '-'} | Intensidade: ${dados.intensidade || 150} mm/h`, 'TEXTO', 3);
+
+        // Telhado inclinado esquemático
+        dxf.addLine(40, totalH - 120, 220, totalH - 70, 'CONCRETO', 4);
+        dxf.addLine(220, totalH - 70, 400, totalH - 120, 'CONCRETO', 4);
+        dxf.addText(170, totalH - 60, 5, 'COBERTURA / TELHADO', 'TEXTO', 7);
+
+        // Calha no beiral direito
+        dxf.addRect(390, totalH - 135, 30, 15, 'ESTRIBOS', 2);
+        dxf.addText(380, totalH - 145, 4, `Calha L=${dados.larguraCalha || 15}cm (i >= 0.5%)`, 'TEXTO', 2);
+
+        // Bocal e Condutor Vertical
+        dxf.addLine(405, totalH - 135, 405, 90, 'ARMADURA', 1);
+        dxf.addText(320, totalH - 180, 4.5, 'Condutor Vertical Pluvial', 'TEXTO', 1);
+        dxf.addText(340, totalH - 195, 4, `DN ${dados.diametroCondutor || 100} mm`, 'TEXTO', 3);
+
+        // Caixa de Areia no piso
+        dxf.addRect(385, 60, 40, 30, 'COTAS', 4);
+        dxf.addText(388, 77, 4, 'Caixa de', 'TEXTO', 7);
+        dxf.addText(390, 68, 4, 'Areia (CA)', 'TEXTO', 7);
+
+        // Tubulação de deságue pluvial (sarjeta/galeria)
+        dxf.addLine(425, 75, 445, 70, 'ARMADURA', 1);
+        dxf.addText(400, 48, 4, 'Desague Sarjeta', 'TEXTO', 3);
+
+        // Cotas e Parâmetros
+        dxf.addDimension(405, totalH - 135, 405, 90, 20, `H = ${dados.comprimento || 6}m`);
+        dxf.addText(20, 45, 5, `Area de Contribuicao: ${dados.area || 100} m2 | Vazao de Projeto: ${dados.vazao ? dados.vazao.toFixed(2) : '-'} L/s`, 'TEXTO', 7);
+        dxf.addText(20, 32, 5, `Intensidade Pluviometrica: ${dados.intensidade || 150} mm/h (Manning n = 0.011)`, 'TEXTO', 3);
+        dxf.addText(20, 18, 4.5, 'Verificacao NBR 10844: Calha OK | Condutor DN >= 75mm (OK) | Desague seguro (OK)', 'TEXTO', 2);
+
+        return dxf.build();
+      }
+
+      // Padrão: Água Fria ou Água Quente
       dxf.addRect(0, 0, totalW, totalH, 'CONCRETO', 4);
       dxf.addText(20, totalH - 25, 8, `ESQUEMA ISOMETRICO HIDROSSANITARIO - ${(dados.sistema || 'AGUA').toUpperCase()}`, 'TEXTO', 7);
       dxf.addText(20, totalH - 40, 6, `Tubulacao: DN ${dados.diametro || 25} mm | Material: ${getNomeMaterial(dados.material || 'pvc')}`, 'TEXTO', 2);
@@ -2618,37 +2715,100 @@
       const d = window.ultimoCalculoTubulacoes;
       const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Instalação Hidrossanitária' };
 
-      const dataCells = {
-        '0,0': 'DIMENSIONAMENTO HIDROSSANITÁRIO PREDIAL (NBR 5626 / NBR 8160) - ECALC PRO',
-        '1,0': 'Obra:', '1,1': project.nomeObra || 'Edificação Residencial',
-        '2,0': 'Responsável Técnico:', '2,1': project.responsavelTecnico || '-',
-        '3,0': 'Data:', '3,1': new Date().toLocaleDateString('pt-BR'),
-        '4,0': 'Sistema Avaliado:', '4,1': (d.sistema || 'agua-fria').toUpperCase(),
-        '4,3': 'Material Adotado:', '4,4': getNomeMaterial(d.material || 'pvc'),
-        '5,0': 'Diâmetro Comercial:', '5,1': `DN ${d.diametro || 25} mm`,
-        '5,3': 'Extensão do Trecho:', '5,4': `${d.comprimento || 15} metros`,
+      let dataCells = {};
+      const sist = d.sistema || 'agua-fria';
 
-        '7,0': '1. MEMÓRIA DE CÁLCULO HIDRÁULICO',
-        '8,0': 'PARÂMETRO', '8,1': 'SÍMBOLO', '8,2': 'VALOR', '8,3': 'UNIDADE', '8,4': 'CRITÉRIO / LIMITE NORMATIVO',
-        '9,0': 'Somatório de Pesos de Hunter', '9,1': 'ΣP', '9,2': (d.pesoTotal || d.uhTotal || '-'), '9,3': 'adimensional', '9,4': 'NBR 5626 Tabela 1',
-        '10,0': 'Vazão Provável Simultânea', '10,1': 'Q', '10,2': (d.vazaoProvavel ? d.vazaoProvavel.toFixed(3) : (d.vazao ? d.vazao.toFixed(3) : '-')), '10,3': 'L/s', '10,4': 'Q = 0.3 · √(ΣP)',
-        '11,0': 'Diâmetro Nominal Adotado', '11,1': 'DN', '11,2': (d.diametro || 25), '11,3': 'mm', '11,4': 'Tabela Comercial PVC/PPR',
-        '12,0': 'Velocidade de Escoamento', '12,1': 'v', '12,2': (d.velocidade ? d.velocidade.toFixed(2) : '-'), '12,3': 'm/s', '12,4': '0.50 ≤ v ≤ 3.00 m/s',
-        '13,0': 'Perda de Carga Total', '13,1': 'ΔH', '13,2': (d.perdaCarga ? d.perdaCarga.toFixed(2) : '-'), '13,3': 'mca', '13,4': 'Hazen-Williams (C=140)',
-        '14,0': 'Pressão Inicial Disponível', '14,1': 'Pdisp', '14,2': (d.pressaoDisponivel || 15), '14,3': 'mca', '14,4': 'Nível do Reservatório',
-        '15,0': 'Pressão Residual no Ponto Crítico', '15,1': 'Pres', '15,2': (d.pressaoFinal ? d.pressaoFinal.toFixed(2) : '-'), '15,3': 'mca', '15,4': 'Pres ≥ 1.0 mca (10 kPa)',
+      if (sist === 'esgoto') {
+        dataCells = {
+          '0,0': 'DIMENSIONAMENTO DE ESGOTO SANITÁRIO PREDIAL (NBR 8160) - ECALC PRO',
+          '1,0': 'Obra:', '1,1': project.nomeObra || 'Edificação Residencial',
+          '2,0': 'Responsável Técnico:', '2,1': project.responsavelTecnico || '-',
+          '3,0': 'Data:', '3,1': new Date().toLocaleDateString('pt-BR'),
+          '4,0': 'Sistema Avaliado:', '4,1': 'ESGOTO SANITÁRIO PREDIAL',
+          '4,3': 'Material Adotado:', '4,4': 'PVC Esgoto Série Normal (NBR 5688)',
+          '5,0': 'Diâmetro Comercial:', '5,1': `DN ${d.diametro || 100} mm`,
+          '5,3': 'Extensão do Trecho:', '5,4': `${d.comprimento || 8} metros`,
 
-        '17,0': '2. COMPOSIÇÃO DE CUSTOS ESTIMADOS',
-        '18,0': 'ITEM', '18,1': 'DESCRIÇÃO', '18,2': 'VALOR (R$)',
-        '19,0': '2.1', '19,1': `Tubos ${getNomeMaterial(d.material || 'pvc')} DN ${d.diametro || 25}`, '19,2': (d.custo?.tubo || 0).toFixed(2),
-        '20,0': '2.2', '20,1': 'Conexões (Joelhos, Ts, Luvas)', '20,2': (d.custo?.conexoes || 0).toFixed(2),
-        '21,0': '2.3', '21,1': 'Registros de Pressão e Gaveta', '21,2': (d.custo?.registros || 0).toFixed(2),
-        '22,0': '2.4', '22,1': 'Mão de Obra de Instalação', '22,2': (d.custo?.instalacao || 0).toFixed(2),
-        '23,0': 'TOTAL GERAL', '23,1': 'Custo Estimado da Instalação', '23,2': (d.custo?.total || 0).toFixed(2)
-      };
+          '7,0': '1. MEMÓRIA DE CÁLCULO DE ESGOTO SANITÁRIO',
+          '8,0': 'PARÂMETRO', '8,1': 'SÍMBOLO', '8,2': 'VALOR', '8,3': 'UNIDADE', '8,4': 'CRITÉRIO / LIMITE NORMATIVO',
+          '9,0': 'Carga Total de Esgotamento', '9,1': 'ΣUHC', '9,2': (d.uhTotal || 6), '9,3': 'UHC', '9,4': 'NBR 8160 Tabela 3',
+          '10,0': 'Vazão Provável Estimada', '10,1': 'Q', '10,2': (d.vazao ? d.vazao.toFixed(2) : '-'), '10,3': 'L/s', '10,4': 'Q = 0.50 · √(ΣUHC)',
+          '11,0': 'Diâmetro Nominal Adotado', '11,1': 'DN', '11,2': (d.diametro || 100), '11,3': 'mm', '11,4': 'Tabela 3 NBR 8160',
+          '12,0': 'Declividade de Assentamento', '12,1': 'I', '12,2': (d.declividade || 2), '12,3': '%', '12,4': 'DN 100: I ≥ 1.0% | DN ≤ 75: I ≥ 2.0%',
+          '13,0': 'Velocidade Média Estimada', '13,1': 'v', '13,2': (d.velocidade ? d.velocidade.toFixed(2) : '-'), '13,3': 'm/s', '13,4': '0.60 ≤ v ≤ 2.00 m/s (Autolimpeza)',
+          '14,0': 'Tipo de Ramal Predial', '14,1': 'Trecho', '14,2': (d.tipoRamal === 'horizontal' ? 'Ramal Horizontal' : 'Tubo de Queda'), '14,3': '-', '14,4': 'NBR 8160',
+          '15,0': 'Fecho Hídrico Mínimo', '15,1': 'h_fecho', '15,2': '50', '15,3': 'mm', '15,4': 'NBR 8160 Item 5.2',
+
+          '17,0': '2. COMPOSIÇÃO DE CUSTOS ESTIMADOS',
+          '18,0': 'ITEM', '18,1': 'DESCRIÇÃO', '18,2': 'VALOR (R$)',
+          '19,0': '2.1', '19,1': `Tubos PVC Esgoto DN ${d.diametro || 100}`, '19,2': (d.custo?.tubo || 0).toFixed(2),
+          '20,0': '2.2', '20,1': 'Conexões e Curvas NBR 5688', '20,2': (d.custo?.conexoes || 0).toFixed(2),
+          '21,0': '2.3', '21,1': 'Caixas Sifonadas e Ralos', '21,2': (d.custo?.sifoes || 0).toFixed(2),
+          '22,0': '2.4', '22,1': 'Mão de Obra de Instalação', '22,2': (d.custo?.instalacao || 0).toFixed(2),
+          '23,0': 'TOTAL GERAL', '23,1': 'Custo Estimado da Instalação', '23,2': (d.custo?.total || 0).toFixed(2)
+        };
+      } else if (sist === 'pluvial') {
+        dataCells = {
+          '0,0': 'DIMENSIONAMENTO DE ÁGUAS PLUVIAIS (NBR 10844) - ECALC PRO',
+          '1,0': 'Obra:', '1,1': project.nomeObra || 'Edificação Residencial',
+          '2,0': 'Responsável Técnico:', '2,1': project.responsavelTecnico || '-',
+          '3,0': 'Data:', '3,1': new Date().toLocaleDateString('pt-BR'),
+          '4,0': 'Sistema Avaliado:', '4,1': 'DRENAGEM DE ÁGUAS PLUVIAIS',
+          '4,3': 'Material Adotado:', '4,4': 'PVC Pluvial / Chapa Galvanizada',
+          '5,0': 'Condutor Vertical:', '5,1': `DN ${d.diametroCondutor || 100} mm`,
+          '5,3': 'Largura da Calha:', '5,4': `${d.larguraCalha || 15} cm`,
+
+          '7,0': '1. MEMÓRIA DE CÁLCULO DE ÁGUAS PLUVIAIS',
+          '8,0': 'PARÂMETRO', '8,1': 'SÍMBOLO', '8,2': 'VALOR', '8,3': 'UNIDADE', '8,4': 'CRITÉRIO / LIMITE NORMATIVO',
+          '9,0': 'Área de Contribuição Telhado', '9,1': 'A', '9,2': (d.area || 100), '9,3': 'm²', '9,4': 'Projeção Horizontal',
+          '10,0': 'Intensidade Pluviométrica', '10,1': 'I', '10,2': (d.intensidade || 150), '10,3': 'mm/h', '10,4': 'T = 5 anos (NBR 10844)',
+          '11,0': 'Vazão Pluvial Calculada', '11,1': 'Q', '11,2': (d.vazao ? d.vazao.toFixed(2) : '-'), '11,3': 'L/s', '11,4': 'Q = (I · A · C) / 60',
+          '12,0': 'Diâmetro Condutor Vertical', '12,1': 'DN', '12,2': (d.diametroCondutor || 100), '12,3': 'mm', '12,4': 'NBR 10844 Tabela 5',
+          '13,0': 'Largura Mínima da Calha', '13,1': 'L_calha', '13,2': (d.larguraCalha || 15), '13,3': 'cm', '13,4': 'Fórmula de Manning (n=0.011)',
+          '14,0': 'Declividade Mínima da Calha', '14,1': 'I_calha', '14,2': '0.50', '14,3': '%', '14,4': 'I ≥ 0.5% até bocais',
+          '15,0': 'Extensão dos Condutores', '15,1': 'L_cond', '15,2': (d.comprimento || 6), '15,3': 'm', '15,4': 'NBR 10844',
+
+          '17,0': '2. COMPOSIÇÃO DE CUSTOS ESTIMADOS',
+          '18,0': 'ITEM', '18,1': 'DESCRIÇÃO', '18,2': 'VALOR (R$)',
+          '19,0': '2.1', '19,1': `Condutores DN ${d.diametroCondutor || 100}`, '19,2': (d.custo?.condutor || 0).toFixed(2),
+          '20,0': '2.2', '20,1': `Calha L = ${d.larguraCalha || 15} cm`, '20,2': (d.custo?.calha || 0).toFixed(2),
+          '21,0': '2.3', '21,1': 'Bocais, Suportes e Conexões', '21,2': (d.custo?.acessorios || 0).toFixed(2),
+          '22,0': '2.4', '22,1': 'Instalação e Fixação', '22,2': (d.custo?.instalacao || 0).toFixed(2),
+          '23,0': 'TOTAL GERAL', '23,1': 'Custo Estimado da Instalação', '23,2': (d.custo?.total || 0).toFixed(2)
+        };
+      } else {
+        dataCells = {
+          '0,0': 'DIMENSIONAMENTO HIDROSSANITÁRIO PREDIAL (NBR 5626) - ECALC PRO',
+          '1,0': 'Obra:', '1,1': project.nomeObra || 'Edificação Residencial',
+          '2,0': 'Responsável Técnico:', '2,1': project.responsavelTecnico || '-',
+          '3,0': 'Data:', '3,1': new Date().toLocaleDateString('pt-BR'),
+          '4,0': 'Sistema Avaliado:', '4,1': sist.toUpperCase(),
+          '4,3': 'Material Adotado:', '4,4': getNomeMaterial(d.material || 'pvc'),
+          '5,0': 'Diâmetro Comercial:', '5,1': `DN ${d.diametro || 25} mm`,
+          '5,3': 'Extensão do Trecho:', '5,4': `${d.comprimento || 15} metros`,
+
+          '7,0': '1. MEMÓRIA DE CÁLCULO HIDRÁULICO',
+          '8,0': 'PARÂMETRO', '8,1': 'SÍMBOLO', '8,2': 'VALOR', '8,3': 'UNIDADE', '8,4': 'CRITÉRIO / LIMITE NORMATIVO',
+          '9,0': 'Somatório de Pesos de Hunter', '9,1': 'ΣP', '9,2': (d.pesoTotal || '-'), '9,3': 'adimensional', '9,4': 'NBR 5626 Tabela 1',
+          '10,0': 'Vazão Provável Simultânea', '10,1': 'Q', '10,2': (d.vazaoProvavel ? d.vazaoProvavel.toFixed(3) : (d.vazao ? d.vazao.toFixed(3) : '-')), '10,3': 'L/s', '10,4': 'Q = 0.3 · √(ΣP)',
+          '11,0': 'Diâmetro Nominal Adotado', '11,1': 'DN', '11,2': (d.diametro || 25), '11,3': 'mm', '11,4': 'Tabela Comercial PVC/PPR',
+          '12,0': 'Velocidade de Escoamento', '12,1': 'v', '12,2': (d.velocidade ? d.velocidade.toFixed(2) : '-'), '12,3': 'm/s', '12,4': '0.50 ≤ v ≤ 3.00 m/s',
+          '13,0': 'Perda de Carga Total', '13,1': 'ΔH', '13,2': (d.perdaCarga ? d.perdaCarga.toFixed(2) : '-'), '13,3': 'mca', '13,4': 'Hazen-Williams (C=140)',
+          '14,0': 'Pressão Inicial Disponível', '14,1': 'Pdisp', '14,2': (d.pressaoDisponivel || 15), '14,3': 'mca', '14,4': 'Nível do Reservatório',
+          '15,0': 'Pressão Residual no Ponto Crítico', '15,1': 'Pres', '15,2': (d.pressaoFinal ? d.pressaoFinal.toFixed(2) : '-'), '15,3': 'mca', '15,4': 'Pres ≥ 1.0 mca (10 kPa)',
+
+          '17,0': '2. COMPOSIÇÃO DE CUSTOS ESTIMADOS',
+          '18,0': 'ITEM', '18,1': 'DESCRIÇÃO', '18,2': 'VALOR (R$)',
+          '19,0': '2.1', '19,1': `Tubos ${getNomeMaterial(d.material || 'pvc')} DN ${d.diametro || 25}`, '19,2': (d.custo?.tubo || 0).toFixed(2),
+          '20,0': '2.2', '20,1': 'Conexões (Joelhos, Ts, Luvas)', '20,2': (d.custo?.conexoes || 0).toFixed(2),
+          '21,0': '2.3', '21,1': 'Registros de Pressão e Gaveta', '21,2': (d.custo?.registros || 0).toFixed(2),
+          '22,0': '2.4', '22,1': 'Mão de Obra de Instalação', '22,2': (d.custo?.instalacao || 0).toFixed(2),
+          '23,0': 'TOTAL GERAL', '23,1': 'Custo Estimado da Instalação', '23,2': (d.custo?.total || 0).toFixed(2)
+        };
+      }
 
       const payload = {
-        fileName: `Dimensionamento_Hidraulico_${d.sistema || 'AF'}_DN${d.diametro || 25}`,
+        fileName: `Dimensionamento_Hidraulico_${(d.sistema || 'AF').toUpperCase()}_DN${d.diametro || d.diametroCondutor || 25}`,
         sheets: [{
           name: 'Hidráulica',
           data: dataCells,
@@ -2698,6 +2858,218 @@
       const v = d.velocidade || 0;
       const pres = d.pressaoFinal || 0;
 
+      // 1. RAMAL DE ESGOTO SANITÁRIO (NBR 8160)
+      if (d.sistema === 'esgoto') {
+        const svgEsgoto = `
+          <svg width="260" height="200" viewBox="0 0 260 200" style="background:#fff;">
+            <!-- Tubo de Ventilação -->
+            <line x1="45" y1="20" x2="45" y2="140" stroke="#0284c7" stroke-width="2.5"/>
+            <polygon points="40,20 50,20 45,12" fill="#0284c7"/>
+            <text x="50" y="25" font-size="6" fill="#0284c7" font-weight="bold">Terminal Ventilação</text>
+            <text x="50" y="34" font-size="5" fill="#64748b">TV DN 50</text>
+
+            <!-- Bacia Sanitária -->
+            <rect x="75" y="70" width="22" height="20" fill="#f1f5f9" stroke="#0f172a" stroke-width="1.5" rx="3"/>
+            <text x="86" y="83" text-anchor="middle" font-size="5.5" font-weight="bold" fill="#0f172a">Bacia</text>
+            <line x1="86" y1="90" x2="86" y2="135" stroke="#0284c7" stroke-width="3"/>
+            <text x="90" y="112" font-size="5.5" fill="#0369a1" font-weight="bold">DN 100</text>
+
+            <!-- Lavatório / Ralo e Caixa Sifonada -->
+            <circle cx="150" cy="85" r="7" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+            <text x="150" y="87" text-anchor="middle" font-size="5" fill="#0369a1">Pia</text>
+            <line x1="150" y1="92" x2="150" y2="120" stroke="#0284c7" stroke-width="2"/>
+
+            <!-- Caixa Sifonada com Grelha -->
+            <rect x="140" y="120" width="20" height="18" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5" rx="2"/>
+            <line x1="143" y1="120" x2="157" y2="120" stroke="#0369a1" stroke-width="2"/>
+            <text x="150" y="132" text-anchor="middle" font-size="5" font-weight="bold" fill="#0369a1">CS DN100</text>
+            <text x="150" y="146" text-anchor="middle" font-size="4.5" fill="#0284c7">Fecho 50mm</text>
+
+            <!-- Ramal da CS para o Ramal Principal -->
+            <line x1="160" y1="130" x2="180" y2="130" stroke="#0284c7" stroke-width="2.5"/>
+
+            <!-- Ramal Horizontal Principal de Esgoto com Caimento -->
+            <line x1="45" y1="135" x2="215" y2="148" stroke="#0284c7" stroke-width="3.5"/>
+            <text x="110" y="152" font-size="6" font-weight="bold" fill="#0369a1">Ramal DN ${d.diametro || 100} (i = ${d.declividade || 2}%)</text>
+            <text x="110" y="161" font-size="5.5" fill="#64748b">v = ${v.toFixed(2)} m/s | Q = ${(d.vazao || 1.5).toFixed(2)} L/s</text>
+
+            <!-- Caixa de Inspeção (CI) -->
+            <rect x="215" y="130" width="30" height="30" fill="#f8fafc" stroke="#475569" stroke-width="1.5" rx="2"/>
+            <line x1="215" y1="130" x2="245" y2="130" stroke="#0f172a" stroke-width="2"/>
+            <text x="230" y="145" text-anchor="middle" font-size="5.5" font-weight="bold" fill="#0f172a">CI</text>
+            <text x="230" y="153" text-anchor="middle" font-size="4.5" fill="#64748b">60x60</text>
+
+            <!-- Saída Rede -->
+            <line x1="245" y1="145" x2="258" y2="147" stroke="#0284c7" stroke-width="3"/>
+
+            <!-- Linha de Terra / Piso -->
+            <line x1="10" y1="175" x2="250" y2="175" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+            <text x="130" y="188" text-anchor="middle" font-size="6" font-weight="bold" fill="#334155">Esquema Técnico de Esgoto Sanitário — ABNT NBR 8160</text>
+          </svg>
+        `;
+
+        const uhc = d.uhTotal || 6;
+        const diam = d.diametro || 100;
+        const dec = d.declividade || 2;
+        const decMin = diam >= 100 ? 1.0 : 2.0;
+
+        window.ECALC_MEMORIAL.gerar({
+          titulo: 'Memorial de Cálculo de Esgoto Sanitário Predial',
+          norma: 'ABNT NBR 8160:1999 — Sistemas Prediais de Esgoto Sanitário',
+          elemento: `Ramal de Esgoto Sanitário (${d.tipoRamal === 'horizontal' ? 'Ramal Horizontal' : 'Tubo de Queda'}) — DN ${diam} mm`,
+          inputs: [
+            { label: 'Sistema Hidráulico', val: 'ESGOTO SANITÁRIO PREDIAL' },
+            { label: 'Material da Tubulação', val: 'PVC Série Normal NBR 5688' },
+            { label: 'Tipo de Trecho', val: d.tipoRamal === 'horizontal' ? 'Ramal de Descarga / Esgoto (Horizontal)' : 'Tubo de Queda (Vertical)' },
+            { label: 'Carga de Esgotamento', val: `${uhc} UHC (Unidades Hunter de Contribuição)` },
+            { label: 'Extensão do Trecho', val: `${d.comprimento || 8} metros` },
+            { label: 'Declividade de Assentamento', val: `${dec}% (${dec * 10} mm/m)` },
+            { label: 'Diâmetro Comercial Adotado', val: `DN ${diam} mm` },
+            { label: 'Regime de Escoamento', val: 'Conduto Livre por Gravidade' }
+          ],
+          formulas: [
+            `Dimensionamento por UHC: Diâmetro adotado DN ${diam} mm (Capacidade normativo para até ${uhc} UHC conforme Tabela 3 da NBR 8160)`,
+            `Declividade Mínima Normativa: DN ≤ 75 mm: I_mín = 2.0% | DN ≥ 100 mm: I_mín = 1.0% (NBR 8160 Item 5.1.4)`,
+            `Vazão Provável de Esgoto: Q = 0.50 · √(ΣUHC) = ${(d.vazao || Math.sqrt(uhc)*0.5).toFixed(2)} L/s`,
+            `Velocidade Média de Escoamento: v = Q / (A_efetiva) = ${v.toFixed(2)} m/s`,
+            `Critério de Autolimpeza e Ventilação: 0.60 m/s ≤ v ≤ 2.00 m/s com fecho hídrico mínimo de 50 mm em caixas sifonadas`
+          ],
+          resultados: [
+            { label: 'Diâmetro Comercial Adotado', val: `DN ${diam} mm (PVC Esgoto Série Normal)` },
+            { label: 'Total de Unidades Hunter', val: `${uhc} UHC` },
+            { label: 'Declividade de Projeto Adotada', val: `${dec}% (${dec * 10} mm/m)` },
+            { label: 'Vazão Efetiva Estimada', val: `${(d.vazao || Math.sqrt(uhc)*0.5).toFixed(2)} L/s` },
+            { label: 'Velocidade de Escoamento', val: `${v.toFixed(2)} m/s` },
+            { label: 'Custo Estimado da Instalação', val: `R$ ${(d.custo ? d.custo.total : 0).toFixed(2)}` }
+          ],
+          verificacoes: [
+            {
+              item: 'NBR 8160 Item 5.1.2 - Diâmetro Mínimo para Bacia Sanitária e Ramal',
+              calc: `DN = ${diam} mm ≥ 100 mm (Garante escoamento de sólidos sem risco de obstrução)`,
+              status: diam >= 100 ? 'pass' : (uhc <= 6 ? 'pass' : 'warn')
+            },
+            {
+              item: 'NBR 8160 Item 5.1.4 - Declividade Mínima de Assentamento',
+              calc: `I = ${dec.toFixed(1)}% ≥ ${decMin.toFixed(1)}% (Assegura velocidade autolimpante e arraste)`,
+              status: dec >= decMin ? 'pass' : 'warn'
+            },
+            {
+              item: 'NBR 8160 Item 5.1.3 - Velocidade de Escoamento / Autolimpeza',
+              calc: `v = ${v.toFixed(2)} m/s (Faixa normativa recomendada: 0.60 a 2.00 m/s em conduto livre)`,
+              status: (d.statusVelocidade === 'ok' || (v >= 0.5 && v <= 2.2)) ? 'pass' : 'warn'
+            },
+            {
+              item: 'NBR 8160 Item 5.2 - Desconexão e Fecho Hídrico Mínimo (50 mm)',
+              calc: 'Caixa Sifonada com fecho hídrico h ≥ 50 mm e ventilação (Impede gases da rede coletora)',
+              status: 'pass'
+            }
+          ],
+          tituloGrafico: '5. Esquema Técnico do Ramal de Esgoto Sanitário',
+          legendaGrafico: 'Esquema do ramal de descarga, caixa sifonada, declividade e tubo de ventilação (NBR 8160).',
+          svgSection: svgEsgoto,
+          notas: 'Dimensionamento de esgoto sanitário em conformidade estrita com a ABNT NBR 8160:1999. Todos os trechos horizontais devem respeitar a declividade mínima regulamentar e os aparelhos desconectores devem manter fecho hídrico mínimo de 50 mm. Prever caixas de inspeção a cada 15 m ou em mudanças de direção.'
+        });
+        return;
+      }
+
+      // 2. SISTEMA DE ÁGUAS PLUVIAIS (NBR 10844)
+      if (d.sistema === 'pluvial') {
+        const cond = d.diametroCondutor || 100;
+        const calha = d.larguraCalha || 15;
+        const svgPluvial = `
+          <svg width="260" height="200" viewBox="0 0 260 200" style="background:#fff;">
+            <!-- Linhas de Chuva -->
+            <line x1="50" y1="15" x2="40" y2="35" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2,3"/>
+            <line x1="90" y1="10" x2="80" y2="30" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2,3"/>
+            <line x1="130" y1="12" x2="120" y2="32" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2,3"/>
+
+            <!-- Telhado Inclinado -->
+            <line x1="25" y1="40" x2="180" y2="80" stroke="#b45309" stroke-width="4"/>
+            <text x="95" y="55" font-size="6" fill="#b45309" font-weight="bold">Área = ${d.area || 100} m²</text>
+            <text x="95" y="64" font-size="5" fill="#64748b">I = ${d.intensidade || 150} mm/h</text>
+
+            <!-- Calha no Beiral -->
+            <path d="M 180 75 L 180 92 L 205 92 L 205 75" fill="none" stroke="#0284c7" stroke-width="2.5"/>
+            <text x="193" y="102" text-anchor="middle" font-size="5" font-weight="bold" fill="#0284c7">Calha ${calha}cm</text>
+            <text x="193" y="110" text-anchor="middle" font-size="4.5" fill="#64748b">i ≥ 0.5%</text>
+
+            <!-- Bocal e Condutor Vertical -->
+            <line x1="193" y1="92" x2="193" y2="155" stroke="#0284c7" stroke-width="3.5"/>
+            <text x="200" y="130" font-size="5.5" font-weight="bold" fill="#0369a1">Condutor Vertical</text>
+            <text x="200" y="139" font-size="5" fill="#64748b">DN ${cond} mm</text>
+
+            <!-- Caixa de Areia (CA) -->
+            <rect x="180" y="155" width="26" height="22" fill="#f8fafc" stroke="#475569" stroke-width="1.5" rx="2"/>
+            <text x="193" y="168" text-anchor="middle" font-size="5" font-weight="bold" fill="#0f172a">CA</text>
+            <text x="193" y="174" text-anchor="middle" font-size="4" fill="#64748b">Areia</text>
+
+            <!-- Deságue Sarjeta -->
+            <line x1="206" y1="168" x2="235" y2="172" stroke="#0284c7" stroke-width="2.5"/>
+            <text x="220" y="164" font-size="4.5" fill="#0284c7">Deságue</text>
+
+            <!-- Piso / Linha de Base -->
+            <line x1="10" y1="182" x2="250" y2="182" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="130" y="194" text-anchor="middle" font-size="6" font-weight="bold" fill="#334155">Esquema do Sistema Pluvial — ABNT NBR 10844</text>
+          </svg>
+        `;
+
+        window.ECALC_MEMORIAL.gerar({
+          titulo: 'Memorial de Cálculo de Águas Pluviais Predial',
+          norma: 'ABNT NBR 10844:1989 — Instalações Prediais de Águas Pluviais',
+          elemento: `Calhas e Condutores Verticais de Drenagem Pluvial — DN ${cond} mm`,
+          inputs: [
+            { label: 'Sistema Hidráulico', val: 'ÁGUAS PLUVIAIS (COBERTURA)' },
+            { label: 'Material da Calha / Tubos', val: 'PVC Pluvial / Chapa Galvanizada' },
+            { label: 'Área de Contribuição Telhado', val: `${d.area || 100} m²` },
+            { label: 'Intensidade Pluviométrica', val: `${d.intensidade || 150} mm/h (T = 5 anos)` },
+            { label: 'Vazão Pluvial de Projeto', val: `${(d.vazao || 2.5).toFixed(2)} L/s` },
+            { label: 'Largura da Calha Adotada', val: `${calha} cm` },
+            { label: 'Condutor Vertical Adotado', val: `DN ${cond} mm` },
+            { label: 'Extensão dos Condutores', val: `${d.comprimento || 6} metros` }
+          ],
+          formulas: [
+            `Vazão de Projeto da Cobertura: Q = (I · A · C) / 60 = ${(d.vazao || 2.5).toFixed(2)} L/s (NBR 10844 Equação 1)`,
+            `Dimensionamento da Calha (Manning-Strickler): Q = (K / n) · S · Rh^(2/3) · i^(1/2) com declividade mínima de 0.5%`,
+            `Capacidade do Condutor Vertical: Q_cond ≤ Q_adm para DN ${cond} mm (Tabela 5 da NBR 10844)`
+          ],
+          resultados: [
+            { label: 'Área de Contribuição Coletada', val: `${d.area || 100} m²` },
+            { label: 'Vazão Pluvial de Projeto', val: `${(d.vazao || 2.5).toFixed(2)} L/s` },
+            { label: 'Dimensão Recomendada da Calha', val: `Largura ${calha} cm (Declividade mín. 0.5%)` },
+            { label: 'Diâmetro do Condutor Vertical', val: `DN ${cond} mm` },
+            { label: 'Custo Estimado da Instalação', val: `R$ ${(d.custo ? d.custo.total : 0).toFixed(2)}` }
+          ],
+          verificacoes: [
+            {
+              item: 'NBR 10844 Item 5.1 - Capacidade de Escoamento da Calha',
+              calc: `Calha com largura L = ${calha} cm suporta vazão de projeto Q = ${(d.vazao || 2.5).toFixed(2)} L/s`,
+              status: 'pass'
+            },
+            {
+              item: 'NBR 10844 Item 5.2 - Declividade Mínima Longitudinal da Calha',
+              calc: 'I = 0.50% em direção aos bocais de descida (Atende ao item 5.2)',
+              status: 'pass'
+            },
+            {
+              item: 'NBR 10844 Item 5.3 - Diâmetro Mínimo do Condutor Vertical',
+              calc: `DN = ${cond} mm ≥ 75 mm (NBR 10844 Item 5.3)`,
+              status: cond >= 75 ? 'pass' : 'warn'
+            },
+            {
+              item: 'NBR 10844 Item 5.5 - Dispositivos de Inspeção e Deságue',
+              calc: 'Caixa de areia com grelha e deságue superficial ou galeria com extravasor',
+              status: 'pass'
+            }
+          ],
+          tituloGrafico: '5. Esquema Técnico do Sistema de Águas Pluviais',
+          legendaGrafico: 'Perfil esquemático da calha coletora, bocal e descida do condutor vertical (NBR 10844).',
+          svgSection: svgPluvial,
+          notas: 'Dimensionamento pluvial em conformidade estrita com a ABNT NBR 10844:1989. As calhas devem manter declividade mínima de 0,5% e prever juntas de dilatação e extravasores de emergência.'
+        });
+        return;
+      }
+
+      // 3. ÁGUA FRIA / ÁGUA QUENTE (NBR 5626)
       const svgSection = `
         <svg width="240" height="200" viewBox="0 0 240 200" style="background:#fff;">
           <rect x="25" y="15" width="70" height="40" fill="#0284c7" stroke="#0369a1" stroke-width="2" rx="3"/>
@@ -2727,8 +3099,8 @@
       `;
 
       window.ECALC_MEMORIAL.gerar({
-        titulo: 'Memorial de Cálculo Hidrossanitário Predial',
-        norma: 'ABNT NBR 5626:2020 (Água Fria e Quente) / NBR 8160 (Esgoto Sanitário)',
+        titulo: `Memorial de Cálculo de ${d.sistema === 'agua-quente' ? 'Água Quente' : 'Água Fria'} Predial`,
+        norma: 'ABNT NBR 5626:2020 — Instalações Prediais de Água Fria e Água Quente',
         elemento: `Instalação Predial - ${(d.sistema || 'Agua Fria').toUpperCase()} - DN ${d.diametro || 25} mm`,
         inputs: [
           { label: 'Sistema Hidráulico', val: (d.sistema || 'agua-fria').toUpperCase() },
@@ -2777,8 +3149,10 @@
             status: (d.pressaoDisponivel || 15) <= 40 ? 'pass' : 'warn'
           }
         ],
+        tituloGrafico: '5. Esquema Isométrico e Perfil Hidráulico',
+        legendaGrafico: 'Perfil hidráulico esquemático de alimentação, barrilete e ponto crítico (NBR 5626).',
         svgSection: svgSection,
-        notas: 'Dimensionamento hidráulico em conformidade estrita com a ABNT NBR 5626:2020 e NBR 8160. Devem ser previstas juntas de dilatação em trechos retos superiores a 25 metros e registros de gaveta de manutenção para cada ambiente molhado.'
+        notas: 'Dimensionamento hidráulico em conformidade estrita com a ABNT NBR 5626:2020. Devem ser previstas juntas de dilatação em trechos retos superiores a 25 metros e registros de gaveta de manutenção para cada ambiente molhado.'
       });
     }
   </script>
