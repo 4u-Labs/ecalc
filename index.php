@@ -708,13 +708,15 @@ $v = time();
             </a>
 
             <!-- FotoLaudo - Câmera Técnica & Relatórios de Engenharia (PWA) -->
-            <a href="../fotolaudo/" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="outros estrutural" style="animation-delay: 0.745s">
-                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Vistorias</span>
-                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">
-                    <img src="../fotolaudo/assets/icon-192.png" alt="FotoLaudo" class="w-12 h-12 rounded-xl object-contain shadow-lg" onerror="this.outerHTML='📷'">
+            <a href="../fotolaudo/" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros estrutural" style="animation-delay: 0.745s">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/fotolaudo.webp" type="image/webp">
+                    <img src="assets/cards/fotolaudo.jpg" alt="FotoLaudo" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>FotoLaudo</h2>
+                    <p>Câmera técnica pericial com GPS, coordenadas UTM, azimute, cotas CAD e emissão de laudos em PDF.</p>
                 </div>
-                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">FotoLaudo</h2>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Câmera técnica pericial com GPS, coordenadas UTM, azimute, cotas CAD e emissão de laudos em PDF.</p>
             </a>
 
             <!-- PowerCalc - Calculadora Científica & Engenharia (PWA) -->
