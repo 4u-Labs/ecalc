@@ -455,7 +455,7 @@ $v = time();
             <div class="flex items-center gap-3 sm:gap-4">
                 <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/60 text-xs text-slate-300">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span class="font-medium">40 Ferramentas Ativas</span>
+                    <span class="font-medium">41 Ferramentas Ativas</span>
                 </div>
 
                 <a href="https://4u.ia.br" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-slate-200 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-400 transition-all duration-200 group">
@@ -557,7 +557,7 @@ $v = time();
 
         <!-- Filter Category Buttons -->
         <div class="flex flex-wrap justify-center gap-2 md:gap-3 max-w-4xl mx-auto category-filters">
-            <button class="filter-btn active px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide" data-filter="all">Todas (<span id="toolCount">40</span>)</button>
+            <button class="filter-btn active px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide" data-filter="all">Todas (<span id="toolCount">41</span>)</button>
             <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="estrutural">🏗️ Estrutural</button>
             <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="hidraulica">💧 Hidráulica</button>
             <button class="filter-btn px-5 py-2.5 rounded-full text-sm font-medium tracking-wide" data-filter="materiais">🧱 Materiais</button>
@@ -871,7 +871,7 @@ $v = time();
             </a>
 
             <!-- PowerCalc - Calculadora Científica & Engenharia (PWA) -->
-            <a href="powercalc/index.html" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.75s;">
+            <a href="https://4u.ia.br/app/powercalc/" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.75s;">
                 <picture class="w-full h-full block">
                     <source srcset="assets/cards/powercalc.webp" type="image/webp">
                     <img src="assets/cards/powercalc.jpg" alt="PowerCalc" loading="lazy">
@@ -929,7 +929,7 @@ $v = time();
             </a>
 
             <!-- Sound Meter - Decibelímetro Digital (PWA) -->
-            <a href="soundmeter/index.html" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.84s;">
+            <a href="https://4u.ia.br/app/soundmeter/" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.84s;">
                 <picture class="w-full h-full block">
                     <source srcset="assets/cards/soundmeter.webp" type="image/webp">
                     <img src="assets/cards/soundmeter.jpg" alt="Sound Meter" loading="lazy">
@@ -949,6 +949,18 @@ $v = time();
                 <div class="sr-only">
                     <h2>Smart Notes A.i.</h2>
                     <p>Bloco de anotações rápidas de campo, memoriais descritivos e listas técnicas com recursos de IA.</p>
+                </div>
+            </a>
+
+            <!-- OfficeClone - Suíte de Escritório Completa (PWA) -->
+            <a href="https://4u.ia.br/app/office/" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.855s;">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/office.webp" type="image/webp">
+                    <img src="assets/cards/office.jpg" alt="OfficeClone" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>OfficeClone</h2>
+                    <p>Sua suíte de escritório completa no navegador com ExcelClone, WordClone, PointClone, ProjectClone, FreePdf e KeepAi.</p>
                 </div>
             </a>
 
@@ -1030,7 +1042,7 @@ $v = time();
             <h3 class="text-xl font-bold text-slate-100 mb-1 font-['Orbitron']">Nenhuma ferramenta encontrada</h3>
             <p class="text-sm text-slate-400 mb-6">Não encontramos resultados para sua busca ou categoria selecionada.</p>
             <button type="button" id="btnResetSearch" class="px-6 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-semibold uppercase tracking-wider transition-all duration-200 shadow-[0_0_15px_rgba(0,210,255,0.2)]">
-                Limpar Pesquisa e Ver Todas (40)
+                Limpar Pesquisa e Ver Todas (41)
             </button>
         </div>
     </main>
