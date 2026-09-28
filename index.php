@@ -696,13 +696,15 @@ $v = time();
             </a>
 
             <!-- CADClone - Software CAD 2D Profissional (PWA) -->
-            <a href="../cadclone/" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="outros estrutural" style="animation-delay: 0.74s">
-                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Projetos</span>
-                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">
-                    <img src="../cadclone/icon-192.png" alt="CADClone" class="w-12 h-12 rounded-xl object-contain shadow-lg" onerror="this.outerHTML='📐'">
+            <a href="../cadclone/" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros estrutural" style="animation-delay: 0.74s">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/cadclone.webp" type="image/webp">
+                    <img src="assets/cards/cadclone.jpg" alt="CADClone" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>CADClone</h2>
+                    <p>Software de CAD 2D no navegador. Comandos AutoCAD, DXF, calco PDF e PWA offline.</p>
                 </div>
-                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">CADClone</h2>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Software de CAD 2D no navegador. Comandos AutoCAD, DXF, calco PDF e PWA offline.</p>
             </a>
 
             <!-- FotoLaudo - Câmera Técnica & Relatórios de Engenharia (PWA) -->
