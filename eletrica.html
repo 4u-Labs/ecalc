@@ -510,6 +510,28 @@
       <h2 class="text-xl font-bold text-amber-400 mb-6 flex items-center gap-3">
         <i class="fas fa-chart-bar"></i> Dimensionamento Elétrico
       </h2>
+
+      <!-- Suite Action Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-slate-900/90 p-4 rounded-2xl border border-amber-500/30 shadow-lg no-print">
+        <div class="text-sm font-bold text-amber-400 flex items-center gap-2">
+          <span>🛠️</span> Ações da Suíte Integrada
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="gerarMemorialEletrica()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📄 Gerar Memorial ABNT</span>
+          </button>
+          <button type="button" onclick="abrirNoOfficeCloneEletrica()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📊 Abrir no OfficeClone</span>
+          </button>
+          <button type="button" onclick="abrirNoCadCloneEletrica()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📐 Abrir no CADClone</span>
+          </button>
+          <button type="button" onclick="baixarDxfEletrica()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-amber-500/40 hover:bg-amber-500/10 text-amber-300 font-medium text-xs transition-all cursor-pointer">
+            <span>💾 Baixar .DXF</span>
+          </button>
+        </div>
+      </div>
+
       <div id="resultado">
         <div class="text-center py-12 text-gray-500">
           <i class="fas fa-calculator text-5xl mb-4 opacity-30"></i>
@@ -2295,6 +2317,333 @@
         setTimeout(() => notif.remove(), 300);
       }, 3000);
     }
+
+    // =============================================
+    // ECALC SUITE - INTEGRAÇÕES (CAD, OFFICE, MEMORIAL)
+    // =============================================
+
+    function gerarDxfUnifilarEletrica(dados, project) {
+      if (!window.ECALC_CAD || !window.ECALC_CAD.DXFBuilder) {
+        throw new Error('Módulo CAD não carregado');
+      }
+      const dxf = new window.ECALC_CAD.DXFBuilder();
+      const nCirc = dados.circuitos.length;
+      const colW = 60; // mm por circuito
+      const totalW = Math.max(nCirc * colW + 120, 450);
+      const totalH = 320;
+
+      // Quadro QDG Moldura Externa
+      dxf.addRect(0, 0, totalW, totalH, 'CONCRETO', 4);
+      dxf.addText(20, totalH - 25, 8, `QUADRO DE DISTRIBUICAO GERAL (QDG) - ${dados.tensao}V`, 'TEXTO', 7);
+      dxf.addText(20, totalH - 40, 6, `Alimentacao: Cabo ${dados.secaoEntrada}mm2 | Disjuntor Geral: ${dados.disjuntorGeral}A Curva C`, 'TEXTO', 2);
+      dxf.addText(20, totalH - 52, 5, `Obra: ${project.nomeObra || 'Projeto Eletrico'} | RT: ${project.responsavelTecnico || '-'} | NBR 5410`, 'TEXTO', 3);
+
+      // Linha de Entrada e Disjuntor Geral
+      dxf.addLine(45, totalH - 60, 45, totalH - 105, 'ARMADURA', 1);
+      dxf.addRect(37, totalH - 95, 16, 20, 'ESTRIBOS', 2);
+      dxf.addText(58, totalH - 86, 5, `${dados.disjuntorGeral}A`, 'TEXTO', 7);
+
+      // Dispositivo DR
+      dxf.addRect(80, totalH - 95, 18, 20, 'CONCRETO', 4);
+      dxf.addText(83, totalH - 86, 5, 'DR 30mA', 'TEXTO', 7);
+      dxf.addLine(45, totalH - 105, 90, totalH - 105, 'ARMADURA', 1);
+
+      // Barramento Principal Horizontal de Fases
+      const yBarra = totalH - 130;
+      dxf.addLine(30, yBarra, totalW - 30, yBarra, 'ARMADURA', 1);
+      dxf.addText(totalW - 25, yBarra - 2, 5, `BARRAMENTO FASE (${dados.tensao}V)`, 'TEXTO', 1);
+
+      // Barramento de Neutro (N)
+      const yNeutro = totalH - 148;
+      dxf.addLine(30, yNeutro, totalW - 30, yNeutro, 'COTAS', 4);
+      dxf.addText(totalW - 25, yNeutro - 2, 5, 'BARRAMENTO DE NEUTRO (N)', 'TEXTO', 4);
+
+      // Barramento de Proteção (PE - Terra)
+      const yTerra = totalH - 165;
+      dxf.addLine(30, yTerra, totalW - 30, yTerra, 'COTAS', 3);
+      dxf.addText(totalW - 25, yTerra - 2, 5, 'BARRAMENTO DE PROTECAO (PE)', 'TEXTO', 3);
+
+      // Circuitos Derivados
+      dados.circuitos.forEach((circ, idx) => {
+        const x = 50 + idx * colW;
+        // Derivação vertical da fase
+        dxf.addLine(x, yBarra, x, 65, 'CONCRETO', 4);
+        
+        // Disjuntor do circuito
+        dxf.addRect(x - 7, yBarra - 38, 14, 18, 'ESTRIBOS', 2);
+        dxf.addText(x + 9, yBarra - 32, 4.5, `${circ.disjuntor}A`, 'TEXTO', 7);
+
+        // Simbologia Unifilar no condutor (Fase, Neutro, Terra)
+        const ySimb = yBarra - 70;
+        // Traço Fase
+        dxf.addLine(x - 5, ySimb - 4, x + 5, ySimb + 4, 'TEXTO', 7);
+        // Traço Neutro
+        dxf.addLine(x - 3, ySimb + 6, x + 3, ySimb + 12, 'TEXTO', 4);
+        dxf.addLine(x + 3, ySimb + 12, x + 6, ySimb + 12, 'TEXTO', 4);
+        // Traço Terra
+        dxf.addLine(x - 7, ySimb - 10, x - 1, ySimb - 4, 'TEXTO', 3);
+        dxf.addLine(x - 10, ySimb - 7, x - 4, ySimb - 1, 'TEXTO', 3);
+
+        // Textos descritivos do circuito
+        dxf.addText(x - 10, 48, 5, `C${circ.numero}`, 'TEXTO', 2);
+        dxf.addText(x - 15, 36, 4, `${circ.potencia.toFixed(0)}W`, 'TEXTO', 7);
+        dxf.addText(x - 15, 26, 4, `${circ.secao}mm2`, 'TEXTO', 3);
+        dxf.addText(x - 15, 16, 3.5, `dV:${circ.quedaTensao.toFixed(1)}%`, 'TEXTO', circ.quedaTensao > 4 ? 1 : 2);
+        dxf.addText(x - 15, 6, 3, circ.fase ? `Fase ${circ.fase}` : (circ.tipo || 'Circ').substring(0, 8), 'TEXTO', 4);
+      });
+
+      return dxf.build();
+    }
+
+    function abrirNoCadCloneEletrica() {
+      if (!ultimoCalculo) {
+        mostrarNotificacao('Calcule o dimensionamento elétrico primeiro!', 'error');
+        return;
+      }
+      try {
+        const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Eletrica' };
+        const dxf = gerarDxfUnifilarEletrica(ultimoCalculo, project);
+        window.ECALC_CAD.abrirNoCadClone(dxf, `unifilar_qdg_${ultimoCalculo.tensao}V.dxf`);
+        mostrarNotificacao('Diagrama Unifilar enviado ao CADClone!', 'success');
+      } catch (err) {
+        console.error(err);
+        mostrarNotificacao('Erro ao gerar DXF: ' + err.message, 'error');
+      }
+    }
+
+    function baixarDxfEletrica() {
+      if (!ultimoCalculo) {
+        mostrarNotificacao('Calcule o dimensionamento elétrico primeiro!', 'error');
+        return;
+      }
+      try {
+        const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Eletrica' };
+        const dxf = gerarDxfUnifilarEletrica(ultimoCalculo, project);
+        window.ECALC_CAD.baixarDXF(dxf, `unifilar_qdg_${ultimoCalculo.tensao}V.dxf`);
+        mostrarNotificacao('Arquivo DXF baixado!', 'success');
+      } catch (err) {
+        console.error(err);
+        mostrarNotificacao('Erro ao baixar DXF: ' + err.message, 'error');
+      }
+    }
+
+    function abrirNoOfficeCloneEletrica() {
+      if (!ultimoCalculo) {
+        mostrarNotificacao('Calcule o dimensionamento elétrico primeiro!', 'error');
+        return;
+      }
+      const d = ultimoCalculo;
+      const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Instalação Elétrica' };
+
+      const dataCells = {
+        '0,0': 'QUADRO DE CARGAS E DIMENSIONAMENTO ELÉTRICO (NBR 5410) - ECALC PRO',
+        '1,0': 'Obra:', '1,1': project.nomeObra || 'Residência Unifamiliar',
+        '2,0': 'Responsável Técnico:', '2,1': project.responsavelTecnico || '-',
+        '3,0': 'Data:', '3,1': new Date().toLocaleDateString('pt-BR'),
+        '4,0': 'Tensão Nominal:', '4,1': `${d.tensao}V`,
+        '4,3': 'Potência Instalada:', '4,4': `${(d.potenciaTotal/1000).toFixed(2)} kW`,
+        '5,0': 'Disjuntor Geral:', '5,1': `${d.disjuntorGeral}A Curva C`,
+        '5,3': 'Potência de Demanda:', '5,4': `${(d.demandaTotal/1000).toFixed(2)} kW`,
+        '6,0': 'Condutor Alimentador:', '6,1': `${d.secaoEntrada} mm² (Cobre)`,
+        '6,3': 'Corrente Total Demanda:', '6,4': `${d.correnteTotal.toFixed(1)} A`,
+
+        '8,0': 'TABELA DE CIRCUITOS TERMINAIS',
+        '9,0': 'CIRC Nº', '9,1': 'DESCRIÇÃO / AMBIENTE', '9,2': 'TIPO', '9,3': 'TENSÃO (V)', '9,4': 'POTÊNCIA (W)',
+        '9,5': 'CORRENTE (A)', '9,6': 'CABO (mm²)', '9,7': 'DISJUNTOR (A)', '9,8': 'ELETRODUTO', '9,9': 'QUEDA TENSÃO (%)', '9,10': 'FASE'
+      };
+
+      let row = 10;
+      d.circuitos.forEach((circ) => {
+        dataCells[`${row},0`] = `C${circ.numero}`;
+        dataCells[`${row},1`] = circ.nome;
+        dataCells[`${row},2`] = (circ.tipo || 'TUG').toUpperCase();
+        dataCells[`${row},3`] = circ.tensao || d.tensao;
+        dataCells[`${row},4`] = circ.potencia;
+        dataCells[`${row},5`] = circ.corrente.toFixed(2);
+        dataCells[`${row},6`] = `${circ.secao} mm²`;
+        dataCells[`${row},7`] = `${circ.disjuntor}A Curva C`;
+        dataCells[`${row},8`] = `Ø ${circ.eletroduto} mm`;
+        dataCells[`${row},9`] = `${circ.quedaTensao.toFixed(2)}%`;
+        dataCells[`${row},10`] = circ.fase ? `Fase ${circ.fase}` : 'Fase Única';
+        row++;
+      });
+
+      // Linha de Totais
+      dataCells[`${row},0`] = 'TOTAL';
+      dataCells[`${row},1`] = `${d.circuitos.length} Circuitos dimensionados`;
+      dataCells[`${row},4`] = d.potenciaTotal;
+      dataCells[`${row},5`] = d.correnteTotal.toFixed(1);
+
+      // Seção de Custo e Materiais
+      row += 2;
+      dataCells[`${row},0`] = 'RESUMO DE MATERIAIS E CUSTOS ESTIMADOS';
+      row++;
+      dataCells[`${row},0`] = 'ITEM'; dataCells[`${row},1`] = 'CATEGORIA'; dataCells[`${row},2`] = 'QUANTIDADE ESTIMADA'; dataCells[`${row},3`] = 'SUBTOTAL (R$)';
+      row++;
+      dataCells[`${row},0`] = '1'; dataCells[`${row},1`] = 'Cabos e Condutores Flexíveis'; dataCells[`${row},2`] = `${d.materiais.cabos?.totalMetros || 150} metros`; dataCells[`${row},3`] = (d.custo.cabos || 0).toFixed(2);
+      row++;
+      dataCells[`${row},0`] = '2'; dataCells[`${row},1`] = 'Disjuntores e Proteções (Geral, DR, Terminais)'; dataCells[`${row},2`] = `${d.circuitos.length + 2} peças`; dataCells[`${row},3`] = (d.custo.disjuntores || 0).toFixed(2);
+      row++;
+      dataCells[`${row},0`] = '3'; dataCells[`${row},1`] = 'Eletrodutos e Conexões'; dataCells[`${row},2`] = `${d.materiais.eletrodutos?.totalMetros || 80} metros`; dataCells[`${row},3`] = (d.custo.eletrodutos || 0).toFixed(2);
+      row++;
+      dataCells[`${row},0`] = '4'; dataCells[`${row},1`] = 'Tomadas, Interruptores e Caixas 4x2'; dataCells[`${row},2`] = `${d.materiais.dispositivos?.totalPontos || 35} pontos`; dataCells[`${row},3`] = (d.custo.dispositivos || 0).toFixed(2);
+      row++;
+      dataCells[`${row},0`] = 'CUSTO TOTAL GERAL'; dataCells[`${row},3`] = (d.custo.total || 0).toFixed(2);
+
+      const payload = {
+        fileName: `Quadro_Cargas_Eletrica_${d.tensao}V`,
+        sheets: [{
+          name: 'Quadro de Cargas',
+          data: dataCells,
+          formats: {
+            '0,0': { bold: true, fontSize: 13, color: '#f59e0b' },
+            '8,0': { bold: true, color: '#2563eb' },
+            '9,0': { bold: true, bgColor: '#e2e8f0' },
+            '9,1': { bold: true, bgColor: '#e2e8f0' },
+            '9,2': { bold: true, bgColor: '#e2e8f0' },
+            '9,3': { bold: true, bgColor: '#e2e8f0' },
+            '9,4': { bold: true, bgColor: '#e2e8f0' },
+            '9,5': { bold: true, bgColor: '#e2e8f0' },
+            '9,6': { bold: true, bgColor: '#e2e8f0' },
+            '9,7': { bold: true, bgColor: '#e2e8f0' },
+            '9,8': { bold: true, bgColor: '#e2e8f0' },
+            '9,9': { bold: true, bgColor: '#e2e8f0' },
+            '9,10': { bold: true, bgColor: '#e2e8f0' }
+          },
+          comments: {},
+          colWidths: { 0: 90, 1: 220, 2: 120, 3: 110, 4: 130, 5: 130, 6: 120, 7: 150, 8: 120, 9: 140, 10: 120 },
+          rowHeights: {},
+          hiddenRows: [],
+          hiddenCols: [],
+          frozenRow: 0,
+          frozenCol: 0,
+          conditionalFormats: [],
+          filters: {}
+        }],
+        darkMode: false
+      };
+
+      localStorage.setItem('excelCloneData', JSON.stringify(payload));
+      window.open('https://4u.ia.br/app/office/excel/', '_blank');
+    }
+
+    function gerarMemorialEletrica() {
+      if (!ultimoCalculo) {
+        mostrarNotificacao('Calcule o dimensionamento elétrico primeiro!', 'error');
+        return;
+      }
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        mostrarNotificacao('Módulo de Memorial não disponível', 'error');
+        return;
+      }
+      const d = ultimoCalculo;
+      const maxQueda = Math.max(...d.circuitos.map(c => c.quedaTensao));
+      const circMaxQueda = d.circuitos.find(c => c.quedaTensao === maxQueda);
+
+      const svgSection = `
+        <svg width="240" height="200" viewBox="0 0 240 200" style="background:#fff;">
+          <rect x="15" y="15" width="210" height="170" fill="#f8fafc" stroke="#0f172a" stroke-width="2" rx="4"/>
+          <text x="120" y="32" text-anchor="middle" font-size="10" font-weight="bold" fill="#0284c7">QDG - QUADRO DE DISTRIBUIÇÃO</text>
+          
+          <rect x="30" y="45" width="40" height="24" fill="#0f172a" rx="2"/>
+          <text x="50" y="60" text-anchor="middle" font-size="8" font-weight="bold" fill="#fff">${d.disjuntorGeral}A</text>
+          
+          <rect x="85" y="45" width="35" height="24" fill="#0284c7" rx="2"/>
+          <text x="102" y="60" text-anchor="middle" font-size="8" font-weight="bold" fill="#fff">DR</text>
+
+          <rect x="135" y="45" width="35" height="24" fill="#d97706" rx="2"/>
+          <text x="152" y="60" text-anchor="middle" font-size="8" font-weight="bold" fill="#fff">DPS</text>
+
+          <line x1="25" y1="85" x2="215" y2="85" stroke="#ef4444" stroke-width="3"/>
+          <text x="120" y="96" text-anchor="middle" font-size="7" font-weight="bold" fill="#ef4444">BARRAMENTO FASE (${d.tensao}V)</text>
+
+          <line x1="25" y1="105" x2="215" y2="105" stroke="#0284c7" stroke-width="2"/>
+          <text x="55" y="114" text-anchor="middle" font-size="7" font-weight="bold" fill="#0284c7">NEUTRO (N)</text>
+
+          <line x1="25" y1="120" x2="215" y2="120" stroke="#16a34a" stroke-width="2"/>
+          <text x="55" y="129" text-anchor="middle" font-size="7" font-weight="bold" fill="#16a34a">TERRA (PE)</text>
+
+          <line x1="45" y1="85" x2="45" y2="140" stroke="#475569" stroke-width="1.5"/>
+          <rect x="37" y="140" width="16" height="14" fill="#334155" rx="1"/>
+          <text x="45" y="150" text-anchor="middle" font-size="6" font-weight="bold" fill="#fff">C1</text>
+          <text x="45" y="165" text-anchor="middle" font-size="6" fill="#0f172a">10A</text>
+
+          <line x1="85" y1="85" x2="85" y2="140" stroke="#475569" stroke-width="1.5"/>
+          <rect x="77" y="140" width="16" height="14" fill="#334155" rx="1"/>
+          <text x="85" y="150" text-anchor="middle" font-size="6" font-weight="bold" fill="#fff">C2</text>
+          <text x="85" y="165" text-anchor="middle" font-size="6" fill="#0f172a">16A</text>
+
+          <line x1="125" y1="85" x2="125" y2="140" stroke="#475569" stroke-width="1.5"/>
+          <rect x="117" y="140" width="16" height="14" fill="#334155" rx="1"/>
+          <text x="125" y="150" text-anchor="middle" font-size="6" font-weight="bold" fill="#fff">C3</text>
+          <text x="125" y="165" text-anchor="middle" font-size="6" fill="#0f172a">20A</text>
+
+          <line x1="165" y1="85" x2="165" y2="140" stroke="#475569" stroke-width="1.5"/>
+          <rect x="157" y="140" width="16" height="14" fill="#334155" rx="1"/>
+          <text x="165" y="150" text-anchor="middle" font-size="6" font-weight="bold" fill="#fff">C4</text>
+          <text x="165" y="165" text-anchor="middle" font-size="6" fill="#0f172a">32A</text>
+
+          <text x="120" y="180" text-anchor="middle" font-size="8" font-weight="bold" fill="#0f172a">${d.circuitos.length} Circuitos Dimensionados (NBR 5410)</text>
+        </svg>
+      `;
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial Descritivo e de Cálculo de Instalações Elétricas Prediais',
+        norma: 'ABNT NBR 5410:2004 - Instalações Elétricas de Baixa Tensão',
+        elemento: `Quadro Geral de Distribuição (QDG) - ${d.tensao}V - ${d.circuitos.length} Circuitos Terminais`,
+        inputs: [
+          { label: 'Tensão Nominal da Rede', val: `${d.tensao}V (${d.tensao === 127 ? 'Monofásico F+N+PE' : d.tensao === 220 ? 'Bifásico 2F+N+PE' : 'Trifásico 3F+N+PE'})` },
+          { label: 'Potência Total Instalada', val: `${(d.potenciaTotal/1000).toFixed(2)} kW (${d.potenciaTotal} W)` },
+          { label: 'Fator de Demanda Global', val: `${(d.fatorDemanda*100).toFixed(0)}%` },
+          { label: 'Potência de Demanda Provável', val: `${(d.demandaTotal/1000).toFixed(2)} kW` },
+          { label: 'Corrente Total de Demanda', val: `${d.correnteTotal.toFixed(1)} A` },
+          { label: 'Seção do Cabo Alimentador', val: `${d.secaoEntrada} mm² (Cobre Flexível BWF 750V)` },
+          { label: 'Disjuntor Geral Termomagnético', val: `${d.disjuntorGeral} A (Curva C)` },
+          { label: 'Quantidade de Circuitos', val: `${d.circuitos.length} circuitos independentes` }
+        ],
+        formulas: [
+          `Corrente de Projeto: Ib = P / (V · cos φ) [ou Ib = P / (√3 · V · cos φ) para trifásico]`,
+          `Critério da Capacidade de Condução: Iz ≥ Ib (Método B1 - condutores em eletroduto em alvenaria NBR 5410 Tab. 36)`,
+          `Critério de Queda de Tensão: ΔV% = (200 · ρ · L · Ib) / (V · S) ≤ 4.0% (Circuito terminal)`,
+          `Coordenação de Proteção contra Sobrecargas: Ib ≤ In ≤ Iz e I2 ≤ 1.45 · Iz`,
+          `Proteção contra Choques Elétricos: Dispositivo DR com sensibilidade IΔn ≤ 30 mA`
+        ],
+        resultados: [
+          { label: 'Potência Total Instalada', val: `${(d.potenciaTotal/1000).toFixed(2)} kW` },
+          { label: 'Demanda de Dimensionamento', val: `${(d.demandaTotal/1000).toFixed(2)} kW (${d.correnteTotal.toFixed(1)} A)` },
+          { label: 'Cabo Alimentador Geral', val: `${d.secaoEntrada} mm²` },
+          { label: 'Disjuntor Geral Adotado', val: `${d.disjuntorGeral} A Curva C` },
+          { label: 'Dispositivo DR Obrigatório', val: `DR 30mA (Proteção contra choques em áreas molhadas)` },
+          { label: 'Pior Queda de Tensão Registrada', val: `${maxQueda.toFixed(2)}% (${circMaxQueda?.nome || 'C1'})` },
+          { label: 'Total de Circuitos Terminais', val: `${d.circuitos.length} circuitos` },
+          { label: 'Custo Total Estimado de Materiais', val: `R$ ${(d.custo.total || 0).toFixed(2)}` }
+        ],
+        verificacoes: [
+          {
+            item: 'NBR 5410 Item 6.2.7 - Queda de Tensão Máxima nos Circuitos (Limite 4.0%)',
+            calc: `ΔV_max = ${maxQueda.toFixed(2)}% ≤ 4.00%`,
+            status: maxQueda <= 4.0 ? 'pass' : 'warn'
+          },
+          {
+            item: 'NBR 5410 Tabela 47 - Seção Mínima dos Condutores de Cobre',
+            calc: `Iluminação ≥ 1.5 mm² | Tomadas (TUG/TUE) ≥ 2.5 mm²`,
+            status: 'pass'
+          },
+          {
+            item: 'NBR 5410 Item 5.1.3.2 - Proteção Adicional contra Contatos Diretos por DR',
+            calc: `Dispositivo DR de alta sensibilidade (30 mA) previsto para o quadro`,
+            status: 'pass'
+          },
+          {
+            item: 'NBR 5410 Item 6.2.11 - Taxa de Ocupação Máxima de Eletrodutos',
+            calc: `Taxa máxima admitida de 40% para 3 ou mais condutores`,
+            status: 'pass'
+          }
+        ],
+        svgSection: svgSection,
+        notas: 'Projeto e dimensionamento elétrico elaborado em conformidade estrita com a norma ABNT NBR 5410:2004 e padrões da concessionária distribuidora de energia. É obrigatória a instalação de aterramento com haste cobreada (BEP) e equipotencialização de massas metálicas.'
+      });
+    }
   </script>
 
     <!-- Footer -->
@@ -2319,5 +2668,7 @@
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-cad.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
 </body>
 </html>

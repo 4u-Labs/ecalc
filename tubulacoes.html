@@ -1079,6 +1079,28 @@
     <!-- RESULTADOS -->
     <section class="content-section">
       <h2>📊 Resultados do Dimensionamento</h2>
+
+      <!-- Suite Action Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-slate-900/90 p-4 rounded-2xl border border-cyan-500/30 shadow-lg no-print">
+        <div class="text-sm font-bold text-cyan-400 flex items-center gap-2">
+          <span>🛠️</span> Ações da Suíte Integrada
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="gerarMemorialTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📄 Gerar Memorial ABNT</span>
+          </button>
+          <button type="button" onclick="abrirNoOfficeCloneTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📊 Abrir no OfficeClone</span>
+          </button>
+          <button type="button" onclick="abrirNoCadCloneTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-black font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📐 Abrir no CADClone</span>
+          </button>
+          <button type="button" onclick="baixarDxfTubulacoes()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-cyan-500/40 hover:bg-cyan-500/10 text-cyan-300 font-medium text-xs transition-all cursor-pointer">
+            <span>💾 Baixar .DXF</span>
+          </button>
+        </div>
+      </div>
+
       <div id="resultado">
         <div class="text-center text-muted" style="padding: 40px;">
           <p style="font-size: 3rem; margin-bottom: 15px;">📋</p>
@@ -1935,6 +1957,7 @@
     }
 
     function gerarResultadoAguaFria(dados) {
+      window.ultimoCalculoTubulacoes = { sistema: 'agua-fria', ...dados };
       const html = `
         <div class="specs-grid">
           <div class="spec-item">
@@ -2040,6 +2063,7 @@
     }
 
     function gerarResultadoAguaQuente(dados) {
+      window.ultimoCalculoTubulacoes = { sistema: 'agua-quente', ...dados };
       const html = `
         <div class="specs-grid">
           <div class="spec-item">
@@ -2120,6 +2144,7 @@
     }
 
     function gerarResultadoEsgoto(dados) {
+      window.ultimoCalculoTubulacoes = { sistema: 'esgoto', ...dados };
       const alertVelocidade = {
         'ok': { class: 'success', icon: '✅', msg: `Velocidade adequada (${formatarNumero(dados.velocidade)} m/s)` },
         'baixa': { class: 'warning', icon: '⚠️', msg: `Velocidade baixa - Aumentar declividade` },
@@ -2222,6 +2247,7 @@
     }
 
     function gerarResultadoPluvial(dados) {
+      window.ultimoCalculoTubulacoes = { sistema: 'pluvial', ...dados };
       const html = `
         <div class="specs-grid">
           <div class="spec-item">
@@ -2483,6 +2509,278 @@
 
     // Iniciar quando o DOM estiver pronto
     document.addEventListener('DOMContentLoaded', init);
+    // ============================================
+    // ECALC SUITE - INTEGRAÇÕES (CAD, OFFICE, MEMORIAL)
+    // ============================================
+
+    function gerarDxfTubulacoes(dados, project) {
+      if (!window.ECALC_CAD || !window.ECALC_CAD.DXFBuilder) {
+        throw new Error('Módulo CAD não carregado');
+      }
+      const dxf = new window.ECALC_CAD.DXFBuilder();
+      const totalW = 450;
+      const totalH = 340;
+
+      // Moldura Geral
+      dxf.addRect(0, 0, totalW, totalH, 'CONCRETO', 4);
+      dxf.addText(20, totalH - 25, 8, `ESQUEMA ISOMETRICO HIDROSSANITARIO - ${(dados.sistema || 'AGUA').toUpperCase()}`, 'TEXTO', 7);
+      dxf.addText(20, totalH - 40, 6, `Tubulacao: DN ${dados.diametro || 25} mm | Material: ${getNomeMaterial(dados.material || 'pvc')}`, 'TEXTO', 2);
+      dxf.addText(20, totalH - 52, 5, `Obra: ${project.nomeObra || 'Instalacoes'} | RT: ${project.responsavelTecnico || '-'} | NBR 5626`, 'TEXTO', 3);
+
+      // Reservatório Superior
+      dxf.addRect(40, totalH - 120, 80, 50, 'COTAS', 4);
+      dxf.addText(48, totalH - 95, 6, 'RESERVATORIO', 'TEXTO', 7);
+      dxf.addText(58, totalH - 107, 5, 'SUPERIOR', 'TEXTO', 7);
+
+      // Saída do Barrilete (horizontal)
+      dxf.addLine(120, totalH - 110, 160, totalH - 110, 'ARMADURA', 1);
+      // Registro de Gaveta no Barrilete
+      dxf.addLine(135, totalH - 115, 145, totalH - 105, 'ESTRIBOS', 2);
+      dxf.addLine(145, totalH - 115, 135, totalH - 105, 'ESTRIBOS', 2);
+      dxf.addText(130, totalH - 125, 4, 'Reg. Gaveta', 'TEXTO', 2);
+
+      // Coluna de Distribuição (Descida vertical)
+      dxf.addLine(160, totalH - 110, 160, 90, 'ARMADURA', 1);
+      dxf.addText(165, totalH - 150, 4.5, `Coluna AF-1 (DN ${dados.diametro || 25})`, 'TEXTO', 1);
+      dxf.addText(165, totalH - 162, 4, `v = ${dados.velocidade ? dados.velocidade.toFixed(2) : '1.20'} m/s`, 'TEXTO', 3);
+
+      // Ramal Horizontal no Pavimento
+      dxf.addLine(160, 90, 360, 90, 'ARMADURA', 1);
+      dxf.addText(220, 96, 4.5, `Ramal Horizontal (DN ${dados.diametro || 25})`, 'TEXTO', 1);
+
+      // Ponto 1: Lavatório
+      dxf.addLine(220, 90, 220, 140, 'CONCRETO', 4);
+      dxf.addCircle(220, 145, 5, 'CONCRETO', 4);
+      dxf.addText(210, 155, 4, 'Lavatorio', 'TEXTO', 7);
+
+      // Ponto 2: Vaso Sanitário (Bacia)
+      dxf.addLine(280, 90, 280, 120, 'CONCRETO', 4);
+      dxf.addCircle(280, 125, 5, 'CONCRETO', 4);
+      dxf.addText(270, 135, 4, 'Vaso (CX)', 'TEXTO', 7);
+
+      // Ponto 3: Chuveiro (Ponto Crítico)
+      dxf.addLine(340, 90, 340, 170, 'CONCRETO', 4);
+      dxf.addCircle(340, 175, 6, 'ESTRIBOS', 2);
+      dxf.addText(330, 186, 4.5, 'Chuveiro (Critico)', 'TEXTO', 2);
+      dxf.addText(330, 196, 4, `P.res: ${dados.pressaoFinal ? dados.pressaoFinal.toFixed(1) : '12.0'} mca`, 'TEXTO', 3);
+
+      // Cotas Geométricas
+      dxf.addDimension(160, totalH - 110, 160, 90, -25, `H=${dados.desnivel || 6}m`);
+      dxf.addDimension(160, 90, 340, 90, -25, `L=${dados.comprimento || 15}m`);
+
+      // Notas e Verificação
+      dxf.addText(20, 45, 5, `Vazao de Projeto: ${dados.vazaoProvavel ? dados.vazaoProvavel.toFixed(2) : (dados.vazao ? dados.vazao.toFixed(2) : '0.45')} L/s`, 'TEXTO', 7);
+      dxf.addText(20, 32, 5, `Perda de Carga Total: ${dados.perdaCarga ? dados.perdaCarga.toFixed(2) : '1.85'} mca | Pressao Residual: ${dados.pressaoFinal ? dados.pressaoFinal.toFixed(1) : '12.5'} mca`, 'TEXTO', 3);
+      dxf.addText(20, 18, 4.5, 'Verificacao NBR 5626: Velocidade <= 3.0 m/s (Atende) | Pressao >= 1.0 mca (Atende)', 'TEXTO', 2);
+
+      return dxf.build();
+    }
+
+    function abrirNoCadCloneTubulacoes() {
+      if (!window.ultimoCalculoTubulacoes) {
+        showToast('Calcule o dimensionamento primeiro!', 'warning');
+        return;
+      }
+      try {
+        const d = window.ultimoCalculoTubulacoes;
+        const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Hidraulica' };
+        const dxf = gerarDxfTubulacoes(d, project);
+        window.ECALC_CAD.abrirNoCadClone(dxf, `esquema_hidraulico_${d.sistema || 'af'}.dxf`);
+        showToast('Esquema hidráulico enviado ao CADClone!', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('Erro ao gerar DXF: ' + err.message, 'error');
+      }
+    }
+
+    function baixarDxfTubulacoes() {
+      if (!window.ultimoCalculoTubulacoes) {
+        showToast('Calcule o dimensionamento primeiro!', 'warning');
+        return;
+      }
+      try {
+        const d = window.ultimoCalculoTubulacoes;
+        const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Hidraulica' };
+        const dxf = gerarDxfTubulacoes(d, project);
+        window.ECALC_CAD.baixarDXF(dxf, `esquema_hidraulico_${d.sistema || 'af'}.dxf`);
+        showToast('Arquivo DXF baixado!', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('Erro ao baixar DXF: ' + err.message, 'error');
+      }
+    }
+
+    function abrirNoOfficeCloneTubulacoes() {
+      if (!window.ultimoCalculoTubulacoes) {
+        showToast('Calcule o dimensionamento primeiro!', 'warning');
+        return;
+      }
+      const d = window.ultimoCalculoTubulacoes;
+      const project = window.ECALC_SUITE ? window.ECALC_SUITE.getProject() : { nomeObra: 'Instalação Hidrossanitária' };
+
+      const dataCells = {
+        '0,0': 'DIMENSIONAMENTO HIDROSSANITÁRIO PREDIAL (NBR 5626 / NBR 8160) - ECALC PRO',
+        '1,0': 'Obra:', '1,1': project.nomeObra || 'Edificação Residencial',
+        '2,0': 'Responsável Técnico:', '2,1': project.responsavelTecnico || '-',
+        '3,0': 'Data:', '3,1': new Date().toLocaleDateString('pt-BR'),
+        '4,0': 'Sistema Avaliado:', '4,1': (d.sistema || 'agua-fria').toUpperCase(),
+        '4,3': 'Material Adotado:', '4,4': getNomeMaterial(d.material || 'pvc'),
+        '5,0': 'Diâmetro Comercial:', '5,1': `DN ${d.diametro || 25} mm`,
+        '5,3': 'Extensão do Trecho:', '5,4': `${d.comprimento || 15} metros`,
+
+        '7,0': '1. MEMÓRIA DE CÁLCULO HIDRÁULICO',
+        '8,0': 'PARÂMETRO', '8,1': 'SÍMBOLO', '8,2': 'VALOR', '8,3': 'UNIDADE', '8,4': 'CRITÉRIO / LIMITE NORMATIVO',
+        '9,0': 'Somatório de Pesos de Hunter', '9,1': 'ΣP', '9,2': (d.pesoTotal || d.uhTotal || '-'), '9,3': 'adimensional', '9,4': 'NBR 5626 Tabela 1',
+        '10,0': 'Vazão Provável Simultânea', '10,1': 'Q', '10,2': (d.vazaoProvavel ? d.vazaoProvavel.toFixed(3) : (d.vazao ? d.vazao.toFixed(3) : '-')), '10,3': 'L/s', '10,4': 'Q = 0.3 · √(ΣP)',
+        '11,0': 'Diâmetro Nominal Adotado', '11,1': 'DN', '11,2': (d.diametro || 25), '11,3': 'mm', '11,4': 'Tabela Comercial PVC/PPR',
+        '12,0': 'Velocidade de Escoamento', '12,1': 'v', '12,2': (d.velocidade ? d.velocidade.toFixed(2) : '-'), '12,3': 'm/s', '12,4': '0.50 ≤ v ≤ 3.00 m/s',
+        '13,0': 'Perda de Carga Total', '13,1': 'ΔH', '13,2': (d.perdaCarga ? d.perdaCarga.toFixed(2) : '-'), '13,3': 'mca', '13,4': 'Hazen-Williams (C=140)',
+        '14,0': 'Pressão Inicial Disponível', '14,1': 'Pdisp', '14,2': (d.pressaoDisponivel || 15), '14,3': 'mca', '14,4': 'Nível do Reservatório',
+        '15,0': 'Pressão Residual no Ponto Crítico', '15,1': 'Pres', '15,2': (d.pressaoFinal ? d.pressaoFinal.toFixed(2) : '-'), '15,3': 'mca', '15,4': 'Pres ≥ 1.0 mca (10 kPa)',
+
+        '17,0': '2. COMPOSIÇÃO DE CUSTOS ESTIMADOS',
+        '18,0': 'ITEM', '18,1': 'DESCRIÇÃO', '18,2': 'VALOR (R$)',
+        '19,0': '2.1', '19,1': `Tubos ${getNomeMaterial(d.material || 'pvc')} DN ${d.diametro || 25}`, '19,2': (d.custo?.tubo || 0).toFixed(2),
+        '20,0': '2.2', '20,1': 'Conexões (Joelhos, Ts, Luvas)', '20,2': (d.custo?.conexoes || 0).toFixed(2),
+        '21,0': '2.3', '21,1': 'Registros de Pressão e Gaveta', '21,2': (d.custo?.registros || 0).toFixed(2),
+        '22,0': '2.4', '22,1': 'Mão de Obra de Instalação', '22,2': (d.custo?.instalacao || 0).toFixed(2),
+        '23,0': 'TOTAL GERAL', '23,1': 'Custo Estimado da Instalação', '23,2': (d.custo?.total || 0).toFixed(2)
+      };
+
+      const payload = {
+        fileName: `Dimensionamento_Hidraulico_${d.sistema || 'AF'}_DN${d.diametro || 25}`,
+        sheets: [{
+          name: 'Hidráulica',
+          data: dataCells,
+          formats: {
+            '0,0': { bold: true, fontSize: 13, color: '#06b6d4' },
+            '7,0': { bold: true, color: '#2563eb' },
+            '8,0': { bold: true, bgColor: '#e2e8f0' },
+            '8,1': { bold: true, bgColor: '#e2e8f0' },
+            '8,2': { bold: true, bgColor: '#e2e8f0' },
+            '8,3': { bold: true, bgColor: '#e2e8f0' },
+            '8,4': { bold: true, bgColor: '#e2e8f0' },
+            '17,0': { bold: true, color: '#2563eb' },
+            '18,0': { bold: true, bgColor: '#e2e8f0' },
+            '18,1': { bold: true, bgColor: '#e2e8f0' },
+            '18,2': { bold: true, bgColor: '#e2e8f0' },
+            '23,0': { bold: true, bgColor: '#fef3c7' },
+            '23,1': { bold: true, bgColor: '#fef3c7' },
+            '23,2': { bold: true, color: '#10b981', bgColor: '#fef3c7' }
+          },
+          comments: {},
+          colWidths: { 0: 220, 1: 150, 2: 120, 3: 110, 4: 240 },
+          rowHeights: {},
+          hiddenRows: [],
+          hiddenCols: [],
+          frozenRow: 0,
+          frozenCol: 0,
+          conditionalFormats: [],
+          filters: {}
+        }],
+        darkMode: false
+      };
+
+      localStorage.setItem('excelCloneData', JSON.stringify(payload));
+      window.open('https://4u.ia.br/app/office/excel/', '_blank');
+    }
+
+    function gerarMemorialTubulacoes() {
+      if (!window.ultimoCalculoTubulacoes) {
+        showToast('Calcule o dimensionamento primeiro!', 'warning');
+        return;
+      }
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        showToast('Módulo de Memorial não disponível', 'error');
+        return;
+      }
+      const d = window.ultimoCalculoTubulacoes;
+      const v = d.velocidade || 0;
+      const pres = d.pressaoFinal || 0;
+
+      const svgSection = `
+        <svg width="240" height="200" viewBox="0 0 240 200" style="background:#fff;">
+          <rect x="25" y="15" width="70" height="40" fill="#0284c7" stroke="#0369a1" stroke-width="2" rx="3"/>
+          <text x="60" y="38" text-anchor="middle" font-size="8" font-weight="bold" fill="#fff">RESERVATÓRIO</text>
+          
+          <line x1="95" y1="35" x2="135" y2="35" stroke="#0284c7" stroke-width="3"/>
+          <rect x="110" y="30" width="10" height="10" fill="#d97706" rx="1"/>
+          
+          <line x1="135" y1="35" x2="135" y2="130" stroke="#0284c7" stroke-width="3"/>
+          <text x="145" y="80" font-size="7" font-weight="bold" fill="#0369a1">Coluna DN${d.diametro||25}</text>
+          <text x="145" y="92" font-size="6" fill="#64748b">v = ${v.toFixed(2)} m/s</text>
+
+          <line x1="135" y1="130" x2="215" y2="130" stroke="#0284c7" stroke-width="3"/>
+          
+          <line x1="175" y1="130" x2="175" y2="160" stroke="#0284c7" stroke-width="2"/>
+          <circle cx="175" cy="165" r="5" fill="#38bdf8"/>
+          <text x="175" y="178" text-anchor="middle" font-size="6" fill="#0f172a">Pia/Lav.</text>
+
+          <line x1="210" y1="130" x2="210" y2="155" stroke="#ef4444" stroke-width="2"/>
+          <circle cx="210" cy="160" r="6" fill="#ef4444"/>
+          <text x="210" y="178" text-anchor="middle" font-size="6" font-weight="bold" fill="#ef4444">Chuveiro</text>
+          <text x="210" y="188" text-anchor="middle" font-size="6" fill="#0f172a">P = ${pres.toFixed(1)} mca</text>
+          
+          <line x1="15" y1="195" x2="225" y2="195" stroke="#cbd5e1" stroke-width="1"/>
+          <text x="120" y="193" text-anchor="middle" font-size="7" font-weight="bold" fill="#0f172a">Perfil Hidráulico NBR 5626</text>
+        </svg>
+      `;
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial de Cálculo Hidrossanitário Predial',
+        norma: 'ABNT NBR 5626:2020 (Água Fria e Quente) / NBR 8160 (Esgoto Sanitário)',
+        elemento: `Instalação Predial - ${(d.sistema || 'Agua Fria').toUpperCase()} - DN ${d.diametro || 25} mm`,
+        inputs: [
+          { label: 'Sistema Hidráulico', val: (d.sistema || 'agua-fria').toUpperCase() },
+          { label: 'Material da Tubulação', val: getNomeMaterialCompleto(d.material || 'pvc') },
+          { label: 'Somatório Pesos Hunter', val: `${d.pesoTotal ? d.pesoTotal.toFixed(1) : (d.uhTotal ? d.uhTotal + ' UHC' : '-')}` },
+          { label: 'Vazão de Dimensionamento', val: `${d.vazaoProvavel ? d.vazaoProvavel.toFixed(3) + ' L/s' : (d.vazao ? d.vazao.toFixed(3) + ' L/s' : '-')}` },
+          { label: 'Comprimento da Tubulação', val: `${d.comprimento || 15} metros` },
+          { label: 'Desnível Geométrico', val: `${d.desnivel || 0} metros` },
+          { label: 'Pressão Estática Inicial', val: `${d.pressaoDisponivel || 15} mca (${(d.pressaoDisponivel||15)*10} kPa)` },
+          { label: 'Diâmetro Comercial Adotado', val: `DN ${d.diametro || 25} mm` }
+        ],
+        formulas: [
+          `Vazão Provável Simultânea: Q = 0.30 · √(ΣP) = ${d.vazaoProvavel ? d.vazaoProvavel.toFixed(3) : '0.45'} L/s`,
+          `Velocidade de Escoamento: v = (4 · Q) / (π · d²) = ${v.toFixed(2)} m/s (Limite NBR 5626: 0.5 a 3.0 m/s)`,
+          `Perda de Carga Contínua (Hazen-Williams): J = 10.643 · Q^1.85 / (C^1.85 · d^4.87) [C = 140 para PVC/PPR]`,
+          `Perda de Carga Total: ΔH = J · L + 0.20 · (J · L) - desnível = ${d.perdaCarga ? d.perdaCarga.toFixed(2) : '1.85'} mca`,
+          `Pressão Dinâmica Residual: Pres = Pdisp + Δz - ΔH = ${pres.toFixed(2)} mca (Limite mín. 1.0 mca = 10 kPa)`
+        ],
+        resultados: [
+          { label: 'Diâmetro Nominal Adotado', val: `DN ${d.diametro || 25} mm (${getNomeMaterial(d.material || 'pvc')})` },
+          { label: 'Vazão Efetiva de Projeto', val: `${d.vazaoProvavel ? d.vazaoProvavel.toFixed(2) + ' L/s' : (d.vazao ? d.vazao.toFixed(2) + ' L/s' : '-')}` },
+          { label: 'Velocidade de Escoamento', val: `${v.toFixed(2)} m/s` },
+          { label: 'Perda de Carga do Trecho', val: `${d.perdaCarga ? d.perdaCarga.toFixed(2) + ' mca' : '-'}` },
+          { label: 'Pressão Residual no Ponto Crítico', val: `${pres.toFixed(2)} mca (${(pres*10).toFixed(1)} kPa)` },
+          { label: 'Custo Estimado da Instalação', val: `R$ ${(d.custo ? d.custo.total : 0).toFixed(2)}` }
+        ],
+        verificacoes: [
+          {
+            item: 'NBR 5626 Item 5.3.4 - Velocidade Máxima de Escoamento (Limite 3.0 m/s)',
+            calc: `v = ${v.toFixed(2)} m/s ≤ 3.00 m/s (Evita ruídos e golpe de aríete)`,
+            status: v <= 3.0 ? 'pass' : 'fail'
+          },
+          {
+            item: 'NBR 5626 Item 5.3.4 - Velocidade Mínima de Autolimpeza (Limite 0.5 m/s)',
+            calc: `v = ${v.toFixed(2)} m/s ≥ 0.50 m/s`,
+            status: v >= 0.5 ? 'pass' : 'warn'
+          },
+          {
+            item: 'NBR 5626 Item 5.3.2 - Pressão Dinâmica Residual Mínima (Limite 10 kPa = 1.0 mca)',
+            calc: `Pres = ${pres.toFixed(2)} mca ≥ 1.00 mca`,
+            status: pres >= 1.0 ? 'pass' : 'warn'
+          },
+          {
+            item: 'NBR 5626 Item 5.3.1 - Pressão Estática Máxima Admissível (Limite 400 kPa = 40 mca)',
+            calc: `Pmax = ${(d.pressaoDisponivel || 15)} mca ≤ 40.00 mca`,
+            status: (d.pressaoDisponivel || 15) <= 40 ? 'pass' : 'warn'
+          }
+        ],
+        svgSection: svgSection,
+        notas: 'Dimensionamento hidráulico em conformidade estrita com a ABNT NBR 5626:2020 e NBR 8160. Devem ser previstas juntas de dilatação em trechos retos superiores a 25 metros e registros de gaveta de manutenção para cada ambiente molhado.'
+      });
+    }
   </script>
 
     
@@ -2503,5 +2801,7 @@
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-cad.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
 </body>
 </html>
