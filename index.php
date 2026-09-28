@@ -436,11 +436,15 @@ $v = time();
     <main class="container mx-auto px-4 pb-24">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="toolsGrid">
             <!-- Tool Cards -->
-            <a href="dosagem.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="materiais" style="animation-delay: 0.1s">
-                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Materiais</span>
-                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">🗿</div>
-                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">Dosagem de Concreto</h2>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Métodos ACI, IPT e NBR 12655. Traço, correções de umidade e custos.</p>
+            <a href="dosagem.html" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="materiais" style="animation-delay: 0.1s">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/dosagem.webp" type="image/webp">
+                    <img src="assets/cards/dosagem.jpg" alt="Dosagem de Concreto" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>Dosagem de Concreto</h2>
+                    <p>Métodos ACI, IPT e NBR 12655. Traço, correções de umidade e custos.</p>
+                </div>
             </a>
 
             <a href="consumo.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="materiais" style="animation-delay: 0.15s">
