@@ -1178,7 +1178,7 @@
                 <div class="result-grid">
                     <div class="result-card highlight">
                         <div class="icon">💡</div>
-                        <div class="value" id="res-luminárias">0</div>
+                        <div class="value" id="res-luminarias">0</div>
                         <div class="unit">luminárias</div>
                         <div class="label">Quantidade Necessária</div>
                     </div>
@@ -1804,24 +1804,30 @@
 
         // ==================== CÁLCULO PRINCIPAL ====================
 
+        function parseNum(val, fallback = 0) {
+            if (val === undefined || val === null || val === '') return fallback;
+            const n = parseFloat(String(val).replace(',', '.'));
+            return isNaN(n) ? fallback : n;
+        }
+
         function calcularIluminacao() {
-            // Coletar dados
-            const comprimento = parseFloat(document.getElementById('comprimento').value) || 5;
-            const largura = parseFloat(document.getElementById('largura').value) || 4;
-            const peDireito = parseFloat(document.getElementById('pe-direito').value) || 2.8;
-            const alturaPlano = parseFloat(document.getElementById('altura-plano').value) || 0.75;
-            const iluminanciaDesejada = parseFloat(document.getElementById('iluminancia').value) || 500;
+            // Coletar dados com suporte a ponto e vírgula
+            const comprimento = parseNum(document.getElementById('comprimento')?.value, 5);
+            const largura = parseNum(document.getElementById('largura')?.value, 4);
+            const peDireito = parseNum(document.getElementById('pe-direito')?.value, 2.8);
+            const alturaPlano = parseNum(document.getElementById('altura-plano')?.value, 0.75);
+            const iluminanciaDesejada = parseNum(document.getElementById('iluminancia')?.value, 500);
             
-            const fluxoLuminaria = parseFloat(document.getElementById('fluxo-luminaria').value) || 4000;
-            const potenciaLuminaria = parseFloat(document.getElementById('potencia-luminaria').value) || 40;
+            const fluxoLuminaria = parseNum(document.getElementById('fluxo-luminaria')?.value, 4000);
+            const potenciaLuminaria = parseNum(document.getElementById('potencia-luminaria')?.value, 40);
             
-            const fatorManutencao = parseFloat(document.getElementById('fator-manutencao').value) || 0.80;
-            const rendimentoLuminaria = parseFloat(document.getElementById('rendimento-luminaria').value) / 100 || 0.85;
-            const uniformidade = parseFloat(document.getElementById('uniformidade').value) || 0.6;
+            const fatorManutencao = parseNum(document.getElementById('fator-manutencao')?.value, 0.80);
+            const rendimentoLuminaria = (parseNum(document.getElementById('rendimento-luminaria')?.value, 85)) / 100;
+            const uniformidade = parseNum(document.getElementById('uniformidade')?.value, 0.6);
             
-            const custoEnergia = parseFloat(document.getElementById('custo-energia').value) || 0.80;
-            const horasUso = parseFloat(document.getElementById('horas-uso').value) || 8;
-            const vidaUtil = parseFloat(document.getElementById('vida-util').value) || 50000;
+            const custoEnergia = parseNum(document.getElementById('custo-energia')?.value, 0.80);
+            const horasUso = parseNum(document.getElementById('horas-uso')?.value, 8);
+            const vidaUtil = parseNum(document.getElementById('vida-util')?.value, 50000);
             
             // Cálculos
             const area = comprimento * largura;
@@ -1834,7 +1840,7 @@
             let fatorUtilizacao;
             const modoFU = document.getElementById('fator-utilizacao-modo').value;
             if (modoFU === 'manual') {
-                fatorUtilizacao = parseFloat(document.getElementById('fator-utilizacao-valor').value) || 0.60;
+                fatorUtilizacao = parseNum(document.getElementById('fator-utilizacao-valor')?.value, 0.60);
             } else {
                 fatorUtilizacao = calcularFU(indiceK, refletancias.teto, refletancias.parede, refletancias.piso);
             }
@@ -1876,8 +1882,19 @@
                 document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
 
-            // Resultados principais
-            document.getElementById('res-custo-mensal').textContent = 'R$ ' + custoMensal.toFixed(2);
+            // Resultados principais (Cards Superiores)
+            const elLum = document.getElementById('res-luminarias') || document.getElementById('res-luminárias');
+            if (elLum) elLum.textContent = formatarNumero(numLuminarias);
+            const elIlum = document.getElementById('res-iluminancia');
+            if (elIlum) elIlum.textContent = formatarNumero(Math.round(iluminanciaObtida));
+            const elFluxo = document.getElementById('res-fluxo-total');
+            if (elFluxo) elFluxo.textContent = formatarNumero(Math.round(numLuminarias * fluxoLuminaria));
+            const elPot = document.getElementById('res-potencia');
+            if (elPot) elPot.textContent = formatarNumero(Math.round(potenciaTotal));
+            const elDpi = document.getElementById('res-dpil');
+            if (elDpi) elDpi.textContent = dpi.toFixed(1);
+            const elCusto = document.getElementById('res-custo-mensal');
+            if (elCusto) elCusto.textContent = 'R$ ' + custoMensal.toFixed(2);
 
             // Orçamento Estimado 2025
             const precoUnitario = potenciaLuminaria <= 12 ? 28 : (potenciaLuminaria <= 18 ? 38 : 48);
