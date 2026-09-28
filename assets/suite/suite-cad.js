@@ -180,6 +180,205 @@
     }
 
     /**
+     * Generate complete DXF for a Column (Cross Section + Elevation with rebars)
+     */
+    function gerarDxfPilar(params) {
+        const dxf = new DXFBuilder();
+        const b = (params.b || 20) * 10; // mm
+        const h = (params.h || 30) * 10;
+        const cobr = (params.cobrimento || 2.5) * 10;
+        const nome = params.nome || 'P-101';
+        const nBarras = params.nBarras || 4;
+        const bitola = params.bitola || 12.5;
+        const rBarra = bitola / 2;
+
+        // 1. SEÇÃO TRANSVERSAL DO PILAR
+        dxf.addRect(0, 0, b, h, 'CONCRETO', 4);
+
+        // Estribo
+        const estriboW = b - (2 * cobr);
+        const estriboH = h - (2 * cobr);
+        dxf.addRect(cobr, cobr, estriboW, estriboH, 'ESTRIBOS', 2);
+
+        // Armaduras Longitudinais (4 cantos obrigatórios)
+        const corners = [
+            [cobr + rBarra + 2, cobr + rBarra + 2],
+            [b - cobr - rBarra - 2, cobr + rBarra + 2],
+            [cobr + rBarra + 2, h - cobr - rBarra - 2],
+            [b - cobr - rBarra - 2, h - cobr - rBarra - 2]
+        ];
+        corners.forEach(([cx, cy]) => dxf.addCircle(cx, cy, rBarra, 'ARMADURA', 1));
+
+        // Barras intermediárias se nBarras > 4
+        if (nBarras === 6) {
+            const midY = h / 2;
+            dxf.addCircle(cobr + rBarra + 2, midY, rBarra, 'ARMADURA', 1);
+            dxf.addCircle(b - cobr - rBarra - 2, midY, rBarra, 'ARMADURA', 1);
+        } else if (nBarras >= 8) {
+            const midY1 = cobr + rBarra + (estriboH / 3);
+            const midY2 = cobr + rBarra + (2 * estriboH / 3);
+            dxf.addCircle(cobr + rBarra + 2, midY1, rBarra, 'ARMADURA', 1);
+            dxf.addCircle(cobr + rBarra + 2, midY2, rBarra, 'ARMADURA', 1);
+            dxf.addCircle(b - cobr - rBarra - 2, midY1, rBarra, 'ARMADURA', 1);
+            dxf.addCircle(b - cobr - rBarra - 2, midY2, rBarra, 'ARMADURA', 1);
+        }
+
+        // Cotas
+        dxf.addDimension(0, 0, b, 0, -35, `${params.b} cm`, 'COTAS');
+        dxf.addDimension(0, 0, 0, h, -35, `${params.h} cm`, 'COTAS');
+        dxf.addText(0, h + 25, 14, `SEÇÃO TRANSVERSAL - ${nome}`, 'TEXTO', 7);
+        dxf.addText(0, h + 8, 9, `Armadura: ${nBarras}%%c${bitola}mm | Estribo: %%c${params.bitolaEstribo || '5.0'} c/${params.espacoEstribo || '15'}cm`, 'TEXTO', 7);
+
+        // 2. ELEVAÇÃO DO PILAR (Pé-direito H = 3.00m)
+        const elevX = b + 150;
+        const peDireito = (params.altura || 3.0) * 1000; // mm
+        dxf.addRect(elevX, 0, b, peDireito, 'CONCRETO', 4);
+
+        // Barras com esperas (+50cm no topo)
+        const espera = 500;
+        dxf.addLine(elevX + cobr + rBarra, 0, elevX + cobr + rBarra, peDireito + espera, 'ARMADURA', 1);
+        dxf.addLine(elevX + b - cobr - rBarra, 0, elevX + b - cobr - rBarra, peDireito + espera, 'ARMADURA', 1);
+
+        // Distribuição de Estribos na Elevação
+        const sEst = (params.espacoEstribo || 15) * 10;
+        let yEst = 50;
+        while (yEst < peDireito) {
+            dxf.addLine(elevX + cobr, yEst, elevX + b - cobr, yEst, 'ESTRIBOS', 2);
+            yEst += sEst;
+        }
+
+        dxf.addDimension(elevX, 0, elevX, peDireito, -45, `H = ${(peDireito / 1000).toFixed(2)} m`, 'COTAS');
+        dxf.addText(elevX, peDireito + espera + 15, 12, `ELEVAÇÃO - ${nome} (ESPERAS +50cm)`, 'TEXTO', 7);
+
+        return dxf.build();
+    }
+
+    /**
+     * Generate complete DXF for a Slab (Planta com Armadura / Vigotas)
+     */
+    function gerarDxfLaje(params) {
+        const dxf = new DXFBuilder();
+        const lx = (params.lx || 4) * 1000; // mm
+        const ly = (params.ly || 5) * 1000;
+        const h = (params.h || 10) * 10;
+        const nome = params.nome || 'L-101';
+        const tipo = params.tipo || 'macica';
+
+        // 1. PLANTA DA LAJE
+        dxf.addRect(0, 0, lx, ly, 'CONCRETO', 4);
+
+        if (tipo === 'trelicada') {
+            // Vigotas unidirecionais paralelas ao menor vão (lx)
+            const sVigota = 420; // 42 cm entre eixos padrão
+            let curY = sVigota;
+            while (curY < ly) {
+                dxf.addLine(0, curY, lx, curY, 'ARMADURA', 1);
+                dxf.addLine(0, curY - 30, lx, curY - 30, 'ESTRIBOS', 2);
+                dxf.addLine(0, curY + 30, lx, curY + 30, 'ESTRIBOS', 2);
+                curY += sVigota;
+            }
+        } else {
+            // Malha bidirecional X e Y
+            const sMalha = 150; // c/ 15cm
+            let curX = sMalha;
+            while (curX < lx) {
+                dxf.addLine(curX, 50, curX, ly - 50, 'ARMADURA', 1);
+                curX += sMalha;
+            }
+            let curY = sMalha;
+            while (curY < ly) {
+                dxf.addLine(50, curY, lx - 50, curY, 'ARMADURA', 1);
+                curY += sMalha;
+            }
+        }
+
+        // Cotas da Planta
+        dxf.addDimension(0, 0, lx, 0, -80, `Lx = ${(lx/1000).toFixed(2)} m`, 'COTAS');
+        dxf.addDimension(0, 0, 0, ly, -80, `Ly = ${(ly/1000).toFixed(2)} m`, 'COTAS');
+        dxf.addText(lx / 2 - 100, ly / 2, 24, `${nome} (h = ${(h/10)}cm)`, 'TEXTO', 7);
+        dxf.addText(lx / 2 - 100, ly / 2 - 50, 14, tipo === 'trelicada' ? 'Laje Treliçada c/ EPS' : 'Laje Maciça Bidirecional', 'TEXTO', 7);
+
+        // 2. CORTE TRANSVERSAL DA LAJE (Abaixo da planta)
+        const corteY = -350;
+        dxf.addRect(0, corteY, lx, h, 'CONCRETO', 4);
+        dxf.addLine(20, corteY + 25, lx - 20, corteY + 25, 'ARMADURA', 1);
+        dxf.addLine(20, corteY + h - 25, lx - 20, corteY + h - 25, 'ARMADURA', 1);
+        dxf.addDimension(0, corteY, 0, corteY + h, -50, `h = ${(h/10)} cm`, 'COTAS');
+        dxf.addText(0, corteY - 60, 14, `CORTE TRANSVERSAL - ${nome}`, 'TEXTO', 7);
+
+        return dxf.build();
+    }
+
+    /**
+     * Generate complete DXF for an Isolated Footing (Sapata Isolada)
+     */
+    function gerarDxfSapata(params) {
+        const dxf = new DXFBuilder();
+        const a = (params.a || 140) * 10; // mm
+        const b = (params.b || 140) * 10;
+        const h = (params.h || 45) * 10;
+        const h0 = (params.h0 || 20) * 10;
+        const aPilar = (params.aPilar || 20) * 10;
+        const bPilar = (params.bPilar || 30) * 10;
+        const nome = params.nome || 'S-101';
+        const cobr = 40; // 4cm cobrimento de fundação
+
+        // 1. PLANTA DA SAPATA
+        dxf.addRect(0, 0, a, b, 'CONCRETO', 4);
+
+        // Pilar centralizado
+        const pilarX = (a - aPilar) / 2;
+        const pilarY = (b - bPilar) / 2;
+        dxf.addRect(pilarX, pilarY, aPilar, bPilar, 'CONCRETO', 4);
+
+        // Malha de Armadura Inferior (X e Y)
+        const sX = 150;
+        let curX = cobr;
+        while (curX < a - cobr) {
+            dxf.addLine(curX, cobr, curX, b - cobr, 'ARMADURA', 1);
+            curX += sX;
+        }
+        let curY = cobr;
+        while (curY < b - cobr) {
+            dxf.addLine(cobr, curY, a - cobr, curY, 'ARMADURA', 1);
+            curY += sX;
+        }
+
+        // Cotas da Planta
+        dxf.addDimension(0, 0, a, 0, -60, `A = ${(a/10)} cm`, 'COTAS');
+        dxf.addDimension(0, 0, 0, b, -60, `B = ${(b/10)} cm`, 'COTAS');
+        dxf.addText(a / 2 - 80, b + 40, 16, `PLANTA - SAPATA ${nome}`, 'TEXTO', 7);
+
+        // 2. CORTE TRANSVERSAL DA SAPATA (Tronco de Pirâmide)
+        const corteX = a + 200;
+        // Lastro de concreto magro 5cm
+        dxf.addRect(corteX, -50, a, 50, '0', 8);
+
+        // Base da sapata h0
+        dxf.addRect(corteX, 0, a, h0, 'CONCRETO', 4);
+
+        // Chanfro superior até o topo h
+        dxf.addLine(corteX, h0, corteX + pilarX, h, 'CONCRETO', 4);
+        dxf.addLine(corteX + a, h0, corteX + a - pilarX, h, 'CONCRETO', 4);
+        dxf.addLine(corteX + pilarX, h, corteX + a - pilarX, h, 'CONCRETO', 4);
+
+        // Pilar de arranque
+        dxf.addRect(corteX + pilarX, h, aPilar, 400, 'CONCRETO', 4);
+
+        // Armadura de flexão no fundo com ganchos verticais
+        dxf.addLine(corteX + cobr, cobr + 150, corteX + cobr, cobr, 'ARMADURA', 1);
+        dxf.addLine(corteX + cobr, cobr, corteX + a - cobr, cobr, 'ARMADURA', 1);
+        dxf.addLine(corteX + a - cobr, cobr, corteX + a - cobr, cobr + 150, 'ARMADURA', 1);
+
+        // Cotas do Corte
+        dxf.addDimension(corteX, 0, corteX, h, -50, `H = ${(h/10)} cm`, 'COTAS');
+        dxf.addDimension(corteX + a, 0, corteX + a, h0, 50, `h0 = ${(h0/10)} cm`, 'COTAS');
+        dxf.addText(corteX, h + 430, 16, `CORTE ESQUEMÁTICO - ${nome}`, 'TEXTO', 7);
+
+        return dxf.build();
+    }
+
+    /**
      * Bridge: Send DXF directly to CADClone & Open in New Tab
      */
     function abrirNoCadClone(dxfString, filename = 'detalhamento_viga.dxf') {
@@ -214,6 +413,9 @@
     window.ECALC_CAD = {
         DXFBuilder,
         gerarDxfViga,
+        gerarDxfPilar,
+        gerarDxfLaje,
+        gerarDxfSapata,
         abrirNoCadClone,
         baixarDXF
     };

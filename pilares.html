@@ -470,11 +470,20 @@
         <h2 class="text-2xl font-bold text-cyan-400 flex items-center gap-3">
           📋 Resultados do Dimensionamento
         </h2>
-        <div class="flex gap-2 no-print">
-          <button onclick="copiarResultados()" class="px-4 py-2 rounded-lg border border-cyan-500/30 hover:bg-cyan-500/10 text-sm transition-all">
+        <div class="flex flex-wrap items-center gap-2 no-print">
+          <button type="button" onclick="abrirNoCadClonePilar()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📐 Abrir no CADClone</span>
+          </button>
+          <button type="button" onclick="gerarMemorialPilar()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📄 Gerar Memorial ABNT</span>
+          </button>
+          <button type="button" onclick="baixarDxfPilar()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-cyan-500/30 hover:bg-cyan-500/10 text-xs text-cyan-300 font-medium transition-all cursor-pointer" title="Baixar arquivo DXF">
+            <span>💾 Baixar .DXF</span>
+          </button>
+          <button onclick="copiarResultados()" class="px-3.5 py-2 rounded-lg border border-white/10 hover:bg-white/5 text-xs text-gray-300 transition-all">
             📋 Copiar
           </button>
-          <button onclick="salvarHistorico()" class="px-4 py-2 rounded-lg border border-purple-500/30 hover:bg-purple-500/10 text-sm transition-all">
+          <button onclick="salvarHistorico()" class="px-3.5 py-2 rounded-lg border border-purple-500/30 hover:bg-purple-500/10 text-xs text-purple-300 transition-all">
             💾 Salvar
           </button>
         </div>
@@ -1918,23 +1927,137 @@ CUSTO ESTIMADO: R$ ${ultimoResultado.custo.total.toFixed(2)}
       if (e.target.id === 'modalHistorico') fecharHistorico();
     });
     
+    // ==================== ECALC SUITE INTEGRATION ====================
+    function abrirNoCadClonePilar() {
+      if (!ultimoResultado) {
+        mostrarToast('⚠️', 'Calcule um pilar primeiro');
+        return;
+      }
+      if (typeof window.ECALC_CAD === 'undefined') {
+        mostrarToast('❌', 'Módulo CADClone não carregado');
+        return;
+      }
+      const d = ultimoResultado;
+      const dxf = window.ECALC_CAD.gerarDxfPilar({
+        b: d.base,
+        h: d.altura,
+        nBarras: d.armadura.quantidade,
+        bitola: d.armadura.bitola,
+        bitolaEstribo: d.estribos.bitola,
+        espacoEstribo: d.estribos.espacamento,
+        altura: d.comprimento,
+        nome: `Pilar P-101 (${d.base}x${d.altura})`
+      });
+      window.ECALC_CAD.abrirNoCadClone(dxf, `detalhamento_pilar_${d.base}x${d.altura}.dxf`);
+    }
+
+    function baixarDxfPilar() {
+      if (!ultimoResultado) {
+        mostrarToast('⚠️', 'Calcule um pilar primeiro');
+        return;
+      }
+      const d = ultimoResultado;
+      if (typeof window.ECALC_CAD === 'undefined') {
+        mostrarToast('❌', 'Módulo CAD não disponível');
+        return;
+      }
+      const dxf = window.ECALC_CAD.gerarDxfPilar({
+        b: d.base,
+        h: d.altura,
+        nBarras: d.armadura.quantidade,
+        bitola: d.armadura.bitola,
+        bitolaEstribo: d.estribos.bitola,
+        espacoEstribo: d.estribos.espacamento,
+        altura: d.comprimento,
+        nome: `Pilar P-101 (${d.base}x${d.altura})`
+      });
+      window.ECALC_CAD.baixarDXF(dxf, `pilar_${d.base}x${d.altura}_H${d.comprimento}m.dxf`);
+      mostrarToast('💾', 'Arquivo DXF exportado!');
+    }
+
+    function gerarMemorialPilar() {
+      if (!ultimoResultado) {
+        mostrarToast('⚠️', 'Calcule um pilar primeiro');
+        return;
+      }
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        mostrarToast('❌', 'Módulo Memorial não disponível');
+        return;
+      }
+      const d = ultimoResultado;
+      const svgSec = gerarSVGSecao(d.base, d.altura, d.armadura, d.cobrimento, d.tipoSecao);
+      
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial de Cálculo de Pilar em Concreto Armado',
+        norma: 'ABNT NBR 6118:2023 - Projeto de Estruturas de Concreto',
+        elemento: `Pilar P-101 (${d.tipoSecao === 'circular' ? 'Ø' + d.base : d.base + ' × ' + d.altura} cm) - Altura L = ${d.comprimento.toFixed(2)} m`,
+        inputs: [
+          { label: 'Dimensões da Seção (b × h)', val: d.tipoSecao === 'circular' ? `Ø${d.base} cm` : `${d.base} × ${d.altura} cm (Ac = ${d.area.toFixed(1)} cm²)` },
+          { label: 'Comprimento Livre / Flambagem (L)', val: `${d.comprimento.toFixed(2)} m` },
+          { label: 'Força Normal de Cálculo (Nd)', val: `${d.cargaAxial.toFixed(2)} kN` },
+          { label: 'Momentos Fletores Solicitantes (Mdx / Mdy)', val: `${d.momentoCalculoX.toFixed(2)} kN·m / ${d.momentoCalculoY.toFixed(2)} kN·m` },
+          { label: 'Classe do Concreto', val: `C${d.fck} (fck = ${d.fck} MPa, fcd = ${(d.fck/1.4).toFixed(2)} MPa)` },
+          { label: 'Aço Longitudinal / Transversal', val: `CA-${d.fyk === 500 ? '50' : '60'} (fyd = ${(d.fyk/1.15).toFixed(2)} MPa)` },
+          { label: 'Cobrimento Nominal (c)', val: `${d.cobrimento.toFixed(1)} cm (NBR 6118 Tabela 7.2)` }
+        ],
+        formulas: [
+          `Índice de Esbeltez: λ = L_flambagem / i = ${d.esbeltez.toFixed(1)} (Classificação: ${d.classificacao})`,
+          `Efeitos Locais de 2ª Ordem: ${d.considerarSegundaOrdem ? 'Obrigatória análise (λ > λ1) pelo método da curvatura ou rigidez aproximada' : 'Dispensável análise (λ ≤ λ1, pilar pouco esbelto)'}`,
+          `Área Mínima de Aço: As,min = max(0.15 · Nd / fyd, 0.004 · Ac) = ${d.armadura.areaMinima.toFixed(2)} cm²`,
+          `Taxa de Armadura Adotada: ρ = As / Ac = ${((d.armadura.areaTotal / d.area) * 100).toFixed(2)}% (0.4% ≤ ρ ≤ 8.0%)`,
+          `Capacidade Resistente Normal: Nrd = 0.85 · fcd · Ac + As · fyd = ${d.capacidade.Nrd.toFixed(1)} kN`
+        ],
+        resultados: [
+          { label: 'Dimensões Finais', val: d.tipoSecao === 'circular' ? `Ø${d.base} cm` : `${d.base} × ${d.altura} cm` },
+          { label: 'Índice de Esbeltez (λ)', val: `${d.esbeltez.toFixed(1)}` },
+          { label: 'Armadura Longitudinal Adotada', val: `${d.armadura.quantidade} φ ${d.armadura.bitola} mm (As = ${d.armadura.areaTotal.toFixed(2)} cm²)` },
+          { label: 'Taxa Geométrica de Armadura (ρ)', val: `${((d.armadura.areaTotal / d.area) * 100).toFixed(2)}%` },
+          { label: 'Armadura Transversal (Estribos)', val: `φ ${d.estribos.bitola} mm c/ ${d.estribos.espacamento} cm` },
+          { label: 'Capacidade Resistente de Cálculo (Nrd)', val: `${d.capacidade.Nrd.toFixed(1)} kN` },
+          { label: 'Taxa de Utilização da Seção', val: `${d.capacidade.taxaUtilizacao.toFixed(1)}%` },
+          { label: 'Custo Estimado de Materiais', val: `R$ ${d.custo.total.toFixed(2)}` }
+        ],
+        verificacoes: [
+          {
+            item: 'ELU - Capacidade Resistente à Compressão Normal',
+            calc: `Nd = ${d.cargaAxial.toFixed(1)} kN ≤ Nrd = ${d.capacidade.Nrd.toFixed(1)} kN (Uso: ${d.capacidade.taxaUtilizacao.toFixed(1)}%)`,
+            status: d.capacidade.taxaUtilizacao <= 100 ? 'pass' : 'fail'
+          },
+          {
+            item: 'ELU - Limite Normativo de Esbeltez (NBR 6118 item 15.8.1)',
+            calc: `λ = ${d.esbeltez.toFixed(1)} ≤ λ,max = 140`,
+            status: d.esbeltez <= 140 ? 'pass' : 'fail'
+          },
+          {
+            item: 'ELU - Armadura Longitudinal Mínima',
+            calc: `As,adotada = ${d.armadura.areaTotal.toFixed(2)} cm² ≥ As,min = ${d.armadura.areaMinima.toFixed(2)} cm²`,
+            status: 'pass'
+          },
+          {
+            item: 'ELS - Espaçamento Máximo de Estribos',
+            calc: `s = ${d.estribos.espacamento} cm ≤ s,max = ${d.estribos.espacamentoMax.toFixed(1)} cm`,
+            status: 'pass'
+          },
+          {
+            item: 'Geometria - Seção Mínima Normativa (NBR 6118)',
+            calc: `${Math.min(d.base, d.altura)} cm ≥ 19 cm (admissível 14 cm com coeficiente adicional γn)`,
+            status: Math.min(d.base, d.altura) >= 14 ? 'pass' : 'warn'
+          }
+        ],
+        svgSection: svgSec,
+        notas: 'Memorial de cálculo gerado pela Suíte Integrada ECALC PRO em estrita conformidade com a ABNT NBR 6118:2023. O projeto executivo e lançamento devem contar com ART/RRT do Responsável Técnico.'
+      });
+    }
+
     // Inicialização
     atualizarPreview();
     setTimeout(calcular, 100);
   </script>
 
     <!-- Footer -->
-    
-    
-
-    
-
-
-    <!-- Footer -->
     <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5 dark:border-white/5">
         <p class="mt-4">&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
     </footer>
-
 
     <script>
         if (document.getElementById('year')) {
@@ -1942,8 +2065,9 @@ CUSTO ESTIMADO: R$ ${ultimoResultado.custo.total.toFixed(2)}
         }
     </script>
 
-
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
     <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-memorial.js"></script>
+    <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>
