@@ -786,11 +786,15 @@ $v = time();
             </a>
 
             <!-- Sound Meter - Decibelímetro Digital (PWA) -->
-            <a href="soundmeter/index.html" class="tool-card group relative rounded-3xl p-8 flex flex-col items-center text-center animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.84s;">
-                <span class="tool-category absolute top-4 right-4 text-[10px] uppercase font-bold px-2 py-1 rounded-full">Conforto</span>
-                <div class="tool-icon-wrapper w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-6 transition-transform duration-500">🎙️</div>
-                <h2 class="text-xl font-semibold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors">Sound Meter</h2>
-                <p class="text-sm text-slate-400 font-light leading-relaxed">Medidor de nível sonoro em tempo real (dB) via microfone e análise de espectro acústico.</p>
+            <a href="soundmeter/index.html" class="tool-card tool-card-image group relative rounded-3xl animate-fade-in opacity-0" data-category="outros" style="animation-delay: 0.84s;">
+                <picture class="w-full h-full block">
+                    <source srcset="assets/cards/soundmeter.webp" type="image/webp">
+                    <img src="assets/cards/soundmeter.jpg" alt="Sound Meter" loading="lazy">
+                </picture>
+                <div class="sr-only">
+                    <h2>Sound Meter</h2>
+                    <p>Medidor de nível sonoro em tempo real (dB) via microfone e análise de espectro acústico.</p>
+                </div>
             </a>
 
             <!-- Smart Notes - Bloco de Notas Técnico -->
