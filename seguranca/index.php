@@ -69,63 +69,95 @@ if (empty($_SESSION['api_token'])) {
         </div>
     </div>
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-slate-900/50 backdrop-blur-xl border-r border-white/10 text-white z-50 transform transition-transform duration-300">
-        <div class="p-6 border-b border-white/10 border-white/10">
-            <a href="#" id="logo-link" class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center">
-                    <span class="text-2xl">🛡️</span>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg">SafeWork Pro</h1>
-                    <div class="flex items-center gap-1">
-                        <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white">IA</span>
-                        <p class="text-xs text-gray-300">Powered by AI</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        
-        <nav class="p-4 space-y-2">
-            <button onclick="showSection('dashboard')" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="dashboard">
-                <span class="text-xl">📊</span>
-                <span>Dashboard</span>
+    <!-- Sidebar Backdrop Overlay (Mobile) -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/75 backdrop-blur-xs z-[10000] hidden lg:hidden transition-opacity duration-300"></div>
+
+    <!-- Mobile Top Bar (visível apenas em telas menores que lg) -->
+    <header class="lg:hidden sticky top-[46px] z-30 bg-slate-900/95 backdrop-blur-md border-b border-white/10 px-4 py-2.5 flex items-center justify-between shadow-lg">
+        <div class="flex items-center gap-2.5">
+            <button type="button" onclick="toggleSidebar(true)" class="p-2 rounded-xl bg-slate-800 text-slate-200 hover:text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-amber-400 active:scale-95 transition-all" aria-label="Abrir Menu">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
             </button>
-            <button onclick="showSection('pgr')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="pgr">
-                <span class="text-xl">🦺</span>
-                <span>Gerador de PGR</span>
-            </button>
-            <button onclick="showSection('pcmat')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="pcmat">
-                <span class="text-xl">🏗️</span>
-                <span>Gerador de PCMAT</span>
-            </button>
-            <button onclick="showSection('apr')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="apr">
-                <span class="text-xl">⚠️</span>
-                <span>APR Digital</span>
-            </button>
-            <button onclick="showSection('epi')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="epi">
-                <span class="text-xl">🧤</span>
-                <span>Checklist de EPI</span>
-            </button>
-            <button onclick="showSection('treinamentos')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="treinamentos">
-                <span class="text-xl">🎓</span>
-                <span>Treinamentos</span>
-            </button>
-        </nav>
-        
-        <!-- Badge de Créditos Unificados -->
-        <div id="sidebar-credits-badge" class="hidden mx-4 my-2 p-3 bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border border-purple-500/20 rounded-xl flex items-center justify-between cursor-pointer hover:border-purple-400/40 transition-all hover:shadow-[0_0_10px_rgba(139,92,246,0.15)]" onclick="openModal('pix-modal')">
             <div class="flex items-center gap-2">
-                <span class="text-lg">💎</span>
+                <span class="text-xl">🛡️</span>
                 <div>
-                    <p class="text-[10px] text-slate-400">Saldo de IA</p>
-                    <p class="font-bold text-xs text-white" id="sidebar-credits-count">0 créditos</p>
+                    <h1 class="font-bold text-sm text-white leading-tight">SafeWork Pro</h1>
+                    <span id="mobile-current-section" class="text-[11px] text-amber-400 font-medium">Dashboard</span>
                 </div>
             </div>
-            <span class="text-[10px] font-semibold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-lg border border-purple-500/20">Recarregar</span>
+        </div>
+        <div id="mobile-credits-container" class="flex items-center gap-2">
+            <button type="button" onclick="openModal('pix-modal')" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-semibold hover:bg-purple-500/30 transition-colors">
+                <span>💎</span>
+                <span id="mobile-credits-count">0 cr</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 lg:top-[46px] h-full lg:h-[calc(100vh-46px)] w-72 sm:w-80 lg:w-64 bg-slate-900/95 lg:bg-slate-900/70 backdrop-blur-xl border-r border-white/10 text-white z-[10001] lg:z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between overflow-y-auto">
+        <div>
+            <div class="p-5 border-b border-white/10 flex items-center justify-between">
+                <a href="#" id="logo-link" class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center shrink-0">
+                        <span class="text-2xl">🛡️</span>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg text-white">SafeWork Pro</h1>
+                        <div class="flex items-center gap-1">
+                            <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white">IA</span>
+                            <p class="text-xs text-gray-300">Powered by AI</p>
+                        </div>
+                    </div>
+                </a>
+                <button type="button" onclick="toggleSidebar(false)" class="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 active:scale-95 transition-all" title="Fechar Menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <nav class="p-4 space-y-2">
+                <button onclick="showSection('dashboard')" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="dashboard">
+                    <span class="text-xl">📊</span>
+                    <span>Dashboard</span>
+                </button>
+                <button onclick="showSection('pgr')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="pgr">
+                    <span class="text-xl">🦺</span>
+                    <span>Gerador de PGR</span>
+                </button>
+                <button onclick="showSection('pcmat')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="pcmat">
+                    <span class="text-xl">🏗️</span>
+                    <span>Gerador de PCMAT</span>
+                </button>
+                <button onclick="showSection('apr')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="apr">
+                    <span class="text-xl">⚠️</span>
+                    <span>APR Digital</span>
+                </button>
+                <button onclick="showSection('epi')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="epi">
+                    <span class="text-xl">🧤</span>
+                    <span>Checklist de EPI</span>
+                </button>
+                <button onclick="showSection('treinamentos')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="treinamentos">
+                    <span class="text-xl">🎓</span>
+                    <span>Treinamentos</span>
+                </button>
+            </nav>
+            
+            <!-- Badge de Créditos Unificados -->
+            <div id="sidebar-credits-badge" class="hidden mx-4 my-2 p-3 bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border border-purple-500/20 rounded-xl flex items-center justify-between cursor-pointer hover:border-purple-400/40 transition-all hover:shadow-[0_0_10px_rgba(139,92,246,0.15)]" onclick="openModal('pix-modal')">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">💎</span>
+                    <div>
+                        <p class="text-[10px] text-slate-400">Saldo de IA</p>
+                        <p class="font-bold text-xs text-white" id="sidebar-credits-count">0 créditos</p>
+                    </div>
+                </div>
+                <span class="text-[10px] font-semibold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-lg border border-purple-500/20">Recarregar</span>
+            </div>
         </div>
         
-        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10" id="sidebar-footer-container">
+        <div class="p-4 border-t border-white/10" id="sidebar-footer-container">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
                     <span class="text-sm">👷</span>
@@ -139,108 +171,108 @@ if (empty($_SESSION['api_token'])) {
     </aside>
 
     <!-- Main Content -->
-    <main class="ml-64 p-8">
+    <main class="w-full lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen">
         <!-- Dashboard Section -->
         <section id="dashboard-section" class="fade-in">
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-white">Dashboard</h2>
-                <p class="text-slate-400">Visão geral do sistema de segurança com IA</p>
+            <div class="mb-6 sm:mb-8">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Dashboard</h2>
+                <p class="text-xs sm:text-sm text-slate-400 mt-1">Visão geral do sistema de segurança com IA</p>
             </div>
             
             <!-- AI Status -->
-            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 mb-8 text-white" id="ai-status-banner">
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 text-white" id="ai-status-banner">
                 <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 bg-slate-900/40 border border-white/5/20 rounded-xl flex items-center justify-center">
-                        <span class="text-4xl">🤖</span>
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-slate-900/40 border border-white/20 rounded-xl flex items-center justify-center shrink-0">
+                        <span class="text-2xl sm:text-4xl">🤖</span>
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold">Inteligência Artificial Ativa</h3>
-                        <p class="text-purple-200">Documentos gerados automaticamente com análise inteligente</p>
+                        <h3 class="text-lg sm:text-xl font-bold">Inteligência Artificial Ativa</h3>
+                        <p class="text-xs sm:text-sm text-purple-200 mt-0.5">Documentos gerados automaticamente com análise inteligente</p>
                     </div>
                 </div>
             </div>
             
             <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 card-hover shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center">
-                            <span class="text-2xl">🦺</span>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover shadow-sm">
+                    <div class="flex items-center justify-between mb-3 sm:mb-4">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center">
+                            <span class="text-xl sm:text-2xl">🦺</span>
                         </div>
-                        <span class="text-green-500 text-sm font-medium">+12%</span>
+                        <span class="text-green-500 text-xs sm:text-sm font-medium">+12%</span>
                     </div>
-                    <h3 class="text-2xl font-bold text-white" id="stat-pgr">0</h3>
-                    <p class="text-slate-400 text-sm">PGRs Gerados</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white" id="stat-pgr">0</h3>
+                    <p class="text-slate-400 text-xs sm:text-sm">PGRs Gerados</p>
                 </div>
                 
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 card-hover shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-cyan-500/20 text-cyan-400 rounded-xl flex items-center justify-center">
-                            <span class="text-2xl">⚠️</span>
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover shadow-sm">
+                    <div class="flex items-center justify-between mb-3 sm:mb-4">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-cyan-500/20 text-cyan-400 rounded-xl flex items-center justify-center">
+                            <span class="text-xl sm:text-2xl">⚠️</span>
                         </div>
-                        <span class="text-green-500 text-sm font-medium">+8%</span>
+                        <span class="text-green-500 text-xs sm:text-sm font-medium">+8%</span>
                     </div>
-                    <h3 class="text-2xl font-bold text-white" id="stat-apr">0</h3>
-                    <p class="text-slate-400 text-sm">APRs Ativas</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white" id="stat-apr">0</h3>
+                    <p class="text-slate-400 text-xs sm:text-sm">APRs Ativas</p>
                 </div>
                 
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 card-hover shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-rose-500/20 text-rose-400 rounded-xl flex items-center justify-center">
-                            <span class="text-2xl">🧤</span>
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover shadow-sm">
+                    <div class="flex items-center justify-between mb-3 sm:mb-4">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-rose-500/20 text-rose-400 rounded-xl flex items-center justify-center">
+                            <span class="text-xl sm:text-2xl">🧤</span>
                         </div>
                         <span class="pulse-dot w-2 h-2 bg-red-500 rounded-full"></span>
                     </div>
-                    <h3 class="text-2xl font-bold text-white" id="stat-epi-alert">0</h3>
-                    <p class="text-slate-400 text-sm">EPIs Vencendo</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white" id="stat-epi-alert">0</h3>
+                    <p class="text-slate-400 text-xs sm:text-sm">EPIs Vencendo</p>
                 </div>
                 
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 card-hover shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center">
-                            <span class="text-2xl">🎓</span>
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover shadow-sm">
+                    <div class="flex items-center justify-between mb-3 sm:mb-4">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center">
+                            <span class="text-xl sm:text-2xl">🎓</span>
                         </div>
-                        <span class="text-yellow-500 text-sm font-medium">5 pendentes</span>
+                        <span class="text-yellow-500 text-[10px] sm:text-sm font-medium">5 pendentes</span>
                     </div>
-                    <h3 class="text-2xl font-bold text-white" id="stat-train">0</h3>
-                    <p class="text-slate-400 text-sm">Treinamentos</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white" id="stat-train">0</h3>
+                    <p class="text-slate-400 text-xs sm:text-sm">Treinamentos</p>
                 </div>
             </div>
             
             <!-- Quick Actions -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm">
-                    <h3 class="font-bold text-lg text-white mb-4">🚀 Ações Rápidas com IA</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="showSection('pgr')" class="p-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white border border-amber-500/30 rounded-xl hover:shadow-lg transition-all">
-                            <span class="text-2xl block mb-2">🦺</span>
-                            <span class="font-medium">Novo PGR</span>
-                            <span class="block text-xs opacity-75">Gerado por IA</span>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+                    <h3 class="font-bold text-base sm:text-lg text-white mb-4">🚀 Ações Rápidas com IA</h3>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                        <button onclick="showSection('pgr')" class="p-3 sm:p-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white border border-amber-500/30 rounded-xl hover:shadow-lg transition-all text-left">
+                            <span class="text-xl sm:text-2xl block mb-1">🦺</span>
+                            <span class="font-medium text-xs sm:text-sm block">Novo PGR</span>
+                            <span class="block text-[10px] sm:text-xs opacity-75">Gerado por IA</span>
                         </button>
-                        <button onclick="showSection('apr')" class="p-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl hover:shadow-lg transition-all">
-                            <span class="text-2xl block mb-2">⚠️</span>
-                            <span class="font-medium">Nova APR</span>
-                            <span class="block text-xs opacity-75">Gerado por IA</span>
+                        <button onclick="showSection('apr')" class="p-3 sm:p-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl hover:shadow-lg transition-all text-left">
+                            <span class="text-xl sm:text-2xl block mb-1">⚠️</span>
+                            <span class="font-medium text-xs sm:text-sm block">Nova APR</span>
+                            <span class="block text-[10px] sm:text-xs opacity-75">Gerado por IA</span>
                         </button>
-                        <button onclick="showSection('epi')" class="p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all">
-                            <span class="text-2xl block mb-2">🧤</span>
-                            <span class="font-medium">Registrar EPI</span>
-                            <span class="block text-xs opacity-75">Termo por IA</span>
+                        <button onclick="showSection('epi')" class="p-3 sm:p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all text-left">
+                            <span class="text-xl sm:text-2xl block mb-1">🧤</span>
+                            <span class="font-medium text-xs sm:text-sm block">Registrar EPI</span>
+                            <span class="block text-[10px] sm:text-xs opacity-75">Termo por IA</span>
                         </button>
-                        <button onclick="showSection('treinamentos')" class="p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg transition-all">
-                            <span class="text-2xl block mb-2">🎓</span>
-                            <span class="font-medium">Treinamento</span>
-                            <span class="block text-xs opacity-75">Certificado por IA</span>
+                        <button onclick="showSection('treinamentos')" class="p-3 sm:p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg transition-all text-left">
+                            <span class="text-xl sm:text-2xl block mb-1">🎓</span>
+                            <span class="font-medium text-xs sm:text-sm block">Treinamento</span>
+                            <span class="block text-[10px] sm:text-xs opacity-75">Certificado por IA</span>
                         </button>
                     </div>
                 </div>
                 
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm">
-                    <h3 class="font-bold text-lg text-white mb-4">⚡ Alertas Importantes</h3>
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+                    <h3 class="font-bold text-base sm:text-lg text-white mb-4">⚡ Alertas Importantes</h3>
                     <div class="space-y-3" id="alerts-container">
                         <div class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
                             <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                            <p class="text-sm text-slate-400">Nenhum alerta no momento</p>
+                            <p class="text-xs sm:text-sm text-slate-400">Nenhum alerta no momento</p>
                         </div>
                     </div>
                 </div>
@@ -249,22 +281,24 @@ if (empty($_SESSION['api_token'])) {
 
         <!-- PGR Section -->
         <section id="pgr-section" class="hidden fade-in">
-            <div class="mb-8 flex justify-between items-center">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-white">🦺 Gerador de PGR</h2>
-                    <p class="text-slate-400">Programa de Gerenciamento de Riscos - NR-01 <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-2">IA</span></p>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+                        <span>🦺</span> Gerador de PGR
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Programa de Gerenciamento de Riscos - NR-01 <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-1">IA</span></p>
                 </div>
-                <button onclick="checkAuthAndOpen('pgr-modal')" class="bg-amber-600 hover:bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)] text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
+                <button onclick="checkAuthAndOpen('pgr-modal')" class="w-full sm:w-auto shrink-0 bg-amber-600 hover:bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)] text-white px-5 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
                     <span>🤖</span> Gerar PGR com IA
                 </button>
             </div>
             
-            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm mb-6">
-                <h3 class="font-bold text-lg mb-4">PGRs Cadastrados</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
+            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm mb-6">
+                <h3 class="font-bold text-base sm:text-lg mb-4 text-white">PGRs Cadastrados</h3>
+                <div class="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                    <table class="w-full min-w-[640px] text-sm">
                         <thead>
-                            <tr class="text-left text-slate-400 text-sm border-b border-white/10">
+                            <tr class="text-left text-slate-400 text-xs sm:text-sm border-b border-white/10">
                                 <th class="pb-3 font-medium">Empresa</th>
                                 <th class="pb-3 font-medium">CNPJ</th>
                                 <th class="pb-3 font-medium">Riscos Identificados</th>
@@ -285,22 +319,24 @@ if (empty($_SESSION['api_token'])) {
 
         <!-- PCMAT Section -->
         <section id="pcmat-section" class="hidden fade-in">
-            <div class="mb-8 flex justify-between items-center">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-white">🏗️ Gerador de PCMAT</h2>
-                    <p class="text-slate-400">Programa de Condições e Meio Ambiente de Trabalho - NR-18 <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-2">IA</span></p>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+                        <span>🏗️</span> Gerador de PCMAT
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Programa de Condições e Meio Ambiente de Trabalho - NR-18 <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-1">IA</span></p>
                 </div>
-                <button onclick="checkAuthAndOpen('pcmat-modal')" class="bg-cyan-600 hover:bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)] text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
+                <button onclick="checkAuthAndOpen('pcmat-modal')" class="w-full sm:w-auto shrink-0 bg-cyan-600 hover:bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)] text-white px-5 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
                     <span>🤖</span> Gerar PCMAT com IA
                 </button>
             </div>
             
-            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-lg mb-4">PCMATs Cadastrados</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
+            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+                <h3 class="font-bold text-base sm:text-lg mb-4 text-white">PCMATs Cadastrados</h3>
+                <div class="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                    <table class="w-full min-w-[640px] text-sm">
                         <thead>
-                            <tr class="text-left text-slate-400 text-sm border-b border-white/10">
+                            <tr class="text-left text-slate-400 text-xs sm:text-sm border-b border-white/10">
                                 <th class="pb-3 font-medium">Obra</th>
                                 <th class="pb-3 font-medium">Endereço</th>
                                 <th class="pb-3 font-medium">Nº Trabalhadores</th>
@@ -321,22 +357,24 @@ if (empty($_SESSION['api_token'])) {
 
         <!-- APR Section -->
         <section id="apr-section" class="hidden fade-in">
-            <div class="mb-8 flex justify-between items-center">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-white">⚠️ APR Digital</h2>
-                    <p class="text-slate-400">Análise Preliminar de Risco <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-2">IA</span></p>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+                        <span>⚠️</span> APR Digital
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Análise Preliminar de Risco <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-1">IA</span></p>
                 </div>
-                <button onclick="checkAuthAndOpen('apr-modal')" class="bg-yellow-600 hover:bg-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.5)] text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
+                <button onclick="checkAuthAndOpen('apr-modal')" class="w-full sm:w-auto shrink-0 bg-yellow-600 hover:bg-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.5)] text-white px-5 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
                     <span>🤖</span> Gerar APR com IA
                 </button>
             </div>
             
-            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-lg mb-4">APRs Cadastradas</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
+            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+                <h3 class="font-bold text-base sm:text-lg mb-4 text-white">APRs Cadastradas</h3>
+                <div class="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                    <table class="w-full min-w-[640px] text-sm">
                         <thead>
-                            <tr class="text-left text-slate-400 text-sm border-b border-white/10">
+                            <tr class="text-left text-slate-400 text-xs sm:text-sm border-b border-white/10">
                                 <th class="pb-3 font-medium">Atividade</th>
                                 <th class="pb-3 font-medium">Local</th>
                                 <th class="pb-3 font-medium">Responsável</th>
@@ -357,46 +395,48 @@ if (empty($_SESSION['api_token'])) {
 
         <!-- EPI Section -->
         <section id="epi-section" class="hidden fade-in">
-            <div class="mb-8 flex justify-between items-center">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-white">🧤 Checklist de EPI</h2>
-                    <p class="text-slate-400">Controle de Equipamentos de Proteção Individual <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-2">IA</span></p>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+                        <span>🧤</span> Checklist de EPI
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Controle de Equipamentos de Proteção Individual <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-1">IA</span></p>
                 </div>
-                <button onclick="checkAuthAndOpen('epi-modal')" class="bg-emerald-600 hover:bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
+                <button onclick="checkAuthAndOpen('epi-modal')" class="w-full sm:w-auto shrink-0 bg-emerald-600 hover:bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] text-white px-5 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
                     <span>🤖</span> Registrar EPI com Termo IA
                 </button>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6">
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-slate-400">Total de EPIs</span>
-                        <span class="text-2xl">🧤</span>
+                        <span class="text-slate-400 text-xs sm:text-sm">Total de EPIs</span>
+                        <span class="text-xl sm:text-2xl">🧤</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-white" id="epi-total">0</h3>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-white" id="epi-total">0</h3>
                 </div>
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm border-l-4 border-green-500">
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border-l-4 border-green-500">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-slate-400">Válidos</span>
-                        <span class="text-2xl">✅</span>
+                        <span class="text-slate-400 text-xs sm:text-sm">Válidos</span>
+                        <span class="text-xl sm:text-2xl">✅</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-green-600" id="epi-valid">0</h3>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-green-500" id="epi-valid">0</h3>
                 </div>
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm border-l-4 border-red-500">
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border-l-4 border-red-500">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-slate-400">Vencidos/Vencendo</span>
-                        <span class="text-2xl">⚠️</span>
+                        <span class="text-slate-400 text-xs sm:text-sm">Vencidos/Vencendo</span>
+                        <span class="text-xl sm:text-2xl">⚠️</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-red-600" id="epi-expired">0</h3>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-red-500" id="epi-expired">0</h3>
                 </div>
             </div>
             
-            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-lg mb-4">Registro de EPIs</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
+            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+                <h3 class="font-bold text-base sm:text-lg mb-4 text-white">Registro de EPIs</h3>
+                <div class="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                    <table class="w-full min-w-[640px] text-sm">
                         <thead>
-                            <tr class="text-left text-slate-400 text-sm border-b border-white/10">
+                            <tr class="text-left text-slate-400 text-xs sm:text-sm border-b border-white/10">
                                 <th class="pb-3 font-medium">Funcionário</th>
                                 <th class="pb-3 font-medium">EPI</th>
                                 <th class="pb-3 font-medium">CA</th>
@@ -418,22 +458,24 @@ if (empty($_SESSION['api_token'])) {
 
         <!-- Treinamentos Section -->
         <section id="treinamentos-section" class="hidden fade-in">
-            <div class="mb-8 flex justify-between items-center">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-white">🎓 Controle de Treinamentos</h2>
-                    <p class="text-slate-400">Gestão de treinamentos obrigatórios por NR <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-2">IA</span></p>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+                        <span>🎓</span> Controle de Treinamentos
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Gestão de treinamentos obrigatórios por NR <span class="ai-badge text-xs px-2 py-0.5 rounded-full text-white ml-1">IA</span></p>
                 </div>
-                <button onclick="checkAuthAndOpen('treinamento-modal')" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
+                <button onclick="checkAuthAndOpen('treinamento-modal')" class="w-full sm:w-auto shrink-0 bg-purple-500 hover:bg-purple-600 text-white px-5 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
                     <span>🤖</span> Novo Treinamento com Certificado IA
                 </button>
             </div>
             
-            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-lg mb-4">Treinamentos Registrados</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
+            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+                <h3 class="font-bold text-base sm:text-lg mb-4 text-white">Treinamentos Registrados</h3>
+                <div class="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                    <table class="w-full min-w-[640px] text-sm">
                         <thead>
-                            <tr class="text-left text-slate-400 text-sm border-b border-white/10">
+                            <tr class="text-left text-slate-400 text-xs sm:text-sm border-b border-white/10">
                                 <th class="pb-3 font-medium">Funcionário</th>
                                 <th class="pb-3 font-medium">Treinamento</th>
                                 <th class="pb-3 font-medium">NR</th>
@@ -464,15 +506,15 @@ if (empty($_SESSION['api_token'])) {
     </main>
 
     <!-- Modal de Autenticação Unificada (4uLabs) -->
-    <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto py-8">
-        <div class="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4 relative shadow-[0_0_50px_rgba(139,92,246,0.15)]">
+    <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-3 sm:p-6">
+        <div class="bg-slate-900/90 backdrop-blur-md border border-white/10 rounded-2xl p-5 sm:p-8 max-w-md w-full mx-auto relative shadow-[0_0_50px_rgba(139,92,246,0.15)] my-auto max-h-[92vh] overflow-y-auto">
             <button onclick="closeModal('auth-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-[0_8px_30px_rgba(124,58,237,0.4)] border border-white/10">
-                    <span class="text-3xl font-extrabold text-white">4U</span>
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-[0_8px_30px_rgba(124,58,237,0.4)] border border-white/10">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-white">4U</span>
                 </div>
-                <h3 class="text-2xl font-bold text-white">Portal 4uLabs</h3>
-                <p class="text-slate-400 text-sm mt-1" id="auth-modal-subtitle">Conecte sua conta unificada para gerenciar seus créditos de IA.</p>
+                <h3 class="text-xl sm:text-2xl font-bold text-white">Portal 4uLabs</h3>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1" id="auth-modal-subtitle">Conecte sua conta unificada para gerenciar seus créditos de IA.</p>
             </div>
             
             <div class="flex border-b border-white/10 mb-6">
@@ -498,39 +540,39 @@ if (empty($_SESSION['api_token'])) {
     </div>
 
     <!-- Modal de Recarga PIX (Mercado Pago) -->
-    <div id="pix-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto py-8">
-        <div class="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4 relative shadow-[0_0_50px_rgba(6,182,212,0.15)]">
+    <div id="pix-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-3 sm:p-6">
+        <div class="bg-slate-900/90 backdrop-blur-md border border-white/10 rounded-2xl p-5 sm:p-8 max-w-md w-full mx-auto relative shadow-[0_0_50px_rgba(6,182,212,0.15)] my-auto max-h-[92vh] overflow-y-auto">
             <button onclick="closePixModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             <div class="text-center mb-6">
-                <h3 class="text-2xl font-bold text-white flex items-center justify-center gap-2">💎 Recarregar Créditos</h3>
+                <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center justify-center gap-2">💎 Recarregar Créditos</h3>
                 <span class="inline-flex items-center gap-1.5 text-[10px] text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20 mt-2 font-semibold tracking-wider">PORTAL UNIFICADO 4ULABS</span>
-                <p class="text-slate-400 text-sm mt-3 leading-relaxed">
-                    Créditos compartilhados! Suas recargas ficam disponíveis para uso no **SafeWork Pro**, **Keep AI**, **TubeMind AI** e demais ferramentas.
+                <p class="text-slate-400 text-xs sm:text-sm mt-3 leading-relaxed">
+                    Créditos compartilhados! Suas recargas ficam disponíveis para uso no <strong>SafeWork Pro</strong>, <strong>Keep AI</strong>, <strong>TubeMind AI</strong> e demais ferramentas.
                 </p>
             </div>
             
             <!-- Packages -->
             <div class="space-y-3 mb-6" id="pix-packages-container">
-                <div onclick="selectPixPackage(0)" id="pkg-0" class="p-4 border-2 border-purple-500 bg-purple-500/10 rounded-2xl cursor-pointer flex items-center justify-between transition-all hover:bg-purple-500/5">
+                <div onclick="selectPixPackage(0)" id="pkg-0" class="p-3 sm:p-4 border-2 border-purple-500 bg-purple-500/10 rounded-2xl cursor-pointer flex items-center justify-between transition-all hover:bg-purple-500/5">
                     <div>
-                        <p class="font-bold text-white text-base">10 créditos</p>
+                        <p class="font-bold text-white text-sm sm:text-base">10 créditos</p>
                         <p class="text-[11px] text-slate-400">Pacote Bronze</p>
                     </div>
-                    <span class="font-bold text-purple-400 text-base">R$ 4,90</span>
+                    <span class="font-bold text-purple-400 text-sm sm:text-base">R$ 4,90</span>
                 </div>
-                <div onclick="selectPixPackage(1)" id="pkg-1" class="p-4 border border-white/10 bg-slate-950/20 rounded-2xl cursor-pointer flex items-center justify-between transition-all hover:bg-white/5">
+                <div onclick="selectPixPackage(1)" id="pkg-1" class="p-3 sm:p-4 border border-white/10 bg-slate-950/20 rounded-2xl cursor-pointer flex items-center justify-between transition-all hover:bg-white/5">
                     <div>
-                        <p class="font-bold text-white text-base">50 créditos</p>
+                        <p class="font-bold text-white text-sm sm:text-base">50 créditos</p>
                         <p class="text-[11px] text-slate-400">Pacote Prata</p>
                     </div>
-                    <span class="font-bold text-slate-300 text-base">R$ 19,90</span>
+                    <span class="font-bold text-slate-300 text-sm sm:text-base">R$ 19,90</span>
                 </div>
-                <div onclick="selectPixPackage(2)" id="pkg-2" class="p-4 border border-white/10 bg-slate-950/20 rounded-2xl cursor-pointer flex items-center justify-between transition-all hover:bg-white/5">
+                <div onclick="selectPixPackage(2)" id="pkg-2" class="p-3 sm:p-4 border border-white/10 bg-slate-950/20 rounded-2xl cursor-pointer flex items-center justify-between transition-all hover:bg-white/5">
                     <div>
-                        <p class="font-bold text-white text-base">100 créditos</p>
+                        <p class="font-bold text-white text-sm sm:text-base">100 créditos</p>
                         <p class="text-[11px] text-slate-400">Pacote Ouro</p>
                     </div>
-                    <span class="font-bold text-slate-300 text-base">R$ 34,90</span>
+                    <span class="font-bold text-slate-300 text-sm sm:text-base">R$ 34,90</span>
                 </div>
             </div>
             
@@ -546,31 +588,33 @@ if (empty($_SESSION['api_token'])) {
     </div>
 
     <!-- Modal PGR -->
-    <div id="pgr-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto py-8">
-        <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div id="pgr-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-2 sm:p-6">
+        <div class="bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto max-h-[92vh] overflow-y-auto my-auto shadow-2xl">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h3 class="text-2xl font-bold text-white">🦺 Novo PGR</h3>
-                    <p class="text-sm text-purple-600">Documento será gerado automaticamente pela IA</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <span>🦺</span> Novo PGR
+                    </h3>
+                    <p class="text-xs sm:text-sm text-purple-400 mt-0.5">Documento será gerado automaticamente pela IA</p>
                 </div>
-                <button onclick="closeModal('pgr-modal')" class="text-slate-500 hover:text-slate-400 text-2xl">&times;</button>
+                <button onclick="closeModal('pgr-modal')" class="text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             </div>
             <form id="pgr-form" onsubmit="savePGR(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Empresa</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Empresa</label>
                         <input type="text" name="empresa" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">CNPJ</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">CNPJ</label>
                         <input type="text" name="cnpj" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Endereço</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Endereço</label>
                         <input type="text" name="endereco" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Ramo de Atividade</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Ramo de Atividade</label>
                         <select name="ramo" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                             <option value="">Selecione...</option>
                             <option value="Construção Civil">Construção Civil</option>
@@ -581,65 +625,65 @@ if (empty($_SESSION['api_token'])) {
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Nº de Funcionários</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Nº de Funcionários</label>
                         <input type="number" name="funcionarios" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Responsável Técnico</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Responsável Técnico</label>
                         <input type="text" name="responsavel" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">CREA/Registro</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">CREA/Registro</label>
                         <input type="text" name="crea" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Riscos Identificados</label>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Riscos Identificados</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="riscos" value="Físico" class="w-4 h-4 text-orange-500">
-                                <span class="text-sm">Físico</span>
+                                <span class="text-xs sm:text-sm">Físico</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="riscos" value="Químico" class="w-4 h-4 text-orange-500">
-                                <span class="text-sm">Químico</span>
+                                <span class="text-xs sm:text-sm">Químico</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="riscos" value="Biológico" class="w-4 h-4 text-orange-500">
-                                <span class="text-sm">Biológico</span>
+                                <span class="text-xs sm:text-sm">Biológico</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="riscos" value="Ergonômico" class="w-4 h-4 text-orange-500">
-                                <span class="text-sm">Ergonômico</span>
+                                <span class="text-xs sm:text-sm">Ergonômico</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="riscos" value="Acidente" class="w-4 h-4 text-orange-500">
-                                <span class="text-sm">Acidente</span>
+                                <span class="text-xs sm:text-sm">Acidente</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="riscos" value="Altura" class="w-4 h-4 text-orange-500">
-                                <span class="text-sm">Altura</span>
+                                <span class="text-xs sm:text-sm">Altura</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="riscos" value="Elétrico" class="w-4 h-4 text-orange-500">
-                                <span class="text-sm">Elétrico</span>
+                                <span class="text-xs sm:text-sm">Elétrico</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="riscos" value="Mecânico" class="w-4 h-4 text-orange-500">
-                                <span class="text-sm">Mecânico</span>
+                                <span class="text-xs sm:text-sm">Mecânico</span>
                             </label>
                         </div>
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Informações Adicionais (opcional)</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Informações Adicionais (opcional)</label>
                         <textarea name="plano_acao" rows="3" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Adicione informações específicas que a IA deve considerar..."></textarea>
                     </div>
                 </div>
                 
-                <div class="flex justify-end gap-4 mt-8">
-                    <button type="button" onclick="closeModal('pgr-modal')" class="px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5">Cancelar</button>
-                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-orange-500 to-purple-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center gap-2">
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6 sm:mt-8">
+                    <button type="button" onclick="closeModal('pgr-modal')" class="w-full sm:w-auto px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5 text-center">Cancelar</button>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-orange-500 to-purple-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center justify-center gap-2">
                         <span>🤖</span> Gerar PGR com IA
                     </button>
                 </div>
@@ -648,31 +692,33 @@ if (empty($_SESSION['api_token'])) {
     </div>
 
     <!-- Modal PCMAT -->
-    <div id="pcmat-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto py-8">
-        <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div id="pcmat-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-2 sm:p-6">
+        <div class="bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto max-h-[92vh] overflow-y-auto my-auto shadow-2xl">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h3 class="text-2xl font-bold text-white">🏗️ Novo PCMAT</h3>
-                    <p class="text-sm text-purple-600">Documento será gerado automaticamente pela IA</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <span>🏗️</span> Novo PCMAT
+                    </h3>
+                    <p class="text-xs sm:text-sm text-purple-400 mt-0.5">Documento será gerado automaticamente pela IA</p>
                 </div>
-                <button onclick="closeModal('pcmat-modal')" class="text-slate-500 hover:text-slate-400 text-2xl">&times;</button>
+                <button onclick="closeModal('pcmat-modal')" class="text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             </div>
             <form id="pcmat-form" onsubmit="savePCMAT(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Nome da Obra</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Nome da Obra</label>
                         <input type="text" name="obra" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Contratante</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Contratante</label>
                         <input type="text" name="contratante" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Endereço da Obra</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Endereço da Obra</label>
                         <input type="text" name="endereco" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Tipo de Obra</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Tipo de Obra</label>
                         <select name="tipo_obra" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500">
                             <option value="">Selecione...</option>
                             <option value="Edificação">Edificação</option>
@@ -683,73 +729,73 @@ if (empty($_SESSION['api_token'])) {
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Nº de Trabalhadores</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Nº de Trabalhadores</label>
                         <input type="number" name="trabalhadores" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Data Início</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Data Início</label>
                         <input type="date" name="data_inicio" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Previsão Término</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Previsão Término</label>
                         <input type="date" name="data_fim" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Engenheiro Responsável</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Engenheiro Responsável</label>
                         <input type="text" name="engenheiro" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">CREA</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">CREA</label>
                         <input type="text" name="crea" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500">
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Funções na Obra</label>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Funções na Obra</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="funcoes" value="Pedreiro" class="w-4 h-4 text-blue-500">
-                                <span class="text-sm">Pedreiro</span>
+                                <span class="text-xs sm:text-sm">Pedreiro</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="funcoes" value="Eletricista" class="w-4 h-4 text-blue-500">
-                                <span class="text-sm">Eletricista</span>
+                                <span class="text-xs sm:text-sm">Eletricista</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="funcoes" value="Carpinteiro" class="w-4 h-4 text-blue-500">
-                                <span class="text-sm">Carpinteiro</span>
+                                <span class="text-xs sm:text-sm">Carpinteiro</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="funcoes" value="Armador" class="w-4 h-4 text-blue-500">
-                                <span class="text-sm">Armador</span>
+                                <span class="text-xs sm:text-sm">Armador</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="funcoes" value="Pintor" class="w-4 h-4 text-blue-500">
-                                <span class="text-sm">Pintor</span>
+                                <span class="text-xs sm:text-sm">Pintor</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="funcoes" value="Servente" class="w-4 h-4 text-blue-500">
-                                <span class="text-sm">Servente</span>
+                                <span class="text-xs sm:text-sm">Servente</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="funcoes" value="Encanador" class="w-4 h-4 text-blue-500">
-                                <span class="text-sm">Encanador</span>
+                                <span class="text-xs sm:text-sm">Encanador</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="funcoes" value="Operador" class="w-4 h-4 text-blue-500">
-                                <span class="text-sm">Operador</span>
+                                <span class="text-xs sm:text-sm">Operador</span>
                             </label>
                         </div>
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Informações Adicionais (opcional)</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Informações Adicionais (opcional)</label>
                         <textarea name="medidas" rows="3" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-blue-500" placeholder="Adicione informações específicas que a IA deve considerar..."></textarea>
                     </div>
                 </div>
                 
-                <div class="flex justify-end gap-4 mt-8">
-                    <button type="button" onclick="closeModal('pcmat-modal')" class="px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5">Cancelar</button>
-                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center gap-2">
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6 sm:mt-8">
+                    <button type="button" onclick="closeModal('pcmat-modal')" class="w-full sm:w-auto px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5 text-center">Cancelar</button>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center justify-center gap-2">
                         <span>🤖</span> Gerar PCMAT com IA
                     </button>
                 </div>
@@ -758,35 +804,37 @@ if (empty($_SESSION['api_token'])) {
     </div>
 
     <!-- Modal APR -->
-    <div id="apr-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto py-8">
-        <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div id="apr-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-2 sm:p-6">
+        <div class="bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto max-h-[92vh] overflow-y-auto my-auto shadow-2xl">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h3 class="text-2xl font-bold text-white">⚠️ Nova APR</h3>
-                    <p class="text-sm text-purple-600">Análise de riscos detalhada gerada pela IA</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <span>⚠️</span> Nova APR
+                    </h3>
+                    <p class="text-xs sm:text-sm text-purple-400 mt-0.5">Análise de riscos detalhada gerada pela IA</p>
                 </div>
-                <button onclick="closeModal('apr-modal')" class="text-slate-500 hover:text-slate-400 text-2xl">&times;</button>
+                <button onclick="closeModal('apr-modal')" class="text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             </div>
             <form id="apr-form" onsubmit="saveAPR(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Atividade</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Atividade</label>
                         <input type="text" name="atividade" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-yellow-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Local</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Local</label>
                         <input type="text" name="local" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-yellow-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Responsável</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Responsável</label>
                         <input type="text" name="responsavel" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-yellow-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Data</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Data</label>
                         <input type="date" name="data" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-yellow-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Tipo de Serviço</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Tipo de Serviço</label>
                         <select name="tipo_servico" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-yellow-500">
                             <option value="">Selecione...</option>
                             <option value="Trabalho em Altura">Trabalho em Altura</option>
@@ -799,7 +847,7 @@ if (empty($_SESSION['api_token'])) {
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Nível de Risco Estimado</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Nível de Risco Estimado</label>
                         <select name="nivel_risco" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-yellow-500">
                             <option value="">Selecione...</option>
                             <option value="Baixo">Baixo</option>
@@ -809,62 +857,62 @@ if (empty($_SESSION['api_token'])) {
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Descrição dos Riscos (a IA irá detalhar)</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Descrição dos Riscos (a IA irá detalhar)</label>
                         <textarea name="riscos" rows="2" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-yellow-500" placeholder="Descreva brevemente os riscos da atividade..."></textarea>
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Medidas de Controle Sugeridas (a IA irá complementar)</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Medidas de Controle Sugeridas (a IA irá complementar)</label>
                         <textarea name="medidas" rows="2" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-yellow-500" placeholder="Descreva as medidas de controle iniciais..."></textarea>
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">EPIs Obrigatórios</label>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">EPIs Obrigatórios</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="epis" value="Capacete" class="w-4 h-4 text-yellow-500">
-                                <span class="text-sm">Capacete</span>
+                                <span class="text-xs sm:text-sm">Capacete</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="epis" value="Óculos" class="w-4 h-4 text-yellow-500">
-                                <span class="text-sm">Óculos</span>
+                                <span class="text-xs sm:text-sm">Óculos</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="epis" value="Luvas" class="w-4 h-4 text-yellow-500">
-                                <span class="text-sm">Luvas</span>
+                                <span class="text-xs sm:text-sm">Luvas</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="epis" value="Botina" class="w-4 h-4 text-yellow-500">
-                                <span class="text-sm">Botina</span>
+                                <span class="text-xs sm:text-sm">Botina</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="epis" value="Cinto" class="w-4 h-4 text-yellow-500">
-                                <span class="text-sm">Cinto Segurança</span>
+                                <span class="text-xs sm:text-sm">Cinto Segurança</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="epis" value="Protetor Auricular" class="w-4 h-4 text-yellow-500">
-                                <span class="text-sm">Protetor Auricular</span>
+                                <span class="text-xs sm:text-sm">Protetor Auricular</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="epis" value="Máscara" class="w-4 h-4 text-yellow-500">
-                                <span class="text-sm">Máscara</span>
+                                <span class="text-xs sm:text-sm">Máscara</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white/5">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
                                 <input type="checkbox" name="epis" value="Uniforme" class="w-4 h-4 text-yellow-500">
-                                <span class="text-sm">Uniforme</span>
+                                <span class="text-xs sm:text-sm">Uniforme</span>
                             </label>
                         </div>
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Assinatura do Responsável</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Assinatura do Responsável</label>
                         <input type="text" name="assinatura" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-yellow-500" placeholder="Nome completo">
                     </div>
                 </div>
                 
-                <div class="flex justify-end gap-4 mt-8">
-                    <button type="button" onclick="closeModal('apr-modal')" class="px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5">Cancelar</button>
-                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-yellow-500 to-purple-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center gap-2">
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6 sm:mt-8">
+                    <button type="button" onclick="closeModal('apr-modal')" class="w-full sm:w-auto px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5 text-center">Cancelar</button>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-yellow-500 to-purple-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center justify-center gap-2">
                         <span>🤖</span> Gerar APR com IA
                     </button>
                 </div>
@@ -873,27 +921,29 @@ if (empty($_SESSION['api_token'])) {
     </div>
 
     <!-- Modal EPI -->
-    <div id="epi-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto py-8">
-        <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-8 max-w-2xl w-full mx-4">
+    <div id="epi-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-2 sm:p-6">
+        <div class="bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6 lg:p-8 max-w-2xl w-full mx-auto max-h-[92vh] overflow-y-auto my-auto shadow-2xl">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h3 class="text-2xl font-bold text-white">🧤 Registrar EPI</h3>
-                    <p class="text-sm text-purple-600">Termo de responsabilidade gerado pela IA</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <span>🧤</span> Registrar EPI
+                    </h3>
+                    <p class="text-xs sm:text-sm text-purple-400 mt-0.5">Termo de responsabilidade gerado pela IA</p>
                 </div>
-                <button onclick="closeModal('epi-modal')" class="text-slate-500 hover:text-slate-400 text-2xl">&times;</button>
+                <button onclick="closeModal('epi-modal')" class="text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             </div>
             <form id="epi-form" onsubmit="saveEPI(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Funcionário</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Funcionário</label>
                         <input type="text" name="funcionario" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-green-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">CPF</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">CPF</label>
                         <input type="text" name="cpf" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-green-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Tipo de EPI</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Tipo de EPI</label>
                         <select name="tipo_epi" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-green-500">
                             <option value="">Selecione...</option>
                             <option value="Capacete">Capacete</option>
@@ -909,26 +959,26 @@ if (empty($_SESSION['api_token'])) {
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Número do CA</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Número do CA</label>
                         <input type="text" name="ca" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-green-500" placeholder="Certificado de Aprovação">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Data de Entrega</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Data de Entrega</label>
                         <input type="date" name="data_entrega" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-green-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Data de Validade</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Data de Validade</label>
                         <input type="date" name="validade" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-green-500">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Observações</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Observações</label>
                         <textarea name="observacoes" rows="2" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-green-500"></textarea>
                     </div>
                 </div>
                 
-                <div class="flex justify-end gap-4 mt-8">
-                    <button type="button" onclick="closeModal('epi-modal')" class="px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5">Cancelar</button>
-                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-green-500 to-purple-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center gap-2">
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6 sm:mt-8">
+                    <button type="button" onclick="closeModal('epi-modal')" class="w-full sm:w-auto px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5 text-center">Cancelar</button>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-green-500 to-purple-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center justify-center gap-2">
                         <span>🤖</span> Registrar com Termo IA
                     </button>
                 </div>
@@ -937,27 +987,29 @@ if (empty($_SESSION['api_token'])) {
     </div>
 
     <!-- Modal Treinamento -->
-    <div id="treinamento-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto py-8">
-        <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-8 max-w-2xl w-full mx-4">
+    <div id="treinamento-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-2 sm:p-6">
+        <div class="bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6 lg:p-8 max-w-2xl w-full mx-auto max-h-[92vh] overflow-y-auto my-auto shadow-2xl">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h3 class="text-2xl font-bold text-white">🎓 Novo Treinamento</h3>
-                    <p class="text-sm text-purple-600">Certificado com conteúdo programático gerado pela IA</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <span>🎓</span> Novo Treinamento
+                    </h3>
+                    <p class="text-xs sm:text-sm text-purple-400 mt-0.5">Certificado com conteúdo programático gerado pela IA</p>
                 </div>
-                <button onclick="closeModal('treinamento-modal')" class="text-slate-500 hover:text-slate-400 text-2xl">&times;</button>
+                <button onclick="closeModal('treinamento-modal')" class="text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             </div>
             <form id="treinamento-form" onsubmit="saveTreinamento(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Funcionário</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Funcionário</label>
                         <input type="text" name="funcionario" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">CPF</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">CPF</label>
                         <input type="text" name="cpf" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Treinamento</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Treinamento</label>
                         <select name="treinamento" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500">
                             <option value="">Selecione...</option>
                             <option value="NR-06 - EPI">NR-06 - EPI</option>
@@ -973,26 +1025,26 @@ if (empty($_SESSION['api_token'])) {
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Carga Horária</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Carga Horária</label>
                         <input type="number" name="carga_horaria" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500" placeholder="Horas">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Data de Realização</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Data de Realização</label>
                         <input type="date" name="data_realizacao" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Data de Validade</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Data de Validade</label>
                         <input type="date" name="validade" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Instrutor/Empresa</label>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Instrutor/Empresa</label>
                         <input type="text" name="instrutor" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500">
                     </div>
                 </div>
                 
-                <div class="flex justify-end gap-4 mt-8">
-                    <button type="button" onclick="closeModal('treinamento-modal')" class="px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5">Cancelar</button>
-                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center gap-2">
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6 sm:mt-8">
+                    <button type="button" onclick="closeModal('treinamento-modal')" class="w-full sm:w-auto px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5 text-center">Cancelar</button>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl hover:shadow-lg font-medium flex items-center justify-center gap-2">
                         <span>🤖</span> Registrar com Certificado IA
                     </button>
                 </div>
@@ -1054,6 +1106,12 @@ if (empty($_SESSION['api_token'])) {
                 } else {
                     sidebarCredits.classList.add('hidden');
                 }
+            }
+            
+            // Atualiza badge mobile
+            const mobileCount = document.getElementById('mobile-credits-count');
+            if (mobileCount) {
+                mobileCount.textContent = `${userCredits} cr`;
             }
             
             // Atualiza o dashboard AI Status
@@ -1402,6 +1460,25 @@ if (empty($_SESSION['api_token'])) {
             return result.data;
         }
 
+        // Mobile Sidebar Toggle
+        function toggleSidebar(open) {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (!sidebar) return;
+            if (open === undefined) {
+                open = sidebar.classList.contains('-translate-x-full');
+            }
+            if (open) {
+                sidebar.classList.remove('-translate-x-full');
+                if (backdrop) backdrop.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                if (backdrop) backdrop.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
+            }
+        }
+
         // Navigation
         function showSection(section) {
             document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
@@ -1413,6 +1490,23 @@ if (empty($_SESSION['api_token'])) {
                     item.classList.add('active');
                 }
             });
+
+            // Update mobile header current section title
+            const sectionTitles = {
+                'dashboard': 'Dashboard',
+                'pgr': 'PGR (NR-01)',
+                'pcmat': 'PCMAT (NR-18)',
+                'apr': 'APR Digital',
+                'epi': 'Controle de EPI',
+                'treinamentos': 'Treinamentos'
+            };
+            const mobileSectionEl = document.getElementById('mobile-current-section');
+            if (mobileSectionEl && sectionTitles[section]) {
+                mobileSectionEl.textContent = sectionTitles[section];
+            }
+
+            // Close mobile sidebar if open
+            toggleSidebar(false);
             
             updateStats();
         }

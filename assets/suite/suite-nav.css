@@ -540,6 +540,70 @@
     to { transform: translateY(0); opacity: 1; }
 }
 
+/* ==========================================================================
+   Responsive Mobile Rules for Suite Navigation
+   ========================================================================== */
+@media (max-width: 768px) {
+    #ecalc-suite-bar {
+        height: 46px;
+        padding: 0 0.5rem;
+    }
+    .ecalc-bar-left {
+        gap: 0.35rem;
+    }
+    .ecalc-brand {
+        font-size: 0.8rem;
+        gap: 0.3rem;
+        padding: 0.15rem 0.3rem;
+    }
+    .ecalc-brand-icon-img {
+        width: 22px;
+        height: 22px;
+    }
+    .ecalc-brand-tag {
+        font-size: 0.55rem;
+        padding: 1px 3px;
+    }
+    .ecalc-btn-icon {
+        width: 30px;
+        height: 30px;
+    }
+    .ecalc-grid-icon {
+        width: 14px;
+        height: 14px;
+        gap: 2px;
+    }
+    .ecalc-grid-icon span {
+        width: 3px;
+        height: 3px;
+    }
+    .ecalc-project-pill {
+        display: none !important;
+    }
+    .ecalc-bar-right {
+        gap: 0.25rem;
+    }
+    .ecalc-bar-right a.ecalc-nav-btn[href*="cadclone"],
+    .ecalc-bar-right a.ecalc-nav-btn[href*="office"] {
+        display: none !important;
+    }
+    .ecalc-nav-btn {
+        padding: 0.2rem 0.45rem;
+        font-size: 0.7rem;
+    }
+    .ecalc-switcher-window {
+        max-width: 95vw;
+        max-height: 85vh;
+        margin: 0 0.5rem;
+        padding: 0;
+    }
+    .ecalc-switcher-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 4px;
+    }
+}
+
 /* Print Rules: Always hide suite controls on paper / PDF */
 @media print {
     #ecalc-suite-bar,
@@ -550,3 +614,4 @@
         display: none !important;
     }
 }
+
