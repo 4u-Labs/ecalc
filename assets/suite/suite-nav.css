@@ -581,15 +581,10 @@
         width: 3px;
         height: 3px;
     }
-    .ecalc-project-pill {
-        display: none !important;
-    }
-    .ecalc-bar-right {
-        gap: 0.25rem;
-        flex-shrink: 0;
-    }
+    .ecalc-project-pill,
     .ecalc-nav-cadclone,
     .ecalc-nav-office,
+    [data-ecalc-hide-mobile="true"],
     .ecalc-bar-right a.ecalc-nav-btn[href*="cadclone"],
     .ecalc-bar-right a.ecalc-nav-btn[href*="office"] {
         display: none !important;

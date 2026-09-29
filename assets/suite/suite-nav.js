@@ -105,13 +105,32 @@
 
     // 3. UI Injections
     function injectStyles() {
+        if (!document.getElementById('ecalc-suite-critical-css')) {
+            const style = document.createElement('style');
+            style.id = 'ecalc-suite-critical-css';
+            style.textContent = `
+                @media (max-width: 768px) {
+                    #ecalc-suite-bar .ecalc-project-pill,
+                    #ecalc-suite-bar .ecalc-nav-cadclone,
+                    #ecalc-suite-bar .ecalc-nav-office,
+                    #ecalc-suite-bar [data-ecalc-hide-mobile="true"],
+                    .ecalc-project-pill,
+                    .ecalc-nav-cadclone,
+                    .ecalc-nav-office {
+                        display: none !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
         if (!document.getElementById('ecalc-suite-css')) {
             const link = document.createElement('link');
             link.id = 'ecalc-suite-css';
             link.rel = 'stylesheet';
             // Compute relative path to assets/suite/suite-nav.css with cache-busting
             const isSubdir = window.location.pathname.includes('/seguranca/');
-            link.href = (isSubdir ? '../' : '') + 'assets/suite/suite-nav.css?v=20260929_2';
+            link.href = (isSubdir ? '../' : '') + 'assets/suite/suite-nav.css?v=20260929_3';
             document.head.appendChild(link);
         }
     }
@@ -141,7 +160,7 @@
                     </div>
                 </button>
 
-                <div class="ecalc-project-pill" id="ecalc-btn-project" title="Editar dados da obra ativa">
+                <div class="ecalc-project-pill hidden md:inline-flex" id="ecalc-btn-project" data-ecalc-hide-mobile="true" title="Editar dados da obra ativa">
                     <span class="dot"></span>
                     <span class="ecalc-project-name" id="ecalc-bar-project-name">${project.nomeObra || 'Definir Obra'}</span>
                     <svg style="width: 12px; height: 12px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -149,10 +168,10 @@
             </div>
 
             <div class="ecalc-bar-right">
-                <a href="${isSubdir ? '../../' : '../'}cadclone/" target="_blank" class="ecalc-nav-btn ecalc-nav-cadclone" title="Abrir Editor CADClone">
+                <a href="${isSubdir ? '../../' : '../'}cadclone/" target="_blank" class="ecalc-nav-btn ecalc-nav-cadclone hidden md:inline-flex" data-ecalc-hide-mobile="true" title="Abrir Editor CADClone">
                     <span>📐 CADClone</span>
                 </a>
-                <a href="https://4u.ia.br/app/office/" target="_blank" class="ecalc-nav-btn ecalc-nav-office" title="Abrir OfficeClone Suite">
+                <a href="https://4u.ia.br/app/office/" target="_blank" class="ecalc-nav-btn ecalc-nav-office hidden md:inline-flex" data-ecalc-hide-mobile="true" title="Abrir OfficeClone Suite">
                     <span>📄 OfficeClone</span>
                 </a>
                 <a href="${rootPath}index.php" class="ecalc-nav-btn ecalc-nav-hub" title="Hub Principal">
