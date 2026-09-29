@@ -5049,6 +5049,7 @@
             'nbr13570': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-13570/',
             'nbr13752': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-13752/',
             'nbr13969': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-13969/',
+            'nbr14009': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-14009/',
             'nbr14280': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-14280/',
             'nbr14628': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-14628/',
             'nbr14718': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-14718/',
@@ -5060,7 +5061,8 @@
             'nbr16325': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-16325/',
             'nbr16401': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-16401/',
             'nbr16537': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-16537/',
-            'nbr17240': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-17240/'
+            'nbr17240': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-17240/',
+            'nbr9078': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-9078/'
         };
 
         function getWpNbrUrl(normaId) {
@@ -5090,8 +5092,8 @@
         }
 
         async function updatePdfCount() {
-            // 36 NRs oficiais integradas + 36 NBRs no repositório WordPress = 72
-            let count = 36 + Object.keys(wpNbrPosts).length;
+            // 36 NRs oficiais integradas + 39 NBRs no repositório WordPress = 75 normas completas (100%)
+            let count = normasData.length;
             const el = document.getElementById('pdfCount');
             if (el) el.textContent = String(count);
             return count;
