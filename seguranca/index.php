@@ -8,13 +8,21 @@ if (empty($_SESSION['api_token'])) {
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>SafeWork Pro - Sistema de Segurança do Trabalho com IA</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/icon-ecalc-32.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="../assets/icon-ecalc-192.png">
+    <link rel="stylesheet" id="ecalc-suite-css" href="../assets/suite/suite-nav.css?v=20260929_3">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', sans-serif; }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
         .bg-slate-900/50 backdrop-blur-xl border-r border-white/10 { background: linear-gradient(135deg, #1e3a5f 0%, #0f2744 100%); }
         .card-hover { transition: all 0.3s ease; }
         .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
@@ -171,7 +179,8 @@ if (empty($_SESSION['api_token'])) {
     </aside>
 
     <!-- Main Content -->
-    <main class="w-full lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen">
+    <main class="lg:ml-64 min-h-screen min-w-0 p-4 sm:p-6 lg:p-8 box-border">
+        <div class="max-w-6xl mx-auto w-full">
         <!-- Dashboard Section -->
         <section id="dashboard-section" class="fade-in">
             <div class="mb-6 sm:mb-8">
@@ -503,36 +512,57 @@ if (empty($_SESSION['api_token'])) {
             </p>
         </footer>
 
+        </div>
     </main>
 
-    <!-- Modal de Autenticação Unificada (4uLabs) -->
+    <!-- Modal de Autenticação Unificada (Portal 4uLabs / Google) -->
     <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-3 sm:p-6">
-        <div class="bg-slate-900/90 backdrop-blur-md border border-white/10 rounded-2xl p-5 sm:p-8 max-w-md w-full mx-auto relative shadow-[0_0_50px_rgba(139,92,246,0.15)] my-auto max-h-[92vh] overflow-y-auto">
-            <button onclick="closeModal('auth-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
-            <div class="text-center mb-6">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-[0_8px_30px_rgba(124,58,237,0.4)] border border-white/10">
+        <div class="bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-5 sm:p-8 max-w-md w-full mx-auto relative shadow-[0_0_50px_rgba(139,92,246,0.2)] my-auto max-h-[92vh] overflow-y-auto">
+            <button onclick="closeModal('auth-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition-colors cursor-pointer">&times;</button>
+            <div class="text-center mb-5">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3.5 shadow-[0_8px_30px_rgba(124,58,237,0.4)] border border-white/10">
                     <span class="text-2xl sm:text-3xl font-extrabold text-white">4U</span>
                 </div>
                 <h3 class="text-xl sm:text-2xl font-bold text-white">Portal 4uLabs</h3>
-                <p class="text-slate-400 text-xs sm:text-sm mt-1" id="auth-modal-subtitle">Conecte sua conta unificada para gerenciar seus créditos de IA.</p>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1" id="auth-modal-subtitle">Conecte sua conta para gerenciar créditos e gerar documentos com IA.</p>
+            </div>
+
+            <!-- Botão Oficial Google OAuth 2.0 (Design Padronizado 4U) -->
+            <div class="mb-4">
+                <button type="button" id="googleLoginBtn" onclick="conectarGoogle()" class="w-full py-3.5 px-4 bg-white hover:bg-slate-100 active:scale-[0.99] text-slate-800 rounded-xl font-bold flex items-center justify-center gap-3 transition-all shadow-md hover:shadow-lg cursor-pointer border border-slate-200">
+                    <svg viewBox="0 0 24 24" width="22" height="22" class="shrink-0">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    <span class="text-sm font-semibold text-slate-800">Entrar com Conta Google</span>
+                </button>
+            </div>
+
+            <!-- Divisor -->
+            <div class="relative flex py-2 items-center mb-4">
+                <div class="flex-grow border-t border-white/10"></div>
+                <span class="flex-shrink mx-3 text-[11px] text-slate-500 uppercase tracking-wider font-semibold">ou com e-mail</span>
+                <div class="flex-grow border-t border-white/10"></div>
             </div>
             
-            <div class="flex border-b border-white/10 mb-6">
-                <button id="tab-login" onclick="switchAuthMode('login')" class="flex-1 pb-3 text-center font-semibold text-sm border-b-2 border-purple-500 text-white transition-all">Entrar</button>
-                <button id="tab-register" onclick="switchAuthMode('register')" class="flex-1 pb-3 text-center font-semibold text-sm border-b-2 border-transparent text-slate-400 hover:text-white transition-all">Cadastrar</button>
+            <div class="flex border-b border-white/10 mb-4">
+                <button type="button" id="tab-login" onclick="switchAuthMode('login')" class="flex-1 pb-2.5 text-center font-semibold text-xs sm:text-sm border-b-2 border-purple-500 text-white transition-all cursor-pointer">Entrar</button>
+                <button type="button" id="tab-register" onclick="switchAuthMode('register')" class="flex-1 pb-2.5 text-center font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-white transition-all cursor-pointer">Cadastrar</button>
             </div>
             
-            <form id="auth-modal-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+            <form id="auth-modal-form" onsubmit="handleAuthSubmit(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">E-mail</label>
-                    <input type="email" id="auth-modal-email" required placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">E-mail</label>
+                    <input type="email" id="auth-modal-email" required placeholder="seuemail@exemplo.com" class="w-full px-3.5 py-2.5 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Senha</label>
-                    <input type="password" id="auth-modal-password" required placeholder="••••••••" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Senha</label>
+                    <input type="password" id="auth-modal-password" required placeholder="••••••••" class="w-full px-3.5 py-2.5 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-sm">
                 </div>
                 
-                <button type="submit" id="btn-auth-modal-submit" class="w-full py-3 mt-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-bold transition-all shadow-[0_4px_20px_rgba(124,58,237,0.3)]">
+                <button type="submit" id="btn-auth-modal-submit" class="w-full py-3 mt-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-bold transition-all shadow-[0_4px_20px_rgba(124,58,237,0.3)] text-sm cursor-pointer">
                     Entrar no Portal 4uLabs
                 </button>
             </form>
@@ -1160,20 +1190,24 @@ if (empty($_SESSION['api_token'])) {
             if (!footerContainer) return;
             
             if (userToken && userData) {
-                const name = userData.display_name || userData.email || 'SW';
+                const name = userData.display_name || userData.name || userData.email || 'SW';
                 const initials = name.substring(0, 2).toUpperCase();
+                const avatarHtml = userData.photo_url 
+                    ? `<img src="${userData.photo_url}" class="w-10 h-10 rounded-full object-cover border border-purple-500/40 shrink-0 shadow-[0_0_10px_rgba(168,85,247,0.3)]" alt="${name}">`
+                    : `<div class="w-10 h-10 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-full flex items-center justify-center font-bold text-white shadow-[0_0_10px_rgba(168,85,247,0.4)] shrink-0">${initials}</div>`;
+                
                 footerContainer.innerHTML = `
                     <div class="flex items-center justify-between w-full">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-full flex items-center justify-center font-bold text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]">
-                                ${initials}
-                            </div>
-                            <div>
-                                <p class="font-medium text-sm text-white max-w-[120px] truncate" title="${name}">${name}</p>
-                                <p class="text-[10px] text-slate-400">Portal 4uLabs</p>
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            ${avatarHtml}
+                            <div class="min-w-0">
+                                <p class="font-medium text-sm text-white truncate" title="${name}">${name}</p>
+                                <p class="text-[10px] text-purple-400 font-semibold flex items-center gap-1 cursor-pointer hover:underline" onclick="openModal('pix-modal')">
+                                    <span>💎</span> <span>${userCredits} créditos</span>
+                                </p>
                             </div>
                         </div>
-                        <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 transition-colors p-1" title="Sair da Conta">
+                        <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-white/5 cursor-pointer shrink-0" title="Sair da Conta">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                         </button>
                     </div>
@@ -1182,7 +1216,7 @@ if (empty($_SESSION['api_token'])) {
                 footerContainer.innerHTML = `
                     <div class="flex flex-col gap-2 w-full">
                         <p class="text-[10px] text-slate-400 text-center">Entre para gerar documentos com IA</p>
-                        <button onclick="openModal('auth-modal')" class="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-semibold text-sm transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+                        <button onclick="openModal('auth-modal')" class="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-semibold text-sm transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.5)] cursor-pointer">
                             🔑 Conectar Conta
                         </button>
                     </div>
@@ -1195,6 +1229,8 @@ if (empty($_SESSION['api_token'])) {
             if (confirm('Deseja desconectar sua conta do Portal 4uLabs?')) {
                 userToken = null;
                 localStorage.removeItem('keepai_token');
+                localStorage.removeItem('user_profile');
+                localStorage.removeItem('user_role');
                 userData = null;
                 userCredits = 0;
                 updateAuthUI();
@@ -1204,7 +1240,7 @@ if (empty($_SESSION['api_token'])) {
         
         function checkAuthAndOpen(modalId) {
             if (!userToken) {
-                alert('🔑 Você precisa conectar sua conta do Portal 4uLabs para gerar documentos com IA.');
+                alert('🔑 Você precisa conectar sua conta para gerar documentos com IA.');
                 openModal('auth-modal');
                 return;
             }
@@ -1216,7 +1252,96 @@ if (empty($_SESSION['api_token'])) {
             openModal(modalId);
         }
 
-        // --- AUTHENTICATION MODAL LOGIC ---
+        // --- GOOGLE OAUTH 2.0 INTEGRATION (ECOSSISTEMA 4ULABS) ---
+        const GOOGLE_CLIENT_ID = '569266864432-pd09jbb5no9ekdhdr018fj643nopp817.apps.googleusercontent.com';
+        let googleTokenClient = null;
+
+        function initGoogleAuth() {
+            if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+                setTimeout(initGoogleAuth, 300);
+                return;
+            }
+            try {
+                googleTokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: GOOGLE_CLIENT_ID,
+                    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid',
+                    callback: async (response) => {
+                        if (response && response.access_token) {
+                            await processarGoogleToken(response.access_token);
+                        }
+                    },
+                    error_callback: (err) => {
+                        console.error('[GoogleAuth] Erro no GSI:', err);
+                    }
+                });
+            } catch (e) {
+                console.warn('[GoogleAuth] Erro ao instanciar initTokenClient:', e);
+            }
+        }
+
+        function conectarGoogle() {
+            if (!googleTokenClient) {
+                initGoogleAuth();
+            }
+            if (googleTokenClient) {
+                googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+            } else {
+                alert('Os serviços do Google estão inicializando. Tente novamente em instantes.');
+            }
+        }
+
+        async function processarGoogleToken(accessToken) {
+            showLoading('Autenticando com sua Conta Google...');
+            try {
+                const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                if (!userInfoRes.ok) throw new Error('Falha ao obter perfil do Google');
+                const googleUser = await userInfoRes.json();
+
+                const backendRes = await fetch('/app/keepai/api/auth.php?action=google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        access_token: accessToken,
+                        email: googleUser.email,
+                        name: googleUser.name || googleUser.given_name || 'Usuário Google',
+                        picture: googleUser.picture || ''
+                    })
+                });
+
+                const data = await backendRes.json();
+                if (!data.success) {
+                    throw new Error(data.error || 'Erro na autenticação central');
+                }
+
+                userToken = data.token;
+                userData = data.user;
+                userCredits = parseInt(data.user.credits || 0);
+
+                localStorage.setItem('keepai_token', data.token);
+                localStorage.setItem('user_profile', JSON.stringify(data.user));
+                localStorage.setItem('user_credits', String(userCredits));
+
+                const emailLower = (data.user.email || '').toLowerCase().trim();
+                const isAdmin = (emailLower === 'fbr4g4@gmail.com' || emailLower === 'fb4g4@gmail.com');
+                if (isAdmin) {
+                    localStorage.setItem('user_role', 'admin');
+                }
+
+                updateAuthUI();
+                updateCreditsUI();
+                closeModal('auth-modal');
+                hideLoading();
+                alert(`🎉 Bem-vindo(a), ${data.user.display_name || data.user.email}!`);
+            } catch (err) {
+                hideLoading();
+                console.error('[GoogleAuth] Erro no login Google:', err);
+                alert('❌ Erro no login Google: ' + err.message);
+            }
+        }
+
+        // --- AUTHENTICATION MODAL LOGIC (EMAIL/SENHA) ---
         let authModalMode = 'login';
         
         function switchAuthMode(mode) {
@@ -1227,13 +1352,13 @@ if (empty($_SESSION['api_token'])) {
             const subtitle = document.getElementById('auth-modal-subtitle');
             
             if (mode === 'login') {
-                tabLogin.className = 'flex-1 pb-3 text-center font-semibold text-sm border-b-2 border-purple-500 text-white transition-all';
-                tabReg.className = 'flex-1 pb-3 text-center font-semibold text-sm border-b-2 border-transparent text-slate-400 hover:text-white transition-all';
+                tabLogin.className = 'flex-1 pb-2.5 text-center font-semibold text-xs sm:text-sm border-b-2 border-purple-500 text-white transition-all cursor-pointer';
+                tabReg.className = 'flex-1 pb-2.5 text-center font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-white transition-all cursor-pointer';
                 btnSubmit.textContent = 'Entrar no Portal 4uLabs';
-                subtitle.textContent = 'Conecte sua conta unificada para gerenciar seus créditos de IA.';
+                subtitle.textContent = 'Conecte sua conta para gerenciar créditos e gerar documentos com IA.';
             } else {
-                tabReg.className = 'flex-1 pb-3 text-center font-semibold text-sm border-b-2 border-purple-500 text-white transition-all';
-                tabLogin.className = 'flex-1 pb-3 text-center font-semibold text-sm border-b-2 border-transparent text-slate-400 hover:text-white transition-all';
+                tabReg.className = 'flex-1 pb-2.5 text-center font-semibold text-xs sm:text-sm border-b-2 border-purple-500 text-white transition-all cursor-pointer';
+                tabLogin.className = 'flex-1 pb-2.5 text-center font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-white transition-all cursor-pointer';
                 btnSubmit.textContent = 'Criar Conta Unificada';
                 subtitle.textContent = 'Crie sua conta unificada. Seus créditos e saldo serão compartilhados em todo o portal.';
             }
@@ -1264,6 +1389,8 @@ if (empty($_SESSION['api_token'])) {
                 userData = result.user;
                 userCredits = parseInt(result.user.credits || 0);
                 localStorage.setItem('keepai_token', result.token);
+                localStorage.setItem('user_profile', JSON.stringify(result.user));
+                localStorage.setItem('user_credits', String(userCredits));
                 
                 updateAuthUI();
                 closeModal('auth-modal');
@@ -1513,8 +1640,16 @@ if (empty($_SESSION['api_token'])) {
 
         // Modal Functions
         function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-            document.getElementById(id).classList.add('flex');
+            if (id === 'pix-modal' && !userToken) {
+                alert('🔑 Conecte sua conta com Google ou e-mail antes de recarregar créditos.');
+                openModal('auth-modal');
+                return;
+            }
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.remove('hidden');
+                el.classList.add('flex');
+            }
         }
 
         function closeModal(id) {
@@ -2678,6 +2813,9 @@ if (empty($_SESSION['api_token'])) {
             // Sincroniza usuário e créditos
             syncUser();
             
+            // Inicializa Google OAuth 2.0
+            initGoogleAuth();
+            
             // Set current year in footer
             document.getElementById('ano').textContent = new Date().getFullYear();
         });
@@ -2714,6 +2852,6 @@ if (empty($_SESSION['api_token'])) {
         }
     </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="../assets/suite/suite-nav.js"></script>
+    <script src="../assets/suite/suite-nav.js?v=20260929_3"></script>
 </body>
 </html>
