@@ -244,18 +244,9 @@
                                 <i class="fas fa-up-right-from-square text-xs"></i>
                                 <span class="hidden md:inline font-semibold">Abrir oficial</span>
                             </button>
-                            <button id="modalOpenPdfBtn" onclick="openPdfForCurrentNorma()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 tooltip whitespace-nowrap cursor-pointer shadow-2xs" data-tip="Abrir PDF anexado (se existir)">
+                            <button id="modalOpenPdfBtn" onclick="openPdfForCurrentNorma()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 tooltip whitespace-nowrap cursor-pointer shadow-2xs" data-tip="Abrir PDF da norma">
                                 <i class="fas fa-file-pdf text-xs"></i>
-                                <span class="hidden md:inline font-semibold">Abrir PDF</span>
-                            </button>
-                            <label class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 cursor-pointer tooltip whitespace-nowrap shadow-2xs" data-tip="Anexar ou substituir PDF desta norma">
-                                <i class="fas fa-paperclip text-xs"></i>
-                                <span class="hidden md:inline font-semibold">Anexar</span>
-                                <input id="modalPdfInput" type="file" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event, true)">
-                            </label>
-                            <button id="modalDeletePdfBtn" onclick="deleteCurrentNormaPdf()" class="hidden bg-red-500/25 hover:bg-red-500/40 text-red-100 hover:text-white active:scale-95 h-9 px-2.5 rounded-xl transition text-xs inline-flex items-center gap-1.5 tooltip whitespace-nowrap cursor-pointer shadow-2xs border border-red-300/30" data-tip="Excluir PDF anexado desta norma">
-                                <i class="fas fa-trash-can text-xs text-red-200"></i>
-                                <span class="hidden lg:inline font-semibold">Excluir PDF</span>
+                                <span class="hidden md:inline font-semibold">PDF Completo</span>
                             </button>
                             <button onclick="copyLink()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs" title="Copiar link direto">
                                 <i class="fas fa-link text-xs"></i>
@@ -579,7 +570,7 @@
                         <i class="fas fa-book text-2xl"></i>
                         <div>
                             <h2 class="text-xl font-bold">Biblioteca de Normas</h2>
-                            <p class="text-white/80 text-sm">Anexe PDFs para consulta offline e use links para conferência (ABNT/Gov/CBM).</p>
+                            <p class="text-white/80 text-sm">Consulte PDFs oficiais de NRs e acesse as NBRs no repositório.</p>
                         </div>
                     </div>
                     <button onclick="closeBiblioteca()" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition" aria-label="Fechar biblioteca">
@@ -587,17 +578,10 @@
                     </button>
                 </div>
 
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-2">
-                    <div class="md:col-span-2 relative">
+                <div class="mt-4">
+                    <div class="relative">
                         <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-white/70"></i>
-                        <input id="pdfSearch" type="text" placeholder="Buscar na biblioteca (ex: 9050, NR 10, incêndio)" class="w-full bg-white/10 placeholder-white/60 text-white rounded-xl pl-10 pr-3 py-2 outline-none focus:ring-2 focus:ring-white/30" oninput="renderBiblioteca()">
-                    </div>
-                    <div class="flex items-center gap-2 justify-end">
-                        <label class="cursor-pointer px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm transition flex items-center gap-2">
-                            <i class="fas fa-file-arrow-up"></i>
-                            <span>Anexar PDF</span>
-                            <input id="pdfInput" type="file" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event)">
-                        </label>
+                        <input id="pdfSearch" type="text" placeholder="Buscar na biblioteca (ex: 9050, NR 10, incêndio, estrutura)" class="w-full bg-white/10 placeholder-white/60 text-white rounded-xl pl-10 pr-3 py-2 outline-none focus:ring-2 focus:ring-white/30" oninput="renderBiblioteca()">
                     </div>
                 </div>
             </div>
@@ -605,7 +589,7 @@
             <div class="p-4 overflow-y-auto max-h-[62vh]" id="bibliotecaList"></div>
 
             <div class="border-t p-4 bg-gray-50 text-xs text-gray-600 leading-relaxed">
-                <strong>Importante:</strong> por direitos autorais, o app não distribui PDFs da ABNT. Aqui você pode <strong>anexar suas cópias</strong> (uso interno) e/ou manter <strong>links de conferência</strong> para a fonte oficial.
+                <strong>Repositório & Normas:</strong> PDFs das NRs oficiais integrados e links diretos para cada postagem no repositório das NBRs para download completo.
             </div>
         </div>
     </div>
@@ -872,6 +856,40 @@
                     relacionadas: ["NBR 6118", "NBR 7480", "NBR 12655"]
                 }
             },
+            {
+                id: "nbr8800",
+                codigo: "NBR 8800",
+                tipo: "NBR",
+                nome: "Projeto de estruturas de aço e de estruturas mistas de aço e concreto de edifícios",
+                categoria: "estrutura",
+                emoji: "🏗️",
+                cor: "blue",
+                resumo: "Diretrizes e critérios para dimensionamento de elementos estruturais de aço e sistemas mistos de aço e concreto.",
+                palavrasChave: ["aço", "estrutura metálica", "perfil", "solda", "parafuso", "flambagem", "mista", "viga", "pilar", "conector"],
+                conteudo: {
+                    escopo: "Estabelece os requisitos básicos que devem ser obedecidos no projeto de estruturas de aço e mistas de edifícios correntes.",
+                    principaisRequisitos: [
+                        "Estados-limites últimos (ELU): resistência à tração, compressão, flexão, cisalhamento e esforços combinados",
+                        "Estados-limites de serviço (ELS): deslocamentos máximos, vibrações e conforto dos usuários",
+                        "Dimensionamento de ligações parafusadas e soldadas",
+                        "Estabilidade de barras e flambagem local, global e distorcional",
+                        "Conectores de cisalhamento em vigas e lajes mistas"
+                    ],
+                    tabelasImportantes: [
+                        "Propriedades mecânicas dos aços estruturais",
+                        "Limites de esbeltez para barras comprimidas e tracionadas",
+                        "Coeficientes de ponderação das ações e resistências",
+                        "Limites de deformações e flechas para ELS"
+                    ],
+                    dicasPraticas: [
+                        "Atenção à flambagem lateral com torção (FLT) em vigas metálicas sem contenção contínua",
+                        "Verificar a compatibilidade dos eletrodos com o tipo de aço na especificação de solda",
+                        "Em estruturas mistas, garanta o posicionamento e ancoragem corretos dos conectores stud bolt",
+                        "Considere o esquema de pintura anticorrosiva e proteção passiva contra fogo desde a concepção"
+                    ],
+                    relacionadas: ["NBR 6118", "NBR 6120", "NBR 8681", "NBR 14718"]
+                }
+            },
 
             // OBRAS E CONSTRUÇÃO
             {
@@ -1093,6 +1111,103 @@
                         "Sanitário acessível: prever área de transferência e barras (layout + fixação)"
                     ],
                     relacionadas: ["NBR 16537", "NBR 14718", "NBR 9077"]
+                }
+            },
+            {
+                id: "nbr10004",
+                codigo: "NBR 10004",
+                tipo: "NBR",
+                nome: "Resíduos sólidos - Classificação",
+                categoria: "obras",
+                emoji: "♻️",
+                cor: "green",
+                resumo: "Classificação dos resíduos sólidos quanto aos seus riscos potenciais ao meio ambiente e à saúde pública.",
+                palavrasChave: ["resíduos", "sólidos", "classificação", "classe i", "classe ii", "perigosos", "inertes", "lixiviação", "meio ambiente"],
+                conteudo: {
+                    escopo: "Classifica os resíduos sólidos em Classe I (perigosos) e Classe II (não perigosos: não inertes A e inertes B) para destinação ambientalmente adequada.",
+                    principaisRequisitos: [
+                        "Identificação das características de periculosidade: inflamabilidade, corrosividade, reatividade, toxicidade e patogenicidade",
+                        "Enquadramento em Classe I (Perigosos) ou Classe II (Não perigosos)",
+                        "Subclassificação da Classe II em Classe II-A (Não inertes) e Classe II-B (Inertes)",
+                        "Metodologias de amostragem, lixiviação e solubilização para ensaios laboratoriais"
+                    ],
+                    tabelasImportantes: [
+                        "Listagens de resíduos perigosos de fontes específicas e não específicas",
+                        "Limites máximos permissíveis no extrato lixiviado e solubilizado",
+                        "Códigos de identificação de resíduos perigosos"
+                    ],
+                    dicasPraticas: [
+                        "Em canteiros de obra, segregue na origem tintas, solventes e óleos (Classe I) de entulhos de alvenaria e concreto (Classe II-B)",
+                        "Exija do transportador e do receptor final o Manifesto de Transporte de Resíduos (MTR) e Certificado de Destinação",
+                        "Armazene resíduos perigosos em bacia de contenção com piso impermeável e cobertura",
+                        "Compatibilize o plano de gerenciamento com a Resolução CONAMA 307"
+                    ],
+                    relacionadas: ["NBR 8419", "NBR 15114", "NR 25"]
+                }
+            },
+            {
+                id: "nbr13133",
+                codigo: "NBR 13133",
+                tipo: "NBR",
+                nome: "Execução de levantamento topográfico",
+                categoria: "obras",
+                emoji: "📐",
+                cor: "amber",
+                resumo: "Procedimentos e tolerâncias para a execução de levantamentos topográficos altimétricos, planimétricos e planialtimétricos.",
+                palavrasChave: ["topografia", "levantamento", "curvas de nível", "poligonal", "coordenadas", "altimetria", "planimetria", "estação total", "gps"],
+                conteudo: {
+                    escopo: "Fixa as condições exigíveis para a execução de levantamento topográfico destinado a estudos, anteprojetos, projetos e execução de obras de engenharia.",
+                    principaisRequisitos: [
+                        "Classificação dos levantamentos quanto à exatidão e finalidade",
+                        "Implantação e amarração da rede de apoio topográfico (marcos e referências de nível)",
+                        "Tolerâncias angulares, lineares e altimétricas admissíveis em cada classe de poligonal",
+                        "Representação gráfica: escalas, convenções topográficas, malha de coordenadas e curvas de nível"
+                    ],
+                    tabelasImportantes: [
+                        "Classes de levantamentos topográficos planimétricos e altimétricos",
+                        "Erros de fechamento admissíveis para poligonais e nivelamentos",
+                        "Espaçamento de curvas de nível em função da escala e relevo"
+                    ],
+                    dicasPraticas: [
+                        "Sempre amarre o levantamento ao Sistema Geodésico Brasileiro (SIRGAS 2000) e RNs oficiais do IBGE",
+                        "Verifique o erro de fechamento da poligonal antes de desmobilizar a equipe de campo",
+                        "Identifique e preserve os marcos topográficos no canteiro para servir de referência durante toda a obra",
+                        "Confira se o levantamento contempla interferências visíveis: postes, bocas de lobo, árvores e redes aéreas"
+                    ],
+                    relacionadas: ["NBR 6492", "NBR 6122", "NBR 13752"]
+                }
+            },
+            {
+                id: "nbr8419",
+                codigo: "NBR 8419",
+                tipo: "NBR",
+                nome: "Apresentação de projetos de aterros sanitários de resíduos sólidos urbanos",
+                categoria: "obras",
+                emoji: "🗑️",
+                cor: "green",
+                resumo: "Diretrizes para elaboração e apresentação de projetos de aterros sanitários para destinação de resíduos sólidos urbanos.",
+                palavrasChave: ["aterro", "sanitário", "resíduos urbanos", "chorume", "drenagem", "biogás", "geotecnia", "impermeabilização", "monitoramento"],
+                conteudo: {
+                    escopo: "Fixa as condições exigíveis para a apresentação de projetos de aterros sanitários destinados à disposição final de resíduos sólidos urbanos.",
+                    principaisRequisitos: [
+                        "Critérios de seleção e caracterização geológica e geotécnica da área",
+                        "Projeto de impermeabilização de fundo com argila compactada e geomembrana de PEAD",
+                        "Sistema de captação, drenagem e tratamento de lixiviados (chorume)",
+                        "Sistema de drenagem e queima ou aproveitamento energético de biogás",
+                        "Monitoramento ambiental de águas subterrâneas e superficiais (poços de piezometria)"
+                    ],
+                    tabelasImportantes: [
+                        "Permeabilidade máxima da barreira mineral de fundo (k <= 10^-7 cm/s)",
+                        "Declividades mínimas das linhas de drenagem de chorume e águas pluviais",
+                        "Frequência e parâmetros de monitoramento das águas de poços testemunhas"
+                    ],
+                    dicasPraticas: [
+                        "Garanta espessura e compactação rigorosa da camada de cobertura diária para controle de vetores e odores",
+                        "Dimensione bacias de amortecimento de chorume para períodos de chuvas intensas",
+                        "Implemente cortina vegetal no perímetro do aterro para mitigação visual e de poeira",
+                        "Mantenha o plano de encerramento e uso futuro da área previsto desde a concepção do aterro"
+                    ],
+                    relacionadas: ["NBR 10004", "NBR 13969", "NBR 6122"]
                 }
             },
 
@@ -4041,47 +4156,30 @@
                 const isFav = favorites.includes(norma.id);
                 const score = relevanceScore(norma, currentSearch);
                 const scoreBadge = currentSearch ? `<span class="bg-white/25 text-[11px] font-bold px-2 py-0.5 rounded-full">Score: ${score}</span>` : '';
-                const hasLocalPdf = !!pdfMap[norma.id];
-                const builtinPath = getBuiltinPdfPath(norma.id);
-                const hasBuiltinPdf = !hasLocalPdf && !!builtinPath;
+                const isNr = norma.id.toLowerCase().startsWith('nr') && !norma.id.toLowerCase().startsWith('nbr');
+                const wpUrl = getWpNbrUrl(norma.id);
+                const builtinPath = isNr ? getBuiltinPdfPath(norma.id) : null;
 
                 let pdfActionHtml = '';
-                if (hasLocalPdf) {
+                if (wpUrl) {
                     pdfActionHtml = `
-                        <div class="flex items-center gap-1">
-                            <button onclick="event.stopPropagation(); openPdfById('${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 border border-emerald-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Abrir PDF salvo no navegador">
-                                <i class="fas fa-file-pdf text-emerald-600"></i>
-                                <span>PDF Completo</span>
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            </button>
-                            <button onclick="deleteCardPdf(event, '${norma.id}', '${norma.codigo}')" class="w-7 h-7 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 flex items-center justify-center transition text-xs border border-red-200 shadow-2xs hover:scale-105 active:scale-95 cursor-pointer" title="${builtinPath ? 'Remover anexo customizado e restaurar PDF integrado' : 'Excluir PDF anexado desta norma'}">
-                                <i class="fas fa-trash-can text-xs"></i>
-                            </button>
-                        </div>
+                        <a href="${wpUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition inline-flex items-center gap-1.5 border border-emerald-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer no-underline" title="Abrir página da ${escapeHtml(norma.codigo)} no repositório WordPress para baixar o PDF">
+                            <i class="fas fa-file-pdf text-emerald-600"></i>
+                            <span>PDF Completo</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        </a>
                     `;
-                } else if (hasBuiltinPdf) {
-                    const isNr = norma.id.toLowerCase().startsWith('nr');
-                    const label = isNr ? 'PDF Oficial' : 'PDF Completo';
-                    const tooltip = isNr ? 'Abrir PDF oficial consolidado vigente já integrado no projeto' : 'Abrir PDF completo integrado (disponibilizado publicamente por universidade/órgão público)';
+                } else if (isNr && builtinPath) {
                     pdfActionHtml = `
-                        <div class="flex items-center gap-1">
-                            <button onclick="event.stopPropagation(); openPdfById('${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 border border-emerald-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="${tooltip}">
-                                <i class="fas fa-file-pdf text-emerald-600"></i>
-                                <span>${label}</span>
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            </button>
-                            <button onclick="attachPdfDirectly(event, '${norma.id}')" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 flex items-center gap-1 transition text-xs border border-slate-200 shadow-2xs cursor-pointer" title="Anexar versão própria / anotada desta norma">
-                                <i class="fas fa-paperclip text-[11px]"></i>
-                            </button>
-                        </div>
+                        <a href="${builtinPath}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition inline-flex items-center gap-1.5 border border-emerald-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer no-underline" title="Abrir PDF oficial consolidado vigente integrado">
+                            <i class="fas fa-file-pdf text-emerald-600"></i>
+                            <span>PDF Oficial</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        </a>
                     `;
                 } else {
-                    // NBR sem PDF ainda
                     pdfActionHtml = `
-                        <button onclick="attachPdfDirectly(event, '${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-800 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 hover:border-blue-200 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Anexar arquivo PDF desta NBR (armazenamento local seguro no navegador)">
-                            <i class="fas fa-paperclip text-slate-500 hover:text-blue-600 text-xs"></i>
-                            <span>Anexar PDF</span>
-                        </button>
+                        <span class="px-2.5 py-1 rounded-xl bg-slate-100/80 text-slate-400 text-[11px] font-semibold border border-slate-200/50">Sem PDF</span>
                     `;
                 }
 
@@ -4336,32 +4434,29 @@
 
             document.getElementById('modalHeader').className = `bg-gradient-to-r ${colors[norma.cor] || 'from-slate-700 to-slate-900'} text-white pt-5 sm:pt-6 pb-4 sm:pb-5 px-4 sm:px-6 shrink-0 shadow-xs`;
 
-            const hasLocalPdf = !!pdfMap[norma.id];
-            const builtinPath = getBuiltinPdfPath(norma.id);
-            const hasBuiltinPdf = !hasLocalPdf && !!builtinPath;
-            const hasAnyPdf = hasLocalPdf || hasBuiltinPdf;
-            const isNr = norma.id.toLowerCase().startsWith('nr');
+            const isNr = norma.id.toLowerCase().startsWith('nr') && !norma.id.toLowerCase().startsWith('nbr');
+            const wpUrl = getWpNbrUrl(norma.id);
+            const builtinPath = isNr ? getBuiltinPdfPath(norma.id) : null;
+            const hasAnyPdf = !!wpUrl || !!builtinPath;
 
             const delModalBtn = document.getElementById('modalDeletePdfBtn');
             if (delModalBtn) {
-                if (hasLocalPdf) {
-                    delModalBtn.classList.remove('hidden');
-                    delModalBtn.setAttribute('data-tip', builtinPath ? 'Remover anexo customizado e restaurar PDF integrado' : 'Excluir PDF anexado desta norma');
-                } else {
-                    delModalBtn.classList.add('hidden');
-                }
+                delModalBtn.classList.add('hidden');
             }
 
             const openModalBtn = document.getElementById('modalOpenPdfBtn');
             if (openModalBtn) {
-                if (hasAnyPdf) {
+                if (wpUrl) {
                     openModalBtn.classList.remove('opacity-40');
-                    const label = hasLocalPdf ? 'Abrir PDF Local' : (isNr ? 'Abrir PDF Oficial' : 'Abrir PDF Completo');
-                    openModalBtn.title = hasLocalPdf ? 'Abrir PDF salvo no navegador' : (isNr ? 'Abrir PDF oficial consolidado vigente integrado' : 'Abrir PDF completo integrado');
-                    openModalBtn.innerHTML = `<i class="fas fa-file-pdf text-xs"></i><span class="hidden md:inline font-semibold">${label}</span>`;
+                    openModalBtn.title = 'Abrir postagem no repositório (WordPress) para baixar o PDF completo';
+                    openModalBtn.innerHTML = `<i class="fas fa-file-pdf text-xs"></i><span class="hidden md:inline font-semibold">PDF Completo</span>`;
+                } else if (isNr && builtinPath) {
+                    openModalBtn.classList.remove('opacity-40');
+                    openModalBtn.title = 'Abrir PDF oficial consolidado vigente integrado';
+                    openModalBtn.innerHTML = `<i class="fas fa-file-pdf text-xs"></i><span class="hidden md:inline font-semibold">PDF Oficial</span>`;
                 } else {
                     openModalBtn.classList.add('opacity-40');
-                    openModalBtn.title = 'Sem PDF anexado para esta norma';
+                    openModalBtn.title = 'Sem PDF disponível para esta norma';
                     openModalBtn.innerHTML = `<i class="fas fa-file-pdf text-xs"></i><span class="hidden md:inline font-semibold">Sem PDF</span>`;
                 }
             }
@@ -4373,8 +4468,8 @@
             document.getElementById('modalSearch').value = '';
 
             let metaText = 'Consulta rápida • resumo técnico';
-            if (hasLocalPdf) metaText = 'Consulta rápida • PDF local anexado';
-            else if (hasBuiltinPdf) metaText = isNr ? 'Consulta rápida • PDF oficial vigente anexado' : 'Consulta rápida • PDF completo integrado';
+            if (wpUrl) metaText = 'Consulta rápida • NBR no Repositório (WordPress)';
+            else if (isNr && builtinPath) metaText = 'Consulta rápida • PDF oficial vigente integrado';
             document.getElementById('modalMeta').textContent = metaText;
 
             const isFav = favorites.includes(norma.id);
@@ -4786,6 +4881,10 @@
             nbr6120: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
             nbr6122: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
             nbr8681: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
+            nbr8800: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
+            nbr10004: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
+            nbr13133: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
+            nbr8419: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
             nbr7480: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
             nbr14931: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
             nbr15575: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
@@ -4924,14 +5023,53 @@
             sel.innerHTML = options;
         }
 
-        const builtinNbrPdfs = new Set([
-            'nbr5410', 'nbr5419', 'nbr5626', 'nbr5674', 'nbr6118', 'nbr6120',
-            'nbr6122', 'nbr6492', 'nbr7198', 'nbr7229', 'nbr7480', 'nbr8160',
-            'nbr8681', 'nbr9050', 'nbr9077', 'nbr10151', 'nbr10844', 'nbr13434',
-            'nbr13570', 'nbr13752', 'nbr13969', 'nbr14280', 'nbr14628', 'nbr14718',
-            'nbr14931', 'nbr15220', 'nbr15575', 'nbr16280', 'nbr16325', 'nbr16401',
-            'nbr16537', 'nbr17240'
-        ]);
+        const wpNbrPosts = {
+            'nbr5410': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-5410/',
+            'nbr5419': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-5419/',
+            'nbr5626': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-5626/',
+            'nbr5674': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-5674/',
+            'nbr6118': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-6118/',
+            'nbr6120': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-6120/',
+            'nbr6122': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-6122/',
+            'nbr6492': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-6492/',
+            'nbr7198': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-7198/',
+            'nbr7229': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-7229/',
+            'nbr7480': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-7480/',
+            'nbr8160': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-8160/',
+            'nbr8419': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-8419/',
+            'nbr8681': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-8681/',
+            'nbr8800': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-8800/',
+            'nbr9050': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-9050/',
+            'nbr9077': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-9077/',
+            'nbr10004': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-10004/',
+            'nbr10151': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-10151/',
+            'nbr10844': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-10844/',
+            'nbr13133': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-13133/',
+            'nbr13434': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-13434/',
+            'nbr13570': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-13570/',
+            'nbr13752': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-13752/',
+            'nbr13969': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-13969/',
+            'nbr14280': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-14280/',
+            'nbr14628': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-14628/',
+            'nbr14718': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-14718/',
+            'nbr14931': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-14931/',
+            'nbr15220': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-15220/',
+            'nbr15575': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-15575/',
+            'nbr155754': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-15575/',
+            'nbr16280': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-16280/',
+            'nbr16325': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-16325/',
+            'nbr16401': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-16401/',
+            'nbr16537': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-16537/',
+            'nbr17240': 'https://guiaestudante9.wordpress.com/2026/09/29/nbr-17240/'
+        };
+
+        function getWpNbrUrl(normaId) {
+            if (!normaId || typeof normaId !== 'string') return null;
+            const cleanId = normaId.toLowerCase().trim();
+            return wpNbrPosts[cleanId] || null;
+        }
+
+        const builtinNbrPdfs = new Set(Object.keys(wpNbrPosts));
 
         function getBuiltinPdfPath(normaId) {
             if (!normaId || typeof normaId !== 'string') return null;
@@ -4952,17 +5090,8 @@
         }
 
         async function updatePdfCount() {
-            // 36 NRs oficiais + 18 NBRs públicas integradas = 54 normas prontas no projeto
-            let count = 36 + builtinNbrPdfs.size;
-            for (const id in (pdfMap || {})) {
-                const cleanId = id.toLowerCase().trim();
-                const isNr = cleanId.startsWith('nr') && !cleanId.startsWith('nbr');
-                const isBuiltinNbr = builtinNbrPdfs.has(cleanId);
-                // Incrementa se o usuário anexou PDF para uma norma que não tinha PDF nativo
-                if (!isNr && !isBuiltinNbr) {
-                    count++;
-                }
-            }
+            // 36 NRs oficiais integradas + 36 NBRs no repositório WordPress = 72
+            let count = 36 + Object.keys(wpNbrPosts).length;
             const el = document.getElementById('pdfCount');
             if (el) el.textContent = String(count);
             return count;
@@ -5052,24 +5181,23 @@
         // AÇÕES DIRETAS DE PDF NOS CARDS
         // =====================
         async function openPdfById(normaId) {
-            // 1. PDF local anexado pelo usuário (IndexedDB)
-            const dbId = pdfMap[normaId];
-            if (dbId) {
-                const rec = await dbGetPdf(dbId);
-                if (rec) {
-                    const blob = new Blob([rec.data], { type: rec.mime || 'application/pdf' });
-                    const url = URL.createObjectURL(blob);
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                    setTimeout(() => URL.revokeObjectURL(url), 60_000);
-                    return;
-                }
+            if (!normaId || typeof normaId !== 'string') return;
+            const cleanId = normaId.toLowerCase().trim();
+
+            // 1. NBR no repositório WordPress (abre a postagem para o usuário baixar na NBR)
+            const wpUrl = getWpNbrUrl(cleanId);
+            if (wpUrl) {
+                window.open(wpUrl, '_blank', 'noopener,noreferrer');
+                return;
             }
-            // 2. PDF integrado no projeto (36 NRs oficiais + 18 NBRs públicas)
-            const builtinPath = getBuiltinPdfPath(normaId);
+
+            // 2. PDF oficial integrado (36 NRs oficiais)
+            const builtinPath = getBuiltinPdfPath(cleanId);
             if (builtinPath) {
                 window.open(builtinPath, '_blank', 'noopener,noreferrer');
                 return;
             }
+
             showToast('Nenhum PDF disponível para esta norma', 'info');
         }
 
@@ -5238,41 +5366,30 @@
                     );
                 })
                 .map(n => {
-                    const hasLocal = !!pdfMap[n.id];
-                    const builtinPath = getBuiltinPdfPath(n.id);
-                    const hasBuiltin = !hasLocal && !!builtinPath;
-                    const hasAny = hasLocal || hasBuiltin;
-                    const isNr = n.id.toLowerCase().startsWith('nr');
+                    const isNr = n.id.toLowerCase().startsWith('nr') && !n.id.toLowerCase().startsWith('nbr');
+                    const wpUrl = getWpNbrUrl(n.id);
+                    const builtinPath = isNr ? getBuiltinPdfPath(n.id) : null;
 
                     const lnk = officialLinks[n.id];
                     const officialBtn = lnk?.url
-                        ? `<a class="px-3 py-2 rounded-lg border bg-white hover:bg-gray-100 transition text-sm" href="${lnk.url}" target="_blank" rel="noopener noreferrer"><i class="fas fa-up-right-from-square mr-2"></i>${escapeHtml(lnk.label || 'Portal Oficial')}</a>`
+                        ? `<a class="px-3 py-2 rounded-lg border bg-white hover:bg-gray-100 transition text-sm no-underline inline-flex items-center" href="${lnk.url}" target="_blank" rel="noopener noreferrer"><i class="fas fa-up-right-from-square mr-2"></i>${escapeHtml(lnk.label || 'Portal Oficial')}</a>`
                         : `<button class="px-3 py-2 rounded-lg border bg-white text-gray-400 text-sm cursor-not-allowed" disabled><i class="fas fa-up-right-from-square mr-2"></i>Sem portal</button>`;
 
                     let pdfBtn = '';
                     let statusBadge = '';
                     let subText = '';
 
-                    if (hasLocal) {
-                        statusBadge = '<span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 font-semibold"><i class="fas fa-floppy-disk mr-1"></i>Arquivo local</span>';
-                        subText = '<div class="text-xs text-gray-500 mt-1"><i class="fas fa-file-pdf mr-1 text-emerald-600"></i>Salvo no navegador (IndexedDB)</div>';
-                        pdfBtn = `
-                            <button class="px-3 py-2 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition text-sm cursor-pointer" onclick="removePdf('${n.id}')" title="Remover"><i class="fas fa-trash mr-1.5"></i>Remover</button>
-                            <button class="px-3 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition text-sm cursor-pointer" onclick="openPdfById('${n.id}')"><i class="fas fa-file-pdf mr-1.5"></i>Abrir PDF</button>
-                        `;
-                    } else if (hasBuiltin) {
-                        const badgeText = isNr ? 'Oficial Integrado' : 'Documento Integrado';
-                        const infoText = isNr ? 'PDF oficial vigente pronto no projeto' : 'PDF completo integrado pronto no projeto';
-                        const btnLabel = isNr ? 'Abrir PDF Oficial' : 'Abrir PDF Completo';
-                        statusBadge = `<span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 font-semibold"><i class="fas fa-circle-check mr-1 text-blue-600"></i>${badgeText}</span>`;
-                        subText = `<div class="text-xs text-blue-700 mt-1"><i class="fas fa-file-pdf mr-1 text-blue-600"></i>${infoText}</div>`;
-                        pdfBtn = `
-                            <button class="px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition text-sm font-semibold cursor-pointer shadow-xs" onclick="openPdfById('${n.id}')"><i class="fas fa-file-pdf mr-1.5"></i>${btnLabel}</button>
-                            <button class="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition text-sm cursor-pointer" onclick="attachPdfDirectly(event, '${n.id}')" title="Substituir por versão própria anotada"><i class="fas fa-paperclip mr-1.5"></i>Anexar local</button>
-                        `;
+                    if (wpUrl) {
+                        statusBadge = '<span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 font-semibold"><i class="fas fa-circle-check mr-1 text-emerald-600"></i>Repositório WordPress</span>';
+                        subText = '<div class="text-xs text-gray-500 mt-1"><i class="fas fa-file-pdf mr-1 text-emerald-600"></i>Post no repositório para download da NBR</div>';
+                        pdfBtn = `<a class="px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition text-sm font-semibold cursor-pointer shadow-xs no-underline inline-flex items-center" href="${wpUrl}" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-pdf mr-1.5"></i>PDF Completo</a>`;
+                    } else if (isNr && builtinPath) {
+                        statusBadge = `<span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 font-semibold"><i class="fas fa-circle-check mr-1 text-blue-600"></i>Oficial Integrado</span>`;
+                        subText = `<div class="text-xs text-blue-700 mt-1"><i class="fas fa-file-pdf mr-1 text-blue-600"></i>PDF oficial vigente pronto no projeto</div>`;
+                        pdfBtn = `<a class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm font-semibold cursor-pointer shadow-xs no-underline inline-flex items-center" href="${builtinPath}" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-pdf mr-1.5"></i>Abrir PDF Oficial</a>`;
                     } else {
                         statusBadge = '<span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">Sem PDF</span>';
-                        pdfBtn = `<button class="px-3 py-2 rounded-lg border bg-white hover:bg-gray-100 transition text-sm cursor-pointer" onclick="attachPdfDirectly(event, '${n.id}')"><i class="fas fa-paperclip mr-1.5"></i>Anexar PDF</button>`;
+                        pdfBtn = `<button class="px-3 py-2 rounded-lg border bg-white text-gray-400 text-sm cursor-not-allowed" disabled>Sem PDF</button>`;
                     }
 
                     return `
