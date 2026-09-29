@@ -2,14 +2,26 @@
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=5.0" name="viewport"/>
   <title>Calculadora de Terraplenagem | Ferramentas de Engenharia</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="stylesheet" id="ecalc-suite-css" href="assets/suite/suite-nav.css?v=20260929_2">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Inter', sans-serif; }
+    * {
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
     body {
       background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
@@ -182,10 +194,12 @@
     }
     
     /* Canvas diagram */
-    #terrainCanvas {
+    #terrainCanvas, #excavationCanvas {
       background: rgba(0, 0, 0, 0.3);
       border-radius: 12px;
       border: 1px solid rgba(0, 255, 255, 0.2);
+      max-width: 100%;
+      height: auto;
     }
   </style>
 </head>
@@ -197,137 +211,151 @@
   </div>
 
   <!-- Header -->
-  <header class="relative z-10 py-6 px-4 no-print">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center text-2xl float">
+  <header class="no-print relative z-20 border-b border-cyan-500/20 py-2.5 sm:py-3 px-3 sm:px-4 backdrop-blur-md bg-black/20">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4">
+      <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+        <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center text-lg sm:text-2xl shrink-0">
           🏗️
         </div>
-        <div>
-          <h1 class="text-2xl font-bold gradient-text">Calculadora de Terraplenagem</h1>
-          <p class="text-gray-400 text-sm">Ferramentas de Engenharia Civil</p>
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent truncate">
+            Calculadora de Terraplenagem
+          </h1>
+          <p class="text-gray-400 text-[11px] sm:text-xs truncate">Ferramentas de Engenharia Civil</p>
         </div>
       </div>
-      <div class="flex gap-3">
-        <button onclick="exportarPDF()" class="px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg hover:bg-cyan-500/20 transition-all flex items-center gap-2">
-          <span>📄</span> Exportar
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <button onclick="exportarPDF()" class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg hover:bg-cyan-500/20 transition-all flex items-center gap-1.5 text-xs text-cyan-300 font-medium cursor-pointer">
+          <span>📄</span> <span class="hidden sm:inline">Exportar</span>
         </button>
-        <button onclick="compartilhar()" class="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg hover:bg-purple-500/20 transition-all flex items-center gap-2">
-          <span>🔗</span> Compartilhar
+        <button onclick="compartilhar()" class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg hover:bg-purple-500/20 transition-all flex items-center gap-1.5 text-xs text-purple-300 font-medium cursor-pointer">
+          <span>🔗</span> <span class="hidden sm:inline">Compartilhar</span>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="relative z-10 max-w-6xl mx-auto px-4 pb-12">
+  <main class="relative z-10 max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-12">
     <!-- Action Buttons -->
-    <div class="flex justify-center gap-4 mb-8 no-print">
-      <button id="btnCalcular" class="px-8 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition-all transform hover:scale-105">
-        ⚡ Calcular
+    <div class="no-print grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-4 mb-5 sm:mb-8">
+      <button id="btnCalcular" type="button" class="py-2.5 px-2 sm:px-8 sm:py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl font-semibold text-xs sm:text-base flex items-center justify-center gap-1.5 hover:shadow-lg hover:shadow-cyan-500/30 transition-all cursor-pointer">
+        <span>⚡</span> Calcular
       </button>
-      <button id="btnReset" class="px-8 py-3 bg-transparent border-2 border-gray-600 rounded-xl font-semibold hover:border-cyan-400 hover:text-cyan-400 transition-all">
-        🔄 Limpar
+      <button id="btnReset" type="button" class="py-2.5 px-2 sm:px-8 sm:py-3 bg-transparent border border-gray-600 rounded-xl font-semibold text-xs sm:text-base flex items-center justify-center gap-1.5 hover:border-cyan-400 hover:text-cyan-400 transition-all cursor-pointer">
+        <span>🔄</span> Limpar
       </button>
-      <button id="btnSalvar" class="px-8 py-3 bg-transparent border-2 border-gray-600 rounded-xl font-semibold hover:border-green-400 hover:text-green-400 transition-all">
-        💾 Salvar
+      <button id="btnSalvar" type="button" class="py-2.5 px-2 sm:px-8 sm:py-3 bg-transparent border border-gray-600 rounded-xl font-semibold text-xs sm:text-base flex items-center justify-center gap-1.5 hover:border-green-400 hover:text-green-400 transition-all cursor-pointer">
+        <span>💾</span> Salvar
       </button>
     </div>
 
     <!-- Tipo de Movimentação -->
-    <section class="glass-card rounded-2xl p-6 mb-6">
-      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">📊</span>
+    <section class="glass-card rounded-2xl p-4 sm:p-6 mb-5 sm:mb-6">
+      <h2 class="text-base sm:text-xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-sm sm:text-base">📊</span>
         Tipo de Movimentação
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button class="tipo-btn active p-5 rounded-xl border-2 border-cyan-500/30 text-left" onclick="selecionarTipo('corte-aterro')">
-          <span class="text-3xl mb-2 block">⛏️</span>
-          <span class="font-semibold block">Corte e Aterro</span>
-          <span class="text-sm text-gray-400">Movimentação de terra</span>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
+        <button class="tipo-btn active p-3.5 sm:p-5 rounded-xl border-2 border-cyan-500/30 text-left cursor-pointer" onclick="selecionarTipo('corte-aterro')">
+          <div class="flex items-center sm:block gap-3">
+            <span class="text-2xl sm:text-3xl sm:mb-2 block shrink-0">⛏️</span>
+            <div>
+              <span class="font-semibold text-sm sm:text-base block">Corte e Aterro</span>
+              <span class="text-xs sm:text-sm text-gray-400">Movimentação de terra</span>
+            </div>
+          </div>
         </button>
-        <button class="tipo-btn p-5 rounded-xl border-2 border-gray-700 text-left" onclick="selecionarTipo('volume-simples')">
-          <span class="text-3xl mb-2 block">📦</span>
-          <span class="font-semibold block">Volume Simples</span>
-          <span class="text-sm text-gray-400">Escavações básicas</span>
+        <button class="tipo-btn p-3.5 sm:p-5 rounded-xl border-2 border-gray-700 text-left cursor-pointer" onclick="selecionarTipo('volume-simples')">
+          <div class="flex items-center sm:block gap-3">
+            <span class="text-2xl sm:text-3xl sm:mb-2 block shrink-0">📦</span>
+            <div>
+              <span class="font-semibold text-sm sm:text-base block">Volume Simples</span>
+              <span class="text-xs sm:text-sm text-gray-400">Escavações básicas</span>
+            </div>
+          </div>
         </button>
-        <button class="tipo-btn p-5 rounded-xl border-2 border-gray-700 text-left" onclick="selecionarTipo('transporte')">
-          <span class="text-3xl mb-2 block">🚛</span>
-          <span class="font-semibold block">Transporte (DMT)</span>
-          <span class="text-sm text-gray-400">Logística de material</span>
+        <button class="tipo-btn p-3.5 sm:p-5 rounded-xl border-2 border-gray-700 text-left cursor-pointer" onclick="selecionarTipo('transporte')">
+          <div class="flex items-center sm:block gap-3">
+            <span class="text-2xl sm:text-3xl sm:mb-2 block shrink-0">🚛</span>
+            <div>
+              <span class="font-semibold text-sm sm:text-base block">Transporte (DMT)</span>
+              <span class="text-xs sm:text-sm text-gray-400">Logística de material</span>
+            </div>
+          </div>
         </button>
       </div>
     </section>
 
     <!-- Histórico de cálculos -->
-    <section class="glass-card rounded-2xl p-6 mb-6 no-print" id="secao-historico" style="display: none;">
-      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">📜</span>
+    <section class="glass-card rounded-2xl p-4 sm:p-6 mb-5 sm:mb-6 no-print" id="secao-historico" style="display: none;">
+      <h2 class="text-base sm:text-xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-sm sm:text-base">📜</span>
         Histórico de Cálculos
       </h2>
       <div id="lista-historico" class="space-y-2 max-h-48 overflow-y-auto"></div>
-      <button onclick="limparHistorico()" class="mt-4 text-sm text-red-400 hover:text-red-300">🗑️ Limpar histórico</button>
+      <button onclick="limparHistorico()" class="mt-3 text-xs sm:text-sm text-red-400 hover:text-red-300 cursor-pointer">🗑️ Limpar histórico</button>
     </section>
 
     <!-- CORTE E ATERRO -->
-    <section class="glass-card rounded-2xl p-6 mb-6" id="form-corte-aterro">
-      <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center">🏔️</span>
+    <section class="glass-card rounded-2xl p-4 sm:p-6 mb-5 sm:mb-6" id="form-corte-aterro">
+      <h2 class="text-base sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2">
+        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-orange-500/20 flex items-center justify-center text-sm sm:text-base">🏔️</span>
         Dados do Terreno
       </h2>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-6 mb-4 sm:mb-6">
         <div class="tooltip-container">
-          <label class="block text-sm text-gray-400 mb-2">Área do terreno (m²)</label>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Área do terreno (m²)</label>
           <input type="number" id="area-terreno" value="1000.00" step="0.01" 
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
           <span class="tooltip-text">Área total a ser trabalhada</span>
         </div>
         <div class="tooltip-container">
-          <label class="block text-sm text-gray-400 mb-2">Cota média atual (m)</label>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Cota média atual (m)</label>
           <input type="number" id="cota-atual" value="100.00" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
           <span class="tooltip-text">Nível atual do terreno</span>
         </div>
-        <div class="tooltip-container">
-          <label class="block text-sm text-gray-400 mb-2">Cota de projeto (m)</label>
+        <div class="tooltip-container sm:col-span-2 md:col-span-1">
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Cota de projeto (m)</label>
           <input type="number" id="cota-projeto" value="99.50" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
           <span class="tooltip-text">Nível desejado final</span>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-6 mb-4 sm:mb-6">
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Tipo de solo</label>
-          <select id="tipo-solo" class="form-select w-full px-4 py-3 rounded-xl">
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Tipo de solo</label>
+          <select id="tipo-solo" class="form-select w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
             <option value="argila">🟤 Argila</option>
             <option value="areia">🟡 Areia</option>
             <option value="silte">🟠 Silte</option>
-            <option value="rocha">�ite Rocha alterada</option>
+            <option value="rocha">🪨 Rocha alterada</option>
             <option value="misto">🔶 Misto (argilo-arenoso)</option>
           </select>
         </div>
         <div class="tooltip-container">
-          <label class="block text-sm text-gray-400 mb-2">Fator de empolamento</label>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Fator de empolamento</label>
           <input type="number" id="empolamento" value="1.25" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
           <span class="tooltip-text">Aumento de volume após escavação (1.20-1.50)</span>
         </div>
-        <div class="tooltip-container">
-          <label class="block text-sm text-gray-400 mb-2">Fator de compactação</label>
+        <div class="tooltip-container sm:col-span-2 md:col-span-1">
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Fator de compactação</label>
           <input type="number" id="compactacao" value="0.90" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
           <span class="tooltip-text">Redução após compactar (0.85-0.95)</span>
         </div>
       </div>
 
       <!-- Visualização do terreno -->
-      <div class="mb-6">
-        <h3 class="text-sm text-gray-400 mb-3">📐 Visualização do Perfil</h3>
-        <canvas id="terrainCanvas" width="600" height="200" class="w-full"></canvas>
+      <div class="mb-5 sm:mb-6 overflow-hidden">
+        <h3 class="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">📐 Visualização do Perfil</h3>
+        <canvas id="terrainCanvas" width="600" height="200" class="w-full max-w-full rounded-xl"></canvas>
       </div>
 
-      <div class="p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30 mb-6">
+      <div class="p-3.5 sm:p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30 mb-5 sm:mb-6 text-xs sm:text-sm">
         <p class="text-cyan-300">
           💡 <strong>Dica:</strong> Empolamento = volume transportado / volume no corte. 
           Compactação = volume final / volume solto.
@@ -338,112 +366,112 @@
     </section>
 
     <!-- VOLUME SIMPLES -->
-    <section class="glass-card rounded-2xl p-6 mb-6" id="form-volume-simples" style="display: none;">
-      <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">📦</span>
+    <section class="glass-card rounded-2xl p-4 sm:p-6 mb-5 sm:mb-6" id="form-volume-simples" style="display: none;">
+      <h2 class="text-base sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2">
+        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm sm:text-base">📦</span>
         Dimensões da Escavação
       </h2>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-6 mb-4 sm:mb-6">
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Comprimento (m)</label>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Comprimento (m)</label>
           <input type="number" id="comprimento" value="10.00" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
         </div>
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Largura (m)</label>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Largura (m)</label>
           <input type="number" id="largura" value="5.00" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
         </div>
-        <div>
-          <label class="block text-sm text-gray-400 mb-2">Profundidade (m)</label>
+        <div class="sm:col-span-2 md:col-span-1">
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Profundidade (m)</label>
           <input type="number" id="profundidade" value="2.00" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-6 mb-4 sm:mb-6">
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Tipo de escavação</label>
-          <select id="tipo-escavacao" class="form-select w-full px-4 py-3 rounded-xl">
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Tipo de escavação</label>
+          <select id="tipo-escavacao" class="form-select w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
             <option value="vala">📏 Vala (paredes verticais)</option>
             <option value="talude">📐 Com talude (inclinado)</option>
             <option value="piscina">🏊 Piscina/Reservatório</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Inclinação do talude (H:V)</label>
-          <select id="inclinacao-talude" class="form-select w-full px-4 py-3 rounded-xl" disabled>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Inclinação do talude (H:V)</label>
+          <select id="inclinacao-talude" class="form-select w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" disabled>
             <option value="0.5">1:2 (26°)</option>
             <option value="0.67">2:3 (34°)</option>
             <option value="1.0" selected>1:1 (45°)</option>
             <option value="1.5">3:2 (56°)</option>
           </select>
         </div>
-        <div>
-          <label class="block text-sm text-gray-400 mb-2">Empolamento</label>
+        <div class="sm:col-span-2 md:col-span-1">
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Empolamento</label>
           <input type="number" id="empolamento-simples" value="1.25" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
         </div>
       </div>
 
       <!-- 3D Preview -->
-      <div class="mb-6">
-        <h3 class="text-sm text-gray-400 mb-3">📐 Vista 3D da Escavação</h3>
-        <canvas id="excavationCanvas" width="600" height="250" class="w-full"></canvas>
+      <div class="mb-5 sm:mb-6 overflow-hidden">
+        <h3 class="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">📐 Vista 3D da Escavação</h3>
+        <canvas id="excavationCanvas" width="600" height="250" class="w-full max-w-full rounded-xl"></canvas>
       </div>
 
       <div id="resultado-volume-simples"></div>
     </section>
 
     <!-- TRANSPORTE -->
-    <section class="glass-card rounded-2xl p-6 mb-6" id="form-transporte" style="display: none;">
-      <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">🚛</span>
+    <section class="glass-card rounded-2xl p-4 sm:p-6 mb-5 sm:mb-6" id="form-transporte" style="display: none;">
+      <h2 class="text-base sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2">
+        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-sm sm:text-base">🚛</span>
         Dados do Transporte
       </h2>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-6 mb-4 sm:mb-6">
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Volume a transportar (m³)</label>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Volume a transportar (m³)</label>
           <input type="number" id="volume-transporte" value="100.00" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
         </div>
         <div class="tooltip-container">
-          <label class="block text-sm text-gray-400 mb-2">DMT - Distância (km)</label>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">DMT - Distância (km)</label>
           <input type="number" id="dmt" value="5.0" step="0.1"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
           <span class="tooltip-text">Distância Média de Transporte</span>
         </div>
-        <div>
-          <label class="block text-sm text-gray-400 mb-2">Capacidade caminhão (m³)</label>
+        <div class="sm:col-span-2 md:col-span-1">
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Capacidade caminhão (m³)</label>
           <input type="number" id="capacidade-caminhao" value="6.0" step="0.5"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-6 mb-4 sm:mb-6">
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Velocidade média (km/h)</label>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Velocidade média (km/h)</label>
           <input type="number" id="velocidade" value="40"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
         </div>
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Tempo carga/descarga (min)</label>
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Tempo carga/descarga (min)</label>
           <input type="number" id="tempo-operacao" value="20"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
         </div>
-        <div>
-          <label class="block text-sm text-gray-400 mb-2">Custo por viagem (R$)</label>
+        <div class="sm:col-span-2 md:col-span-1">
+          <label class="block text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">Custo por viagem (R$)</label>
           <input type="number" id="custo-viagem" value="240.00" step="0.01"
-                 class="form-control w-full px-4 py-3 rounded-xl">
+                 class="form-control w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl">
         </div>
       </div>
 
       <!-- Gráfico de transporte -->
-      <div class="mb-6">
-        <h3 class="text-sm text-gray-400 mb-3">📊 Análise de Produtividade</h3>
-        <div class="h-64">
+      <div class="mb-5 sm:mb-6 overflow-hidden">
+        <h3 class="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">📊 Análise de Produtividade</h3>
+        <div class="h-56 sm:h-64">
           <canvas id="transportChart"></canvas>
         </div>
       </div>
@@ -452,27 +480,27 @@
     </section>
 
     <!-- Referências NBR -->
-    <section class="glass-card rounded-2xl p-6">
-      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center">📚</span>
+    <section class="glass-card rounded-2xl p-4 sm:p-6">
+      <h2 class="text-base sm:text-xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center text-sm sm:text-base">📚</span>
         Referências Normativas
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all">
-          <span class="text-cyan-400 font-semibold">NBR 6502:1995</span>
-          <p class="text-sm text-gray-400">Rochas e Solos - Terminologia</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div class="p-3.5 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all">
+          <span class="text-cyan-400 font-semibold text-sm sm:text-base">NBR 6502:1995</span>
+          <p class="text-xs sm:text-sm text-gray-400 mt-0.5">Rochas e Solos - Terminologia</p>
         </div>
-        <div class="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all">
-          <span class="text-cyan-400 font-semibold">NBR 12007:1990</span>
-          <p class="text-sm text-gray-400">Solos - Ensaio de Adensamento</p>
+        <div class="p-3.5 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all">
+          <span class="text-cyan-400 font-semibold text-sm sm:text-base">NBR 12007:1990</span>
+          <p class="text-xs sm:text-sm text-gray-400 mt-0.5">Solos - Ensaio de Adensamento</p>
         </div>
-        <div class="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all">
-          <span class="text-cyan-400 font-semibold">NBR 9061:1985</span>
-          <p class="text-sm text-gray-400">Segurança de Escavação a Céu Aberto</p>
+        <div class="p-3.5 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all">
+          <span class="text-cyan-400 font-semibold text-sm sm:text-base">NBR 9061:1985</span>
+          <p class="text-xs sm:text-sm text-gray-400 mt-0.5">Segurança de Escavação a Céu Aberto</p>
         </div>
-        <div class="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all">
-          <span class="text-cyan-400 font-semibold">NBR 11682:2009</span>
-          <p class="text-sm text-gray-400">Estabilidade de Encostas</p>
+        <div class="p-3.5 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all">
+          <span class="text-cyan-400 font-semibold text-sm sm:text-base">NBR 11682:2009</span>
+          <p class="text-xs sm:text-sm text-gray-400 mt-0.5">Estabilidade de Encostas</p>
         </div>
       </div>
     </section>
@@ -601,9 +629,14 @@
         btn.classList.add('border-gray-700');
       });
       
-      event.target.closest('.tipo-btn').classList.add('active');
-      event.target.closest('.tipo-btn').classList.remove('border-gray-700');
-      event.target.closest('.tipo-btn').classList.add('border-cyan-500/30');
+      const targetBtn = (window.event && window.event.target) 
+        ? window.event.target.closest('.tipo-btn') 
+        : document.querySelector(`[onclick*="${tipo}"]`);
+      if (targetBtn) {
+        targetBtn.classList.add('active');
+        targetBtn.classList.remove('border-gray-700');
+        targetBtn.classList.add('border-cyan-500/30');
+      }
 
       document.getElementById('form-corte-aterro').style.display = 'none';
       document.getElementById('form-volume-simples').style.display = 'none';
@@ -852,63 +885,63 @@
       const numeroCaminhoes = Math.ceil(volumeEmpolado / 6);
 
       let html = `
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-6">
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Operação</div>
-            <div class="text-xl font-bold text-cyan-400">${operacaoIcon} ${operacao}</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mt-4 sm:mt-6">
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Operação</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${operacaoIcon} ${operacao}</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Diferença Cota</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(Math.abs(diferencaCota))} m</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Diferença Cota</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(Math.abs(diferencaCota))} m</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Volume ${operacao}</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(volumeCorte + volumeAterro)} m³</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Volume ${operacao}</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(volumeCorte + volumeAterro)} m³</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Peso Total</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(pesoTotal / 1000)} t</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Peso Total</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(pesoTotal / 1000)} t</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Custo Estimado</div>
-            <div class="text-xl font-bold text-green-400">${formatarMoeda(custoTotal)}</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Custo Estimado</div>
+            <div class="text-base sm:text-xl font-bold text-green-400">${formatarMoeda(custoTotal)}</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Caminhões (6m³)</div>
-            <div class="text-xl font-bold text-cyan-400">${numeroCaminhoes} viagens</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Caminhões (6m³)</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${numeroCaminhoes} vgs</div>
           </div>
         </div>
       `;
 
       if (volumeCorte > 0) {
         html += `
-          <div class="glass-card rounded-xl p-5 mt-6 border border-red-500/20">
-            <h3 class="font-semibold text-red-400 mb-4 flex items-center gap-2">
-              <span class="w-6 h-6 rounded bg-red-500/20 flex items-center justify-center">⛏️</span>
+          <div class="glass-card rounded-xl p-3.5 sm:p-5 mt-4 sm:mt-6 border border-red-500/20">
+            <h3 class="font-semibold text-red-400 text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-red-500/20 flex items-center justify-center text-xs">⛏️</span>
               Detalhamento do Corte
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3 text-xs sm:text-sm">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Volume no corte:</span>
                 <span class="font-semibold">${formatarNumero(volumeCorte)} m³</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Volume empolado:</span>
                 <span class="font-semibold">${formatarNumero(volumeEmpolado)} m³ <span class="text-cyan-400">(×${empolamento})</span></span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Tipo de solo:</span>
                 <span class="font-semibold">${infoSolo.nome}</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Densidade:</span>
                 <span class="font-semibold">${formatarNumero(infoSolo.densidade, 0)} kg/m³</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Peso total:</span>
                 <span class="font-semibold">${formatarNumero(pesoTotal / 1000)} toneladas</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Caminhões necessários:</span>
                 <span class="font-semibold">${numeroCaminhoes} (capacidade 6m³)</span>
               </div>
@@ -920,25 +953,25 @@
       if (volumeAterro > 0) {
         const camadas = Math.ceil(Math.abs(diferencaCota) * 100 / 20);
         html += `
-          <div class="glass-card rounded-xl p-5 mt-6 border border-green-500/20">
-            <h3 class="font-semibold text-green-400 mb-4 flex items-center gap-2">
-              <span class="w-6 h-6 rounded bg-green-500/20 flex items-center justify-center">📦</span>
+          <div class="glass-card rounded-xl p-3.5 sm:p-5 mt-4 sm:mt-6 border border-green-500/20">
+            <h3 class="font-semibold text-green-400 text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-green-500/20 flex items-center justify-center text-xs">📦</span>
               Detalhamento do Aterro
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3 text-xs sm:text-sm">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Volume final necessário:</span>
                 <span class="font-semibold">${formatarNumero(volumeAterro)} m³</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Volume solto necessário:</span>
                 <span class="font-semibold">${formatarNumero(volumeCompactado)} m³ <span class="text-cyan-400">(÷${compactacao})</span></span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Camadas de compactação:</span>
                 <span class="font-semibold">${camadas} camadas (20cm cada)</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Compactação:</span>
                 <span class="font-semibold">Rolo vibratório (mín. 95% PN)</span>
               </div>
@@ -956,59 +989,59 @@
       }
 
       html += `
-        <div class="glass-card rounded-xl p-5 mt-6 border border-yellow-500/20">
-          <h3 class="font-semibold text-yellow-400 mb-4 flex items-center gap-2">
-            <span class="w-6 h-6 rounded bg-yellow-500/20 flex items-center justify-center">💰</span>
+        <div class="glass-card rounded-xl p-3.5 sm:p-5 mt-4 sm:mt-6 border border-yellow-500/20">
+          <h3 class="font-semibold text-yellow-400 text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+            <span class="w-6 h-6 rounded bg-yellow-500/20 flex items-center justify-center text-xs">💰</span>
             Composição de Custos
           </h3>
-          <div class="space-y-3">
-            <div class="flex justify-between items-center">
+          <div class="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
+            <div class="flex justify-between items-center py-1 border-b border-white/5">
               <span class="text-gray-400">Escavação/Movimentação:</span>
               <span class="font-semibold">${formatarMoeda(custoEscavacao)}</span>
             </div>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center py-1 border-b border-white/5">
               <span class="text-gray-400">Compactação:</span>
               <span class="font-semibold">${formatarMoeda(custoCompactacao)}</span>
             </div>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center py-1 border-b border-white/5">
               <span class="text-gray-400">Custo por m³:</span>
               <span class="font-semibold">${formatarMoeda((volumeCorte + volumeAterro) > 0 ? custoTotal / (volumeCorte + volumeAterro) : 0)}/m³</span>
             </div>
-            <div class="flex justify-between items-center pt-3 border-t border-white/10">
-              <span class="text-lg font-semibold">Total estimado:</span>
-              <span class="text-xl font-bold text-green-400">${formatarMoeda(custoTotal)}</span>
+            <div class="flex justify-between items-center pt-2 sm:pt-3">
+              <span class="text-sm sm:text-base font-semibold">Total estimado:</span>
+              <span class="text-lg sm:text-xl font-bold text-green-400">${formatarMoeda(custoTotal)}</span>
             </div>
           </div>
-          <p class="text-xs text-gray-500 mt-4">*Não inclui transporte (bota-fora ou empréstimo)</p>
+          <p class="text-[11px] sm:text-xs text-gray-500 mt-3">*Não inclui transporte (bota-fora ou empréstimo)</p>
         </div>
 
-        <div class="glass-card rounded-xl p-5 mt-6 border border-orange-500/20">
-          <h3 class="font-semibold text-orange-400 mb-4 flex items-center gap-2">
-            <span class="w-6 h-6 rounded bg-orange-500/20 flex items-center justify-center">⚠️</span>
+        <div class="glass-card rounded-xl p-3.5 sm:p-5 mt-4 sm:mt-6 border border-orange-500/20">
+          <h3 class="font-semibold text-orange-400 text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+            <span class="w-6 h-6 rounded bg-orange-500/20 flex items-center justify-center text-xs">⚠️</span>
             Recomendações Técnicas
           </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            <div class="flex items-start gap-2 py-2">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs sm:text-sm">
+            <div class="flex items-start gap-2 py-1">
               <span class="text-orange-400">▸</span>
               <span class="text-gray-300">Realizar sondagem SPT para confirmar tipo de solo</span>
             </div>
-            <div class="flex items-start gap-2 py-2">
+            <div class="flex items-start gap-2 py-1">
               <span class="text-orange-400">▸</span>
               <span class="text-gray-300">Verificar necessidade de escoramento em cortes > 1,5m</span>
             </div>
-            <div class="flex items-start gap-2 py-2">
+            <div class="flex items-start gap-2 py-1">
               <span class="text-orange-400">▸</span>
               <span class="text-gray-300">Garantir drenagem adequada (evitar empoçamento)</span>
             </div>
-            <div class="flex items-start gap-2 py-2">
+            <div class="flex items-start gap-2 py-1">
               <span class="text-orange-400">▸</span>
               <span class="text-gray-300">Compactar aterros em camadas de 20-30cm</span>
             </div>
-            <div class="flex items-start gap-2 py-2">
+            <div class="flex items-start gap-2 py-1">
               <span class="text-orange-400">▸</span>
               <span class="text-gray-300">Ensaios de compactação a cada 200m³ ou camada</span>
             </div>
-            <div class="flex items-start gap-2 py-2">
+            <div class="flex items-start gap-2 py-1">
               <span class="text-orange-400">▸</span>
               <span class="text-gray-300">Considerar estabilidade de taludes (NBR 11682)</span>
             </div>
@@ -1060,60 +1093,60 @@
       const custoEscavacao = volumeCorte * 26;
 
       let html = `
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-6">
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Volume Corte</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(volumeCorte)} m³</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mt-4 sm:mt-6">
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Volume Corte</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(volumeCorte)} m³</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Volume Empolado</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(volumeEmpolado)} m³</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Volume Empolado</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(volumeEmpolado)} m³</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Área Base</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(areaBase)} m²</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Área Base</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(areaBase)} m²</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Área Topo</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(areaTopo)} m²</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Área Topo</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(areaTopo)} m²</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Caminhões (6m³)</div>
-            <div class="text-xl font-bold text-cyan-400">${numeroCaminhoes} viagens</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Caminhões (6m³)</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${numeroCaminhoes} vgs</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Custo Estimado</div>
-            <div class="text-xl font-bold text-green-400">${formatarMoeda(custoEscavacao)}</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Custo Estimado</div>
+            <div class="text-base sm:text-xl font-bold text-green-400">${formatarMoeda(custoEscavacao)}</div>
           </div>
         </div>
 
-        <div class="glass-card rounded-xl p-5 mt-6 border border-blue-500/20">
-          <h3 class="font-semibold text-blue-400 mb-4 flex items-center gap-2">
-            <span class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center">📊</span>
+        <div class="glass-card rounded-xl p-3.5 sm:p-5 mt-4 sm:mt-6 border border-blue-500/20">
+          <h3 class="font-semibold text-blue-400 text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+            <span class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center text-xs">📊</span>
             Detalhamento
           </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-            <div class="flex justify-between py-2 border-b border-white/5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3 text-xs sm:text-sm">
+            <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
               <span class="text-gray-400">Dimensões base:</span>
               <span class="font-semibold">${formatarNumero(comprimento)}m × ${formatarNumero(largura)}m</span>
             </div>
-            <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
               <span class="text-gray-400">Profundidade:</span>
               <span class="font-semibold">${formatarNumero(profundidade)}m</span>
             </div>
-            <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
               <span class="text-gray-400">Volume no corte:</span>
               <span class="font-semibold">${formatarNumero(volumeCorte)} m³</span>
             </div>
-            <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
               <span class="text-gray-400">Empolamento:</span>
               <span class="font-semibold">${((empolamento - 1) * 100).toFixed(0)}%</span>
             </div>
-            <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
               <span class="text-gray-400">Volume a transportar:</span>
               <span class="font-semibold">${formatarNumero(volumeEmpolado)} m³</span>
             </div>
-            <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
               <span class="text-gray-400">Tipo:</span>
               <span class="font-semibold">${tipoEscavacao === 'vala' ? 'Vala' : tipoEscavacao === 'talude' ? 'Com Talude' : 'Piscina/Reservatório'}</span>
             </div>
@@ -1125,11 +1158,11 @@
         const adicional = profundidade * inclinacaoTalude;
         const angulo = Math.atan(1 / inclinacaoTalude) * (180 / Math.PI);
         html += `
-          <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 mt-6">
+          <div class="p-3.5 sm:p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 mt-4 sm:mt-6 text-xs sm:text-sm">
             <p class="text-purple-300">
               <strong>📐 Talude:</strong> Inclinação ${inclinacaoTalude}:1 (${angulo.toFixed(0)}°)<br>
-              <span class="text-sm">Dimensões no topo: ${formatarNumero(comprimento + 2 * adicional)}m × ${formatarNumero(largura + 2 * adicional)}m</span><br>
-              <span class="text-sm">Adicional por lado: ${formatarNumero(adicional)}m</span>
+              <span class="text-xs">Dimensões no topo: ${formatarNumero(comprimento + 2 * adicional)}m × ${formatarNumero(largura + 2 * adicional)}m</span><br>
+              <span class="text-xs">Adicional por lado: ${formatarNumero(adicional)}m</span>
             </p>
           </div>
         `;
@@ -1162,104 +1195,104 @@
       atualizarGraficoTransporte(volume, numeroViagens, horasNecessarias, custoTotal, produtividade);
 
       let html = `
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-6">
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Nº de Viagens</div>
-            <div class="text-xl font-bold text-cyan-400">${numeroViagens}</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mt-4 sm:mt-6">
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Nº de Viagens</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${numeroViagens}</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Tempo/Ciclo</div>
-            <div class="text-xl font-bold text-cyan-400">${tempoCiclo.toFixed(0)} min</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Tempo/Ciclo</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${tempoCiclo.toFixed(0)} min</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Produtividade</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(produtividade, 1)} m³/h</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Produtividade</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(produtividade, 1)} m³/h</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Horas Total</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(horasNecessarias, 1)} h</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Horas Total</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(horasNecessarias, 1)} h</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Dias Trabalho</div>
-            <div class="text-xl font-bold text-cyan-400">${formatarNumero(diasTrabalho, 1)} dias</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Dias Trabalho</div>
+            <div class="text-base sm:text-xl font-bold text-cyan-400">${formatarNumero(diasTrabalho, 1)} d</div>
           </div>
-          <div class="spec-item p-4 rounded-xl text-center">
-            <div class="text-sm text-gray-400 mb-1">Custo Total</div>
-            <div class="text-xl font-bold text-green-400">${formatarMoeda(custoTotal)}</div>
+          <div class="spec-item p-3 sm:p-4 rounded-xl text-center">
+            <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Custo Total</div>
+            <div class="text-base sm:text-xl font-bold text-green-400">${formatarMoeda(custoTotal)}</div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <div class="glass-card rounded-xl p-5 border border-green-500/20">
-            <h3 class="font-semibold text-green-400 mb-4 flex items-center gap-2">
-              <span class="w-6 h-6 rounded bg-green-500/20 flex items-center justify-center">🚛</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
+          <div class="glass-card rounded-xl p-3.5 sm:p-5 border border-green-500/20">
+            <h3 class="font-semibold text-green-400 text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-green-500/20 flex items-center justify-center text-xs">🚛</span>
               Análise do Transporte
             </h3>
-            <div class="space-y-3 text-sm">
-              <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Volume total:</span>
                 <span class="font-semibold">${formatarNumero(volume)} m³</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">DMT (ida e volta):</span>
                 <span class="font-semibold">${formatarNumero(dmt * 2, 1)} km</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Capacidade caminhão:</span>
                 <span class="font-semibold">${capacidade} m³</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Tempo transporte:</span>
                 <span class="font-semibold">${tempoTransporte.toFixed(0)} min</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Tempo carga/descarga:</span>
                 <span class="font-semibold">${tempoOp} min</span>
               </div>
             </div>
           </div>
 
-          <div class="glass-card rounded-xl p-5 border border-yellow-500/20">
-            <h3 class="font-semibold text-yellow-400 mb-4 flex items-center gap-2">
-              <span class="w-6 h-6 rounded bg-yellow-500/20 flex items-center justify-center">💰</span>
+          <div class="glass-card rounded-xl p-3.5 sm:p-5 border border-yellow-500/20">
+            <h3 class="font-semibold text-yellow-400 text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-yellow-500/20 flex items-center justify-center text-xs">💰</span>
               Custos de Transporte
             </h3>
-            <div class="space-y-3 text-sm">
-              <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Custo por viagem:</span>
                 <span class="font-semibold">${formatarMoeda(custoViagem)}</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Número de viagens:</span>
                 <span class="font-semibold">${numeroViagens}</span>
               </div>
-              <div class="flex justify-between py-2 border-b border-white/5">
+              <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
                 <span class="text-gray-400">Custo por m³:</span>
                 <span class="font-semibold">${formatarMoeda(custoM3)}/m³</span>
               </div>
-              <div class="flex justify-between py-2 pt-3 border-t border-white/10">
+              <div class="flex justify-between py-1.5 sm:py-2 pt-2 sm:pt-3 border-t border-white/10">
                 <span class="font-semibold">Custo total:</span>
-                <span class="text-lg font-bold text-green-400">${formatarMoeda(custoTotal)}</span>
+                <span class="text-base sm:text-lg font-bold text-green-400">${formatarMoeda(custoTotal)}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="glass-card rounded-xl p-5 mt-6 border border-blue-500/20">
-          <h3 class="font-semibold text-blue-400 mb-4 flex items-center gap-2">
-            <span class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center">📋</span>
+        <div class="glass-card rounded-xl p-3.5 sm:p-5 mt-4 sm:mt-6 border border-blue-500/20">
+          <h3 class="font-semibold text-blue-400 text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
+            <span class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center text-xs">📋</span>
             Planejamento
           </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-            <div class="flex justify-between py-2 border-b border-white/5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3 text-xs sm:text-sm">
+            <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
               <span class="text-gray-400">Horas necessárias:</span>
               <span class="font-semibold">${formatarNumero(horasNecessarias, 1)}h</span>
             </div>
-            <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
               <span class="text-gray-400">Dias úteis (8h/dia):</span>
               <span class="font-semibold">${Math.ceil(diasTrabalho)} dias</span>
             </div>
-            <div class="flex justify-between py-2 border-b border-white/5">
+            <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/5">
               <span class="text-gray-400">Viagens por dia:</span>
               <span class="font-semibold">${Math.ceil(numeroViagens / Math.ceil(diasTrabalho))} viagens</span>
             </div>
