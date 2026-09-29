@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+    html, body { max-width: 100vw; overflow-x: hidden; }
         * { font-family: 'Inter', sans-serif; }
         .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
         .gradient-bg { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #1e3a5f 100%); }
@@ -38,11 +39,11 @@
             #modalContent { max-height: none !important; overflow: visible !important; }
         }
     </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_3>
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Header -->
-    <header class="gradient-bg text-white sticky top-0 z-50 shadow-xl">
+    <header class="gradient-bg text-white shadow-xl no-print relative z-20">
         <div class="max-w-7xl mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -9631,7 +9632,7 @@
     </script>
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_3">
+    <script src="assets/suite/suite-nav.js?v=20260929_4">
         // ==========================================
         // CENTRAL DE FERRAMENTAS E DIMENSIONADORES DAS NRs
         // ==========================================

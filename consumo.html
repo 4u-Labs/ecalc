@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    html, body { max-width: 100vw; overflow-x: hidden; }
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     
     * {
@@ -51,9 +52,8 @@
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-color);
       padding: 1rem 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: relative; z-index: 20;
+      padding: 0.65rem 1rem;
     }
     
     .header-content {
@@ -820,7 +820,7 @@
       color: var(--primary);
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_3>
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
 </head>
 <body>
   <!-- Header -->
@@ -1982,6 +1982,6 @@
 
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_3"></script>
+    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
 </body>
 </html>

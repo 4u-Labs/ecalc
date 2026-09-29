@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    html, body { max-width: 100vw; overflow-x: hidden; }
     * { font-family: 'Inter', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
     
@@ -346,39 +347,37 @@
       color: #64748b !important;
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_3>
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
 </head>
 <body class="text-gray-100">
   <!-- Toast Container -->
   <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
   
   <!-- Header -->
-  <header class="glass-dark sticky top-0 z-40 border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-4 py-3">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center font-bold text-lg">
-            🏗️
-          </div>
-          <div>
-            <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-              Dosagem de Concreto
-            </h1>
-            <p class="text-xs text-gray-400">Calculadora Avançada v7.0</p>
-          </div>
+  <header class="no-print relative z-20 glass-dark border-b border-white/10 py-2.5 sm:py-3.5 px-3 sm:px-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4">
+      <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+        <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center font-bold text-lg sm:text-2xl shrink-0">
+          🏗️
         </div>
-        
-        <div class="flex items-center gap-3">
-          <button onclick="toggleAutoCalc()" id="autoCalcBtn" class="btn-outline px-3 py-2 rounded-lg text-sm flex items-center gap-2">
-            <span id="autoCalcIcon" class="w-2 h-2 rounded-full bg-gray-500"></span>
-            <span class="hidden sm:inline">Auto-cálculo</span>
-          </button>
-          <button onclick="toggleTheme()" class="btn-outline p-2 rounded-lg">
-            <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-            </svg>
-          </button>
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent truncate">
+            Dosagem de Concreto
+          </h1>
+          <p class="text-[11px] sm:text-xs text-gray-400 truncate">Calculadora Avançada v7.0 • ACI / IPT / Abrams</p>
         </div>
+      </div>
+      
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <button onclick="toggleAutoCalc()" id="autoCalcBtn" class="btn-outline px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs flex items-center gap-1.5" title="Alternar Auto-cálculo">
+          <span id="autoCalcIcon" class="w-2 h-2 rounded-full bg-gray-500"></span>
+          <span class="hidden sm:inline">Auto-cálculo</span>
+        </button>
+        <button onclick="toggleTheme()" class="btn-outline p-2 rounded-lg text-xs" title="Alternar Modo Claro / Escuro">
+          <svg id="themeIcon" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
@@ -1895,7 +1894,7 @@ Traço Unitário: ${d.traco}`;
     }
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_3"></script>
-    <script src="assets/suite/suite-memorial.js?v=20260929_3"></script>
+    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
 </body>
 </html>

@@ -109,15 +109,47 @@
             const style = document.createElement('style');
             style.id = 'ecalc-suite-critical-css';
             style.textContent = `
+                /* Prevent app-level headers from sticking and colliding with #ecalc-suite-bar */
+                body > header,
+                body header.glass-dark,
+                body header.glass,
+                body header.header,
+                body header.gradient-bg,
+                header[class*="sticky"] {
+                    position: relative !important;
+                    top: auto !important;
+                }
+                #ecalc-suite-bar .ecalc-project-pill,
+                #ecalc-suite-bar .ecalc-nav-cadclone,
+                #ecalc-suite-bar .ecalc-nav-office {
+                    display: inline-flex;
+                }
                 @media (max-width: 768px) {
+                    #ecalc-suite-bar {
+                        height: 48px !important;
+                        padding: 0 10px !important;
+                        background: #030611 !important;
+                    }
                     #ecalc-suite-bar .ecalc-project-pill,
                     #ecalc-suite-bar .ecalc-nav-cadclone,
                     #ecalc-suite-bar .ecalc-nav-office,
                     #ecalc-suite-bar [data-ecalc-hide-mobile="true"],
                     .ecalc-project-pill,
                     .ecalc-nav-cadclone,
-                    .ecalc-nav-office {
+                    .ecalc-nav-office,
+                    [data-ecalc-hide-mobile="true"] {
                         display: none !important;
+                    }
+                    .ecalc-btn-icon {
+                        width: 32px !important;
+                        height: 32px !important;
+                    }
+                    .ecalc-nav-hub {
+                        padding: 0.3rem 0.6rem !important;
+                        font-size: 0.75rem !important;
+                        background: rgba(0, 210, 255, 0.12) !important;
+                        border-color: rgba(0, 210, 255, 0.3) !important;
+                        color: #00D2FF !important;
                     }
                 }
             `;
@@ -130,7 +162,7 @@
             link.rel = 'stylesheet';
             // Compute relative path to assets/suite/suite-nav.css with cache-busting
             const isSubdir = window.location.pathname.includes('/seguranca/');
-            link.href = (isSubdir ? '../' : '') + 'assets/suite/suite-nav.css?v=20260929_3';
+            link.href = (isSubdir ? '../' : '') + 'assets/suite/suite-nav.css?v=20260929_4';
             document.head.appendChild(link);
         }
     }
@@ -152,15 +184,7 @@
                     <span class="ecalc-brand-tag">SUITE</span>
                 </a>
 
-                <button type="button" class="ecalc-btn-icon" id="ecalc-btn-switcher" title="Alternar Aplicativo (9 Pontos)">
-                    <div class="ecalc-grid-icon">
-                        <span></span><span></span><span></span>
-                        <span></span><span></span><span></span>
-                        <span></span><span></span><span></span>
-                    </div>
-                </button>
-
-                <div class="ecalc-project-pill hidden md:inline-flex" id="ecalc-btn-project" data-ecalc-hide-mobile="true" title="Editar dados da obra ativa">
+                <div class="ecalc-project-pill" id="ecalc-btn-project" data-ecalc-hide-mobile="true" title="Editar dados da obra ativa">
                     <span class="dot"></span>
                     <span class="ecalc-project-name" id="ecalc-bar-project-name">${project.nomeObra || 'Definir Obra'}</span>
                     <svg style="width: 12px; height: 12px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -168,10 +192,17 @@
             </div>
 
             <div class="ecalc-bar-right">
-                <a href="${isSubdir ? '../../' : '../'}cadclone/" target="_blank" class="ecalc-nav-btn ecalc-nav-cadclone hidden md:inline-flex" data-ecalc-hide-mobile="true" title="Abrir Editor CADClone">
+                <button type="button" class="ecalc-btn-icon" id="ecalc-btn-switcher" title="Alternar Aplicativo (9 Pontos)">
+                    <div class="ecalc-grid-icon">
+                        <span></span><span></span><span></span>
+                        <span></span><span></span><span></span>
+                        <span></span><span></span><span></span>
+                    </div>
+                </button>
+                <a href="${isSubdir ? '../../' : '../'}cadclone/" target="_blank" class="ecalc-nav-btn ecalc-nav-cadclone" data-ecalc-hide-mobile="true" title="Abrir Editor CADClone">
                     <span>📐 CADClone</span>
                 </a>
-                <a href="https://4u.ia.br/app/office/" target="_blank" class="ecalc-nav-btn ecalc-nav-office hidden md:inline-flex" data-ecalc-hide-mobile="true" title="Abrir OfficeClone Suite">
+                <a href="https://4u.ia.br/app/office/" target="_blank" class="ecalc-nav-btn ecalc-nav-office" data-ecalc-hide-mobile="true" title="Abrir OfficeClone Suite">
                     <span>📄 OfficeClone</span>
                 </a>
                 <a href="${rootPath}index.php" class="ecalc-nav-btn ecalc-nav-hub" title="Hub Principal">

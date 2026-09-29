@@ -24,6 +24,7 @@
     }
   </script>
   <style>
+    html, body { max-width: 100vw; overflow-x: hidden; }
     * { box-sizing: border-box; }
     body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -84,10 +85,10 @@
     }
     .hidden { display: none !important; }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_3>
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
 </head>
 <body class="font-sans text-gray-100">
-  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5">
+  <header class="bg-dark-900/90 backdrop-blur-xl border-b border-white/5 no-print relative z-20">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-4">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-orange to-neon-magenta flex items-center justify-center font-bold text-dark-900 text-xl">
@@ -796,8 +797,8 @@ Sistema de Drenagem Obrigatório: Camada drenante de brita com e = 30 cm no tard
     });
   </script>
   <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-  <script src="assets/suite/suite-nav.js?v=20260929_3"></script>
-  <script src="assets/suite/suite-memorial.js?v=20260929_3"></script>
-  <script src="assets/suite/suite-cad.js?v=20260929_3"></script>
+  <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+  <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
+  <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
 </body>
 </html>
