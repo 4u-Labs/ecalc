@@ -1,3 +1,9 @@
 DirectoryIndex index.php index.html
 RewriteEngine On
 RewriteRule ^index\.html$ index.php [L,QSA]
+
+# Redirecionamentos permanentes (301) para os PWAs oficiais em /app/
+RewriteRule ^notas(/.*)?$ https://4u.ia.br/app/keepai/ [R=301,L]
+RewriteRule ^contratos(/.*)?$ https://4u.ia.br/app/4usign/#hub [R=301,L]
+RewriteRule ^powercalc(/.*)?$ https://4u.ia.br/app/powercalc/ [R=301,L]
+RewriteRule ^soundmeter(/.*)?$ https://4u.ia.br/app/soundmeter/ [R=301,L]
