@@ -2,16 +2,26 @@
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=5.0" name="viewport"/>
   <title>Dimensionamento de Pilares | Ferramentas de Engenharia</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="stylesheet" id="ecalc-suite-css" href="assets/suite/suite-nav.css?v=20260929_2">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       font-family: 'Inter', sans-serif;
+      box-sizing: border-box;
     }
+    
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
     body {
       background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
@@ -221,149 +231,151 @@
 </head>
 <body class="text-gray-200">
   <!-- Header -->
-  <header class="no-print sticky top-0 z-50 glass border-b border-cyan-500/20">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <a href="#" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+  <header class="no-print relative z-20 glass border-b border-cyan-500/20 py-2.5 sm:py-3">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 sm:gap-4 min-w-0">
+        <a href="#" class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent truncate">
           🏗️ EngCalc
         </a>
-        <span class="text-xs text-gray-500 hidden sm:inline">Dimensionamento de Pilares</span>
+        <span class="text-xs text-gray-400 hidden sm:inline border-l border-white/10 pl-3">Dimensionamento de Pilares</span>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="exportarPDF()" class="p-2 rounded-lg hover:bg-white/10 transition-all tooltip-cyber" data-tooltip="Exportar PDF">
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <button type="button" onclick="exportarPDF()" class="p-2 rounded-lg hover:bg-white/10 transition-all tooltip-cyber cursor-pointer text-sm" data-tooltip="Exportar PDF">
           📄
         </button>
-        <button onclick="window.print()" class="p-2 rounded-lg hover:bg-white/10 transition-all tooltip-cyber" data-tooltip="Imprimir">
+        <button type="button" onclick="window.print()" class="p-2 rounded-lg hover:bg-white/10 transition-all tooltip-cyber cursor-pointer text-sm" data-tooltip="Imprimir">
           🖨️
         </button>
-        <button onclick="compartilhar()" class="p-2 rounded-lg hover:bg-white/10 transition-all tooltip-cyber" data-tooltip="Compartilhar">
+        <button type="button" onclick="compartilhar()" class="p-2 rounded-lg hover:bg-white/10 transition-all tooltip-cyber cursor-pointer text-sm" data-tooltip="Compartilhar">
           📤
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-6">
+  <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
     <!-- Quick Actions -->
-    <div class="no-print flex flex-wrap gap-3 justify-center mb-8">
-      <button id="btnCalcular" class="btn-cyber px-8 py-3 rounded-xl font-semibold text-lg flex items-center gap-2">
+    <div class="no-print grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-3 justify-center mb-6 sm:mb-8">
+      <button id="btnCalcular" type="button" class="btn-cyber py-2.5 px-4 sm:px-8 sm:py-3 rounded-xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 cursor-pointer shadow-md">
         <span>⚡</span> Calcular
       </button>
-      <button onclick="abrirModalPrecos()" class="px-6 py-3 rounded-xl border border-cyan-500/30 hover:border-cyan-500 hover:bg-cyan-500/10 transition-all flex items-center gap-2">
+      <button type="button" onclick="abrirModalPrecos()" class="py-2.5 px-4 sm:px-6 sm:py-3 rounded-xl border border-cyan-500/30 hover:border-cyan-500 hover:bg-cyan-500/10 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm cursor-pointer">
         <span>⚙️</span> Preços
       </button>
-      <button onclick="abrirHistorico()" class="px-6 py-3 rounded-xl border border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 transition-all flex items-center gap-2">
+      <button type="button" onclick="abrirHistorico()" class="py-2.5 px-4 sm:px-6 sm:py-3 rounded-xl border border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm cursor-pointer">
         <span>📊</span> Histórico
       </button>
-      <button onclick="limparTudo()" class="px-6 py-3 rounded-xl border border-red-500/30 hover:border-red-500 hover:bg-red-500/10 transition-all flex items-center gap-2">
+      <button type="button" onclick="limparTudo()" class="py-2.5 px-4 sm:px-6 sm:py-3 rounded-xl border border-red-500/30 hover:border-red-500 hover:bg-red-500/10 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm cursor-pointer">
         <span>🗑️</span> Limpar
       </button>
     </div>
 
-    <div class="grid lg:grid-cols-3 gap-6">
+    <div class="grid lg:grid-cols-3 gap-5 md:gap-6">
       <!-- Left Column - Inputs -->
-      <div class="lg:col-span-2 space-y-6">
+      <div class="lg:col-span-2 space-y-4 sm:space-y-6">
         <!-- Tipo de Seção -->
-        <section class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
-            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm">1</span>
+        <section class="glass rounded-2xl p-4 sm:p-5 md:p-6">
+          <h2 class="text-base sm:text-lg md:text-xl font-semibold text-cyan-400 mb-3 sm:mb-4 flex items-center gap-2">
+            <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">1</span>
             Tipo de Seção
           </h2>
-          <div class="grid grid-cols-3 gap-3">
-            <button class="tipo-btn active p-4 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-500 transition-all text-center" data-tipo="retangular">
-              <div class="text-3xl mb-2">▭</div>
-              <div class="font-medium">Retangular</div>
+          <div class="grid grid-cols-3 gap-2 sm:gap-3">
+            <button type="button" class="tipo-btn active p-2.5 sm:p-3.5 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-500 transition-all text-center cursor-pointer" data-tipo="retangular">
+              <div class="text-2xl sm:text-3xl mb-1 sm:mb-1.5">▭</div>
+              <div class="font-semibold text-xs sm:text-sm truncate">Retangular</div>
             </button>
-            <button class="tipo-btn p-4 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-500 transition-all text-center" data-tipo="quadrada">
-              <div class="text-3xl mb-2">◻</div>
-              <div class="font-medium">Quadrada</div>
+            <button type="button" class="tipo-btn p-2.5 sm:p-3.5 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-500 transition-all text-center cursor-pointer" data-tipo="quadrada">
+              <div class="text-2xl sm:text-3xl mb-1 sm:mb-1.5">◻</div>
+              <div class="font-semibold text-xs sm:text-sm truncate">Quadrada</div>
             </button>
-            <button class="tipo-btn p-4 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-500 transition-all text-center" data-tipo="circular">
-              <div class="text-3xl mb-2">⚫</div>
-              <div class="font-medium">Circular</div>
+            <button type="button" class="tipo-btn p-2.5 sm:p-3.5 rounded-xl border-2 border-cyan-500/30 hover:border-cyan-500 transition-all text-center cursor-pointer" data-tipo="circular">
+              <div class="text-2xl sm:text-3xl mb-1 sm:mb-1.5">⚫</div>
+              <div class="font-semibold text-xs sm:text-sm truncate">Circular</div>
             </button>
           </div>
         </section>
 
         <!-- Geometria -->
-        <section class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
-            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm">2</span>
+        <section class="glass rounded-2xl p-4 sm:p-5 md:p-6">
+          <h2 class="text-base sm:text-lg md:text-xl font-semibold text-cyan-400 mb-3 sm:mb-4 flex items-center gap-2">
+            <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">2</span>
             Geometria do Pilar
           </h2>
-          <div id="geometria-inputs" class="grid sm:grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400 flex items-center gap-2">
+          <div id="geometria-inputs" class="grid sm:grid-cols-2 gap-3 sm:gap-4">
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400 flex items-center gap-1.5">
                 Base (b)
                 <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Menor dimensão da seção transversal">ⓘ</span>
               </label>
               <div class="relative">
-                <input type="number" id="base" value="20" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+                <input type="number" id="base" value="20" min="12" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
               </div>
             </div>
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400 flex items-center gap-2">
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400 flex items-center gap-1.5">
                 Altura (h)
                 <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Maior dimensão da seção transversal">ⓘ</span>
               </label>
               <div class="relative">
-                <input type="number" id="altura" value="40" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+                <input type="number" id="altura" value="40" min="12" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
               </div>
             </div>
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400">Comprimento (L)</label>
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400">Comprimento (L)</label>
               <div class="relative">
-                <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">m</span>
+                <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">m</span>
               </div>
             </div>
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400 flex items-center gap-2">
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400 flex items-center gap-1.5">
                 Cobrimento (c)
                 <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="NBR 6118: mín. 2,5cm (int.) ou 3,0cm (ext.)">ⓘ</span>
               </label>
               <div class="relative">
-                <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-4 py-3 rounded-xl" />
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+                <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
               </div>
             </div>
           </div>
         </section>
 
         <!-- Cargas -->
-        <section class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
-            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm">3</span>
-            Cargas Atuantes
-            <span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full">Valores de cálculo</span>
-          </h2>
-          <div class="grid sm:grid-cols-3 gap-4">
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400">Carga Axial (Nd)</label>
+        <section class="glass rounded-2xl p-4 sm:p-5 md:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3 sm:mb-4">
+            <h2 class="text-base sm:text-lg md:text-xl font-semibold text-cyan-400 flex items-center gap-2">
+              <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">3</span>
+              Cargas Atuantes
+            </h2>
+            <span class="text-[10px] sm:text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full font-medium">Valores de cálculo</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400">Carga Axial (Nd)</label>
               <div class="relative">
-                <input type="number" id="carga-axial" value="500" min="0" class="input-cyber w-full px-4 py-3 rounded-xl" />
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">kN</span>
+                <input type="number" id="carga-axial" value="500" min="0" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">kN</span>
               </div>
             </div>
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400">Momento X (Mdx)</label>
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400">Momento X (Mdx)</label>
               <div class="relative">
-                <input type="number" id="momento-x" value="20" min="0" class="input-cyber w-full px-4 py-3 rounded-xl" />
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">kN.m</span>
+                <input type="number" id="momento-x" value="20" min="0" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">kN.m</span>
               </div>
             </div>
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400">Momento Y (Mdy)</label>
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400">Momento Y (Mdy)</label>
               <div class="relative">
-                <input type="number" id="momento-y" value="0" min="0" class="input-cyber w-full px-4 py-3 rounded-xl" />
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">kN.m</span>
+                <input type="number" id="momento-y" value="0" min="0" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">kN.m</span>
               </div>
             </div>
           </div>
-          <div class="mt-4 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
-            <p class="text-sm text-cyan-300">
+          <div class="mt-3 sm:mt-4 p-3 sm:p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+            <p class="text-xs sm:text-sm text-cyan-300">
               💡 <strong>Dica:</strong> Cargas devem ser de cálculo (já majoradas γf = 1,4). 
               Para pilares centrais sem excentricidade, use apenas carga axial.
             </p>
@@ -371,15 +383,15 @@
         </section>
 
         <!-- Materiais -->
-        <section class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center gap-2">
-            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-sm">4</span>
+        <section class="glass rounded-2xl p-4 sm:p-5 md:p-6">
+          <h2 class="text-base sm:text-lg md:text-xl font-semibold text-cyan-400 mb-3 sm:mb-4 flex items-center gap-2">
+            <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">4</span>
             Materiais e Condições
           </h2>
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400">Classe do Concreto</label>
-              <select id="fck" class="input-cyber w-full px-4 py-3 rounded-xl appearance-none cursor-pointer">
+          <div class="grid sm:grid-cols-2 gap-3 sm:gap-4">
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400">Classe do Concreto</label>
+              <select id="fck" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl appearance-none cursor-pointer">
                 <option value="20">C20 (fck = 20 MPa)</option>
                 <option value="25" selected>C25 (fck = 25 MPa)</option>
                 <option value="30">C30 (fck = 30 MPa)</option>
@@ -389,35 +401,35 @@
                 <option value="50">C50 (fck = 50 MPa)</option>
               </select>
             </div>
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400">Tipo de Aço</label>
-              <select id="aco" class="input-cyber w-full px-4 py-3 rounded-xl appearance-none cursor-pointer">
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400">Tipo de Aço</label>
+              <select id="aco" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl appearance-none cursor-pointer">
                 <option value="500">CA-50 (fyk = 500 MPa)</option>
                 <option value="600">CA-60 (fyk = 600 MPa)</option>
               </select>
             </div>
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400 flex items-center gap-2">
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400 flex items-center gap-1.5">
                 Vinculação
                 <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Define o comprimento equivalente (le = k × L)">ⓘ</span>
               </label>
-              <select id="vinculacao" class="input-cyber w-full px-4 py-3 rounded-xl appearance-none cursor-pointer">
+              <select id="vinculacao" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl appearance-none cursor-pointer">
                 <option value="1.0" selected>Engastado-Engastado (k=1,0)</option>
                 <option value="0.7">Engastado-Rotulado (k=0,7)</option>
                 <option value="0.5">Bi-engastado c/ transl. impedida (k=0,5)</option>
                 <option value="2.0">Balanço (k=2,0)</option>
               </select>
             </div>
-            <div class="space-y-2">
-              <label class="text-sm text-gray-400">Taxa de Armadura Desejada</label>
+            <div class="space-y-1.5 sm:space-y-2">
+              <label class="text-xs sm:text-sm text-gray-400">Taxa de Armadura Desejada</label>
               <div class="relative">
-                <input type="number" id="taxa-armadura" value="1.5" min="0.4" max="8.0" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+                <input type="number" id="taxa-armadura" value="1.5" min="0.4" max="8.0" step="0.1" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">%</span>
               </div>
               <div class="h-2 bg-gray-700 rounded-full overflow-hidden mt-2">
                 <div id="taxa-bar" class="h-full progress-bar" style="width: 18.75%"></div>
               </div>
-              <div class="flex justify-between text-xs text-gray-500">
+              <div class="flex justify-between text-[11px] text-gray-500">
                 <span>0,4% (mín)</span>
                 <span>4% (emenda)</span>
                 <span>8% (máx)</span>
@@ -425,14 +437,19 @@
             </div>
           </div>
         </section>
+
+        <!-- Botão Calcular no fim do formulário -->
+        <button type="button" onclick="calcular()" class="w-full btn-cyber py-3.5 sm:py-4 px-6 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-cyan-500/20 transition-all">
+          <span>⚡</span> CALCULAR PILAR
+        </button>
       </div>
 
       <!-- Right Column - Live Preview -->
-      <div class="space-y-6">
+      <div class="space-y-4 sm:space-y-6">
         <!-- Visualização do Pilar -->
-        <section class="glass rounded-2xl p-6 sticky top-20">
-          <h2 class="text-lg font-semibold text-cyan-400 mb-4">👁️ Visualização</h2>
-          <div id="pilar-preview" class="pilar-3d flex items-center justify-center min-h-[250px]">
+        <section class="glass rounded-2xl p-4 sm:p-5 md:p-6 lg:sticky lg:top-20 relative">
+          <h2 class="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4 flex items-center gap-2">👁️ Visualização</h2>
+          <div id="pilar-preview" class="pilar-3d flex items-center justify-center min-h-[200px] sm:min-h-[250px] overflow-hidden">
             <div class="pilar-visual text-center">
               <div id="pilar-shape" class="w-24 h-40 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border-2 border-cyan-500 rounded-lg mx-auto flex items-center justify-center">
                 <div class="grid grid-cols-2 gap-2 p-2">
@@ -442,27 +459,27 @@
                   <div class="w-3 h-3 bg-red-500 rounded-full"></div>
                 </div>
               </div>
-              <div id="pilar-dims" class="text-cyan-400 font-mono text-sm mt-3">20 × 40 cm</div>
+              <div id="pilar-dims" class="text-cyan-400 font-mono text-xs sm:text-sm mt-3">20 × 40 cm</div>
             </div>
           </div>
           
           <!-- Quick Stats -->
-          <div id="quick-stats" class="grid grid-cols-2 gap-3 mt-4">
-            <div class="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-center">
-              <div class="text-2xl font-bold text-cyan-400" id="stat-area">800</div>
-              <div class="text-xs text-gray-400">Área (cm²)</div>
+          <div id="quick-stats" class="grid grid-cols-2 gap-2.5 sm:gap-3 mt-4">
+            <div class="p-2.5 sm:p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-center">
+              <div class="text-xl sm:text-2xl font-bold text-cyan-400" id="stat-area">800</div>
+              <div class="text-[10px] sm:text-xs text-gray-400">Área (cm²)</div>
             </div>
-            <div class="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-center">
-              <div class="text-2xl font-bold text-purple-400" id="stat-esbeltez">--</div>
-              <div class="text-xs text-gray-400">Esbeltez (λ)</div>
+            <div class="p-2.5 sm:p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-center">
+              <div class="text-xl sm:text-2xl font-bold text-purple-400" id="stat-esbeltez">--</div>
+              <div class="text-[10px] sm:text-xs text-gray-400">Esbeltez (λ)</div>
             </div>
-            <div class="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-center">
-              <div class="text-2xl font-bold text-green-400" id="stat-taxa">1.5%</div>
-              <div class="text-xs text-gray-400">Taxa Real</div>
+            <div class="p-2.5 sm:p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-center">
+              <div class="text-xl sm:text-2xl font-bold text-green-400" id="stat-taxa">1.5%</div>
+              <div class="text-[10px] sm:text-xs text-gray-400">Taxa Real</div>
             </div>
-            <div class="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-center">
-              <div class="text-2xl font-bold text-yellow-400" id="stat-custo">--</div>
-              <div class="text-xs text-gray-400">Custo (R$)</div>
+            <div class="p-2.5 sm:p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-center">
+              <div class="text-xl sm:text-2xl font-bold text-yellow-400" id="stat-custo">--</div>
+              <div class="text-[10px] sm:text-xs text-gray-400">Custo (R$)</div>
             </div>
           </div>
         </section>
@@ -470,45 +487,45 @@
     </div>
 
     <!-- Resultados -->
-    <section id="resultado-section" class="mt-8 glass rounded-2xl p-6 hidden">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-cyan-400 flex items-center gap-3">
+    <section id="resultado-section" class="mt-6 sm:mt-8 glass rounded-2xl p-4 sm:p-6 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 sm:mb-6">
+        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-cyan-400 flex items-center gap-2 sm:gap-3">
           📋 Resultados do Dimensionamento
         </h2>
-        <div class="flex flex-wrap items-center gap-2 no-print">
-          <button type="button" onclick="abrirNoCadClonePilar()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
-            <span>📐 Abrir no CADClone</span>
+        <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 no-print w-full sm:w-auto">
+          <button type="button" onclick="abrirNoCadClonePilar()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📐 CADClone</span>
           </button>
-          <button type="button" onclick="gerarMemorialPilar()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
-            <span>📄 Gerar Memorial ABNT</span>
+          <button type="button" onclick="gerarMemorialPilar()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+            <span>📄 Memorial ABNT</span>
           </button>
-          <button type="button" onclick="baixarDxfPilar()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-cyan-500/30 hover:bg-cyan-500/10 text-xs text-cyan-300 font-medium transition-all cursor-pointer" title="Baixar arquivo DXF">
-            <span>💾 Baixar .DXF</span>
+          <button type="button" onclick="baixarDxfPilar()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-cyan-500/30 hover:bg-cyan-500/10 text-xs text-cyan-300 font-medium transition-all cursor-pointer" title="Baixar arquivo DXF">
+            <span>💾 .DXF</span>
           </button>
-          <button onclick="copiarResultados()" class="px-3.5 py-2 rounded-lg border border-white/10 hover:bg-white/5 text-xs text-gray-300 transition-all">
+          <button type="button" onclick="copiarResultados()" class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 rounded-xl border border-white/10 hover:bg-white/5 text-xs text-gray-300 transition-all cursor-pointer">
             📋 Copiar
           </button>
-          <button onclick="salvarHistorico()" class="px-3.5 py-2 rounded-lg border border-purple-500/30 hover:bg-purple-500/10 text-xs text-purple-300 transition-all">
+          <button type="button" onclick="salvarHistorico()" class="col-span-2 sm:col-span-1 w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 rounded-xl border border-purple-500/30 hover:bg-purple-500/10 text-xs text-purple-300 transition-all cursor-pointer">
             💾 Salvar
           </button>
         </div>
       </div>
       
       <!-- Tabs -->
-      <div class="flex gap-2 mb-6 overflow-x-auto pb-2 no-print">
-        <button class="tab-btn active px-4 py-2 rounded-lg bg-cyan-500/20 text-cyan-400 whitespace-nowrap" data-tab="resumo">
+      <div class="flex gap-1.5 sm:gap-2 mb-5 sm:mb-6 overflow-x-auto pb-2 no-print no-scrollbar -mx-2 px-2">
+        <button class="tab-btn active px-3 sm:px-4 py-2 rounded-lg bg-cyan-500/20 text-cyan-400 whitespace-nowrap text-xs sm:text-sm font-semibold cursor-pointer" data-tab="resumo">
           📊 Resumo
         </button>
-        <button class="tab-btn px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap" data-tab="armadura">
+        <button class="tab-btn px-3 sm:px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap text-xs sm:text-sm font-semibold cursor-pointer" data-tab="armadura">
           🔩 Armadura
         </button>
-        <button class="tab-btn px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap" data-tab="verificacoes">
+        <button class="tab-btn px-3 sm:px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap text-xs sm:text-sm font-semibold cursor-pointer" data-tab="verificacoes">
           ✅ Verificações
         </button>
-        <button class="tab-btn px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap" data-tab="custos">
+        <button class="tab-btn px-3 sm:px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap text-xs sm:text-sm font-semibold cursor-pointer" data-tab="custos">
           💰 Custos
         </button>
-        <button class="tab-btn px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap" data-tab="detalhamento">
+        <button class="tab-btn px-3 sm:px-4 py-2 rounded-lg hover:bg-white/5 whitespace-nowrap text-xs sm:text-sm font-semibold cursor-pointer" data-tab="detalhamento">
           📐 Detalhamento
         </button>
       </div>
@@ -517,24 +534,24 @@
     </section>
 
     <!-- Referências NBR -->
-    <section class="mt-8 glass rounded-2xl p-6">
-      <h2 class="text-xl font-semibold text-cyan-400 mb-4">📚 Referências Normativas</h2>
-      <div class="grid sm:grid-cols-2 gap-4">
-        <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
-          <div class="font-semibold text-purple-400">NBR 6118:2023</div>
-          <div class="text-sm text-gray-400">Projeto de Estruturas de Concreto - Procedimento</div>
+    <section class="mt-6 sm:mt-8 glass rounded-2xl p-4 sm:p-6">
+      <h2 class="text-lg sm:text-xl font-semibold text-cyan-400 mb-3 sm:mb-4">📚 Referências Normativas</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div class="p-3.5 sm:p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div class="font-semibold text-sm sm:text-base text-purple-400">NBR 6118:2023</div>
+          <div class="text-xs sm:text-sm text-gray-400">Projeto de Estruturas de Concreto - Procedimento</div>
         </div>
-        <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
-          <div class="font-semibold text-purple-400">Item 17.3</div>
-          <div class="text-sm text-gray-400">Pilares - dimensões mínimas e armaduras</div>
+        <div class="p-3.5 sm:p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div class="font-semibold text-sm sm:text-base text-purple-400">Item 17.3</div>
+          <div class="text-xs sm:text-sm text-gray-400">Pilares - dimensões mínimas e armaduras</div>
         </div>
-        <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
-          <div class="font-semibold text-purple-400">Item 15.8</div>
-          <div class="text-sm text-gray-400">Esbeltez e efeitos de 2ª ordem</div>
+        <div class="p-3.5 sm:p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div class="font-semibold text-sm sm:text-base text-purple-400">Item 15.8</div>
+          <div class="text-xs sm:text-sm text-gray-400">Esbeltez e efeitos de 2ª ordem</div>
         </div>
-        <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
-          <div class="font-semibold text-purple-400">Item 17.3.5</div>
-          <div class="text-sm text-gray-400">Armaduras longitudinal e transversal</div>
+        <div class="p-3.5 sm:p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+          <div class="font-semibold text-sm sm:text-base text-purple-400">Item 17.3.5</div>
+          <div class="text-xs sm:text-sm text-gray-400">Armaduras longitudinal e transversal</div>
         </div>
       </div>
     </section>
@@ -694,89 +711,89 @@
       
       if (tipo === 'circular') {
         geometriaDiv.innerHTML = `
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400">Diâmetro (D)</label>
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400">Diâmetro (D)</label>
             <div class="relative">
-              <input type="number" id="diametro" value="30" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              <input type="number" id="diametro" value="30" min="12" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
             </div>
           </div>
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400">Comprimento (L)</label>
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400">Comprimento (L)</label>
             <div class="relative">
-              <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">m</span>
+              <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">m</span>
             </div>
           </div>
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400">Cobrimento (c)</label>
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400">Cobrimento (c)</label>
             <div class="relative">
-              <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
             </div>
           </div>
         `;
       } else if (tipo === 'quadrada') {
         geometriaDiv.innerHTML = `
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400">Lado (a)</label>
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400">Lado (a)</label>
             <div class="relative">
-              <input type="number" id="lado" value="30" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              <input type="number" id="lado" value="30" min="12" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
             </div>
           </div>
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400">Comprimento (L)</label>
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400">Comprimento (L)</label>
             <div class="relative">
-              <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">m</span>
+              <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">m</span>
             </div>
           </div>
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400">Cobrimento (c)</label>
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400">Cobrimento (c)</label>
             <div class="relative">
-              <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
             </div>
           </div>
         `;
       } else {
         geometriaDiv.innerHTML = `
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400 flex items-center gap-2">
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400 flex items-center gap-1.5">
               Base (b)
               <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Menor dimensão da seção transversal">ⓘ</span>
             </label>
             <div class="relative">
-              <input type="number" id="base" value="20" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              <input type="number" id="base" value="20" min="12" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
             </div>
           </div>
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400 flex items-center gap-2">
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400 flex items-center gap-1.5">
               Altura (h)
               <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="Maior dimensão da seção transversal">ⓘ</span>
             </label>
             <div class="relative">
-              <input type="number" id="altura" value="40" min="12" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              <input type="number" id="altura" value="40" min="12" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
             </div>
           </div>
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400">Comprimento (L)</label>
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400">Comprimento (L)</label>
             <div class="relative">
-              <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">m</span>
+              <input type="number" id="comprimento" value="3.0" min="0.5" step="0.1" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">m</span>
             </div>
           </div>
-          <div class="space-y-2">
-            <label class="text-sm text-gray-400 flex items-center gap-2">
+          <div class="space-y-1.5 sm:space-y-2">
+            <label class="text-xs sm:text-sm text-gray-400 flex items-center gap-1.5">
               Cobrimento (c)
               <span class="tooltip-cyber cursor-help text-cyan-400" data-tooltip="NBR 6118: mín. 2,5cm (int.) ou 3,0cm (ext.)">ⓘ</span>
             </label>
             <div class="relative">
-              <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-4 py-3 rounded-xl" />
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">cm</span>
+              <input type="number" id="cobrimento" value="3.0" min="1.5" step="0.5" class="input-cyber w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs sm:text-sm">cm</span>
             </div>
           </div>
         `;
@@ -1184,34 +1201,34 @@
             </div>
             
             <!-- Cards de resumo -->
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div class="p-4 rounded-xl bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20">
-                <div class="text-xs text-gray-400 mb-1">Seção</div>
-                <div class="text-2xl font-bold text-cyan-400">${tipoSecao === 'circular' ? 'Ø' + base : base + '×' + altura}</div>
-                <div class="text-xs text-gray-500">cm</div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-5 sm:mb-6">
+              <div class="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20">
+                <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Seção</div>
+                <div class="text-xl sm:text-2xl font-bold text-cyan-400">${tipoSecao === 'circular' ? 'Ø' + base : base + '×' + altura}</div>
+                <div class="text-[10px] sm:text-xs text-gray-500">cm</div>
               </div>
-              <div class="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-transparent border border-purple-500/20">
-                <div class="text-xs text-gray-400 mb-1">Esbeltez (λ)</div>
-                <div class="text-2xl font-bold text-purple-400">${esbeltez.toFixed(1)}</div>
-                <div class="text-xs text-gray-500">L=${comprimento.toFixed(2)}m</div>
+              <div class="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-transparent border border-purple-500/20">
+                <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Esbeltez (λ)</div>
+                <div class="text-xl sm:text-2xl font-bold text-purple-400">${esbeltez.toFixed(1)}</div>
+                <div class="text-[10px] sm:text-xs text-gray-500">L=${comprimento.toFixed(2)}m</div>
               </div>
-              <div class="p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-transparent border border-green-500/20">
-                <div class="text-xs text-gray-400 mb-1">Armadura</div>
-                <div class="text-2xl font-bold text-green-400">${armadura.quantidade}Ø${armadura.bitola}</div>
-                <div class="text-xs text-gray-500">${armadura.areaTotal.toFixed(2)} cm²</div>
+              <div class="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-transparent border border-green-500/20">
+                <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Armadura</div>
+                <div class="text-xl sm:text-2xl font-bold text-green-400">${armadura.quantidade}Ø${armadura.bitola}</div>
+                <div class="text-[10px] sm:text-xs text-gray-500">${armadura.areaTotal.toFixed(2)} cm²</div>
               </div>
-              <div class="p-4 rounded-xl bg-gradient-to-br from-yellow-500/10 to-transparent border border-yellow-500/20">
-                <div class="text-xs text-gray-400 mb-1">Custo Total</div>
-                <div class="text-2xl font-bold text-yellow-400">R$ ${custo.total.toFixed(0)}</div>
-                <div class="text-xs text-gray-500">estimado</div>
+              <div class="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-yellow-500/10 to-transparent border border-yellow-500/20">
+                <div class="text-[11px] sm:text-xs text-gray-400 mb-0.5 sm:mb-1">Custo Total</div>
+                <div class="text-xl sm:text-2xl font-bold text-yellow-400">R$ ${custo.total.toFixed(0)}</div>
+                <div class="text-[10px] sm:text-xs text-gray-500">estimado</div>
               </div>
             </div>
             
             <!-- Capacidade -->
-            <div class="mb-6">
-              <div class="flex justify-between text-sm mb-2">
+            <div class="mb-5 sm:mb-6">
+              <div class="flex justify-between text-xs sm:text-sm mb-2">
                 <span class="text-gray-400">Utilização da Seção</span>
-                <span class="${capacidade.taxaUtilizacao > 100 ? 'text-red-400' : capacidade.taxaUtilizacao > 80 ? 'text-yellow-400' : 'text-green-400'}">${capacidade.taxaUtilizacao.toFixed(1)}%</span>
+                <span class="${capacidade.taxaUtilizacao > 100 ? 'text-red-400' : capacidade.taxaUtilizacao > 80 ? 'text-yellow-400' : 'text-green-400'} font-semibold">${capacidade.taxaUtilizacao.toFixed(1)}%</span>
               </div>
               <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
                 <div class="h-full transition-all duration-500 ${
@@ -1219,15 +1236,15 @@
                   capacidade.taxaUtilizacao > 80 ? 'bg-yellow-500' : 'bg-green-500'
                 }" style="width: ${Math.min(capacidade.taxaUtilizacao, 100)}%"></div>
               </div>
-              <div class="text-xs text-gray-500 mt-1">
+              <div class="text-[11px] sm:text-xs text-gray-500 mt-1.5">
                 Nd = ${cargaAxial.toFixed(0)} kN | Nrd = ${capacidade.Nrd.toFixed(0)} kN
               </div>
             </div>
             
             <!-- Visualização da seção -->
-            <div class="p-6 rounded-xl bg-white/5 border border-white/10">
-              <h3 class="font-semibold mb-4">Seção Transversal</h3>
-              <div class="flex justify-center">
+            <div class="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10 overflow-hidden">
+              <h3 class="font-semibold text-sm sm:text-base mb-3 sm:mb-4">Seção Transversal</h3>
+              <div class="flex justify-center overflow-x-auto py-2">
                 ${gerarSVGSecao(base, altura, armadura, cobrimento, tipoSecao)}
               </div>
             </div>
@@ -1239,32 +1256,32 @@
       else if (tab === 'armadura') {
         html = `
           <div class="tab-content active">
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
               <!-- Armadura Longitudinal -->
-              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
-                <h3 class="font-semibold text-cyan-400 mb-4">🔩 Armadura Longitudinal</h3>
-                <div class="space-y-3">
-                  <div class="flex justify-between py-2 border-b border-white/10">
+              <div class="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-cyan-400 text-sm sm:text-base mb-3 sm:mb-4">🔩 Armadura Longitudinal</h3>
+                <div class="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
+                  <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/10">
                     <span class="text-gray-400">Configuração</span>
                     <span class="font-bold text-cyan-400">${armadura.quantidade}Ø${armadura.bitola} mm</span>
                   </div>
-                  <div class="flex justify-between py-2 border-b border-white/10">
+                  <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/10">
                     <span class="text-gray-400">Área Total</span>
                     <span>${armadura.areaTotal.toFixed(2)} cm²</span>
                   </div>
-                  <div class="flex justify-between py-2 border-b border-white/10">
+                  <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/10">
                     <span class="text-gray-400">Taxa Real</span>
                     <span>${((armadura.areaTotal / area) * 100).toFixed(2)}%</span>
                   </div>
-                  <div class="flex justify-between py-2 border-b border-white/10">
+                  <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/10">
                     <span class="text-gray-400">Área Mínima</span>
                     <span class="text-gray-500">${armadura.areaMinima.toFixed(2)} cm² (0,4%)</span>
                   </div>
-                  <div class="flex justify-between py-2 border-b border-white/10">
+                  <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/10">
                     <span class="text-gray-400">Espaçamento</span>
                     <span>${armadura.espacamento.toFixed(1)} cm</span>
                   </div>
-                  <div class="flex justify-between py-2">
+                  <div class="flex justify-between py-1.5 sm:py-2">
                     <span class="text-gray-400">Cobrimento</span>
                     <span>${cobrimento.toFixed(1)} cm</span>
                   </div>
@@ -1272,30 +1289,30 @@
               </div>
               
               <!-- Armadura Transversal -->
-              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
-                <h3 class="font-semibold text-purple-400 mb-4">⚙️ Armadura Transversal (Estribos)</h3>
-                <div class="space-y-3">
-                  <div class="flex justify-between py-2 border-b border-white/10">
+              <div class="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-purple-400 text-sm sm:text-base mb-3 sm:mb-4">⚙️ Armadura Transversal (Estribos)</h3>
+                <div class="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
+                  <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/10">
                     <span class="text-gray-400">Bitola</span>
                     <span class="font-bold text-purple-400">Ø${estribos.bitola} mm</span>
                   </div>
-                  <div class="flex justify-between py-2 border-b border-white/10">
+                  <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/10">
                     <span class="text-gray-400">Espaçamento</span>
                     <span>c/${estribos.espacamento} cm</span>
                   </div>
-                  <div class="flex justify-between py-2 border-b border-white/10">
+                  <div class="flex justify-between py-1.5 sm:py-2 border-b border-white/10">
                     <span class="text-gray-400">Espaçamento Máximo</span>
                     <span class="text-gray-500">${estribos.espacamentoMax.toFixed(1)} cm</span>
                   </div>
-                  <div class="flex justify-between py-2">
+                  <div class="flex justify-between py-1.5 sm:py-2">
                     <span class="text-gray-400">Tipo de Aço</span>
                     <span>CA-${fyk === 500 ? '50' : '60'}</span>
                   </div>
                 </div>
                 
                 <div class="mt-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
-                  <div class="text-sm text-yellow-400 font-medium mb-1">⚠️ Regiões Especiais</div>
-                  <ul class="text-xs text-gray-400 space-y-1">
+                  <div class="text-xs sm:text-sm text-yellow-400 font-medium mb-1">⚠️ Regiões Especiais</div>
+                  <ul class="text-[11px] sm:text-xs text-gray-400 space-y-1">
                     <li>• Extremidades (30cm): espaçamento ≤ ${Math.min(20, estribos.espacamento)} cm</li>
                     <li>• Emendas: espaçamento ≤ ${Math.floor(estribos.espacamento * 0.75)} cm</li>
                   </ul>
@@ -1304,22 +1321,24 @@
             </div>
             
             <!-- Tabela de bitolas -->
-            <div class="mt-6 p-6 rounded-xl bg-white/5 border border-white/10 overflow-x-auto">
-              <h3 class="font-semibold mb-4">📊 Opções de Armadura</h3>
-              <table class="w-full text-sm">
-                <thead>
-                  <tr class="border-b border-white/10">
-                    <th class="text-left py-2 text-gray-400">Bitola</th>
-                    <th class="text-center py-2 text-gray-400">Qtd</th>
-                    <th class="text-center py-2 text-gray-400">Área (cm²)</th>
-                    <th class="text-center py-2 text-gray-400">Taxa (%)</th>
-                    <th class="text-center py-2 text-gray-400">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${gerarTabelaBitolas(area, armadura.areaMinima)}
-                </tbody>
-              </table>
+            <div class="mt-4 sm:mt-6 p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10 overflow-hidden">
+              <h3 class="font-semibold text-sm sm:text-base mb-3 sm:mb-4">📊 Opções de Armadura</h3>
+              <div class="overflow-x-auto w-full -mx-1 px-1">
+                <table class="w-full text-xs sm:text-sm min-w-[340px]">
+                  <thead>
+                    <tr class="border-b border-white/10">
+                      <th class="text-left py-2 text-gray-400">Bitola</th>
+                      <th class="text-center py-2 text-gray-400">Qtd</th>
+                      <th class="text-center py-2 text-gray-400">Área (cm²)</th>
+                      <th class="text-center py-2 text-gray-400">Taxa (%)</th>
+                      <th class="text-center py-2 text-gray-400">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${gerarTabelaBitolas(area, armadura.areaMinima)}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         `;
@@ -1329,68 +1348,68 @@
       else if (tab === 'verificacoes') {
         html = `
           <div class="tab-content active">
-            <div class="space-y-4">
+            <div class="space-y-3 sm:space-y-4">
               ${verificacoes.map(v => `
-                <div class="p-4 rounded-xl border ${
+                <div class="p-3.5 sm:p-4 rounded-xl border ${
                   v.tipo === 'erro' ? 'bg-red-500/10 border-red-500/30' :
                   v.tipo === 'aviso' ? 'bg-yellow-500/10 border-yellow-500/30' :
                   'bg-green-500/10 border-green-500/30'
                 }">
-                  <div class="flex items-start gap-3">
-                    <span class="text-xl">${v.tipo === 'erro' ? '❌' : v.tipo === 'aviso' ? '⚠️' : '✅'}</span>
+                  <div class="flex items-start gap-2.5 sm:gap-3">
+                    <span class="text-lg sm:text-xl">${v.tipo === 'erro' ? '❌' : v.tipo === 'aviso' ? '⚠️' : '✅'}</span>
                     <div class="flex-1">
-                      <div class="font-semibold ${
+                      <div class="font-semibold text-xs sm:text-sm ${
                         v.tipo === 'erro' ? 'text-red-400' :
                         v.tipo === 'aviso' ? 'text-yellow-400' :
                         'text-green-400'
                       }">${v.titulo}</div>
-                      <div class="text-sm text-gray-300 mt-1">${v.msg}</div>
-                      <div class="text-xs text-gray-500 mt-1">${v.referencia}</div>
+                      <div class="text-xs sm:text-sm text-gray-300 mt-0.5 sm:mt-1">${v.msg}</div>
+                      <div class="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">${v.referencia}</div>
                     </div>
                   </div>
                 </div>
               `).join('')}
               
               <!-- Verificação de esbeltez -->
-              <div class="p-4 rounded-xl border ${
+              <div class="p-3.5 sm:p-4 rounded-xl border ${
                 esbeltez <= 90 ? 'bg-green-500/10 border-green-500/30' :
                 esbeltez <= 140 ? 'bg-yellow-500/10 border-yellow-500/30' :
                 'bg-red-500/10 border-red-500/30'
               }">
-                <div class="flex items-start gap-3">
-                  <span class="text-xl">${esbeltez <= 140 ? '✅' : '❌'}</span>
+                <div class="flex items-start gap-2.5 sm:gap-3">
+                  <span class="text-lg sm:text-xl">${esbeltez <= 140 ? '✅' : '❌'}</span>
                   <div class="flex-1">
-                    <div class="font-semibold ${
+                    <div class="font-semibold text-xs sm:text-sm ${
                       esbeltez <= 90 ? 'text-green-400' :
                       esbeltez <= 140 ? 'text-yellow-400' :
                       'text-red-400'
                     }">Índice de Esbeltez</div>
-                    <div class="text-sm text-gray-300 mt-1">
+                    <div class="text-xs sm:text-sm text-gray-300 mt-0.5 sm:mt-1">
                       λ = ${esbeltez.toFixed(1)} ${esbeltez <= 140 ? '≤ 140 (limite NBR)' : '> 140 (EXCEDE LIMITE!)'}
                     </div>
-                    <div class="text-xs text-gray-500 mt-1">NBR 6118 item 15.8.1</div>
+                    <div class="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">NBR 6118 item 15.8.1</div>
                   </div>
                 </div>
               </div>
               
               <!-- Verificação de capacidade -->
-              <div class="p-4 rounded-xl border ${
+              <div class="p-3.5 sm:p-4 rounded-xl border ${
                 capacidade.taxaUtilizacao <= 80 ? 'bg-green-500/10 border-green-500/30' :
                 capacidade.taxaUtilizacao <= 100 ? 'bg-yellow-500/10 border-yellow-500/30' :
                 'bg-red-500/10 border-red-500/30'
               }">
-                <div class="flex items-start gap-3">
-                  <span class="text-xl">${capacidade.status === 'ok' ? '✅' : '❌'}</span>
+                <div class="flex items-start gap-2.5 sm:gap-3">
+                  <span class="text-lg sm:text-xl">${capacidade.status === 'ok' ? '✅' : '❌'}</span>
                   <div class="flex-1">
-                    <div class="font-semibold ${
+                    <div class="font-semibold text-xs sm:text-sm ${
                       capacidade.taxaUtilizacao <= 80 ? 'text-green-400' :
                       capacidade.taxaUtilizacao <= 100 ? 'text-yellow-400' :
                       'text-red-400'
                     }">Capacidade Resistente</div>
-                    <div class="text-sm text-gray-300 mt-1">
+                    <div class="text-xs sm:text-sm text-gray-300 mt-0.5 sm:mt-1">
                       Utilização: ${capacidade.taxaUtilizacao.toFixed(1)}% (Nd/Nrd = ${cargaAxial.toFixed(0)}/${capacidade.Nrd.toFixed(0)} kN)
                     </div>
-                    <div class="text-xs text-gray-500 mt-1">Verificação simplificada à compressão</div>
+                    <div class="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Verificação simplificada à compressão</div>
                   </div>
                 </div>
               </div>
@@ -1403,78 +1422,78 @@
       else if (tab === 'custos') {
         html = `
           <div class="tab-content active">
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
               <!-- Detalhamento -->
-              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
-                <h3 class="font-semibold text-cyan-400 mb-4">💰 Detalhamento de Custos</h3>
-                <div class="space-y-4">
-                  <div class="p-4 rounded-lg bg-cyan-500/10">
-                    <div class="flex justify-between items-center mb-2">
-                      <span class="text-gray-400">Aço</span>
-                      <span class="font-bold text-cyan-400">R$ ${custo.custoAco.toFixed(2)}</span>
+              <div class="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-cyan-400 text-sm sm:text-base mb-3 sm:mb-4">💰 Detalhamento de Custos</h3>
+                <div class="space-y-3 sm:space-y-4">
+                  <div class="p-3 sm:p-4 rounded-lg bg-cyan-500/10">
+                    <div class="flex justify-between items-center mb-1 sm:mb-2">
+                      <span class="text-xs sm:text-sm text-gray-400">Aço</span>
+                      <span class="font-bold text-sm sm:text-base text-cyan-400">R$ ${custo.custoAco.toFixed(2)}</span>
                     </div>
-                    <div class="text-xs text-gray-500">
+                    <div class="text-[11px] sm:text-xs text-gray-500">
                       ${custo.pesoAcoTotal.toFixed(1)} kg × R$ ${precosPilares.acoKg.toFixed(2)}/kg
                     </div>
-                    <div class="text-xs text-gray-500">
+                    <div class="text-[10px] sm:text-xs text-gray-500 mt-0.5">
                       (Long: ${custo.pesoAcoLong.toFixed(1)} kg | Estr: ${custo.pesoAcoEstribos.toFixed(1)} kg)
                     </div>
                   </div>
                   
-                  <div class="p-4 rounded-lg bg-purple-500/10">
-                    <div class="flex justify-between items-center mb-2">
-                      <span class="text-gray-400">Concreto C${fck}</span>
-                      <span class="font-bold text-purple-400">R$ ${custo.custoConcreto.toFixed(2)}</span>
+                  <div class="p-3 sm:p-4 rounded-lg bg-purple-500/10">
+                    <div class="flex justify-between items-center mb-1 sm:mb-2">
+                      <span class="text-xs sm:text-sm text-gray-400">Concreto C${fck}</span>
+                      <span class="font-bold text-sm sm:text-base text-purple-400">R$ ${custo.custoConcreto.toFixed(2)}</span>
                     </div>
-                    <div class="text-xs text-gray-500">
+                    <div class="text-[11px] sm:text-xs text-gray-500">
                       ${custo.volumeConcreto.toFixed(3)} m³ × R$ ${(precosPilares.concretoBase + (fck - 20) * precosPilares.adicionalFck).toFixed(0)}/m³
                     </div>
                   </div>
                   
-                  <div class="p-4 rounded-lg bg-yellow-500/10">
-                    <div class="flex justify-between items-center mb-2">
-                      <span class="text-gray-400">Formas</span>
-                      <span class="font-bold text-yellow-400">R$ ${custo.custoForma.toFixed(2)}</span>
+                  <div class="p-3 sm:p-4 rounded-lg bg-yellow-500/10">
+                    <div class="flex justify-between items-center mb-1 sm:mb-2">
+                      <span class="text-xs sm:text-sm text-gray-400">Formas</span>
+                      <span class="font-bold text-sm sm:text-base text-yellow-400">R$ ${custo.custoForma.toFixed(2)}</span>
                     </div>
-                    <div class="text-xs text-gray-500">
+                    <div class="text-[11px] sm:text-xs text-gray-500">
                       ${custo.areaForma.toFixed(2)} m² × R$ ${precosPilares.forma.toFixed(0)}/m²
                     </div>
                   </div>
                   
-                  <div class="p-4 rounded-lg bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30">
+                  <div class="p-3 sm:p-4 rounded-lg bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30">
                     <div class="flex justify-between items-center">
-                      <span class="font-semibold">TOTAL</span>
-                      <span class="text-2xl font-bold text-cyan-400">R$ ${custo.total.toFixed(2)}</span>
+                      <span class="text-xs sm:text-base font-semibold">TOTAL</span>
+                      <span class="text-xl sm:text-2xl font-bold text-cyan-400">R$ ${custo.total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
               </div>
               
               <!-- Gráfico -->
-              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
-                <h3 class="font-semibold text-purple-400 mb-4">📊 Distribuição</h3>
-                <div class="aspect-square max-w-[250px] mx-auto">
+              <div class="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-purple-400 text-sm sm:text-base mb-3 sm:mb-4">📊 Distribuição</h3>
+                <div class="aspect-square max-w-[220px] sm:max-w-[250px] mx-auto">
                   <canvas id="chartCustos"></canvas>
                 </div>
-                <div class="mt-4 space-y-2 text-sm">
+                <div class="mt-4 space-y-2 text-xs sm:text-sm">
                   <div class="flex justify-between">
-                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-cyan-500"></span> Aço</span>
-                    <span>${custo.porcentagens.aco.toFixed(1)}%</span>
+                    <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded bg-cyan-500"></span> Aço</span>
+                    <span class="font-medium">${custo.porcentagens.aco.toFixed(1)}%</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-purple-500"></span> Concreto</span>
-                    <span>${custo.porcentagens.concreto.toFixed(1)}%</span>
+                    <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded bg-purple-500"></span> Concreto</span>
+                    <span class="font-medium">${custo.porcentagens.concreto.toFixed(1)}%</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-yellow-500"></span> Forma</span>
-                    <span>${custo.porcentagens.forma.toFixed(1)}%</span>
+                    <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded bg-yellow-500"></span> Forma</span>
+                    <span class="font-medium">${custo.porcentagens.forma.toFixed(1)}%</span>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div class="mt-4 p-4 rounded-xl bg-gray-500/10 border border-gray-500/20">
-              <p class="text-sm text-gray-400">
+            <div class="mt-4 p-3.5 sm:p-4 rounded-xl bg-gray-500/10 border border-gray-500/20">
+              <p class="text-xs sm:text-sm text-gray-400">
                 ⚠️ <strong>Nota:</strong> Valores estimados para referência. Não incluem mão de obra, equipamentos, transporte e variações regionais. Consulte fornecedores locais para orçamento preciso.
               </p>
             </div>
@@ -1489,11 +1508,11 @@
       else if (tab === 'detalhamento') {
         html = `
           <div class="tab-content active">
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
               <!-- Detalhes Geométricos -->
-              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
-                <h3 class="font-semibold text-cyan-400 mb-4">📐 Dados Geométricos</h3>
-                <table class="w-full text-sm">
+              <div class="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-cyan-400 text-sm sm:text-base mb-3 sm:mb-4">📐 Dados Geométricos</h3>
+                <table class="w-full text-xs sm:text-sm">
                   <tbody>
                     <tr class="border-b border-white/5">
                       <td class="py-2 text-gray-400">Tipo de Seção</td>
@@ -1517,16 +1536,16 @@
                     </tr>
                     <tr>
                       <td class="py-2 text-gray-400">Esbeltez (λ)</td>
-                      <td class="py-2 text-right">${esbeltez.toFixed(2)}</td>
+                      <td class="py-2 text-right font-semibold">${esbeltez.toFixed(2)}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               
               <!-- Dados de Carregamento -->
-              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
-                <h3 class="font-semibold text-purple-400 mb-4">⚡ Carregamento</h3>
-                <table class="w-full text-sm">
+              <div class="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-purple-400 text-sm sm:text-base mb-3 sm:mb-4">⚡ Carregamento</h3>
+                <table class="w-full text-xs sm:text-sm">
                   <tbody>
                     <tr class="border-b border-white/5">
                       <td class="py-2 text-gray-400">Carga Axial (Nd)</td>
@@ -1553,9 +1572,9 @@
               </div>
               
               <!-- Materiais -->
-              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
-                <h3 class="font-semibold text-green-400 mb-4">🧱 Materiais</h3>
-                <table class="w-full text-sm">
+              <div class="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-green-400 text-sm sm:text-base mb-3 sm:mb-4">🧱 Materiais</h3>
+                <table class="w-full text-xs sm:text-sm">
                   <tbody>
                     <tr class="border-b border-white/5">
                       <td class="py-2 text-gray-400">Concreto</td>
@@ -1578,9 +1597,9 @@
               </div>
               
               <!-- Quantitativos -->
-              <div class="p-6 rounded-xl bg-white/5 border border-white/10">
-                <h3 class="font-semibold text-yellow-400 mb-4">📋 Quantitativos</h3>
-                <table class="w-full text-sm">
+              <div class="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+                <h3 class="font-semibold text-yellow-400 text-sm sm:text-base mb-3 sm:mb-4">📋 Quantitativos</h3>
+                <table class="w-full text-xs sm:text-sm">
                   <tbody>
                     <tr class="border-b border-white/5">
                       <td class="py-2 text-gray-400">Volume Concreto</td>
@@ -1608,9 +1627,9 @@
             </div>
             
             <!-- Observações -->
-            <div class="mt-6 p-6 rounded-xl bg-white/5 border border-white/10">
-              <h3 class="font-semibold mb-4">📝 Observações para Execução</h3>
-              <ul class="space-y-2 text-sm text-gray-300">
+            <div class="mt-4 sm:mt-6 p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+              <h3 class="font-semibold text-sm sm:text-base mb-3 sm:mb-4">📝 Observações para Execução</h3>
+              <ul class="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-300">
                 <li class="flex gap-2"><span>•</span>Verificar interferências com vigas e lajes antes do lançamento</li>
                 <li class="flex gap-2"><span>•</span>Emendas por traspasse: preferir fora de regiões críticas (extremidades)</li>
                 <li class="flex gap-2"><span>•</span>Garantir cobrimento com uso de espaçadores adequados</li>
@@ -1624,11 +1643,11 @@
       }
       
       html += `
-        <div class="result-card glass rounded-2xl p-6 mt-6">
-          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <div class="result-card glass rounded-2xl p-4 sm:p-6 mt-4 sm:mt-6 overflow-hidden">
+          <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
             <span class="text-cyan-400">📝</span> Memorial de Cálculo
           </h3>
-          <pre class="font-mono text-xs text-gray-400 bg-black/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE PILARES
+          <pre class="font-mono text-[10px] sm:text-xs text-gray-400 bg-black/30 p-3 sm:p-4 rounded-xl overflow-x-auto whitespace-pre-wrap break-all max-w-full">MEMORIAL DESCRITIVO DE CÁLCULO DE PILARES
 Data: ${new Date().toLocaleDateString('pt-BR')}
 
 1. PARÂMETROS GERAIS
@@ -1666,7 +1685,7 @@ Classificação: ${classificacao}</pre>
       const cob = cobrimento * escala;
       const barraR = 4;
       
-      let svg = `<svg width="${w + 40}" height="${h + 40}" viewBox="0 0 ${w + 40} ${h + 40}">`;
+      let svg = `<svg class="max-w-full h-auto" style="max-height: 260px;" width="${w + 40}" height="${h + 40}" viewBox="0 0 ${w + 40} ${h + 40}">`;
       
       // Fundo
       if (tipo === 'circular') {
