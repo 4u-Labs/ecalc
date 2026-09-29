@@ -109,9 +109,9 @@
             const link = document.createElement('link');
             link.id = 'ecalc-suite-css';
             link.rel = 'stylesheet';
-            // Compute relative path to assets/suite/suite-nav.css
+            // Compute relative path to assets/suite/suite-nav.css with cache-busting
             const isSubdir = window.location.pathname.includes('/seguranca/');
-            link.href = (isSubdir ? '../' : '') + 'assets/suite/suite-nav.css';
+            link.href = (isSubdir ? '../' : '') + 'assets/suite/suite-nav.css?v=20260929_2';
             document.head.appendChild(link);
         }
     }
@@ -149,13 +149,13 @@
             </div>
 
             <div class="ecalc-bar-right">
-                <a href="${isSubdir ? '../../' : '../'}cadclone/" target="_blank" class="ecalc-nav-btn" title="Abrir Editor CADClone">
+                <a href="${isSubdir ? '../../' : '../'}cadclone/" target="_blank" class="ecalc-nav-btn ecalc-nav-cadclone" title="Abrir Editor CADClone">
                     <span>📐 CADClone</span>
                 </a>
-                <a href="https://4u.ia.br/app/office/" target="_blank" class="ecalc-nav-btn" title="Abrir OfficeClone Suite">
+                <a href="https://4u.ia.br/app/office/" target="_blank" class="ecalc-nav-btn ecalc-nav-office" title="Abrir OfficeClone Suite">
                     <span>📄 OfficeClone</span>
                 </a>
-                <a href="${rootPath}index.php" class="ecalc-nav-btn" title="Hub Principal">
+                <a href="${rootPath}index.php" class="ecalc-nav-btn ecalc-nav-hub" title="Hub Principal">
                     <span>🏠 Hub</span>
                 </a>
             </div>

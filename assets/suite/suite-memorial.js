@@ -283,6 +283,52 @@
                 color: #0f172a;
             }
 
+            /* SCREEN RESPONSIVE: Mobile adaptations */
+            @media screen and (max-width: 640px) {
+                .ecalc-memorial-modal {
+                    padding: 12px 6px 40px 6px;
+                }
+                .ecalc-memorial-actions {
+                    padding: 6px 12px;
+                    gap: 8px;
+                    width: 90%;
+                    max-width: 320px;
+                    justify-content: center;
+                }
+                .ecalc-memorial-btn {
+                    padding: 6px 12px;
+                    font-size: 0.78rem;
+                }
+                .ecalc-a4-sheet {
+                    padding: 14px 10px;
+                    font-size: 8.5pt;
+                    width: 100% !important;
+                    box-sizing: border-box;
+                    min-height: auto;
+                }
+                .ecalc-sheet-header {
+                    flex-direction: column;
+                    text-align: center;
+                    gap: 6px;
+                }
+                .ecalc-sheet-meta {
+                    text-align: center;
+                }
+                .ecalc-data-grid {
+                    grid-template-columns: 1fr;
+                    gap: 4px;
+                }
+                .ecalc-sheet-footer {
+                    flex-direction: column-reverse;
+                    align-items: center;
+                    gap: 16px;
+                }
+                .ecalc-signature-line {
+                    width: 100%;
+                    max-width: 220px;
+                }
+            }
+
             /* PRINT CSS: Strict A4 Optimization - Zero Blank Pages */
             @media print {
                 /* 1. When memorial modal is active, completely remove all other body elements from print layout flow */

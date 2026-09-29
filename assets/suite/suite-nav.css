@@ -20,6 +20,10 @@
     top: 0;
     left: 0;
     right: 0;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: clip;
     height: 52px;
     background: rgba(3, 6, 17, 0.92);
     backdrop-filter: blur(16px);
@@ -582,14 +586,18 @@
     }
     .ecalc-bar-right {
         gap: 0.25rem;
+        flex-shrink: 0;
     }
+    .ecalc-nav-cadclone,
+    .ecalc-nav-office,
     .ecalc-bar-right a.ecalc-nav-btn[href*="cadclone"],
     .ecalc-bar-right a.ecalc-nav-btn[href*="office"] {
         display: none !important;
     }
     .ecalc-nav-btn {
-        padding: 0.2rem 0.45rem;
-        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.72rem;
+        white-space: nowrap;
     }
     .ecalc-switcher-window {
         max-width: 95vw;

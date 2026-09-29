@@ -2,13 +2,19 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Cálculo de Lajes - NBR 6118:2014</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="stylesheet" id="ecalc-suite-css" href="assets/suite/suite-nav.css?v=20260929_2">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', sans-serif; }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
         
         :root {
             --primary: #3b82f6;
@@ -113,25 +119,32 @@
         }
         
         /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
         .dark ::-webkit-scrollbar-track { background: #1e293b; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         /* Toast notification */
         .toast {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 1rem 1.5rem;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            left: 1.5rem;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 0.75rem 1.25rem;
             border-radius: 0.75rem;
             color: white;
             font-weight: 500;
             z-index: 1000;
             animation: toastIn 0.3s ease-out;
+            text-align: center;
         }
         
         @keyframes toastIn {
@@ -181,27 +194,27 @@
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 min-h-screen transition-colors duration-300">
     <!-- Header -->
-    <header class="gradient-bg text-white py-4 md:py-6 shadow-2xl sticky top-0 z-50 no-print">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3 md:gap-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                        <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <header class="gradient-bg text-white py-3 sm:py-4 md:py-6 shadow-xl relative z-20 no-print">
+        <div class="container mx-auto px-4 max-w-7xl">
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 sm:gap-3 md:gap-4 min-w-0">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                     </div>
-                    <div>
-                        <h1 class="text-lg md:text-2xl font-bold tracking-tight">Cálculo de Lajes</h1>
-                        <p class="text-blue-200 text-xs md:text-sm">NBR 6118:2014 • Método de Marcus</p>
+                    <div class="min-w-0">
+                        <h1 class="text-base sm:text-lg md:text-2xl font-bold tracking-tight truncate">Cálculo de Lajes</h1>
+                        <p class="text-blue-200 text-[11px] sm:text-xs md:text-sm truncate">NBR 6118:2014 • Método de Marcus</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 md:gap-3">
+                <div class="flex items-center gap-2 md:gap-3 shrink-0">
                     <!-- Dark Mode Toggle -->
                     <button onclick="toggleDarkMode()" class="p-2 md:p-2.5 bg-white/10 hover:bg-white/20 rounded-lg transition-all" title="Alternar tema">
-                        <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="sunIcon" class="w-4 h-4 sm:w-5 sm:h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
-                        <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="moonIcon" class="w-4 h-4 sm:w-5 sm:h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                         </svg>
                     </button>
@@ -218,26 +231,26 @@
     </header>
 
     <!-- Quick Stats Bar -->
-    <div id="quickStats" class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-3 sticky top-[72px] md:top-[88px] z-40 no-print hidden">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between gap-4 overflow-x-auto pb-1">
-                <div class="flex items-center gap-2 min-w-max">
-                    <span class="text-xs text-slate-500 dark:text-slate-400">Laje:</span>
-                    <span id="statDims" class="text-sm font-semibold text-slate-700 dark:text-slate-200">3.00 × 4.00 m</span>
+    <div id="quickStats" class="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 py-2 sm:py-2.5 sticky top-[46px] z-30 no-print hidden shadow-xs max-w-full overflow-hidden">
+        <div class="container mx-auto px-4 max-w-7xl">
+            <div class="flex items-center justify-between sm:justify-start gap-3 sm:gap-6 overflow-x-auto pb-0.5 no-scrollbar text-xs sm:text-sm">
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Laje:</span>
+                    <span id="statDims" class="font-semibold text-slate-700 dark:text-slate-200">3.00 × 4.00 m</span>
                 </div>
-                <div class="flex items-center gap-2 min-w-max">
-                    <span class="text-xs text-slate-500 dark:text-slate-400">Carga:</span>
-                    <span id="statCarga" class="text-sm font-semibold text-slate-700 dark:text-slate-200">— kN/m²</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Carga:</span>
+                    <span id="statCarga" class="font-semibold text-slate-700 dark:text-slate-200">— kN/m²</span>
                 </div>
-                <div class="flex items-center gap-2 min-w-max">
-                    <span class="text-xs text-slate-500 dark:text-slate-400">Mx:</span>
-                    <span id="statMx" class="text-sm font-semibold text-blue-600">— kN.m/m</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Mx:</span>
+                    <span id="statMx" class="font-semibold text-blue-600">— kN.m/m</span>
                 </div>
-                <div class="flex items-center gap-2 min-w-max">
-                    <span class="text-xs text-slate-500 dark:text-slate-400">As,x:</span>
-                    <span id="statAsx" class="text-sm font-semibold text-green-600">— cm²/m</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400">As,x:</span>
+                    <span id="statAsx" class="font-semibold text-green-600">— cm²/m</span>
                 </div>
-                <div id="statStatus" class="flex items-center gap-1 min-w-max">
+                <div id="statStatus" class="flex items-center gap-1 shrink-0 ml-auto sm:ml-0">
                     <span class="w-2 h-2 rounded-full bg-slate-300"></span>
                     <span class="text-xs text-slate-500">Aguardando</span>
                 </div>
@@ -245,20 +258,20 @@
         </div>
     </div>
 
-    <main class="container mx-auto px-4 py-6 md:py-8">
-        <div class="grid lg:grid-cols-12 gap-6 md:gap-8">
+    <main class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8 max-w-7xl">
+        <div class="grid lg:grid-cols-12 gap-5 md:gap-8">
             <!-- Formulário de Entrada -->
             <div class="lg:col-span-4 no-print">
-                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-5 md:p-6 sticky top-32">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-4 sm:p-5 md:p-6 relative lg:sticky lg:top-20">
                     <!-- Tabs -->
-                    <div class="flex gap-2 mb-6 bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
-                        <button onclick="switchTab('geometria')" id="tabGeometria" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all tab-active">
+                    <div class="flex gap-1.5 sm:gap-2 mb-5 bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
+                        <button onclick="switchTab('geometria')" id="tabGeometria" class="flex-1 py-2 px-1 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all tab-active text-center">
                             📐 Geometria
                         </button>
-                        <button onclick="switchTab('materiais')" id="tabMateriais" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-600">
+                        <button onclick="switchTab('materiais')" id="tabMateriais" class="flex-1 py-2 px-1 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-600 text-center">
                             🧱 Materiais
                         </button>
-                        <button onclick="switchTab('cargas')" id="tabCargas" class="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-600">
+                        <button onclick="switchTab('cargas')" id="tabCargas" class="flex-1 py-2 px-1 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-600 text-center">
                             ⚖️ Cargas
                         </button>
                     </div>
@@ -267,22 +280,22 @@
                     <div id="contentGeometria" class="space-y-4">
                         <!-- Tipo de Laje -->
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                                 Tipo de Laje
                                 <span class="tooltip ml-1 text-blue-500 cursor-help" data-tip="Escolha o sistema estrutural da laje">ⓘ</span>
                             </label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button onclick="setTipoLaje('macica')" id="btnMacica" class="p-3 rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-center transition-all">
-                                    <div class="text-2xl mb-1">▬</div>
-                                    <div class="text-xs font-medium text-slate-700 dark:text-slate-200">Maciça</div>
+                            <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+                                <button type="button" onclick="setTipoLaje('macica')" id="btnMacica" class="p-2 sm:p-3 rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-center transition-all cursor-pointer">
+                                    <div class="text-xl sm:text-2xl mb-1">▬</div>
+                                    <div class="text-[11px] sm:text-xs font-semibold text-slate-700 dark:text-slate-200">Maciça</div>
                                 </button>
-                                <button onclick="setTipoLaje('nervurada')" id="btnNervurada" class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 text-center transition-all">
-                                    <div class="text-2xl mb-1">⊓⊓⊓</div>
-                                    <div class="text-xs font-medium text-slate-700 dark:text-slate-200">Nervurada</div>
+                                <button type="button" onclick="setTipoLaje('nervurada')" id="btnNervurada" class="p-2 sm:p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 text-center transition-all cursor-pointer">
+                                    <div class="text-xl sm:text-2xl mb-1">⊓⊓⊓</div>
+                                    <div class="text-[11px] sm:text-xs font-semibold text-slate-700 dark:text-slate-200">Nervurada</div>
                                 </button>
-                                <button onclick="setTipoLaje('premoldada')" id="btnPremoldada" class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 text-center transition-all">
-                                    <div class="text-2xl mb-1">⊏⊐⊏⊐</div>
-                                    <div class="text-xs font-medium text-slate-700 dark:text-slate-200">Pré-mold.</div>
+                                <button type="button" onclick="setTipoLaje('premoldada')" id="btnPremoldada" class="p-2 sm:p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 text-center transition-all cursor-pointer">
+                                    <div class="text-xl sm:text-2xl mb-1">⊏⊐⊏⊐</div>
+                                    <div class="text-[11px] sm:text-xs font-semibold text-slate-700 dark:text-slate-200">Pré-mold.</div>
                                 </button>
                             </div>
                             <input type="hidden" id="tipoLaje" value="macica">
@@ -290,8 +303,8 @@
 
                         <!-- Condição de Apoio -->
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Condição de Apoio</label>
-                            <select id="condicaoApoio" onchange="atualizarDiagrama(); calcularPreview()" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Condição de Apoio</label>
+                            <select id="condicaoApoio" onchange="atualizarDiagrama(); calcularPreview()" class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-xs sm:text-sm text-slate-700 dark:text-slate-200">
                                 <option value="1">Tipo 1 - 4 bordas apoiadas</option>
                                 <option value="2">Tipo 2 - 3 apoiadas, 1 engastada</option>
                                 <option value="3">Tipo 3 - 2 opostas apoiadas, 2 engastadas</option>
@@ -302,49 +315,49 @@
                         </div>
 
                         <!-- Dimensões com Slider -->
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5 sm:mb-2">
                                     Lx <span class="text-slate-400 font-normal">(menor)</span>
                                 </label>
                                 <div class="relative">
                                     <input type="number" id="lx" value="3.0" step="0.1" min="1" max="8" 
-                                        class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200"
+                                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-xs sm:text-sm text-slate-700 dark:text-slate-200"
                                         oninput="atualizarDiagrama(); calcularPreview()">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">m</span>
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm">m</span>
                                 </div>
                                 <input type="range" id="lxRange" min="1" max="8" step="0.1" value="3.0" 
-                                    class="w-full mt-2" oninput="document.getElementById('lx').value = this.value; atualizarDiagrama(); calcularPreview()">
+                                    class="w-full mt-1.5 sm:mt-2" oninput="document.getElementById('lx').value = this.value; atualizarDiagrama(); calcularPreview()">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5 sm:mb-2">
                                     Ly <span class="text-slate-400 font-normal">(maior)</span>
                                 </label>
                                 <div class="relative">
                                     <input type="number" id="ly" value="4.0" step="0.1" min="1" max="10" 
-                                        class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200"
+                                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-xs sm:text-sm text-slate-700 dark:text-slate-200"
                                         oninput="atualizarDiagrama(); calcularPreview()">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">m</span>
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm">m</span>
                                 </div>
                                 <input type="range" id="lyRange" min="1" max="10" step="0.1" value="4.0" 
-                                    class="w-full mt-2" oninput="document.getElementById('ly').value = this.value; atualizarDiagrama(); calcularPreview()">
+                                    class="w-full mt-1.5 sm:mt-2" oninput="document.getElementById('ly').value = this.value; atualizarDiagrama(); calcularPreview()">
                             </div>
                         </div>
 
                         <!-- Espessura -->
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5 sm:mb-2">
                                 Espessura (h)
-                                <span class="ml-2 text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full">mín. 7cm</span>
+                                <span class="ml-2 text-[10px] sm:text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full font-normal">mín. 7cm</span>
                             </label>
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2.5 sm:gap-3">
                                 <input type="range" id="espessuraRange" min="7" max="25" step="1" value="10" 
                                     class="flex-1" oninput="document.getElementById('espessura').value = this.value; calcularPreview()">
-                                <div class="relative w-24">
+                                <div class="relative w-20 sm:w-24 shrink-0">
                                     <input type="number" id="espessura" value="10" step="1" min="7" max="30" 
-                                        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg input-focus focus:outline-none transition text-center text-slate-700 dark:text-slate-200"
+                                        class="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg input-focus focus:outline-none transition text-center text-xs sm:text-sm text-slate-700 dark:text-slate-200"
                                         oninput="document.getElementById('espessuraRange').value = this.value; calcularPreview()">
-                                    <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">cm</span>
+                                    <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] sm:text-xs">cm</span>
                                 </div>
                             </div>
                         </div>
@@ -354,32 +367,32 @@
                     <div id="contentMateriais" class="space-y-4 hidden">
                         <!-- Concreto -->
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                                 Classe do Concreto (fck)
                             </label>
-                            <div class="grid grid-cols-5 gap-2">
-                                <button onclick="setFck(20)" class="fck-btn p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200" data-fck="20">C20</button>
-                                <button onclick="setFck(25)" class="fck-btn p-2 rounded-lg border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-sm font-medium transition text-slate-700 dark:text-slate-200" data-fck="25">C25</button>
-                                <button onclick="setFck(30)" class="fck-btn p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200" data-fck="30">C30</button>
-                                <button onclick="setFck(35)" class="fck-btn p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200" data-fck="35">C35</button>
-                                <button onclick="setFck(40)" class="fck-btn p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200" data-fck="40">C40</button>
+                            <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+                                <button type="button" onclick="setFck(20)" class="fck-btn p-1.5 sm:p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-xs sm:text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200 cursor-pointer" data-fck="20">C20</button>
+                                <button type="button" onclick="setFck(25)" class="fck-btn p-1.5 sm:p-2 rounded-lg border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-xs sm:text-sm font-medium transition text-slate-700 dark:text-slate-200 cursor-pointer" data-fck="25">C25</button>
+                                <button type="button" onclick="setFck(30)" class="fck-btn p-1.5 sm:p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-xs sm:text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200 cursor-pointer" data-fck="30">C30</button>
+                                <button type="button" onclick="setFck(35)" class="fck-btn p-1.5 sm:p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-xs sm:text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200 cursor-pointer" data-fck="35">C35</button>
+                                <button type="button" onclick="setFck(40)" class="fck-btn p-1.5 sm:p-2 rounded-lg border-2 border-slate-200 dark:border-slate-600 text-xs sm:text-sm font-medium hover:border-blue-400 transition text-slate-700 dark:text-slate-200 cursor-pointer" data-fck="40">C40</button>
                             </div>
                             <input type="hidden" id="fck" value="25">
                         </div>
 
                         <!-- Aço -->
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                                 Categoria do Aço
                             </label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button onclick="setAco(500)" id="btnCa50" class="p-4 rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 transition-all">
-                                    <div class="text-lg font-bold text-slate-700 dark:text-slate-200">CA-50</div>
-                                    <div class="text-xs text-slate-500 dark:text-slate-400">fyk = 500 MPa</div>
+                            <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
+                                <button type="button" onclick="setAco(500)" id="btnCa50" class="p-3 sm:p-4 rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 transition-all cursor-pointer">
+                                    <div class="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200">CA-50</div>
+                                    <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">fyk = 500 MPa</div>
                                 </button>
-                                <button onclick="setAco(600)" id="btnCa60" class="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 transition-all">
-                                    <div class="text-lg font-bold text-slate-700 dark:text-slate-200">CA-60</div>
-                                    <div class="text-xs text-slate-500 dark:text-slate-400">fyk = 600 MPa</div>
+                                <button type="button" onclick="setAco(600)" id="btnCa60" class="p-3 sm:p-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 transition-all cursor-pointer">
+                                    <div class="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200">CA-60</div>
+                                    <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">fyk = 600 MPa</div>
                                 </button>
                             </div>
                             <input type="hidden" id="aco" value="500">
@@ -387,16 +400,16 @@
 
                         <!-- Cobrimento -->
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                                 Cobrimento Nominal
                             </label>
-                            <select id="cobrimento" onchange="calcularPreview()" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200">
+                            <select id="cobrimento" onchange="calcularPreview()" class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-xs sm:text-sm text-slate-700 dark:text-slate-200">
                                 <option value="2.0">2.0 cm - CAA I (interno seco)</option>
                                 <option value="2.5" selected>2.5 cm - CAA II (urbano)</option>
                                 <option value="3.0">3.0 cm - CAA III (marinho)</option>
                                 <option value="4.0">4.0 cm - CAA IV (industrial)</option>
                             </select>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Conforme Tabela 7.2 da NBR 6118</p>
+                            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">Conforme Tabela 7.2 da NBR 6118</p>
                         </div>
                     </div>
 
@@ -404,44 +417,44 @@
                     <div id="contentCargas" class="space-y-4 hidden">
                         <!-- Carga Permanente -->
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                                 Carga Permanente Adicional
                                 <span class="tooltip ml-1 text-blue-500 cursor-help" data-tip="Revestimento, contrapiso, paredes, etc.">ⓘ</span>
                             </label>
                             <div class="relative">
                                 <input type="number" id="cargaPermanente" value="1.5" step="0.1" min="0" max="10"
-                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-slate-700 dark:text-slate-200"
+                                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl input-focus focus:outline-none transition text-xs sm:text-sm text-slate-700 dark:text-slate-200"
                                     oninput="calcularPreview()">
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">kN/m²</span>
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm">kN/m²</span>
                             </div>
-                            <div class="flex flex-wrap gap-2 mt-2">
-                                <button onclick="document.getElementById('cargaPermanente').value=1.0; calcularPreview()" class="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300">Leve (1.0)</button>
-                                <button onclick="document.getElementById('cargaPermanente').value=1.5; calcularPreview()" class="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300">Normal (1.5)</button>
-                                <button onclick="document.getElementById('cargaPermanente').value=2.5; calcularPreview()" class="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300">Pesada (2.5)</button>
+                            <div class="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
+                                <button type="button" onclick="document.getElementById('cargaPermanente').value=1.0; calcularPreview()" class="text-xs px-2.5 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300 cursor-pointer">Leve (1.0)</button>
+                                <button type="button" onclick="document.getElementById('cargaPermanente').value=1.5; calcularPreview()" class="text-xs px-2.5 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300 cursor-pointer">Normal (1.5)</button>
+                                <button type="button" onclick="document.getElementById('cargaPermanente').value=2.5; calcularPreview()" class="text-xs px-2.5 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition text-slate-600 dark:text-slate-300 cursor-pointer">Pesada (2.5)</button>
                             </div>
                         </div>
 
                         <!-- Carga Acidental -->
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                                 Carga Acidental (uso)
                             </label>
                             <div class="grid grid-cols-2 gap-2">
-                                <button onclick="setCargaAcidental(1.5)" class="carga-btn p-3 rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-left transition-all" data-carga="1.5">
-                                    <div class="font-bold text-slate-700 dark:text-slate-200">🏠 Residencial</div>
-                                    <div class="text-xs text-slate-500 dark:text-slate-400">1.5 kN/m²</div>
+                                <button type="button" onclick="setCargaAcidental(1.5)" class="carga-btn p-2.5 sm:p-3 rounded-xl border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-left transition-all cursor-pointer" data-carga="1.5">
+                                    <div class="font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200">🏠 Residencial</div>
+                                    <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">1.5 kN/m²</div>
                                 </button>
-                                <button onclick="setCargaAcidental(2.0)" class="carga-btn p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-left hover:border-blue-300 transition-all" data-carga="2.0">
-                                    <div class="font-bold text-slate-700 dark:text-slate-200">🏢 Escritório</div>
-                                    <div class="text-xs text-slate-500 dark:text-slate-400">2.0 kN/m²</div>
+                                <button type="button" onclick="setCargaAcidental(2.0)" class="carga-btn p-2.5 sm:p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-left hover:border-blue-300 transition-all cursor-pointer" data-carga="2.0">
+                                    <div class="font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200">🏢 Escritório</div>
+                                    <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">2.0 kN/m²</div>
                                 </button>
-                                <button onclick="setCargaAcidental(3.0)" class="carga-btn p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-left hover:border-blue-300 transition-all" data-carga="3.0">
-                                    <div class="font-bold text-slate-700 dark:text-slate-200">🏪 Comercial</div>
-                                    <div class="text-xs text-slate-500 dark:text-slate-400">3.0 kN/m²</div>
+                                <button type="button" onclick="setCargaAcidental(3.0)" class="carga-btn p-2.5 sm:p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-left hover:border-blue-300 transition-all cursor-pointer" data-carga="3.0">
+                                    <div class="font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200">🏪 Comercial</div>
+                                    <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">3.0 kN/m²</div>
                                 </button>
-                                <button onclick="setCargaAcidental(5.0)" class="carga-btn p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-left hover:border-blue-300 transition-all" data-carga="5.0">
-                                    <div class="font-bold text-slate-700 dark:text-slate-200">🚗 Garagem</div>
-                                    <div class="text-xs text-slate-500 dark:text-slate-400">5.0 kN/m²</div>
+                                <button type="button" onclick="setCargaAcidental(5.0)" class="carga-btn p-2.5 sm:p-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-left hover:border-blue-300 transition-all cursor-pointer" data-carga="5.0">
+                                    <div class="font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200">🚗 Garagem</div>
+                                    <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">5.0 kN/m²</div>
                                 </button>
                             </div>
                             <input type="hidden" id="cargaAcidental" value="1.5">
@@ -449,8 +462,8 @@
                     </div>
 
                     <!-- Botão Calcular -->
-                    <button onclick="calcular()" class="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 shadow-lg hover:shadow-xl pulse-glow">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="button" onclick="calcular()" class="w-full mt-5 sm:mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 sm:py-4 px-4 sm:px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl pulse-glow cursor-pointer text-sm sm:text-base">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                         </svg>
                         CALCULAR LAJE
@@ -461,25 +474,25 @@
             <!-- Resultados -->
             <div class="lg:col-span-8 space-y-6">
                 <!-- Diagrama da Laje -->
-                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-5 md:p-6 animate-fade-in">
-                    <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-                        <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-4 sm:p-5 md:p-6 animate-fade-in">
+                    <h2 class="text-base sm:text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 mb-3 sm:mb-4 flex items-center gap-2">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"></path>
                             </svg>
                         </div>
                         Esquema Estrutural
                     </h2>
-                    <div class="flex justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-700 dark:to-slate-600 rounded-xl p-4">
-                        <svg id="diagramaLaje" viewBox="0 0 400 300" class="w-full max-w-lg"></svg>
+                    <div class="flex justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-700 dark:to-slate-600 rounded-xl p-2 sm:p-4 overflow-hidden">
+                        <svg id="diagramaLaje" viewBox="0 0 400 300" class="w-full max-w-lg h-auto max-h-[240px] sm:max-h-[300px]"></svg>
                     </div>
-                    <div class="flex justify-center gap-8 mt-4 text-sm">
+                    <div class="flex justify-center gap-6 sm:gap-8 mt-3 sm:mt-4 text-xs sm:text-sm">
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-1 bg-slate-400 rounded"></div>
+                            <div class="w-6 sm:w-8 h-1 bg-slate-400 rounded"></div>
                             <span class="text-slate-600 dark:text-slate-300">Apoio Simples</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <div class="w-6 h-4 bg-gradient-to-b from-slate-700 to-slate-500 rounded-sm"></div>
+                            <div class="w-5 sm:w-6 h-3 sm:h-4 bg-gradient-to-b from-slate-700 to-slate-500 rounded-sm"></div>
                             <span class="text-slate-600 dark:text-slate-300">Engaste</span>
                         </div>
                     </div>
@@ -487,19 +500,19 @@
 
                 <!-- Resultados do Cálculo -->
                 <div id="resultados">
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-700 dark:to-slate-600 rounded-2xl p-8 md:p-12 text-center animate-fade-in">
-                        <div class="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                            <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-700 dark:to-slate-600 rounded-2xl p-6 sm:p-8 md:p-12 text-center animate-fade-in">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg">
+                            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl md:text-2xl font-bold text-slate-700 dark:text-slate-200 mb-2">Pronto para Calcular</h3>
-                        <p class="text-slate-500 dark:text-slate-400">Configure os parâmetros ao lado e clique em "Calcular Laje"</p>
-                        <div class="mt-6 flex flex-wrap justify-center gap-3">
-                            <span class="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-xs text-slate-600 dark:text-slate-300 shadow">✓ Momentos fletores</span>
-                            <span class="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-xs text-slate-600 dark:text-slate-300 shadow">✓ Armaduras</span>
-                            <span class="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-xs text-slate-600 dark:text-slate-300 shadow">✓ Verificações</span>
-                            <span class="px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-xs text-slate-600 dark:text-slate-300 shadow">✓ Quantitativos</span>
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-700 dark:text-slate-200 mb-2">Pronto para Calcular</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Configure os parâmetros ao lado e clique em "Calcular Laje"</p>
+                        <div class="mt-4 sm:mt-6 flex flex-wrap justify-center gap-2 sm:gap-3">
+                            <span class="px-2.5 sm:px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 shadow">✓ Momentos fletores</span>
+                            <span class="px-2.5 sm:px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 shadow">✓ Armaduras</span>
+                            <span class="px-2.5 sm:px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 shadow">✓ Verificações</span>
+                            <span class="px-2.5 sm:px-3 py-1 bg-white dark:bg-slate-800 rounded-full text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 shadow">✓ Quantitativos</span>
                         </div>
                     </div>
                 </div>
@@ -907,91 +920,91 @@
             // Render results
             document.getElementById('resultados').innerHTML = `
                 <!-- Suite Action Bar -->
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-md no-print">
-                    <div class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-md no-print">
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                         <span class="text-blue-500">🛠️</span> Ações da Suíte Integrada
                     </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <button type="button" onclick="abrirNoCadCloneLaje()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+                    <div class="grid grid-cols-1 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
+                        <button type="button" onclick="abrirNoCadCloneLaje()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2.5 sm:py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
                             <span>📐 Abrir no CADClone</span>
                         </button>
-                        <button type="button" onclick="gerarMemorialLaje()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
+                        <button type="button" onclick="gerarMemorialLaje()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2.5 sm:py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs shadow-md transition-all cursor-pointer">
                             <span>📄 Gerar Memorial ABNT</span>
                         </button>
-                        <button type="button" onclick="baixarDxfLaje()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium text-xs transition-all cursor-pointer" title="Baixar arquivo DXF">
+                        <button type="button" onclick="baixarDxfLaje()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium text-xs transition-all cursor-pointer" title="Baixar arquivo DXF">
                             <span>💾 Baixar .DXF</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Status Banner -->
-                <div class="animate-slide-up ${todasOk ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-amber-500 to-orange-500'} rounded-2xl p-6 text-white mb-6">
+                <div class="animate-slide-up ${todasOk ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-amber-500 to-orange-500'} rounded-2xl p-4 sm:p-6 text-white mb-6">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
                                 ${todasOk ? 
-                                    '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' :
-                                    '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>'
+                                    '<svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' :
+                                    '<svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>'
                                 }
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold">${todasOk ? 'Dimensionamento OK!' : 'Verificar Dimensionamento'}</h3>
-                                <p class="text-white/80 text-sm">Laje ${tipoLaje} ${lx.toFixed(2)} × ${ly.toFixed(2)} m | Tipo ${condicaoApoio}</p>
+                                <h3 class="text-lg sm:text-xl font-bold">${todasOk ? 'Dimensionamento OK!' : 'Verificar Dimensionamento'}</h3>
+                                <p class="text-white/80 text-xs sm:text-sm">Laje ${tipoLaje} ${lx.toFixed(2)} × ${ly.toFixed(2)} m | Tipo ${condicaoApoio}</p>
                             </div>
                         </div>
-                        <div class="text-right hidden md:block">
-                            <div class="text-3xl font-bold">${AsX.toFixed(2)}</div>
-                            <div class="text-sm text-white/80">cm²/m (As,x)</div>
+                        <div class="text-right hidden sm:block">
+                            <div class="text-2xl sm:text-3xl font-bold">${AsX.toFixed(2)}</div>
+                            <div class="text-xs sm:text-sm text-white/80">cm²/m (As,x)</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Quick Summary Cards -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 card-shadow animate-fade-in" style="animation-delay: 0.1s">
-                        <div class="text-sm text-slate-500 dark:text-slate-400">Momento Mx</div>
-                        <div class="text-2xl font-bold text-blue-600">${mx.toFixed(2)}</div>
-                        <div class="text-xs text-slate-400">kN.m/m</div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 mb-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-3 sm:p-4 card-shadow animate-fade-in" style="animation-delay: 0.1s">
+                        <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Momento Mx</div>
+                        <div class="text-xl sm:text-2xl font-bold text-blue-600">${mx.toFixed(2)}</div>
+                        <div class="text-[10px] sm:text-xs text-slate-400">kN.m/m</div>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 card-shadow animate-fade-in" style="animation-delay: 0.2s">
-                        <div class="text-sm text-slate-500 dark:text-slate-400">Momento My</div>
-                        <div class="text-2xl font-bold text-purple-600">${my.toFixed(2)}</div>
-                        <div class="text-xs text-slate-400">kN.m/m</div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-3 sm:p-4 card-shadow animate-fade-in" style="animation-delay: 0.2s">
+                        <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Momento My</div>
+                        <div class="text-xl sm:text-2xl font-bold text-purple-600">${my.toFixed(2)}</div>
+                        <div class="text-[10px] sm:text-xs text-slate-400">kN.m/m</div>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 card-shadow animate-fade-in" style="animation-delay: 0.3s">
-                        <div class="text-sm text-slate-500 dark:text-slate-400">Armadura As,x</div>
-                        <div class="text-2xl font-bold text-green-600">${AsX.toFixed(2)}</div>
-                        <div class="text-xs text-slate-400">cm²/m</div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-3 sm:p-4 card-shadow animate-fade-in" style="animation-delay: 0.3s">
+                        <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Armadura As,x</div>
+                        <div class="text-xl sm:text-2xl font-bold text-green-600">${AsX.toFixed(2)}</div>
+                        <div class="text-[10px] sm:text-xs text-slate-400">cm²/m</div>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 card-shadow animate-fade-in" style="animation-delay: 0.4s">
-                        <div class="text-sm text-slate-500 dark:text-slate-400">Armadura As,y</div>
-                        <div class="text-2xl font-bold text-emerald-600">${AsY.toFixed(2)}</div>
-                        <div class="text-xs text-slate-400">cm²/m</div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-3 sm:p-4 card-shadow animate-fade-in" style="animation-delay: 0.4s">
+                        <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Armadura As,y</div>
+                        <div class="text-xl sm:text-2xl font-bold text-emerald-600">${AsY.toFixed(2)}</div>
+                        <div class="text-[10px] sm:text-xs text-slate-400">cm²/m</div>
                     </div>
                 </div>
 
                 <!-- Detailed Results -->
-                <div class="grid md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <!-- Cargas -->
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 animate-fade-in">
-                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-                            <span class="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center text-orange-600 dark:text-orange-400">⚖️</span>
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-4 sm:p-6 animate-fade-in">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                            <span class="w-7 h-7 sm:w-8 sm:h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center text-orange-600 dark:text-orange-400 text-sm">⚖️</span>
                             Carregamentos
                         </h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between py-2 border-b border-slate-100 dark:border-slate-700">
+                        <div class="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
+                            <div class="flex justify-between py-1.5 sm:py-2 border-b border-slate-100 dark:border-slate-700">
                                 <span class="text-slate-600 dark:text-slate-300">Peso próprio (g₀)</span>
                                 <span class="font-semibold text-slate-800 dark:text-slate-200">${g0.toFixed(2)} kN/m²</span>
                             </div>
-                            <div class="flex justify-between py-2 border-b border-slate-100 dark:border-slate-700">
+                            <div class="flex justify-between py-1.5 sm:py-2 border-b border-slate-100 dark:border-slate-700">
                                 <span class="text-slate-600 dark:text-slate-300">Carga permanente</span>
                                 <span class="font-semibold text-slate-800 dark:text-slate-200">${gPermanente.toFixed(2)} kN/m²</span>
                             </div>
-                            <div class="flex justify-between py-2 border-b border-slate-100 dark:border-slate-700">
+                            <div class="flex justify-between py-1.5 sm:py-2 border-b border-slate-100 dark:border-slate-700">
                                 <span class="text-slate-600 dark:text-slate-300">Carga acidental</span>
                                 <span class="font-semibold text-slate-800 dark:text-slate-200">${qAcidental.toFixed(2)} kN/m²</span>
                             </div>
-                            <div class="flex justify-between py-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg px-3 -mx-3">
+                            <div class="flex justify-between py-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg px-2.5 sm:px-3">
                                 <span class="font-semibold text-blue-700 dark:text-blue-300">Carga de cálculo (p<sub>d</sub>)</span>
                                 <span class="font-bold text-blue-700 dark:text-blue-300">${pd.toFixed(2)} kN/m²</span>
                             </div>
@@ -999,86 +1012,88 @@
                     </div>
 
                     <!-- Verificações -->
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 animate-fade-in">
-                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-                            <span class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center text-green-600 dark:text-green-400">✓</span>
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-4 sm:p-6 animate-fade-in">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                            <span class="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center text-green-600 dark:text-green-400 text-sm">✓</span>
                             Verificações NBR 6118
                         </h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between py-2">
+                        <div class="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
+                            <div class="flex items-center justify-between py-1.5 sm:py-2">
                                 <span class="text-slate-600 dark:text-slate-300">Espessura mínima (h ≥ ${hMin}cm)</span>
-                                <span class="${verif.espessura ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} px-3 py-1 rounded-full text-sm font-medium">
+                                <span class="${verif.espessura ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-medium">
                                     ${verif.espessura ? '✓ OK' : '✗ Falha'}
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between py-2">
+                            <div class="flex items-center justify-between py-1.5 sm:py-2">
                                 <span class="text-slate-600 dark:text-slate-300">Flecha (f ≤ L/250)</span>
-                                <span class="${verif.flecha ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} px-3 py-1 rounded-full text-sm font-medium">
+                                <span class="${verif.flecha ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-medium">
                                     ${verif.flecha ? '✓ OK' : '✗ Falha'}
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between py-2">
+                            <div class="flex items-center justify-between py-1.5 sm:py-2">
                                 <span class="text-slate-600 dark:text-slate-300">Dimensionamento flexão</span>
-                                <span class="${verif.armaduraX && verif.armaduraY ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} px-3 py-1 rounded-full text-sm font-medium">
+                                <span class="${verif.armaduraX && verif.armaduraY ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-medium">
                                     ${verif.armaduraX && verif.armaduraY ? '✓ OK' : '✗ Falha'}
                                 </span>
                             </div>
-                            <div class="mt-4 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
-                                <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Utilização da flecha</div>
-                                <div class="h-3 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                            <div class="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                                <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mb-1">Utilização da flecha</div>
+                                <div class="h-2.5 sm:h-3 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
                                     <div class="h-full progress-bar ${flechaTotal/flechaLimite > 1 ? 'danger' : flechaTotal/flechaLimite > 0.8 ? 'warning' : ''}" style="width: ${Math.min(flechaTotal/flechaLimite*100, 100)}%"></div>
                                 </div>
-                                <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">${((flechaTotal/flechaLimite)*100).toFixed(1)}% (${flechaTotal.toFixed(2)} / ${flechaLimite.toFixed(2)} mm)</div>
+                                <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">${((flechaTotal/flechaLimite)*100).toFixed(1)}% (${flechaTotal.toFixed(2)} / ${flechaLimite.toFixed(2)} mm)</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Armaduras -->
-                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 mt-6 animate-fade-in">
-                    <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400">🔩</span>
-                        Armaduras Calculadas
-                        <span class="ml-auto text-xs px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 rounded-full">As,min = ${AsMin.toFixed(2)} cm²/m</span>
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-4 sm:p-6 mt-6 animate-fade-in">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3 sm:mb-4">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 text-sm sm:text-base">
+                            <span class="w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 text-sm">🔩</span>
+                            Armaduras Calculadas
+                        </h3>
+                        <span class="text-[11px] sm:text-xs px-2.5 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 rounded-full font-medium">As,min = ${AsMin.toFixed(2)} cm²/m</span>
+                    </div>
+                    <div class="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                        <table class="w-full min-w-[480px] sm:min-w-full text-xs sm:text-sm">
                             <thead>
                                 <tr class="bg-slate-50 dark:bg-slate-700">
-                                    <th class="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-200 rounded-l-lg">Armadura</th>
-                                    <th class="px-4 py-3 text-center font-semibold text-slate-700 dark:text-slate-200">Calculado</th>
-                                    <th class="px-4 py-3 text-center font-semibold text-slate-700 dark:text-slate-200">Adotado</th>
-                                    <th class="px-4 py-3 text-center font-semibold text-slate-700 dark:text-slate-200 rounded-r-lg">Detalhamento</th>
+                                    <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left font-semibold text-slate-700 dark:text-slate-200 rounded-l-lg">Armadura</th>
+                                    <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-center font-semibold text-slate-700 dark:text-slate-200">Calculado</th>
+                                    <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-center font-semibold text-slate-700 dark:text-slate-200">Adotado</th>
+                                    <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-center font-semibold text-slate-700 dark:text-slate-200 rounded-r-lg">Detalhamento</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                                 <tr>
-                                    <td class="px-4 py-4 font-medium text-slate-800 dark:text-slate-200">As,x <span class="text-blue-500">(positiva)</span></td>
-                                    <td class="px-4 py-4 text-center text-slate-600 dark:text-slate-300">${armX.As.toFixed(2)} cm²/m</td>
-                                    <td class="px-4 py-4 text-center font-bold text-blue-600">${AsX.toFixed(2)} cm²/m</td>
-                                    <td class="px-4 py-4 text-center">
-                                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full font-medium">
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 font-medium text-slate-800 dark:text-slate-200">As,x <span class="text-blue-500">(positiva)</span></td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center text-slate-600 dark:text-slate-300">${armX.As.toFixed(2)} cm²/m</td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center font-bold text-blue-600">${AsX.toFixed(2)} cm²/m</td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center">
+                                        <span class="px-2.5 sm:px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full font-medium text-xs">
                                             φ${sugX.phi} c/${sugX.espacamento}
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="px-4 py-4 font-medium text-slate-800 dark:text-slate-200">As,y <span class="text-purple-500">(positiva)</span></td>
-                                    <td class="px-4 py-4 text-center text-slate-600 dark:text-slate-300">${armY.As.toFixed(2)} cm²/m</td>
-                                    <td class="px-4 py-4 text-center font-bold text-purple-600">${AsY.toFixed(2)} cm²/m</td>
-                                    <td class="px-4 py-4 text-center">
-                                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full font-medium">
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 font-medium text-slate-800 dark:text-slate-200">As,y <span class="text-purple-500">(positiva)</span></td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center text-slate-600 dark:text-slate-300">${armY.As.toFixed(2)} cm²/m</td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center font-bold text-purple-600">${AsY.toFixed(2)} cm²/m</td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center">
+                                        <span class="px-2.5 sm:px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full font-medium text-xs">
                                             φ${sugY.phi} c/${sugY.espacamento}
                                         </span>
                                     </td>
                                 </tr>
                                 ${AsXn > 0 ? `
                                 <tr class="bg-red-50/50 dark:bg-red-900/20">
-                                    <td class="px-4 py-4 font-medium text-slate-800 dark:text-slate-200">As',x <span class="text-red-500">(negativa)</span></td>
-                                    <td class="px-4 py-4 text-center text-slate-600 dark:text-slate-300">${armXn.As.toFixed(2)} cm²/m</td>
-                                    <td class="px-4 py-4 text-center font-bold text-red-600">${AsXn.toFixed(2)} cm²/m</td>
-                                    <td class="px-4 py-4 text-center">
-                                        <span class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full font-medium">
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 font-medium text-slate-800 dark:text-slate-200">As',x <span class="text-red-500">(negativa)</span></td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center text-slate-600 dark:text-slate-300">${armXn.As.toFixed(2)} cm²/m</td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center font-bold text-red-600">${AsXn.toFixed(2)} cm²/m</td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center">
+                                        <span class="px-2.5 sm:px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full font-medium text-xs">
                                             φ${sugXn.phi} c/${sugXn.espacamento}
                                         </span>
                                     </td>
@@ -1086,11 +1101,11 @@
                                 ` : ''}
                                 ${AsYn > 0 ? `
                                 <tr class="bg-red-50/50 dark:bg-red-900/20">
-                                    <td class="px-4 py-4 font-medium text-slate-800 dark:text-slate-200">As',y <span class="text-red-500">(negativa)</span></td>
-                                    <td class="px-4 py-4 text-center text-slate-600 dark:text-slate-300">${armYn.As.toFixed(2)} cm²/m</td>
-                                    <td class="px-4 py-4 text-center font-bold text-red-600">${AsYn.toFixed(2)} cm²/m</td>
-                                    <td class="px-4 py-4 text-center">
-                                        <span class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full font-medium">
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 font-medium text-slate-800 dark:text-slate-200">As',y <span class="text-red-500">(negativa)</span></td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center text-slate-600 dark:text-slate-300">${armYn.As.toFixed(2)} cm²/m</td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center font-bold text-red-600">${AsYn.toFixed(2)} cm²/m</td>
+                                    <td class="px-3 sm:px-4 py-3 sm:py-4 text-center">
+                                        <span class="px-2.5 sm:px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full font-medium text-xs">
                                             φ${sugYn.phi} c/${sugYn.espacamento}
                                         </span>
                                     </td>
@@ -1102,117 +1117,117 @@
                 </div>
 
                 <!-- Quantitativos -->
-                <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 mt-6 text-white animate-fade-in shadow-lg">
-                    <h3 class="font-bold mb-4 flex items-center gap-2 text-lg">
-                        <span class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">📦</span>
+                <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-4 sm:p-6 mt-6 text-white animate-fade-in shadow-lg">
+                    <h3 class="font-bold mb-3 sm:mb-4 flex items-center gap-2 text-base sm:text-lg">
+                        <span class="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center text-sm sm:text-base">📦</span>
                         Quantitativos Estimados
                     </h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur border border-white/10">
-                            <div class="text-white/70 text-sm">Área da Laje</div>
-                            <div class="text-2xl font-bold">${areaLaje.toFixed(2)}</div>
-                            <div class="text-white/60 text-xs">m²</div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+                        <div class="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur border border-white/10">
+                            <div class="text-white/70 text-xs sm:text-sm">Área da Laje</div>
+                            <div class="text-xl sm:text-2xl font-bold">${areaLaje.toFixed(2)}</div>
+                            <div class="text-white/60 text-[10px] sm:text-xs">m²</div>
                         </div>
-                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur border border-white/10">
-                            <div class="text-white/70 text-sm">Volume Concreto</div>
-                            <div class="text-2xl font-bold">${volumeConcreto.toFixed(2)}</div>
-                            <div class="text-white/60 text-xs">m³</div>
+                        <div class="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur border border-white/10">
+                            <div class="text-white/70 text-xs sm:text-sm">Volume Concreto</div>
+                            <div class="text-xl sm:text-2xl font-bold">${volumeConcreto.toFixed(2)}</div>
+                            <div class="text-white/60 text-[10px] sm:text-xs">m³</div>
                         </div>
-                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur border border-white/10">
-                            <div class="text-white/70 text-sm">Peso Aço (est.)</div>
-                            <div class="text-2xl font-bold">${(pesoAcoTotal/1000).toFixed(1)}</div>
-                            <div class="text-white/60 text-xs">kg</div>
+                        <div class="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur border border-white/10">
+                            <div class="text-white/70 text-xs sm:text-sm">Peso Aço (est.)</div>
+                            <div class="text-xl sm:text-2xl font-bold">${(pesoAcoTotal/1000).toFixed(1)}</div>
+                            <div class="text-white/60 text-[10px] sm:text-xs">kg</div>
                         </div>
-                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur border border-white/10">
-                            <div class="text-white/70 text-sm">Taxa de Aço</div>
-                            <div class="text-2xl font-bold">${((pesoAcoTotal/1000)/(volumeConcreto*1000)*1000).toFixed(1)}</div>
-                            <div class="text-white/60 text-xs">kg/m³</div>
+                        <div class="bg-white/10 rounded-xl p-3 sm:p-4 backdrop-blur border border-white/10">
+                            <div class="text-white/70 text-xs sm:text-sm">Taxa de Aço</div>
+                            <div class="text-xl sm:text-2xl font-bold">${((pesoAcoTotal/1000)/(volumeConcreto*1000)*1000).toFixed(1)}</div>
+                            <div class="text-white/60 text-[10px] sm:text-xs">kg/m³</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Orçamento Estimado -->
-                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 mt-6 animate-fade-in border-2 border-emerald-500/20">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                             <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
-                                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-4 sm:p-6 mt-6 animate-fade-in border-2 border-emerald-500/20">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4 sm:mb-6">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                             <div class="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                              </div>
-                             Orçamento Preliminar 2025
+                             Orçamento Preliminar
                         </h3>
-                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold uppercase tracking-wider">Referência SINAPI</span>
+                        <span class="px-2.5 py-0.5 sm:px-3 sm:py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider">Referência SINAPI</span>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
-                            <div class="text-slate-500 dark:text-slate-400 text-xs uppercase font-bold mb-1">Materiais</div>
-                            <div class="text-2xl font-bold text-slate-800 dark:text-slate-100">R$ ${custoMaterial.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
+                        <div class="p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
+                            <div class="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs uppercase font-bold mb-1">Materiais</div>
+                            <div class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">R$ ${custoMaterial.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
                         </div>
-                        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
-                            <div class="text-slate-500 dark:text-slate-400 text-xs uppercase font-bold mb-1">Mão de Obra</div>
-                            <div class="text-2xl font-bold text-slate-800 dark:text-slate-100">R$ ${custoMaoObraExec.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                        <div class="p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
+                            <div class="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs uppercase font-bold mb-1">Mão de Obra</div>
+                            <div class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">R$ ${custoMaoObraExec.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
                         </div>
-                        <div class="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
-                            <div class="text-emerald-600 dark:text-emerald-400 text-xs uppercase font-bold mb-1">Custo Total</div>
-                            <div class="text-2xl font-extrabold text-emerald-700 dark:text-emerald-300">R$ ${custoTotalEstimado.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                        <div class="p-3.5 sm:p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
+                            <div class="text-emerald-600 dark:text-emerald-400 text-[10px] sm:text-xs uppercase font-bold mb-1">Custo Total</div>
+                            <div class="text-xl sm:text-2xl font-extrabold text-emerald-700 dark:text-emerald-300">R$ ${custoTotalEstimado.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
                         </div>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-4 text-center italic">* Valores baseados em médias nacionais. Não substituem cotações locais reais.</p>
+                    <p class="text-[10px] text-slate-400 mt-3 text-center italic">* Valores baseados em médias nacionais. Não substituem cotações locais reais.</p>
                 </div>
 
                 <!-- Dados Técnicos -->
-                <div class="grid md:grid-cols-2 gap-6 mt-6">
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 animate-fade-in">
-                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4">📐 Geometria</h3>
-                        <div class="grid grid-cols-2 gap-3 text-sm">
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">Lx (menor vão)</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-4 sm:p-6 animate-fade-in">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-3 sm:mb-4 text-sm sm:text-base">📐 Geometria</h3>
+                        <div class="grid grid-cols-2 gap-2.5 sm:gap-3 text-xs sm:text-sm">
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">Lx (menor vão)</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">${lx.toFixed(2)} m</div>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">Ly (maior vão)</div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">Ly (maior vão)</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">${ly.toFixed(2)} m</div>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">Espessura (h)</div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">Espessura (h)</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">${(h*100).toFixed(1)} cm</div>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">Altura útil (d)</div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">Altura útil (d)</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">${(d*100).toFixed(2)} cm</div>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">Relação λ</div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">Relação λ</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">${lambda.toFixed(3)}</div>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">Cobrimento</div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">Cobrimento</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">${(cobrimento*100).toFixed(1)} cm</div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 animate-fade-in">
-                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4">🧱 Materiais</h3>
-                        <div class="grid grid-cols-2 gap-3 text-sm">
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">Concreto</div>
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-4 sm:p-6 animate-fade-in">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-3 sm:mb-4 text-sm sm:text-base">🧱 Materiais</h3>
+                        <div class="grid grid-cols-2 gap-2.5 sm:gap-3 text-xs sm:text-sm">
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">Concreto</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">C${fck}</div>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">fcd</div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">fcd</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">${fcd.toFixed(2)} MPa</div>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">Aço</div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">Aço</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">CA-${fyk === 500 ? '50' : '60'}</div>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3">
-                                <div class="text-slate-500 dark:text-slate-400">fyd</div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">fyd</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">${fyd.toFixed(2)} MPa</div>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 col-span-2">
-                                <div class="text-slate-500 dark:text-slate-400">Ecs (módulo secante)</div>
+                            <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-2.5 sm:p-3 col-span-2">
+                                <div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs">Ecs (módulo secante)</div>
                                 <div class="font-bold text-slate-800 dark:text-slate-200">${(Ecs/1000).toFixed(1)} GPa</div>
                             </div>
                         </div>
@@ -1220,14 +1235,14 @@
                 </div>
 
                 <!-- Notas -->
-                <div class="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-6 mt-6 animate-fade-in">
-                    <h3 class="font-bold text-amber-800 dark:text-amber-200 mb-3 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 sm:p-6 mt-6 animate-fade-in">
+                    <h3 class="font-bold text-amber-800 dark:text-amber-200 mb-2.5 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         Observações Importantes
                     </h3>
-                    <ul class="text-sm text-amber-900 dark:text-amber-100 space-y-2">
+                    <ul class="text-xs sm:text-sm text-amber-900 dark:text-amber-100 space-y-1.5 sm:space-y-2">
                         <li>• Cálculo baseado na NBR 6118:2014 e tabelas de Marcus para lajes retangulares</li>
                         <li>• Armadura negativa: estender a 0,25 do vão a partir do apoio engastado</li>
                         <li>• Espaçamento máximo: s ≤ min(2h, 20cm) para armadura principal</li>
@@ -1236,11 +1251,11 @@
                     </ul>
                 </div>
 
-                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-6 mt-6 animate-fade-in">
-                    <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl card-shadow p-4 sm:p-6 mt-6 animate-fade-in">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
                         <span class="text-cyan-400">📝</span> Memorial de Cálculo
                     </h3>
-                    <pre class="font-mono text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">MEMORIAL DESCRITIVO DE CÁLCULO DE LAJE MACIÇA
+                    <pre class="font-mono text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 p-3 sm:p-4 rounded-xl overflow-x-auto whitespace-pre-wrap break-all max-w-full">MEMORIAL DESCRITIVO DE CÁLCULO DE LAJE MACIÇA
 Data: ${new Date().toLocaleDateString('pt-BR')}
 
 1. PARÂMETROS GERAIS
