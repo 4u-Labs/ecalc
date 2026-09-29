@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>Acabamentos e Revestimentos | Ferramentas de Engenharia</title>
+  <title>Acabamentos e Revestimentos | Suíte de Engenharia eCalc</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
             dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
-            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', pink: '#ff00aa' }
+            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', pink: '#ff00aa', yellow: '#ffea00', orange: '#ff8800' }
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
@@ -42,11 +42,11 @@
       position: absolute;
       inset: -2px;
       border-radius: 18px;
-      background: linear-gradient(135deg, #ff00aa, #8b1bf7, #ff00aa);
+      background: linear-gradient(135deg, #ff00aa, #8b1bf7, #00ffff);
       background-size: 300% 300%;
       animation: gradientMove 8s ease infinite;
       z-index: -1;
-      opacity: 0.6;
+      opacity: 0.5;
     }
     @keyframes gradientMove {
       0%, 100% { background-position: 0% 50%; }
@@ -60,319 +60,2282 @@
     .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
     
     .form-input {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.25s ease;
     }
     .form-input:focus {
       border-color: #ff00aa;
-      box-shadow: 0 0 15px rgba(255, 0, 170, 0.2);
+      box-shadow: 0 0 15px rgba(255, 0, 170, 0.25);
       outline: none;
+      background: rgba(255, 255, 255, 0.07);
     }
     .btn-primary {
       background: linear-gradient(135deg, #ff00aa 0%, #8b1bf7 100%);
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
     }
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 30px rgba(255, 0, 170, 0.4);
     }
     .card-hover:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       border-color: #ff00aa;
     }
+    .hidden-section { display: none !important; }
     
-    .hidden-section { display: none; }
+    /* Preset button pills */
+    .preset-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.2s ease;
+    }
+    .preset-btn:hover {
+      background: rgba(255, 0, 170, 0.15);
+      border-color: #ff00aa;
+      color: #ff00aa;
+    }
+    .preset-btn.active {
+      background: linear-gradient(135deg, rgba(255, 0, 170, 0.3), rgba(139, 27, 247, 0.3));
+      border-color: #ff00aa;
+      color: #ffffff;
+      font-weight: 600;
+    }
+    
+    /* Tab buttons */
+    .mod-tab {
+      transition: all 0.2s ease;
+    }
+    .mod-tab.active {
+      background: linear-gradient(135deg, #ff00aa 0%, #8b1bf7 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 0, 170, 0.35);
+    }
   </style>
 </head>
-<body class="font-sans text-gray-100">
+<body class="font-sans text-gray-100 pb-16">
+  <!-- Top Navigation Header -->
   <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-pink to-neon-purple flex items-center justify-center font-bold text-dark-900 text-xl">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-pink to-neon-purple flex items-center justify-center font-bold text-dark-900 text-xl shadow-lg shadow-pink-500/20">
           🎨
         </div>
         <div>
-          <h1 class="text-lg font-semibold text-white">Acabamentos</h1>
-          <p class="text-xs text-gray-500">Pintura, Pisos, Rejunte e Drywall</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold text-white">Acabamentos & Revestimentos</h1>
+            <span class="bg-pink-500/20 text-neon-pink border border-pink-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">ABNT NBR</span>
+          </div>
+          <p class="text-xs text-gray-400">Pintura • Pisos • Drywall • Chapisco & Emboço • Contrapiso • Impermeabilização</p>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      <div class="flex items-center gap-2">
+        <button id="btnVerObra" onclick="toggleModalObra()" class="px-3 py-1.5 rounded-xl bg-dark-700 hover:bg-dark-600 border border-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5 transition">
+          <span>📋</span> <span class="hidden sm:inline">Ambientes da Obra</span> (<span id="contAmbientes" class="text-neon-pink font-bold">0</span>)
+        </button>
+        <button id="btnReset" class="p-2 rounded-xl bg-dark-700 hover:bg-dark-600 border border-white/10 text-gray-400 hover:text-white transition-colors" title="Restaurar padrão">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <div class="grid lg:grid-cols-3 gap-8">
-      <div class="lg:col-span-1 space-y-6">
-        <div class="gradient-border p-6">
-          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <span class="text-neon-pink">●</span> Tipo de Serviço
-          </h2>
-          <div class="space-y-4">
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <!-- ECALC SUITE PRO BAR (Item 3) -->
+    <div class="bg-gradient-to-r from-slate-900 via-dark-800 to-slate-900 border border-pink-500/30 rounded-2xl p-4 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-slate-900 border border-pink-500/40 flex items-center justify-center p-1.5 shadow-lg shadow-pink-500/20 shrink-0">
+          <img src="assets/icon-ecalc-64.png" alt="ECALC" class="w-full h-full object-contain">
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-wider text-pink-400 font-bold">ECALC SUITE PRO</div>
+          <div class="text-sm font-semibold text-white">Engenharia de Acabamentos — NBR 13749, NBR 13753, NBR 15758, NBR 9575</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        <button type="button" onclick="gerarMemorialAcabamentos()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-xs shadow-md shadow-pink-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>📄 Gerar Memorial ABNT</span>
+        </button>
+        <button type="button" onclick="exportarOfficeClone()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>📊 Abrir no OfficeClone</span>
+        </button>
+        <button type="button" onclick="abrirNoCadCloneAcabamentos()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>📐 Abrir no CADClone</span>
+        </button>
+        <button type="button" onclick="baixarDxfAcabamentos()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>💾 Baixar .DXF</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Módulo Tabs: 8 Módulos Técnicos (Item 1) -->
+    <div class="bg-dark-800/70 p-2 rounded-2xl border border-white/5 overflow-x-auto">
+      <div class="flex items-center gap-1.5 min-w-max">
+        <button onclick="trocarModulo('pintura')" id="tab-pintura" class="mod-tab active px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-gray-300">
+          <span>🎨</span> 1. Pintura & Massa
+        </button>
+        <button onclick="trocarModulo('piso')" id="tab-piso" class="mod-tab px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-gray-300">
+          <span>🔲</span> 2. Pisos & Porcelanatos
+        </button>
+        <button onclick="trocarModulo('drywall')" id="tab-drywall" class="mod-tab px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-gray-300">
+          <span>🏗️</span> 3. Drywall Paredes
+        </button>
+        <button onclick="trocarModulo('chapisco')" id="tab-chapisco" class="mod-tab px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-gray-300">
+          <span>🧱</span> 4. Chapisco & Emboço
+        </button>
+        <button onclick="trocarModulo('contrapiso')" id="tab-contrapiso" class="mod-tab px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-gray-300">
+          <span>📐</span> 5. Contrapiso
+        </button>
+        <button onclick="trocarModulo('impermeabilizacao')" id="tab-impermeabilizacao" class="mod-tab px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-gray-300">
+          <span>🛡️</span> 6. Impermeabilização
+        </button>
+        <button onclick="trocarModulo('rodapes')" id="tab-rodapes" class="mod-tab px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-gray-300">
+          <span>📏</span> 7. Rodapés & Soleiras
+        </button>
+        <button onclick="trocarModulo('forro')" id="tab-forro" class="mod-tab px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-gray-300">
+          <span>☁️</span> 8. Forro de Gesso
+        </button>
+      </div>
+    </div>
+
+    <!-- Layout Grid: Formulário + Resultados/Diagramas -->
+    <div class="grid lg:grid-cols-12 gap-8 items-start">
+      <!-- Coluna da Esquerda: Formulários dos Módulos (5 cols) -->
+      <div class="lg:col-span-5 space-y-6">
+        <!-- Identificação do Ambiente (Item 6) -->
+        <div class="gradient-border p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="text-neon-pink">●</span> Identificação do Cômodo / Ambiente
+            </h3>
+            <span class="text-[10px] text-gray-400">Multi-Ambientes</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-sm text-gray-400 mb-2">Selecione o Módulo</label>
-              <select id="moduloSelecionado" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700 font-medium">
-                <option value="pintura">Pintura e Massa</option>
-                <option value="piso">Pisos e Porcelanatos (Argamassa/Rejunte)</option>
-                <option value="drywall">Parede de Drywall</option>
-              </select>
+              <label class="block text-xs text-gray-400 mb-1">Nome do Cômodo</label>
+              <input type="text" id="nomeAmbiente" value="Sala de Estar" class="form-input w-full px-3 py-2 rounded-xl text-sm text-white bg-dark-700">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Observação / Bloco</label>
+              <input type="text" id="obsAmbiente" value="Térreo / Apto 101" class="form-input w-full px-3 py-2 rounded-xl text-sm text-white bg-dark-700">
             </div>
           </div>
         </div>
 
-        <!-- Módulo Pintura -->
+        <!-- 1. Módulo Pintura e Massa (NBR 13245 / ABRAFATI) -->
         <div id="secPintura" class="gradient-border p-6 module-section">
-          <h2 class="text-lg font-semibold mb-4 text-white">Medidas (Pintura)</h2>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>🎨</span> Pintura & Massa (ABRAFATI)
+            </h2>
+            <span class="text-[10px] bg-pink-500/20 text-neon-pink px-2 py-0.5 rounded-full font-semibold border border-pink-500/30">NBR 13245</span>
+          </div>
+
           <div class="space-y-4">
-            <div><label class="block text-sm text-gray-400 mb-1">Área Bruta da Parede (m²)</label><input type="number" id="p_area" value="50" step="0.5" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
-            <div><label class="block text-sm text-gray-400 mb-1">Área de Vãos/Janelas (m²) - Desconto</label><input type="number" id="p_vaos" value="5" step="0.5" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+            <!-- Presets ABRAFATI (Item 5) -->
             <div>
-              <label class="block text-sm text-gray-400 mb-1">Demãos Desejadas</label>
-              <select id="p_demaos" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700">
-                <option value="1">1 Demão</option>
-                <option value="2" selected>2 Demãos</option>
-                <option value="3">3 Demãos</option>
-              </select>
+              <label class="block text-xs font-semibold text-gray-300 mb-2">⚡ Padrão de Tinta (Norma ABRAFATI)</label>
+              <div class="grid grid-cols-3 gap-1.5 text-xs">
+                <button type="button" onclick="setPresetTinta('economica', 7)" class="preset-btn py-1.5 px-2 rounded-lg text-center" id="btn-tinta-economica">
+                  <span class="block font-semibold">Econômica</span>
+                  <span class="text-[10px] text-gray-400">7 m²/L</span>
+                </button>
+                <button type="button" onclick="setPresetTinta('standard', 9)" class="preset-btn py-1.5 px-2 rounded-lg text-center active" id="btn-tinta-standard">
+                  <span class="block font-semibold">Standard</span>
+                  <span class="text-[10px] text-gray-400">9 m²/L</span>
+                </button>
+                <button type="button" onclick="setPresetTinta('premium', 11)" class="preset-btn py-1.5 px-2 rounded-lg text-center" id="btn-tinta-premium">
+                  <span class="block font-semibold">Premium</span>
+                  <span class="text-[10px] text-gray-400">11 m²/L</span>
+                </button>
+                <button type="button" onclick="setPresetTinta('esmalte', 12)" class="preset-btn py-1.5 px-2 rounded-lg text-center" id="btn-tinta-esmalte">
+                  <span class="block font-semibold">Esmalte</span>
+                  <span class="text-[10px] text-gray-400">12 m²/L</span>
+                </button>
+                <button type="button" onclick="setPresetTinta('epoxi', 8)" class="preset-btn py-1.5 px-2 rounded-lg text-center" id="btn-tinta-epoxi">
+                  <span class="block font-semibold">Epóxi</span>
+                  <span class="text-[10px] text-gray-400">8 m²/L</span>
+                </button>
+                <button type="button" onclick="setPresetTinta('selador', 6)" class="preset-btn py-1.5 px-2 rounded-lg text-center" id="btn-tinta-selador">
+                  <span class="block font-semibold">Selador</span>
+                  <span class="text-[10px] text-gray-400">6 m²/L</span>
+                </button>
+              </div>
             </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-1">Rendimento Médio Tinta (m²/L por demão)</label>
-              <input type="number" id="p_rend" value="10" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700" title="Ex: Tinta Acrílica Rende ~10m²/L">
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Área Bruta Paredes (m²)</label>
+                <input type="number" id="p_area" value="50" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Vãos/Janelas Desconto (m²)</label>
+                <input type="number" id="p_vaos" value="6" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Demãos Desejadas</label>
+                <select id="p_demaos" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm">
+                  <option value="1">1 Demão</option>
+                  <option value="2" selected>2 Demãos (Padrão)</option>
+                  <option value="3">3 Demãos</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Rendimento (m²/L/demão)</label>
+                <input type="number" id="p_rend" value="9" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Aplicação de Massa</label>
+                <select id="p_massa_tipo" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm">
+                  <option value="pva" selected>Massa Corrida PVA (Interna)</option>
+                  <option value="acrilica">Massa Acrílica (Externa/Molhada)</option>
+                  <option value="nenhuma">Não aplicar massa</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Consumo de Massa (kg/m²)</label>
+                <input type="number" id="p_massa_cons" value="1.2" step="0.1" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Módulo Piso -->
+        <!-- 2. Módulo Pisos e Porcelanatos (NBR 13753 / NBR 14081) -->
         <div id="secPiso" class="gradient-border p-6 module-section hidden-section">
-          <h2 class="text-lg font-semibold mb-4 text-white">Medidas (Piso Cerâmico)</h2>
-          <div class="space-y-4">
-            <div><label class="block text-sm text-gray-400 mb-1">Área do Chão (m²)</label><input type="number" id="pi_area" value="30" step="0.5" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
-            <div class="grid grid-cols-2 gap-2">
-              <div><label class="block text-sm text-gray-400 mb-1">Peça Comp. (cm)</label><input type="number" id="pi_l" value="60" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
-              <div><label class="block text-sm text-gray-400 mb-1">Peça Larg. (cm)</label><input type="number" id="pi_w" value="60" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
-            </div>
-            <div><label class="block text-sm text-gray-400 mb-1">Espessura do Rejunte (mm)</label><input type="number" id="pi_rejunte" value="2" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
-            <div><label class="block text-sm text-gray-400 mb-1">Perda / Recortes (%)</label><input type="number" id="pi_perda" value="10" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>🔲</span> Pisos & Porcelanatos
+            </h2>
+            <span class="text-[10px] bg-purple-500/20 text-neon-purple px-2 py-0.5 rounded-full font-semibold border border-purple-500/30">NBR 13753 / 14081</span>
           </div>
-        </div>
 
-        <!-- Módulo Drywall -->
-        <div id="secDrywall" class="gradient-border p-6 module-section hidden-section">
-          <h2 class="text-lg font-semibold mb-4 text-white">Medidas (Drywall)</h2>
           <div class="space-y-4">
-            <div><label class="block text-sm text-gray-400 mb-1">Largura da Parede (m)</label><input type="number" id="d_largura" value="4" step="0.1" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
-            <div><label class="block text-sm text-gray-400 mb-1">Altura / Pé-direito (m)</label><input type="number" id="d_altura" value="2.8" step="0.1" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700"></div>
+            <!-- Presets Formatos Comerciais (Item 5) -->
             <div>
-              <label class="block text-sm text-gray-400 mb-1">Tipo de Face</label>
-              <select id="d_faces" class="form-input w-full px-4 py-2 rounded-xl bg-dark-700">
-                <option value="2">Duas Faces (Parede Divisória)</option>
-                <option value="1">Uma Face (Revestimento Parede)</option>
-              </select>
+              <label class="block text-xs font-semibold text-gray-300 mb-2">⚡ Formatos Comerciais Rápidos (cm)</label>
+              <div class="grid grid-cols-4 gap-1.5 text-xs">
+                <button type="button" onclick="setPresetPiso(60, 60)" class="preset-btn py-1 px-1.5 rounded-lg text-center active" id="btn-piso-60-60">60x60</button>
+                <button type="button" onclick="setPresetPiso(80, 80)" class="preset-btn py-1 px-1.5 rounded-lg text-center" id="btn-piso-80-80">80x80</button>
+                <button type="button" onclick="setPresetPiso(90, 90)" class="preset-btn py-1 px-1.5 rounded-lg text-center" id="btn-piso-90-90">90x90</button>
+                <button type="button" onclick="setPresetPiso(60, 120)" class="preset-btn py-1 px-1.5 rounded-lg text-center" id="btn-piso-60-120">60x120</button>
+                <button type="button" onclick="setPresetPiso(20, 120)" class="preset-btn py-1 px-1.5 rounded-lg text-center" id="btn-piso-20-120">20x120</button>
+                <button type="button" onclick="setPresetPiso(45, 45)" class="preset-btn py-1 px-1.5 rounded-lg text-center" id="btn-piso-45-45">45x45</button>
+                <button type="button" onclick="setPresetPiso(30, 30)" class="preset-btn py-1 px-1.5 rounded-lg text-center" id="btn-piso-30-30">30x30</button>
+                <button type="button" onclick="setPresetPiso(20, 20)" class="preset-btn py-1 px-1.5 rounded-lg text-center" id="btn-piso-20-20">20x20</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Área Piso (m²)</label>
+                <input type="number" id="pi_area" value="30" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Comp. Peça (cm)</label>
+                <input type="number" id="pi_l" value="60" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700" onchange="verificarDuplaColagem()">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Larg. Peça (cm)</label>
+                <input type="number" id="pi_w" value="60" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700" onchange="verificarDuplaColagem()">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Argamassa Colante</label>
+                <select id="pi_argamassa_tipo" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm" onchange="verificarDuplaColagem()">
+                  <option value="AC1">AC-I (Interna comum)</option>
+                  <option value="AC2">AC-II (Externa/Molhada)</option>
+                  <option value="AC3" selected>AC-III (Grandes Formatos/Porcelanatos)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Junta de Rejunte (mm)</label>
+                <input type="number" id="pi_rejunte" value="2" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Tipo de Paginação</label>
+                <select id="pi_paginacao" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm" onchange="calcular()">
+                  <option value="reto" selected>Alinhado Reto (Contínuo)</option>
+                  <option value="amarrado">Amarrado / Transpassado (Tijolinho)</option>
+                  <option value="diagonal">Diagonal a 45°</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Margem p/ Perdas (%)</label>
+                <input type="number" id="pi_perda" value="10" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+            </div>
+
+            <div id="avisoDuplaColagem" class="p-2.5 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-xs text-yellow-300 flex items-center gap-2">
+              <span>⚠️</span> <span><b>Dupla Colagem Ativada:</b> Peça ≥ 60cm exige argamassa no contrapiso e no verso da peça (8 kg/m²).</span>
             </div>
           </div>
         </div>
 
-        <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 shadow-lg shadow-pink-500/30">
-          Gerar Quantitativos
+        <!-- 3. Módulo Paredes de Drywall (NBR 15758) -->
+        <div id="secDrywall" class="gradient-border p-6 module-section hidden-section">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>🏗️</span> Parede Drywall
+            </h2>
+            <span class="text-[10px] bg-cyan-500/20 text-neon-cyan px-2 py-0.5 rounded-full font-semibold border border-cyan-500/30">NBR 15758</span>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Preset Chapa Cor (Item 5) -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-2">⚡ Tipo de Chapa de Gesso (Cor/Norma)</label>
+              <div class="grid grid-cols-3 gap-1.5 text-xs">
+                <button type="button" onclick="setPresetDrywall('ST')" class="preset-btn py-1.5 px-2 rounded-lg text-center active" id="btn-drywall-st">
+                  <span class="block font-semibold">ST (Branca)</span>
+                  <span class="text-[10px] text-gray-400">Padrão / Seco</span>
+                </button>
+                <button type="button" onclick="setPresetDrywall('RU')" class="preset-btn py-1.5 px-2 rounded-lg text-center" id="btn-drywall-ru">
+                  <span class="block font-semibold">RU (Verde)</span>
+                  <span class="text-[10px] text-gray-400">Resist. Umidade</span>
+                </button>
+                <button type="button" onclick="setPresetDrywall('RF')" class="preset-btn py-1.5 px-2 rounded-lg text-center" id="btn-drywall-rf">
+                  <span class="block font-semibold">RF (Rosa)</span>
+                  <span class="text-[10px] text-gray-400">Corta-Fogo</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Comprimento Parede (m)</label>
+                <input type="number" id="d_largura" value="4.5" step="0.1" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Pé-direito / Altura (m)</label>
+                <input type="number" id="d_altura" value="2.8" step="0.1" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Chapeamento</label>
+                <select id="d_faces" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm">
+                  <option value="2" selected>2 Faces (Parede Divisória)</option>
+                  <option value="1">1 Face (Revestimento Parede)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Espaçamento Montantes</label>
+                <select id="d_espacamento" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm">
+                  <option value="600" selected>600 mm (Padrão)</option>
+                  <option value="400">400 mm (Cargas pesadas / Cerâmica)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5 flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold text-white">Isolamento Acústico (Lã de Vidro/Rocha)</div>
+                <div class="text-[10px] text-gray-400">Adicionar mantas no miolo da estrutura metálica</div>
+              </div>
+              <input type="checkbox" id="d_isolamento" class="w-5 h-5 accent-pink-500 rounded cursor-pointer" checked>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Módulo Chapisco, Emboço e Reboco (NBR 13749) (Item 1) -->
+        <div id="secChapisco" class="gradient-border p-6 module-section hidden-section">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>🧱</span> Chapisco, Emboço & Reboco
+            </h2>
+            <span class="text-[10px] bg-amber-500/20 text-neon-yellow px-2 py-0.5 rounded-full font-semibold border border-amber-500/30">NBR 13749</span>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-2">⚡ Tipo de Argamassa e Traço Normativo</label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="setPresetChapisco('chapisco', 1, 3, 5)" class="preset-btn py-1.5 px-2 rounded-lg text-left" id="btn-traco-chapisco">
+                  <span class="block font-bold">1. Chapisco (1:3)</span>
+                  <span class="text-[10px] text-gray-400">Espessura 5mm • Adesão</span>
+                </button>
+                <button type="button" onclick="setPresetChapisco('emboco_int', 1, 2, 8, 15)" class="preset-btn py-1.5 px-2 rounded-lg text-left active" id="btn-traco-emboco-int">
+                  <span class="block font-bold">2. Emboço Int. (1:2:8)</span>
+                  <span class="text-[10px] text-gray-400">Espessura 15mm • Cimento+Cal</span>
+                </button>
+                <button type="button" onclick="setPresetChapisco('emboco_ext', 1, 1, 6, 25)" class="preset-btn py-1.5 px-2 rounded-lg text-left" id="btn-traco-emboco-ext">
+                  <span class="block font-bold">3. Emboço Ext. (1:1:6)</span>
+                  <span class="text-[10px] text-gray-400">Espessura 25mm • Fachada</span>
+                </button>
+                <button type="button" onclick="setPresetChapisco('reboco', 0, 1, 2, 5)" class="preset-btn py-1.5 px-2 rounded-lg text-left" id="btn-traco-reboco">
+                  <span class="block font-bold">4. Reboco Fino (1:2)</span>
+                  <span class="text-[10px] text-gray-400">Espessura 5mm • Cal+Areia</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Área de Aplicação (m²)</label>
+                <input type="number" id="ch_area" value="60" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Espessura Camada (mm)</label>
+                <input type="number" id="ch_espessura" value="15" min="3" max="40" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block text-[11px] text-gray-400 mb-1">Traço Cimento</label>
+                <input type="number" id="ch_p_cim" value="1" min="0" step="0.5" class="form-input w-full px-2 py-1.5 rounded-lg text-center text-white bg-dark-700 text-xs">
+              </div>
+              <div>
+                <label class="block text-[11px] text-gray-400 mb-1">Traço Cal</label>
+                <input type="number" id="ch_p_cal" value="2" min="0" step="0.5" class="form-input w-full px-2 py-1.5 rounded-lg text-center text-white bg-dark-700 text-xs">
+              </div>
+              <div>
+                <label class="block text-[11px] text-gray-400 mb-1">Traço Areia</label>
+                <input type="number" id="ch_p_areia" value="8" min="1" step="0.5" class="form-input w-full px-2 py-1.5 rounded-lg text-center text-white bg-dark-700 text-xs">
+              </div>
+            </div>
+
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5 flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold text-white">Aditivo Impermeabilizante / Vedacit</div>
+                <div class="text-[10px] text-gray-400">Recomendado para paredes externas e baldrames</div>
+              </div>
+              <input type="checkbox" id="ch_aditivo" class="w-5 h-5 accent-pink-500 rounded cursor-pointer" checked>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Módulo Contrapiso e Regularização (NBR 13753) (Item 1) -->
+        <div id="secContrapiso" class="gradient-border p-6 module-section hidden-section">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>📐</span> Contrapiso & Regularização
+            </h2>
+            <span class="text-[10px] bg-green-500/20 text-neon-green px-2 py-0.5 rounded-full font-semibold border border-green-500/30">NBR 13753</span>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-2">⚡ Traço da Argamassa Farofa</label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="setPresetContrapiso('1:3', 380, 1.05)" class="preset-btn py-1.5 px-2 rounded-lg text-left" id="btn-cp-13">
+                  <span class="block font-bold">1:3 (Alta Resistência)</span>
+                  <span class="text-[10px] text-gray-400">Garagens, molhados e tráfego</span>
+                </button>
+                <button type="button" onclick="setPresetContrapiso('1:4', 300, 1.15)" class="preset-btn py-1.5 px-2 rounded-lg text-left active" id="btn-cp-14">
+                  <span class="block font-bold">1:4 (Residencial Padrão)</span>
+                  <span class="text-[10px] text-gray-400">Quartos, salas e lajes internas</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Área do Piso (m²)</label>
+                <input type="number" id="cp_area" value="40" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Espessura Média (cm)</label>
+                <input type="number" id="cp_espessura" value="3.0" step="0.5" min="2" max="10" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Perdas / Desníveis (%)</label>
+                <input type="number" id="cp_perda" value="10" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+              <div class="flex flex-col justify-end">
+                <label class="flex items-center gap-2 p-2.5 bg-dark-800 rounded-xl border border-white/5 cursor-pointer">
+                  <input type="checkbox" id="cp_fibras" class="w-4 h-4 accent-pink-500 rounded" checked>
+                  <span class="text-xs text-gray-300">Fibras Polipropileno</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Módulo Impermeabilização (NBR 9575 / NBR 9574) (Item 1) -->
+        <div id="secImpermeabilizacao" class="gradient-border p-6 module-section hidden-section">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>🛡️</span> Impermeabilização
+            </h2>
+            <span class="text-[10px] bg-blue-500/20 text-neon-cyan px-2 py-0.5 rounded-full font-semibold border border-blue-500/30">NBR 9575 / 9574</span>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-2">⚡ Sistema Impermeabilizante</label>
+              <div class="grid grid-cols-3 gap-1.5 text-xs">
+                <button type="button" onclick="setPresetImper('manta')" class="preset-btn py-2 px-1.5 rounded-lg text-center active" id="btn-imp-manta">
+                  <span class="block font-bold">Manta 4mm</span>
+                  <span class="text-[10px] text-gray-400">Lajes/Terraços</span>
+                </button>
+                <button type="button" onclick="setPresetImper('polimerica')" class="preset-btn py-2 px-1.5 rounded-lg text-center" id="btn-imp-polimerica">
+                  <span class="block font-bold">Arg. Polimérica</span>
+                  <span class="text-[10px] text-gray-400">Banheiros/Área Molhada</span>
+                </button>
+                <button type="button" onclick="setPresetImper('asfaltica')" class="preset-btn py-2 px-1.5 rounded-lg text-center" id="btn-imp-asfaltica">
+                  <span class="block font-bold">Pintura Asfáltica</span>
+                  <span class="text-[10px] text-gray-400">Baldrame/Muros</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Área Plana (m²)</label>
+                <input type="number" id="imp_area" value="35" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Perímetro / Rodapés (m)</label>
+                <input type="number" id="imp_perimetro" value="24" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700" title="Para virada de 20cm na parede">
+              </div>
+            </div>
+
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5 space-y-2 text-xs">
+              <div class="flex justify-between text-gray-400">
+                <span>Altura da virada nos rodapés:</span>
+                <span class="text-white font-bold">20 cm</span>
+              </div>
+              <div class="flex justify-between text-gray-400">
+                <span>Transpasse de manta / telas:</span>
+                <span class="text-white font-bold">10 cm (+15% área)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Módulo Rodapés, Soleiras e Peitoris (Item 1) -->
+        <div id="secRodapes" class="gradient-border p-6 module-section hidden-section">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>📏</span> Rodapés, Soleiras & Peitoris
+            </h2>
+            <span class="text-[10px] bg-pink-500/20 text-neon-pink px-2 py-0.5 rounded-full font-semibold border border-pink-500/30">Acabamentos</span>
+          </div>
+
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Perímetro do Cômodo (m)</label>
+                <input type="number" id="rod_perimetro" value="26" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Qtd. Portas (Desconto vãos)</label>
+                <input type="number" id="rod_portas" value="2" min="0" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700" title="Desconta 0.80m por porta">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Tipo de Fixação Rodapé</label>
+                <select id="rod_fixacao" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm">
+                  <option value="cola_pu" selected>Cola PU / Fixa Cuba (Tubos 400g)</option>
+                  <option value="argamassa">Argamassa Colante AC-II</option>
+                  <option value="pregos">Pregos de Aço sem cabeça</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Perdas / Meias-esquadrias (%)</label>
+                <input type="number" id="rod_perda" value="10" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+            </div>
+
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5 space-y-3">
+              <div class="text-xs font-bold text-gray-300">Soleiras e Peitoris em Granito</div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] text-gray-400 mb-1">Soleiras de Portas (m)</label>
+                  <input type="number" id="sol_portas" value="1.6" step="0.1" class="form-input w-full px-2 py-1.5 rounded-lg text-white bg-dark-700 text-xs">
+                </div>
+                <div>
+                  <label class="block text-[11px] text-gray-400 mb-1">Peitoris de Janelas (m)</label>
+                  <input type="number" id="pei_janelas" value="2.4" step="0.1" class="form-input w-full px-2 py-1.5 rounded-lg text-white bg-dark-700 text-xs">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Módulo Forro de Gesso (Item 1) -->
+        <div id="secForro" class="gradient-border p-6 module-section hidden-section">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>☁️</span> Forro de Gesso & Drywall
+            </h2>
+            <span class="text-[10px] bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full font-semibold border border-indigo-500/30">NBR 15758</span>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-2">⚡ Tipo de Forro</label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="setPresetForro('f530')" class="preset-btn py-1.5 px-2 rounded-lg text-left active" id="btn-forro-f530">
+                  <span class="block font-bold">Forro Drywall F530</span>
+                  <span class="text-[10px] text-gray-400">Canaletas e tirantes reguladores</span>
+                </button>
+                <button type="button" onclick="setPresetForro('placa')" class="preset-btn py-1.5 px-2 rounded-lg text-left" id="btn-forro-placa">
+                  <span class="block font-bold">Plaquinha 60x60</span>
+                  <span class="text-[10px] text-gray-400">Placas fundidas com sisal e arame</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Área do Teto (m²)</label>
+                <input type="number" id="fo_area" value="25" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Perímetro do Teto (m)</label>
+                <input type="number" id="fo_perimetro" value="20" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700" title="Para cantoneiras ou tabica">
+              </div>
+            </div>
+
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5 flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold text-white">Tabica Metálica / Junta de Dilatação</div>
+                <div class="text-[10px] text-gray-400">Forro com efeito flutuante anti-fissuras no perímetro</div>
+              </div>
+              <input type="checkbox" id="fo_tabica" class="w-5 h-5 accent-pink-500 rounded cursor-pointer" checked>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão Principal de Cálculo -->
+        <button id="btnCalcular" onclick="calcular()" class="btn-primary w-full py-3.5 rounded-xl font-bold text-dark-900 shadow-xl shadow-pink-500/25 flex items-center justify-center gap-2 text-base">
+          <span>⚡</span> Calcular Materiais & Orçamento
+        </button>
+
+        <button onclick="adicionarAmbienteObra()" class="w-full py-2.5 rounded-xl bg-dark-800 hover:bg-dark-700 border border-pink-500/30 text-neon-pink font-semibold text-xs flex items-center justify-center gap-2 transition">
+          <span>➕</span> Adicionar este Cômodo à Lista da Obra
         </button>
       </div>
 
-      <div class="lg:col-span-2 space-y-6">
-        <div id="resultadoSection" class="gradient-border p-8 opacity-50 transition-opacity duration-500">
-          <div class="text-gray-400 mb-4 text-sm uppercase tracking-wider text-center font-bold">Resumo de Materiais</div>
+      <!-- Coluna da Direita: Resultados, Diagrama SVG e Orçamento (7 cols) -->
+      <div class="lg:col-span-7 space-y-6">
+        <!-- 1. Cards de Resumo de Materiais -->
+        <div id="resultadoSection" class="gradient-border p-6 opacity-50 transition-all duration-500">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+            <div>
+              <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Resumo do Serviço</span>
+              <h3 id="resumoTitulo" class="text-lg font-bold text-white">Pintura e Massa Corrida</h3>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-gray-400">Área de Cálculo</span>
+              <div id="resumoArea" class="text-xl font-bold text-neon-pink">44.0 m²</div>
+            </div>
+          </div>
           
-          <div id="gridResultados" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div id="gridResultados" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <!-- Gerado via JS -->
           </div>
         </div>
 
+        <!-- 2. Diagrama Visual Interativo (Item 4) -->
         <div class="gradient-border p-6">
-          <h3 class="text-lg font-semibold mb-4 text-white">📝 Relatório Detalhado</h3>
-          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>🎨</span> Diagrama Visual & Modulação (SVG)
+            </h3>
+            <span id="diagramaTipo" class="text-[11px] text-gray-400 font-mono">Em Escala Proporcional</span>
+          </div>
+
+          <div id="svgContainer" class="bg-dark-900 rounded-xl p-4 border border-white/5 flex items-center justify-center min-h-[240px] overflow-hidden">
+            <!-- Diagrama SVG renderizado dinamicamente -->
+          </div>
+        </div>
+
+        <!-- 3. Painel de Estimativa de Custos, Orçamento e BDI (Item 2) -->
+        <div class="gradient-border p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>💰</span> Orçamento Estimativo & BDI
+              </h3>
+              <p class="text-xs text-gray-400">Preços unitários médios de mercado (personalizáveis)</p>
+            </div>
+            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">BDI Integrado</span>
+          </div>
+
+          <!-- Tabela de Insumos com Preços Editáveis -->
+          <div class="overflow-x-auto mb-4">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-white/10 text-gray-400">
+                  <th class="py-2 px-2">Insumo</th>
+                  <th class="py-2 px-2">Qtd</th>
+                  <th class="py-2 px-2">Unid</th>
+                  <th class="py-2 px-2">Preço Unit. (R$)</th>
+                  <th class="py-2 px-2 text-right">Subtotal (R$)</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaCustosCorpo" class="divide-y divide-white/5 text-gray-300">
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Parâmetros de Mão de Obra e BDI -->
+          <div class="grid sm:grid-cols-2 gap-4 p-4 bg-dark-800/60 rounded-xl border border-white/5 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-1">Mão de Obra (R$/m² de serviço)</label>
+              <div class="flex gap-2 items-center">
+                <input type="number" id="maoDeObraM2" value="25" min="0" step="1" class="form-input w-28 px-3 py-1.5 rounded-lg text-white bg-dark-700 text-sm font-semibold" onchange="calcularCustos()">
+                <span class="text-xs text-gray-400">Total: <strong id="totalMaoDeObra" class="text-white">R$ 0,00</strong></span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-1">Taxa de BDI / Margem Comercial (%)</label>
+              <div class="flex gap-2 items-center">
+                <input type="number" id="taxaBdi" value="25" min="0" max="100" step="1" class="form-input w-24 px-3 py-1.5 rounded-lg text-white bg-dark-700 text-sm font-semibold" onchange="calcularCustos()">
+                <span class="text-xs text-gray-400">Lucro/Adm: <strong id="totalBdi" class="text-white">R$ 0,00</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumo Financeiro Geral -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Total Materiais</div>
+              <div id="costMateriais" class="text-sm sm:text-base font-bold text-gray-200">R$ 0,00</div>
+            </div>
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Total Mão de Obra</div>
+              <div id="costMaoObra" class="text-sm sm:text-base font-bold text-gray-200">R$ 0,00</div>
+            </div>
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Custo Total / m²</div>
+              <div id="costPorM2" class="text-sm sm:text-base font-bold text-neon-cyan">R$ 0,00</div>
+            </div>
+            <div class="p-3 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-xl border border-pink-500/30">
+              <div class="text-[10px] text-pink-300 font-semibold">Preço de Venda (C/ BDI)</div>
+              <div id="costTotalGeral" class="text-base sm:text-lg font-bold text-neon-pink">R$ 0,00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Memorial Descritivo Monospace / Prévia -->
+        <div class="gradient-border p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>📝</span> Memorial Técnico de Cálculo
+            </h3>
+            <button onclick="copiarMemorialTexto()" class="text-xs text-neon-pink hover:underline">Copiar Texto</button>
+          </div>
+          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/60 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap max-h-64 border border-white/5">Aguardando cálculo...</pre>
         </div>
       </div>
     </div>
   </main>
 
-  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
+  <!-- Modal / Gaveta de Ambientes da Obra & WhatsApp (Item 6) -->
+  <div id="modalObra" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-dark-800 border border-white/10 rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="p-5 border-b border-white/10 flex items-center justify-between bg-dark-900">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">📋</span>
+          <div>
+            <h3 class="text-base font-bold text-white">Ambientes & Lista de Compras da Obra</h3>
+            <p class="text-xs text-gray-400">Consolidação de materiais e cotação para fornecedores</p>
+          </div>
+        </div>
+        <button onclick="toggleModalObra()" class="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-6 flex-1">
+        <!-- Lista de Cômodos Cadastrados -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Cômodos Adicionados (<span id="modalContAmbientes">0</span>)</h4>
+            <button onclick="limparTodosAmbientes()" class="text-xs text-red-400 hover:underline">Limpar Todos</button>
+          </div>
+          <div id="listaAmbientesTabela" class="space-y-2 text-xs">
+            <!-- Injetado via JS -->
+            <p class="text-gray-500 italic text-center py-4">Nenhum ambiente adicionado ainda. Calcule um cômodo e clique em "Adicionar este Cômodo à Lista da Obra".</p>
+          </div>
+        </div>
+
+        <!-- Lista Consolidada de Compras -->
+        <div class="bg-dark-900/80 p-4 rounded-2xl border border-white/5">
+          <h4 class="text-xs font-bold text-neon-pink uppercase tracking-wider mb-3 flex items-center gap-1.5">
+            <span>🛒</span> Lista Consolidada para Compra
+          </h4>
+          <div id="listaConsolidadaCompras" class="space-y-2 text-xs font-mono text-gray-300">
+            <!-- Injetado via JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-white/10 bg-dark-900 flex flex-wrap items-center justify-between gap-3">
+        <button type="button" onclick="copiarPedidoWhatsApp()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+          <span>📲</span> Copiar Cotação para WhatsApp
+        </button>
+        <button type="button" onclick="toggleModalObra()" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-white/5">
     <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
   </footer>
 
+  <!-- SCRIPT ENGINE -->
   <script>
     const $ = id => document.getElementById(id);
 
-    // Mudar Módulo Visível
-    $('moduloSelecionado').addEventListener('change', (e) => {
-      document.querySelectorAll('.module-section').forEach(el => el.classList.add('hidden-section'));
-      if (e.target.value === 'pintura') $('secPintura').classList.remove('hidden-section');
-      if (e.target.value === 'piso') $('secPiso').classList.remove('hidden-section');
-      if (e.target.value === 'drywall') $('secDrywall').classList.remove('hidden-section');
-    });
+    // Estado global do aplicativo
+    let moduloAtivo = 'pintura';
+    let ultimoResultado = null;
+    let precosInsumos = {};
+    let ambientesObra = [];
 
-    function addCard(titulo, valor, unidade) {
+    // Preços padrão médios de mercado (R$)
+    const PRECOS_PADRAO = {
+      'Tinta Acrílica (Lata 18L)': 380.00,
+      'Tinta Acrílica (Galão 3.6L)': 95.00,
+      'Massa Corrida / Acrílica (kg)': 4.50,
+      'Fita Crepe (Rolo 50m)': 14.00,
+      'Folha de Lixa': 3.00,
+      'Piso / Porcelanato (m²)': 85.00,
+      'Argamassa Colante AC-I (Saco 20kg)': 16.00,
+      'Argamassa Colante AC-II (Saco 20kg)': 26.00,
+      'Argamassa Colante AC-III (Saco 20kg)': 39.00,
+      'Rejunte (kg)': 8.50,
+      'Espaçadores/Niveladores (Pct 100un)': 28.00,
+      'Chapa Drywall ST 12.5mm (1.20x2.40m)': 42.00,
+      'Chapa Drywall RU 12.5mm (Verde)': 58.00,
+      'Chapa Drywall RF 12.5mm (Rosa)': 64.00,
+      'Perfil Montante Metálico (3m)': 28.00,
+      'Perfil Guia Metálico (3m)': 24.00,
+      'Parafusos TA25 (Cento)': 9.00,
+      'Fita para Juntas Drywall (Rolo)': 22.00,
+      'Massa de Junta Drywall (kg)': 6.00,
+      'Lã Acústica de Vidro/Rocha (m²)': 22.00,
+      'Cimento CP II (Saco 50kg)': 36.00,
+      'Cal Hidratada CH-I (Saco 20kg)': 18.00,
+      'Areia Lavada Média/Grossa (m³)': 95.00,
+      'Aditivo Impermeabilizante / Vedacit (L)': 16.00,
+      'Fibras de Polipropileno (Pct 600g)': 24.00,
+      'Manta Asfáltica 4mm Tipo III (Rolo 10m²)': 240.00,
+      'Primer Asfáltico (Lata 18L)': 180.00,
+      'Gás GLP para Maçarico (kg)': 12.00,
+      'Argamassa Polimérica (Caixa 18kg)': 75.00,
+      'Tela de Poliéster Estruturante (m)': 4.50,
+      'Pintura Asfáltica Alicerce (Lata 18L)': 140.00,
+      'Rodapé (m linear)': 18.00,
+      'Cola PU Fixa Cuba/Rodapé (Tubo 400g)': 26.00,
+      'Soleira / Peitoril Granito (m linear)': 75.00,
+      'Placa de Gesso 60x60 (unid)': 4.50,
+      'Gesso em Pó para Fundição (Saco 40kg)': 26.00,
+      'Perfil Canaleta F530 (3m)': 19.00,
+      'Tirantes com Regulador (unid)': 2.50
+    };
+
+    // Mão de obra média sugerida por m² (R$)
+    const MAO_DE_OBRA_PADRAO = {
+      pintura: 25,
+      piso: 45,
+      drywall: 35,
+      chapisco: 30,
+      contrapiso: 22,
+      impermeabilizacao: 35,
+      rodapes: 18,
+      forro: 38
+    };
+
+    function addCard(titulo, valor, unidade, sub = '') {
       return `
-        <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover text-center">
-          <div class="text-xs text-gray-500 mb-1">${titulo}</div>
-          <div class="text-xl font-semibold text-neon-pink">${valor} <span class="text-sm text-gray-400">${unidade}</span></div>
+        <div class="p-3.5 bg-dark-800/60 rounded-xl border border-white/5 card-hover text-center transition">
+          <div class="text-[11px] text-gray-400 mb-0.5">${titulo}</div>
+          <div class="text-lg sm:text-xl font-bold text-neon-pink">${valor} <span class="text-xs text-gray-400 font-normal">${unidade}</span></div>
+          ${sub ? `<div class="text-[10px] text-gray-500 mt-0.5">${sub}</div>` : ''}
         </div>
       `;
     }
 
+    // Navegação entre abas
+    function trocarModulo(mod) {
+      moduloAtivo = mod;
+      document.querySelectorAll('.mod-tab').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`tab-${mod}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      document.querySelectorAll('.module-section').forEach(el => el.classList.add('hidden-section'));
+      
+      const modMap = {
+        pintura: 'secPintura',
+        piso: 'secPiso',
+        drywall: 'secDrywall',
+        chapisco: 'secChapisco',
+        contrapiso: 'secContrapiso',
+        impermeabilizacao: 'secImpermeabilizacao',
+        rodapes: 'secRodapes',
+        forro: 'secForro'
+      };
+      
+      const targetSec = $(modMap[mod]);
+      if (targetSec) targetSec.classList.remove('hidden-section');
+
+      // Atualizar Mão de Obra padrão para o módulo
+      if (MAO_DE_OBRA_PADRAO[mod]) {
+        $('maoDeObraM2').value = MAO_DE_OBRA_PADRAO[mod];
+      }
+
+      calcular();
+    }
+
+    // =========================================================
+    // PRESETS INTELIGENTES (Item 5)
+    // =========================================================
+    function setPresetTinta(tipo, rend) {
+      document.querySelectorAll('#secPintura .preset-btn').forEach(b => b.classList.remove('active'));
+      const btn = $(`btn-tinta-${tipo}`);
+      if (btn) btn.classList.add('active');
+      $('p_rend').value = rend;
+      calcular();
+    }
+
+    function setPresetPiso(l, w) {
+      document.querySelectorAll('#secPiso .preset-btn').forEach(b => b.classList.remove('active'));
+      const btn = $(`btn-piso-${l}-${w}`);
+      if (btn) btn.classList.add('active');
+      $('pi_l').value = l;
+      $('pi_w').value = w;
+      verificarDuplaColagem();
+      calcular();
+    }
+
+    function verificarDuplaColagem() {
+      const l = parseFloat($('pi_l').value) || 0;
+      const w = parseFloat($('pi_w').value) || 0;
+      const argTipo = $('pi_argamassa_tipo').value;
+      const aviso = $('avisoDuplaColagem');
+      if (l >= 60 || w >= 60 || argTipo === 'AC3') {
+        aviso.classList.remove('hidden');
+      } else {
+        aviso.classList.add('hidden');
+      }
+    }
+
+    function setPresetDrywall(tipo) {
+      document.querySelectorAll('#secDrywall .preset-btn').forEach(b => b.classList.remove('active'));
+      const btn = $(`btn-drywall-${tipo.toLowerCase()}`);
+      if (btn) btn.classList.add('active');
+      calcular();
+    }
+
+    function setPresetChapisco(tipo, cim, cal, areia, esp) {
+      document.querySelectorAll('#secChapisco .preset-btn').forEach(b => b.classList.remove('active'));
+      if (tipo === 'chapisco') $('btn-traco-chapisco').classList.add('active');
+      if (tipo === 'emboco_int') $('btn-traco-emboco-int').classList.add('active');
+      if (tipo === 'emboco_ext') $('btn-traco-emboco-ext').classList.add('active');
+      if (tipo === 'reboco') $('btn-traco-reboco').classList.add('active');
+
+      $('ch_p_cim').value = cim;
+      $('ch_p_cal').value = cal;
+      $('ch_p_areia').value = areia;
+      $('ch_espessura').value = esp;
+      calcular();
+    }
+
+    function setPresetContrapiso(tipo, cimentoKg, areiaM3) {
+      document.querySelectorAll('#secContrapiso .preset-btn').forEach(b => b.classList.remove('active'));
+      if (tipo === '1:3') $('btn-cp-13').classList.add('active');
+      if (tipo === '1:4') $('btn-cp-14').classList.add('active');
+      calcular();
+    }
+
+    function setPresetImper(tipo) {
+      document.querySelectorAll('#secImpermeabilizacao .preset-btn').forEach(b => b.classList.remove('active'));
+      const btn = $(`btn-imp-${tipo}`);
+      if (btn) btn.classList.add('active');
+      calcular();
+    }
+
+    function setPresetForro(tipo) {
+      document.querySelectorAll('#secForro .preset-btn').forEach(b => b.classList.remove('active'));
+      const btn = $(`btn-forro-${tipo}`);
+      if (btn) btn.classList.add('active');
+      calcular();
+    }
+
+    // =========================================================
+    // CÁLCULOS DOS 8 MÓDULOS TÉCNICOS (Item 1)
+    // =========================================================
+
+    // 1. PINTURA & MASSA
     function calcPintura() {
       const aBruta = parseFloat($('p_area').value) || 0;
       const aVaos = parseFloat($('p_vaos').value) || 0;
       const demaos = parseInt($('p_demaos').value) || 2;
-      const rendLt = parseFloat($('p_rend').value) || 10;
+      const rendLt = parseFloat($('p_rend').value) || 9;
+      const tipoMassa = $('p_massa_tipo').value;
+      const consMassa = parseFloat($('p_massa_cons').value) || 1.2;
 
-      const areaLiquida = Math.max(0, aBruta - aVaos);
-      const m2Totais = areaLiquida * demaos;
+      const aLiq = Math.max(0, aBruta - aVaos);
+      const m2Totais = aLiq * demaos;
       const litros = m2Totais / rendLt;
       
       const latas18 = Math.floor(litros / 18);
-      const galoes36 = Math.ceil((litros % 18) / 3.6);
+      const restoLitros = litros % 18;
+      const galoes36 = Math.ceil(restoLitros / 3.6);
 
-      // Massa Corrida (1 kg rende aprox 1 a 1.5 m² em 2 demãos)
-      const massaKg = areaLiquida * 1.2; // Estimativa média
+      const massaKg = (tipoMassa !== 'nenhuma') ? aLiq * consMassa : 0;
+      const sacosMassa20 = Math.ceil(massaKg / 20);
+      const lixas = Math.ceil(aLiq / 15);
+      const fitaCrepe = Math.max(1, Math.ceil(aVaos * 1.5 / 50));
+
+      const itens = [
+        { nome: 'Tinta Acrílica (Lata 18L)', qtd: latas18, unid: 'latas' },
+        { nome: 'Tinta Acrílica (Galão 3.6L)', qtd: galoes36, unid: 'galões' },
+        { nome: 'Massa Corrida / Acrílica (kg)', qtd: Math.ceil(massaKg), unid: 'kg' },
+        { nome: 'Folha de Lixa', qtd: lixas, unid: 'folhas' },
+        { nome: 'Fita Crepe (Rolo 50m)', qtd: fitaCrepe, unid: 'rolos' }
+      ].filter(i => i.qtd > 0);
+
+      $('resumoTitulo').textContent = 'Pintura & Massa Corrida';
+      $('resumoArea').textContent = `${aLiq.toFixed(1)} m² líq.`;
 
       $('gridResultados').innerHTML = 
-        addCard("Área Líquida", areaLiquida.toFixed(1), "m²") +
-        addCard("Total a Pintar (C/ Demãos)", m2Totais.toFixed(1), "m²") +
-        addCard("Tinta Necessária", litros.toFixed(1), "Litros") +
+        addCard("Área Líquida", aLiq.toFixed(1), "m²", `Bruta: ${aBruta}m²`) +
+        addCard("Total Pintura (Demãos)", m2Totais.toFixed(1), "m²", `${demaos} demãos`) +
+        addCard("Tinta Total", litros.toFixed(1), "Litros", `Rend. ${rendLt} m²/L`) +
         addCard("Latas Grandes (18L)", latas18, "unid.") +
         addCard("Galões (3.6L)", galoes36, "unid.") +
-        addCard("Massa Corrida Estimada", massaKg.toFixed(1), "kg");
+        addCard("Massa Corrida", massaKg.toFixed(1), "kg", `~${sacosMassa20} sacos 20kg`);
 
-      $('memorial').textContent = `MÓDULO: PINTURA E MASSA CORRIDA
-Área Bruta: ${aBruta.toFixed(2)} m²
-Área de Vãos (Desconto): ${aVaos.toFixed(2)} m²
-Área Líquida: ${areaLiquida.toFixed(2)} m²
+      const memorialTxt = `MEMORIAL DE QUANTITATIVOS - PINTURA E MASSA (ABNT NBR 13245 / ABRAFATI)
+Ambiente: ${$('nomeAmbiente').value} (${$('obsAmbiente').value})
+Data: ${new Date().toLocaleDateString('pt-BR')}
 
-Demãos: ${demaos}
-Rendimento Adotado: ${rendLt} m²/L por demão
-Total de Litros: ${litros.toFixed(2)} L
-Embalagens Sugeridas: ${latas18} Latas de 18L + ${galoes36} Galões de 3.6L.
+1. PARÂMETROS DE ÁREA
+- Área Bruta de Paredes: ${aBruta.toFixed(2)} m²
+- Desconto de Vãos (Janelas/Portas): ${aVaos.toFixed(2)} m²
+- Área Líquida Efetiva: ${aLiq.toFixed(2)} m²
 
-Massa Corrida (Estimativa conservadora de 1.2kg/m²): ${massaKg.toFixed(2)} kg.`;
+2. CONSUMO DE TINTA
+- Número de Demãos: ${demaos}
+- Rendimento Adotado: ${rendLt} m²/L por demão (Norma ABRAFATI)
+- Volume Teórico Requerido: ${litros.toFixed(2)} Litros
+- Embalagens Recomendadas: ${latas18} Latas de 18L e ${galoes36} Galões de 3.6L
+
+3. COMPLEMENTOS & PREPARAÇÃO DE SUPERFÍCIE
+- Massa (${tipoMassa.toUpperCase()}): ${massaKg.toFixed(1)} kg (${sacosMassa20} barricas/sacos de 20kg)
+- Folhas de Lixa (grão 150/220): ${lixas} unidades
+- Fita Crepe para isolamento: ${fitaCrepe} rolos de 50m`;
+
+      $('memorial').textContent = memorialTxt;
+
+      renderSvgPintura(aBruta, aVaos, aLiq);
+
+      return {
+        modulo: 'Pintura',
+        area: aLiq,
+        itens,
+        memorial: memorialTxt
+      };
     }
 
+    // 2. PISOS & PORCELANATOS
     function calcPiso() {
       const area = parseFloat($('pi_area').value) || 0;
       const cCm = parseFloat($('pi_l').value) || 60;
       const lCm = parseFloat($('pi_w').value) || 60;
       const espRejunte = parseFloat($('pi_rejunte').value) || 2;
       const perda = parseFloat($('pi_perda').value) || 10;
+      const argTipo = $('pi_argamassa_tipo').value;
+      const paginacao = $('pi_paginacao').value;
 
-      const areaTotalComPerda = area * (1 + perda/100);
-      const areaPecaM2 = (cCm/100) * (lCm/100);
-      const numPecas = Math.ceil(areaTotalComPerda / areaPecaM2);
+      const areaComPerda = area * (1 + perda/100);
+      const areaPecaM2 = (cCm / 100) * (lCm / 100);
+      const numPecas = Math.ceil(areaComPerda / areaPecaM2);
 
-      // Argamassa (Aprox 5 kg/m² para peças normais, até 8 kg/m² para peças grandes com dupla colagem)
-      let argamassaM2 = (cCm >= 60 || lCm >= 60) ? 7.5 : 5.0; 
-      const argamassaKg = area * argamassaM2;
-      const sacos20 = Math.ceil(argamassaKg / 20);
+      // Dupla colagem para peças >= 60cm ou AC-III
+      const duplaColagem = (cCm >= 60 || lCm >= 60 || argTipo === 'AC3');
+      const argConsKgM2 = duplaColagem ? 8.0 : 5.0;
+      const argKgTotal = areaComPerda * argConsKgM2;
+      const sacosArg20 = Math.ceil(argKgTotal / 20);
 
-      // Rejunte (Fórmula padrão da indústria)
-      // Kg/m² = ((A+B)/(A*B)) * C * D * 1.58
-      // Onde A e B em mm, C espessura da peça (adotar 8mm), D junta em mm
+      // Fórmula oficial de rejunte cerâmico
+      // Kg/m² = ((A + B) / (A * B)) * C * D * 1.58
       const aMm = cCm * 10;
       const bMm = lCm * 10;
-      const espPecaMm = 8;
+      const espPecaMm = (cCm >= 80 || lCm >= 80) ? 10 : 8;
       const coef = 1.58;
-      
-      const rejunteM2 = ((aMm + bMm) / (aMm * bMm)) * espPecaMm * espRejunte * coef;
-      const rejunteKgTotal = areaTotalComPerda * rejunteM2;
+      const rejunteKgM2 = ((aMm + bMm) / (aMm * bMm)) * espPecaMm * espRejunte * coef;
+      const rejunteKg = areaComPerda * rejunteKgM2;
+      const pctRejunte1kg = Math.ceil(rejunteKg);
+
+      const niveladores = Math.ceil(areaComPerda * 6); // ~6 clipes por m²
+
+      const nomeArg = argTipo === 'AC1' ? 'Argamassa Colante AC-I (Saco 20kg)' : (argTipo === 'AC2' ? 'Argamassa Colante AC-II (Saco 20kg)' : 'Argamassa Colante AC-III (Saco 20kg)');
+
+      const itens = [
+        { nome: 'Piso / Porcelanato (m²)', qtd: parseFloat(areaComPerda.toFixed(1)), unid: 'm²' },
+        { nome: nomeArg, qtd: sacosArg20, unid: 'sacos' },
+        { nome: 'Rejunte (kg)', qtd: pctRejunte1kg, unid: 'kg' },
+        { nome: 'Espaçadores/Niveladores (Pct 100un)', qtd: Math.ceil(niveladores / 100), unid: 'pacotes' }
+      ];
+
+      $('resumoTitulo').textContent = 'Pisos & Revestimentos Cerâmicos';
+      $('resumoArea').textContent = `${area.toFixed(1)} m² chão`;
 
       $('gridResultados').innerHTML = 
-        addCard("Área (com perda)", areaTotalComPerda.toFixed(1), "m²") +
-        addCard("Qtd. de Peças Cerâmicas", numPecas, "unid.") +
-        addCard("Argamassa Colante (AC)", argamassaKg.toFixed(1), "kg") +
-        addCard("Sacos de Argamassa (20kg)", sacos20, "sacos") +
-        addCard("Rejuntamento", rejunteKgTotal.toFixed(1), "kg");
+        addCard("Área Total (c/ perda)", areaComPerda.toFixed(1), "m²", `+${perda}% recortes`) +
+        addCard("Peças Inteiras", numPecas, "unidades", `${cCm}x${lCm} cm`) +
+        addCard("Argamassa Colante", `${sacosArg20}`, "sacos 20kg", `${argKgTotal.toFixed(0)} kg (${argConsKgM2}kg/m²)`) +
+        addCard("Rejuntamento", rejunteKg.toFixed(1), "kg", `Junta: ${espRejunte}mm`) +
+        addCard("Clipes Niveladores", niveladores, "unid.", "Anti-desnível") +
+        addCard("Dupla Colagem", duplaColagem ? "SIM" : "NÃO", "", duplaColagem ? "Obrigatória NBR" : "Simples colagem");
 
-      $('memorial').textContent = `MÓDULO: PISO E PORCELANATO
-Área do Chão: ${area.toFixed(2)} m²
-Perda/Recorte: ${perda}% -> Total p/ Compra: ${areaTotalComPerda.toFixed(2)} m²
-Tamanho da Peça: ${cCm}cm x ${lCm}cm (${areaPecaM2.toFixed(3)} m²/peça)
-Quantidade de Peças: ${numPecas} peças inteiras
+      const memorialTxt = `MEMORIAL DE QUANTITATIVOS - PISOS E PORCELANATOS (ABNT NBR 13753 / NBR 14081)
+Ambiente: ${$('nomeAmbiente').value} (${$('obsAmbiente').value})
+Data: ${new Date().toLocaleDateString('pt-BR')}
 
-Argamassa:
-Consumo adotado: ${argamassaM2} kg/m² (Dupla colagem considerada para peças >=60cm)
-Total: ${sacos20} sacos de 20kg.
+1. PARÂMETROS DO REVESTIMENTO
+- Área do Piso: ${area.toFixed(2)} m²
+- Acréscimo para Cortes/Perdas: ${perda}% -> Área de Compra: ${areaComPerda.toFixed(2)} m²
+- Formato da Peça: ${cCm} cm x ${lCm} cm (Área unitária: ${areaPecaM2.toFixed(4)} m²)
+- Total de Placas Cerâmicas: ${numPecas} peças
+- Paginação Adotada: ${paginacao.toUpperCase()}
 
-Rejunte:
-Junta de assentamento: ${espRejunte} mm
-Consumo estimado: ${rejunteKgTotal.toFixed(2)} kg.`;
+2. ARGAMASSA COLANTE (${argTipo})
+- Método de Aplicação: ${duplaColagem ? 'Dupla Colagem (base e tardoz - peça >= 60cm)' : 'Colagem Simples'}
+- Consumo Adotado: ${argConsKgM2.toFixed(1)} kg/m²
+- Consumo Total de Argamassa: ${argKgTotal.toFixed(1)} kg -> ${sacosArg20} sacos de 20kg
+
+3. REJUNTAMENTO E NIVELAMENTO
+- Espessura da Junta: ${espRejunte} mm
+- Consumo Estimado de Rejunte: ${rejunteKg.toFixed(2)} kg
+- Clipes Niveladores e Cunhas: ${niveladores} unidades`;
+
+      $('memorial').textContent = memorialTxt;
+
+      renderSvgPaginacaoPiso(area, cCm, lCm, paginacao);
+
+      return {
+        modulo: 'Piso',
+        area: areaComPerda,
+        itens,
+        memorial: memorialTxt
+      };
     }
 
+    // 3. DRYWALL (PAREDES)
     function calcDrywall() {
       const l = parseFloat($('d_largura').value) || 0;
       const h = parseFloat($('d_altura').value) || 0;
       const faces = parseInt($('d_faces').value) || 2;
-      
-      const areaM2 = l * h;
-      // Parâmetros de consumo por m² (Tabela Gypsum/Knauf genérica para parede padrão 600mm)
-      // Chapas (Standard 1.20 x 2.40m = 2.88m²)
-      const m2Chapa = 2.88;
-      let qtdChapas = Math.ceil((areaM2 * faces) / m2Chapa * 1.05); // 5% perda
-      
-      // Montantes (aprox 2 a 3 por m) e Guias
-      // Simplificado: Guias (sup + inf) = l * 2. Montantes a cada 60cm = (l/0.6 + 1) * h
-      const mLinearGuia = l * 2 * 1.1; // 10% perda
-      const guias3m = Math.ceil(mLinearGuia / 3);
-      
-      const mLinearMontante = (Math.ceil(l / 0.6) + 1) * h;
-      const montantes3m = Math.ceil(mLinearMontante / 3 * 1.05);
+      const espacamento = parseInt($('d_espacamento').value) || 600;
+      const isolamento = $('d_isolamento').checked;
 
-      const parafusosChapa = Math.ceil(areaM2 * faces * 15); // ~15 por m²
-      const massaDrywall = Math.ceil(areaM2 * faces * 0.3); // 0.3kg/m²
-      const fitaTelada = Math.ceil(areaM2 * faces * 1.5); // 1.5m/m²
+      const areaM2 = l * h;
+      const m2Chapa = 2.88; // 1.20 x 2.40m
+      const qtdChapas = Math.ceil((areaM2 * faces) / m2Chapa * 1.05);
+
+      const mLinearGuia = l * 2 * 1.1; // Chão e teto
+      const guias3m = Math.ceil(mLinearGuia / 3);
+
+      const passoM = espacamento / 1000;
+      const numMontantesEixos = Math.ceil(l / passoM) + 1;
+      const mLinearMontantes = numMontantesEixos * h * 1.05;
+      const montantes3m = Math.ceil(mLinearMontantes / 3);
+
+      const parafusosChapa = Math.ceil(areaM2 * faces * 15);
+      const parafusosTR = numMontantesEixos * 4;
+      const fitaM = Math.ceil(areaM2 * faces * 1.5);
+      const massaKg = Math.ceil(areaM2 * faces * 0.35);
+      const laM2 = isolamento ? Math.ceil(areaM2 * 1.05) : 0;
+
+      const itens = [
+        { nome: 'Chapa Drywall ST 12.5mm (1.20x2.40m)', qtd: qtdChapas, unid: 'chapas' },
+        { nome: 'Perfil Montante Metálico (3m)', qtd: montantes3m, unid: 'barras' },
+        { nome: 'Perfil Guia Metálico (3m)', qtd: guias3m, unid: 'barras' },
+        { nome: 'Parafusos TA25 (Cento)', qtd: Math.ceil(parafusosChapa / 100), unid: 'centos' },
+        { nome: 'Fita para Juntas Drywall (Rolo)', qtd: Math.ceil(fitaM / 50), unid: 'rolos 50m' },
+        { nome: 'Massa de Junta Drywall (kg)', qtd: massaKg, unid: 'kg' }
+      ];
+      if (laM2 > 0) {
+        itens.push({ nome: 'Lã Acústica de Vidro/Rocha (m²)', qtd: laM2, unid: 'm²' });
+      }
+
+      $('resumoTitulo').textContent = 'Paredes de Drywall';
+      $('resumoArea').textContent = `${areaM2.toFixed(1)} m² parede`;
 
       $('gridResultados').innerHTML = 
-        addCard("Área da Parede", areaM2.toFixed(1), "m²") +
-        addCard("Chapas (1.20x2.40m)", qtdChapas, "unid.") +
-        addCard("Montantes (3m)", montantes3m, "unid.") +
-        addCard("Guias (3m)", guias3m, "unid.") +
-        addCard("Parafusos p/ Chapa (Trombeta)", parafusosChapa, "unid.") +
-        addCard("Massa p/ Juntas", massaDrywall, "kg") +
-        addCard("Fita para Juntas", fitaTelada, "metros");
+        addCard("Área da Parede", areaM2.toFixed(1), "m²", `${l}m x ${h}m`) +
+        addCard("Chapas 1.20x2.40", qtdChapas, "unidades", `${faces} face(s)`) +
+        addCard("Montantes (3m)", montantes3m, "barras", `Eixos a ${espacamento}mm`) +
+        addCard("Guias Sup/Inf (3m)", guias3m, "barras") +
+        addCard("Parafusos TA25", parafusosChapa, "unid.") +
+        addCard("Massa de Juntas", `${massaKg}`, "kg", `${fitaM}m fita microperf.`);
 
-      $('memorial').textContent = `MÓDULO: DRYWALL
-Dimensões da Parede: L=${l.toFixed(2)}m x H=${h.toFixed(2)}m
-Área Frontal: ${areaM2.toFixed(2)} m²
-Número de Faces a chapear: ${faces}
-Espaçamento entre montantes adotado: 600 mm
+      const memorialTxt = `MEMORIAL DE QUANTITATIVOS - PAREDE DE DRYWALL (ABNT NBR 15758)
+Ambiente: ${$('nomeAmbiente').value} (${$('obsAmbiente').value})
+Data: ${new Date().toLocaleDateString('pt-BR')}
 
-LISTA DE MATERIAIS
-- Chapas ST 12.5mm (1.20x2.40m): ${qtdChapas} peças (Incluso 5% perda)
-- Perfis Montantes de 90mm (3m): ${montantes3m} peças
-- Perfis Guias de 90mm (3m): ${guias3m} peças
-- Parafusos TA25 (Metal/Chapa): ${parafusosChapa} unidades
-- Fita telada/papel microperfurado: ${fitaTelada} m
-- Massa para tratamento de juntas: ${massaDrywall} kg`;
+1. GEOMETRIA DA DIVISÓRIA
+- Comprimento: ${l.toFixed(2)} m | Altura / Pé-direito: ${h.toFixed(2)} m
+- Área Frontal: ${areaM2.toFixed(2)} m² | Faces Chapeadas: ${faces}
+- Espaçamento entre Montantes: ${espacamento} mm
+
+2. ESTRUTURA METÁLICA (Aço Galvanizado 48/70/90mm)
+- Guias Superior e Inferior: ${guias3m} barras de 3 metros (${mLinearGuia.toFixed(1)} m lineares)
+- Montantes Verticais: ${montantes3m} barras de 3 metros (${numMontantesEixos} montantes no vão)
+
+3. CHAPEAMENTO E ACABAMENTO
+- Chapas de Gesso Acartonado (1.20 x 2.40m): ${qtdChapas} peças
+- Parafusos Autobrocantes TA25: ${parafusosChapa} unidades
+- Fita de Papel Microperfurado / Telada: ${fitaM} metros
+- Massa de Tratamento de Juntas: ${massaKg} kg
+${isolamento ? `- Isolamento Termoacústico (Lã Mineral): ${laM2} m²` : '- Sem isolamento acústico interno'}`;
+
+      $('memorial').textContent = memorialTxt;
+
+      renderSvgDrywall(l, h, espacamento, numMontantesEixos);
+
+      return {
+        modulo: 'Drywall',
+        area: areaM2,
+        itens,
+        memorial: memorialTxt
+      };
     }
 
+    // 4. CHAPISCO, EMBOÇO E REBOCO (NBR 13749)
+    function calcChapisco() {
+      const area = parseFloat($('ch_area').value) || 0;
+      const espMm = parseFloat($('ch_espessura').value) || 15;
+      const pCim = parseFloat($('ch_p_cim').value) || 1;
+      const pCal = parseFloat($('ch_p_cal').value) || 2;
+      const pAreia = parseFloat($('ch_p_areia').value) || 8;
+      const temAditivo = $('ch_aditivo').checked;
+
+      const volumeM3 = area * (espMm / 1000) * 1.15; // 15% perdas
+
+      let cimentoKg = 0;
+      let calKg = 0;
+      let areiaM3 = 0;
+
+      if (pCal === 0) {
+        // Chapisco puro (1:3 ou 1:4)
+        cimentoKg = volumeM3 * 360;
+        areiaM3 = volumeM3 * 1.05;
+      } else if (pCim === 0) {
+        // Reboco fino (cal e areia)
+        calKg = volumeM3 * 260;
+        areiaM3 = volumeM3 * 0.95;
+      } else {
+        // Emboço cimento + cal + areia (ex: 1:2:8 ou 1:1:6)
+        const somaPartes = pCim + pCal + pAreia;
+        cimentoKg = volumeM3 * (pCim / somaPartes) * 1300;
+        calKg = volumeM3 * (pCal / somaPartes) * 650;
+        areiaM3 = volumeM3 * (pAreia / somaPartes) * 1.25;
+      }
+
+      const sacosCim50 = Math.ceil(cimentoKg / 50);
+      const sacosCal20 = Math.ceil(calKg / 20);
+      const areiaCompra = parseFloat(areiaM3.toFixed(2));
+      const aditivoLitros = temAditivo ? Math.ceil(sacosCim50 * 2) : 0;
+
+      const itens = [];
+      if (sacosCim50 > 0) itens.push({ nome: 'Cimento CP II (Saco 50kg)', qtd: sacosCim50, unid: 'sacos' });
+      if (sacosCal20 > 0) itens.push({ nome: 'Cal Hidratada CH-I (Saco 20kg)', qtd: sacosCal20, unid: 'sacos' });
+      itens.push({ nome: 'Areia Lavada Média/Grossa (m³)', qtd: areiaCompra, unid: 'm³' });
+      if (aditivoLitros > 0) itens.push({ nome: 'Aditivo Impermeabilizante / Vedacit (L)', qtd: aditivoLitros, unid: 'litros' });
+
+      $('resumoTitulo').textContent = 'Chapisco, Emboço e Reboco';
+      $('resumoArea').textContent = `${area.toFixed(1)} m² parede`;
+
+      $('gridResultados').innerHTML = 
+        addCard("Volume de Argamassa", volumeM3.toFixed(2), "m³", `Espessura: ${espMm}mm`) +
+        addCard("Cimento CP II", sacosCim50, "sacos 50kg", `${cimentoKg.toFixed(0)} kg`) +
+        addCard("Cal Hidratada", sacosCal20, "sacos 20kg", `${calKg.toFixed(0)} kg`) +
+        addCard("Areia Lavada", areiaCompra, "m³", "Média/grossa") +
+        addCard("Traço Volumétrico", `${pCim}:${pCal}:${pAreia}`, "proporção") +
+        addCard("Aditivo Impermeab.", aditivoLitros > 0 ? `${aditivoLitros} L` : "NÃO", "", "Plastificante/Vedacit");
+
+      const memorialTxt = `MEMORIAL DE QUANTITATIVOS - ARGAMASSA DE REVESTIMENTO (ABNT NBR 13749)
+Ambiente: ${$('nomeAmbiente').value} (${$('obsAmbiente').value})
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS DO REVESTIMENTO
+- Área de Aplicação: ${area.toFixed(2)} m²
+- Espessura de Camada: ${espMm} mm
+- Volume de Argamassa Fresca Requerido (c/ 15% perdas): ${volumeM3.toFixed(3)} m³
+- Traço Adotado (Cimento : Cal : Areia): ${pCim} : ${pCal} : ${pAreia}
+
+2. CONSUMO DE MATERIAIS
+- Cimento Portland: ${cimentoKg.toFixed(1)} kg -> ${sacosCim50} sacos de 50 kg
+- Cal Hidratada CH-I: ${calKg.toFixed(1)} kg -> ${sacosCal20} sacos de 20 kg
+- Areia Lavada: ${areiaCompra} m³
+${aditivoLitros > 0 ? `- Aditivo Impermeabilizante / Hidrófugo: ${aditivoLitros} Litros` : '- Sem aditivo impermeabilizante'}`;
+
+      $('memorial').textContent = memorialTxt;
+
+      renderSvgCamadas('emboço', espMm);
+
+      return {
+        modulo: 'Chapisco/Emboço',
+        area: area,
+        itens,
+        memorial: memorialTxt
+      };
+    }
+
+    // 5. CONTRAPISO E REGULARIZAÇÃO (NBR 13753)
+    function calcContrapiso() {
+      const area = parseFloat($('cp_area').value) || 0;
+      const espCm = parseFloat($('cp_espessura').value) || 3.0;
+      const perda = parseFloat($('cp_perda').value) || 10;
+      const fibras = $('cp_fibras').checked;
+
+      const volumeM3 = area * (espCm / 100) * (1 + perda/100);
+      // Traço farofa 1:4 (300kg cimento/m³)
+      const cimentoKg = volumeM3 * 320;
+      const areiaM3 = volumeM3 * 1.10;
+      const sacosCim50 = Math.ceil(cimentoKg / 50);
+      const fibrasKg = fibras ? Math.ceil(volumeM3 * 0.6) : 0;
+
+      const itens = [
+        { nome: 'Cimento CP II (Saco 50kg)', qtd: sacosCim50, unid: 'sacos' },
+        { nome: 'Areia Lavada Média/Grossa (m³)', qtd: parseFloat(areiaM3.toFixed(2)), unid: 'm³' }
+      ];
+      if (fibrasKg > 0) {
+        itens.push({ nome: 'Fibras de Polipropileno (Pct 600g)', qtd: Math.ceil(fibrasKg / 0.6), unid: 'pacotes' });
+      }
+
+      $('resumoTitulo').textContent = 'Contrapiso & Regularização';
+      $('resumoArea').textContent = `${area.toFixed(1)} m² chão`;
+
+      $('gridResultados').innerHTML = 
+        addCard("Volume de Farofa", volumeM3.toFixed(2), "m³", `Espessura: ${espCm} cm`) +
+        addCard("Cimento CP II", sacosCim50, "sacos 50kg", `${cimentoKg.toFixed(0)} kg`) +
+        addCard("Areia Lavada", areiaM3.toFixed(2), "m³", "Areia média/grossa") +
+        addCard("Fibras Anti-fissura", fibras ? `${fibrasKg} kg` : "NÃO", "", "Polipropileno") +
+        addCard("Área Regularizada", area.toFixed(1), "m²", `+${perda}% perdas`) +
+        addCard("Traço Adotado", "1:4", "cimento:areia", "Seco (farofa)");
+
+      const memorialTxt = `MEMORIAL DE QUANTITATIVOS - CONTRAPISO (ABNT NBR 13753)
+Ambiente: ${$('nomeAmbiente').value} (${$('obsAmbiente').value})
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS DE EXECUÇÃO
+- Área do Piso: ${area.toFixed(2)} m²
+- Espessura Média de Regularização: ${espCm} cm
+- Volume Total de Argamassa Farofa (c/ ${perda}% perdas): ${volumeM3.toFixed(3)} m³
+- Traço Normativo: 1:4 (Cimento : Areia em volume)
+
+2. CONSUMO DE INSUMOS
+- Cimento Portland: ${cimentoKg.toFixed(1)} kg -> ${sacosCim50} sacos de 50 kg
+- Areia Média Lavada: ${areiaM3.toFixed(2)} m³
+${fibras ? `- Fibras de Polipropileno para Controle de Retração: ${fibrasKg} kg` : '- Sem adição de fibras'}`;
+
+      $('memorial').textContent = memorialTxt;
+
+      renderSvgCamadas('contrapiso', espCm * 10);
+
+      return {
+        modulo: 'Contrapiso',
+        area: area,
+        itens,
+        memorial: memorialTxt
+      };
+    }
+
+    // 6. IMPERMEABILIZAÇÃO (NBR 9575)
+    function calcImpermeabilizacao() {
+      const area = parseFloat($('imp_area').value) || 0;
+      const perimetro = parseFloat($('imp_perimetro').value) || 0;
+      
+      // Virada de 20cm na parede
+      const areaRodape = perimetro * 0.20;
+      const areaTotal = (area + areaRodape) * 1.15; // 15% transpasse e perdas
+
+      let rolosManta = 0;
+      let primerLitros = 0;
+      let gasKg = 0;
+      let argPolimKg = 0;
+      let telaM = 0;
+      let pinturaAsfLitros = 0;
+
+      const itens = [];
+
+      // Detectar preset ativo
+      const isManta = $('btn-imp-manta').classList.contains('active');
+      const isPolim = $('btn-imp-polimerica').classList.contains('active');
+      const isAsf = $('btn-imp-asfaltica').classList.contains('active');
+
+      if (isManta) {
+        rolosManta = Math.ceil(areaTotal / 10); // Rolo de 10m²
+        primerLitros = areaTotal * 0.40;
+        gasKg = areaTotal * 0.35;
+        const latasPrimer = Math.ceil(primerLitros / 18);
+
+        itens.push({ nome: 'Manta Asfáltica 4mm Tipo III (Rolo 10m²)', qtd: rolosManta, unid: 'rolos' });
+        itens.push({ nome: 'Primer Asfáltico (Lata 18L)', qtd: latasPrimer, unid: 'latas' });
+        itens.push({ nome: 'Gás GLP para Maçarico (kg)', qtd: Math.ceil(gasKg), unid: 'kg' });
+
+        $('gridResultados').innerHTML = 
+          addCard("Área Total Protegida", areaTotal.toFixed(1), "m²", `Plano: ${area}m² + Rodapé`) +
+          addCard("Manta Asfáltica 4mm", rolosManta, "rolos 10m²", "Tipo III Poliéster") +
+          addCard("Primer Asfáltico", `${latasPrimer}`, "latas 18L", `${primerLitros.toFixed(1)} Litros`) +
+          addCard("Gás GLP Maçarico", `${gasKg.toFixed(1)}`, "kg", "Aplicação térmica") +
+          addCard("Transpasse Adotado", "10 cm", "", "Emendas soldadas") +
+          addCard("Altura Rodapé", "20 cm", "", "Virada estanque");
+
+      } else if (isPolim) {
+        argPolimKg = areaTotal * 3.5; // 3 a 4 demãos cruzadas
+        telaM = perimetro + 4; // Rodapé + ralos
+        const caixasArg18 = Math.ceil(argPolimKg / 18);
+
+        itens.push({ nome: 'Argamassa Polimérica (Caixa 18kg)', qtd: caixasArg18, unid: 'caixas' });
+        itens.push({ nome: 'Tela de Poliéster Estruturante (m)', qtd: Math.ceil(telaM), unid: 'metros' });
+
+        $('gridResultados').innerHTML = 
+          addCard("Área Total Protegida", areaTotal.toFixed(1), "m²", "Cozinha/Banheiro/Baldrame") +
+          addCard("Argamassa Polimérica", caixasArg18, "caixas 18kg", `${argPolimKg.toFixed(1)} kg`) +
+          addCard("Tela de Poliéster", Math.ceil(telaM), "metros", "Veda cantos e ralos") +
+          addCard("Demãos Recomendadas", "3 a 4", "demãos", "Aplicação cruzada") +
+          addCard("Consumo Médio", "3.5 kg/m²", "", "Semi-flexível") +
+          addCard("Tempo de Cura", "7 dias", "", "Antes do teste estanque");
+
+      } else {
+        pinturaAsfLitros = areaTotal * 0.60; // 2 a 3 demãos
+        const latas18 = Math.ceil(pinturaAsfLitros / 18);
+
+        itens.push({ nome: 'Pintura Asfáltica Alicerce (Lata 18L)', qtd: latas18, unid: 'latas' });
+
+        $('gridResultados').innerHTML = 
+          addCard("Área Total Protegida", areaTotal.toFixed(1), "m²", "Muros/Alicerce/Baldrame") +
+          addCard("Pintura Asfáltica", latas18, "latas 18L", `${pinturaAsfLitros.toFixed(1)} Litros`) +
+          addCard("Demãos", "2 a 3", "demãos", "Base solvente/água") +
+          addCard("Consumo Médio", "0.60 L/m²", "", "Bloqueio umidade ascensional") +
+          addCard("Secagem", "24 horas", "", "Por demão") +
+          addCard("Aplicação", "Trincha/Rolo", "", "Direto na alvenaria");
+      }
+
+      $('resumoTitulo').textContent = 'Impermeabilização de Estruturas';
+      $('resumoArea').textContent = `${areaTotal.toFixed(1)} m² total`;
+
+      const memorialTxt = `MEMORIAL DE QUANTITATIVOS - IMPERMEABILIZAÇÃO (ABNT NBR 9575 / NBR 9574)
+Ambiente: ${$('nomeAmbiente').value} (${$('obsAmbiente').value})
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS DA SUPERFÍCIE
+- Área Plana: ${area.toFixed(2)} m²
+- Perímetro Linear: ${perimetro.toFixed(2)} m (Virada vertical de 20cm)
+- Área Efetiva c/ Transpasses e Rodapés: ${areaTotal.toFixed(2)} m²
+
+2. ESPECIFICAÇÃO DO SISTEMA
+- Sistema Selecionado: ${isManta ? 'Manta Asfáltica 4mm Tipo III (Poliéster)' : (isPolim ? 'Argamassa Polimérica Bicomponente' : 'Emulsão/Pintura Asfáltica')}
+${isManta ? `- Manta Asfáltica: ${rolosManta} rolos de 10m²\n- Primer de Aderência: ${primerLitros.toFixed(1)} L (${Math.ceil(primerLitros/18)} latas)\n- Gás GLP p/ maçarico: ${gasKg.toFixed(1)} kg` : ''}
+${isPolim ? `- Argamassa Polimérica: ${argPolimKg.toFixed(1)} kg (${Math.ceil(argPolimKg/18)} caixas de 18kg)\n- Tela de Poliéster estruturante p/ vértices: ${Math.ceil(telaM)} metros lineares` : ''}
+${isAsf ? `- Pintura Asfáltica: ${pinturaAsfLitros.toFixed(1)} L (${Math.ceil(pinturaAsfLitros/18)} latas de 18L)` : ''}
+
+3. PRESCRIÇÕES NORMATIVAS (NBR 9574)
+- Teste de estanqueidade obrigatório por no mínimo 72 horas com lâmina d'água antes da proteção mecânica.`;
+
+      $('memorial').textContent = memorialTxt;
+
+      renderSvgCamadas('impermeabilizacao', 4);
+
+      return {
+        modulo: 'Impermeabilização',
+        area: areaTotal,
+        itens,
+        memorial: memorialTxt
+      };
+    }
+
+    // 7. RODAPÉS, SOLEIRAS E PEITORIS
+    function calcRodapes() {
+      const perimetro = parseFloat($('rod_perimetro').value) || 0;
+      const portas = parseInt($('rod_portas').value) || 0;
+      const fixacao = $('rod_fixacao').value;
+      const perda = parseFloat($('rod_perda').value) || 10;
+      const solPortas = parseFloat($('sol_portas').value) || 0;
+      const peiJanelas = parseFloat($('pei_janelas').value) || 0;
+
+      // Desconto de 80cm por vão de porta
+      const mLinearLiquido = Math.max(0, perimetro - (portas * 0.80));
+      const mLinearCompra = mLinearLiquido * (1 + perda/100);
+
+      // Fixação: 1 tubo de cola PU rende ~9m lineares
+      const tubosCola = (fixacao === 'cola_pu') ? Math.ceil(mLinearCompra / 9) : 0;
+      const sacosArgAC2 = (fixacao === 'argamassa') ? Math.ceil(mLinearCompra * 1.5 / 20) : 0;
+
+      const totalGranitos = solPortas + peiJanelas;
+
+      const itens = [
+        { nome: 'Rodapé (m linear)', qtd: parseFloat(mLinearCompra.toFixed(1)), unid: 'metros' }
+      ];
+      if (tubosCola > 0) itens.push({ nome: 'Cola PU Fixa Cuba/Rodapé (Tubo 400g)', qtd: tubosCola, unid: 'tubos' });
+      if (sacosArgAC2 > 0) itens.push({ nome: 'Argamassa Colante AC-II (Saco 20kg)', qtd: sacosArgAC2, unid: 'sacos' });
+      if (totalGranitos > 0) itens.push({ nome: 'Soleira / Peitoril Granito (m linear)', qtd: parseFloat(totalGranitos.toFixed(1)), unid: 'metros' });
+
+      $('resumoTitulo').textContent = 'Rodapés, Soleiras e Peitoris';
+      $('resumoArea').textContent = `${mLinearCompra.toFixed(1)} m rodapé`;
+
+      $('gridResultados').innerHTML = 
+        addCard("Metragem p/ Compra", mLinearCompra.toFixed(1), "metros", `+${perda}% cantos`) +
+        addCard("Metragem Líquida", mLinearLiquido.toFixed(1), "metros", `${portas} portas desc.`) +
+        addCard("Fixação de Rodapé", tubosCola > 0 ? `${tubosCola} tubos` : `${sacosArgAC2} sacos`, tubosCola > 0 ? "Cola PU 400g" : "Argamassa AC-II") +
+        addCard("Soleiras de Portas", solPortas.toFixed(1), "metros", "Granito polido") +
+        addCard("Peitoris de Janelas", peiJanelas.toFixed(1), "metros", "Granito polido") +
+        addCard("Total de Granitos", totalGranitos.toFixed(1), "metros");
+
+      const memorialTxt = `MEMORIAL DE QUANTITATIVOS - RODAPÉS E SOLEIRAS
+Ambiente: ${$('nomeAmbiente').value} (${$('obsAmbiente').value})
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. RODAPÉS
+- Perímetro Bruto do Ambiente: ${perimetro.toFixed(2)} m
+- Desconto de Vãos de Portas (${portas} portas de 80cm): ${(portas * 0.80).toFixed(2)} m
+- Comprimento Líquido: ${mLinearLiquido.toFixed(2)} m
+- Comprimento com ${perda}% de quebras e cantos: ${mLinearCompra.toFixed(2)} m lineares
+- Fixação: ${tubosCola > 0 ? `${tubosCola} tubos de Cola PU (rendimento 9m/tubo)` : `${sacosArgAC2} sacos de Argamassa AC-II`}
+
+2. SOLEIRAS E PEITORIS
+- Soleiras de Portas (largura 15/20cm): ${solPortas.toFixed(2)} metros
+- Peitoris de Janelas (c/ pingadeira): ${peiJanelas.toFixed(2)} metros
+- Metragem Total de Pedras Naturais: ${totalGranitos.toFixed(2)} metros lineares`;
+
+      $('memorial').textContent = memorialTxt;
+
+      renderSvgCamadas('rodapé', 10);
+
+      return {
+        modulo: 'Rodapés',
+        area: mLinearCompra,
+        itens,
+        memorial: memorialTxt
+      };
+    }
+
+    // 8. FORRO DE GESSO (NBR 15758)
+    function calcForro() {
+      const area = parseFloat($('fo_area').value) || 0;
+      const perimetro = parseFloat($('fo_perimetro').value) || 0;
+      const isF530 = $('btn-forro-f530').classList.contains('active');
+      const temTabica = $('fo_tabica').checked;
+
+      const itens = [];
+
+      if (isF530) {
+        // Forro Drywall estruturado F530
+        const chapas = Math.ceil(area / 2.88 * 1.05); // 1.20x2.40m
+        // Canaletas F530 a cada 60cm -> ~1.8m lineares por m²
+        const mLinearF530 = area * 1.8 * 1.05;
+        const barrasF530 = Math.ceil(mLinearF530 / 3);
+        // Tabica metálica ou cantoneira perimetral
+        const barrasTabica = Math.ceil(perimetro * 1.10 / 3);
+        // Tirantes e reguladores (1 a cada 1.2m²)
+        const tirantes = Math.ceil(area / 1.2);
+        const parafusos = Math.ceil(area * 15);
+        const massaKg = Math.ceil(area * 0.35);
+
+        itens.push({ nome: 'Chapa Drywall ST 12.5mm (1.20x2.40m)', qtd: chapas, unid: 'chapas' });
+        itens.push({ nome: 'Perfil Canaleta F530 (3m)', qtd: barrasF530, unid: 'barras' });
+        itens.push({ nome: 'Tirantes com Regulador (unid)', qtd: tirantes, unid: 'unidades' });
+        itens.push({ nome: 'Fita para Juntas Drywall (Rolo)', qtd: Math.max(1, Math.ceil(area * 1.2 / 50)), unid: 'rolos' });
+        itens.push({ nome: 'Massa de Junta Drywall (kg)', qtd: massaKg, unid: 'kg' });
+
+        $('gridResultados').innerHTML = 
+          addCard("Área de Forro", area.toFixed(1), "m²", "Teto contínuo") +
+          addCard("Chapas 1.20x2.40", chapas, "unidades", "ST 12.5mm") +
+          addCard("Canaletas F530 (3m)", barrasF530, "barras", "Eixos a 60cm") +
+          addCard("Perímetro / Tabica", `${barrasTabica}`, "barras 3m", temTabica ? "Tabica flutuante" : "Cantoneira L") +
+          addCard("Tirantes c/ Regulador", tirantes, "unidades", "Ancoragem laje") +
+          addCard("Parafusos GN25", parafusos, "unid.");
+
+      } else {
+        // Plaquinha 60x60
+        const placas = Math.ceil(area / 0.36 * 1.10); // ~2.8 a 3 un/m²
+        const gessoKg = Math.ceil(area * 1.5); // Gesso pó p/ chumbamento
+        const sacosGesso = Math.ceil(gessoKg / 40);
+
+        itens.push({ nome: 'Placa de Gesso 60x60 (unid)', qtd: placas, unid: 'placas' });
+        itens.push({ nome: 'Gesso em Pó para Fundição (Saco 40kg)', qtd: sacosGesso, unid: 'sacos' });
+
+        $('gridResultados').innerHTML = 
+          addCard("Área de Teto", area.toFixed(1), "m²", "Forro plaquinha") +
+          addCard("Placas 60x60 cm", placas, "placas", "Fundição lisa") +
+          addCard("Gesso de Chumbamento", sacosGesso, "sacos 40kg", `${gessoKg} kg em pó`) +
+          addCard("Arame Galvanizado nº 18", Math.ceil(area * 2), "metros", "Sustentação") +
+          addCard("Sisal de Fixação", Math.ceil(area * 0.1), "kg", "Bucha de gesso") +
+          addCard("Moldura Perimetral", perimetro.toFixed(1), "metros", "Acabamento de canto");
+      }
+
+      $('resumoTitulo').textContent = isF530 ? 'Forro Drywall Aramado (F530)' : 'Forro de Placas de Gesso (60x60)';
+      $('resumoArea').textContent = `${area.toFixed(1)} m² teto`;
+
+      const memorialTxt = `MEMORIAL DE QUANTITATIVOS - FORRO DE GESSO (ABNT NBR 15758)
+Ambiente: ${$('nomeAmbiente').value} (${$('obsAmbiente').value})
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+1. PARÂMETROS DO TETO
+- Área de Cobertura: ${area.toFixed(2)} m²
+- Perímetro das Paredes: ${perimetro.toFixed(2)} m
+- Sistema: ${isF530 ? 'Forro Drywall com Perfis F530 e Tirantes' : 'Forro de Placas de Gesso 60x60cm'}
+
+2. MATERIAIS PRINCIPAIS
+${isF530 ? `- Chapas de Gesso ST 12.5mm: ${Math.ceil(area / 2.88 * 1.05)} unidades\n- Perfis F530: ${Math.ceil(area * 1.8 * 1.05 / 3)} barras de 3m\n- Tabica Metálica Perimetral: ${Math.ceil(perimetro * 1.10 / 3)} barras de 3m\n- Tirantes e Reguladores: ${Math.ceil(area / 1.2)} conjuntos` : `- Placas de Gesso Fundido 60x60: ${Math.ceil(area / 0.36 * 1.10)} peças\n- Gesso em Pó de Chumbamento: ${Math.ceil(area * 1.5)} kg (${Math.ceil(area * 1.5 / 40)} sacos de 40kg)`}`;
+
+      $('memorial').textContent = memorialTxt;
+
+      renderSvgCamadas('forro', 25);
+
+      return {
+        modulo: 'Forro',
+        area: area,
+        itens,
+        memorial: memorialTxt
+      };
+    }
+
+    // =========================================================
+    // DISPATCHER PRINCIPAL DE CÁLCULO
+    // =========================================================
     function calcular() {
       $('resultadoSection').classList.remove('opacity-50');
       $('resultadoSection').classList.add('pulse-glow');
-      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 800);
 
-      const mod = $('moduloSelecionado').value;
-      if (mod === 'pintura') calcPintura();
-      else if (mod === 'piso') calcPiso();
-      else if (mod === 'drywall') calcDrywall();
+      let res = null;
+      if (moduloAtivo === 'pintura') res = calcPintura();
+      else if (moduloAtivo === 'piso') res = calcPiso();
+      else if (moduloAtivo === 'drywall') res = calcDrywall();
+      else if (moduloAtivo === 'chapisco') res = calcChapisco();
+      else if (moduloAtivo === 'contrapiso') res = calcContrapiso();
+      else if (moduloAtivo === 'impermeabilizacao') res = calcImpermeabilizacao();
+      else if (moduloAtivo === 'rodapes') res = calcRodapes();
+      else if (moduloAtivo === 'forro') res = calcForro();
+
+      ultimoResultado = res;
+      renderTabelaCustos(res.itens);
+      calcularCustos();
     }
 
-    $('btnCalcular').addEventListener('click', calcular);
-    $('btnReset').addEventListener('click', () => location.reload());
+    // =========================================================
+    // ORÇAMENTO, PREÇOS E BDI (Item 2)
+    // =========================================================
+    function renderTabelaCustos(itens) {
+      const tbody = $('tabelaCustosCorpo');
+      tbody.innerHTML = '';
 
+      itens.forEach((it, idx) => {
+        const precoPadrao = PRECOS_PADRAO[it.nome] || 25.00;
+        if (precosInsumos[it.nome] === undefined) {
+          precosInsumos[it.nome] = precoPadrao;
+        }
+
+        const subtotal = it.qtd * precosInsumos[it.nome];
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-white/5 transition';
+        tr.innerHTML = `
+          <td class="py-2 px-2 font-medium text-white">${it.nome}</td>
+          <td class="py-2 px-2 text-neon-pink font-semibold">${it.qtd}</td>
+          <td class="py-2 px-2 text-gray-400">${it.unid}</td>
+          <td class="py-2 px-2">
+            <input type="number" step="0.5" value="${precosInsumos[it.nome].toFixed(2)}" class="form-input w-24 px-2 py-1 rounded text-right text-xs bg-dark-700 text-white font-mono" onchange="atualizarPrecoInsumo('${it.nome}', this.value)">
+          </td>
+          <td class="py-2 px-2 text-right font-mono font-bold text-gray-200" id="subtotal-${idx}">
+            R$ ${subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function atualizarPrecoInsumo(nome, val) {
+      precosInsumos[nome] = parseFloat(val) || 0;
+      calcularCustos();
+    }
+
+    function calcularCustos() {
+      if (!ultimoResultado || !ultimoResultado.itens) return;
+
+      let totalMateriais = 0;
+      ultimoResultado.itens.forEach((it, idx) => {
+        const pu = precosInsumos[it.nome] || PRECOS_PADRAO[it.nome] || 0;
+        const sub = it.qtd * pu;
+        totalMateriais += sub;
+        const subEl = $(`subtotal-${idx}`);
+        if (subEl) subEl.textContent = `R$ ${sub.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      });
+
+      const taxaMO = parseFloat($('maoDeObraM2').value) || 0;
+      const taxaBdi = parseFloat($('taxaBdi').value) || 0;
+      const area = ultimoResultado.area || 1;
+
+      const totalMO = area * taxaMO;
+      const custoDireto = totalMateriais + totalMO;
+      const valorBdi = custoDireto * (taxaBdi / 100);
+      const totalGeral = custoDireto + valorBdi;
+      const custoPorM2 = totalGeral / area;
+
+      $('totalMaoDeObra').textContent = `R$ ${totalMO.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      $('totalBdi').textContent = `R$ ${valorBdi.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      $('costMateriais').textContent = `R$ ${totalMateriais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      $('costMaoObra').textContent = `R$ ${totalMO.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      $('costPorM2').textContent = `R$ ${custoPorM2.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} /m²`;
+      $('costTotalGeral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    // =========================================================
+    // DIAGRAMAS VISUAIS EM SVG (Item 4)
+    // =========================================================
+
+    // Diagrama 1: Paginação de Piso (Alinhado, Tijolinho, Diagonal)
+    function renderSvgPaginacaoPiso(area, pecaL, pecaW, paginacao) {
+      $('diagramaTipo').textContent = `Paginação: ${paginacao.toUpperCase()} (${pecaL}x${pecaW}cm)`;
+      
+      const svgW = 480;
+      const svgH = 260;
+      const pad = 25;
+      const cW = svgW - 2 * pad;
+      const cH = svgH - 2 * pad;
+
+      const escala = Math.min(cW / 6.0, cH / 4.0); // Ambiente modelo 6x4m
+      const pW = (pecaW / 100) * escala;
+      const pL = (pecaL / 100) * escala;
+
+      let rects = '';
+
+      if (paginacao === 'reto') {
+        for (let x = pad; x < pad + cW; x += pW) {
+          for (let y = pad; y < pad + cH; y += pL) {
+            const w = Math.min(pW, pad + cW - x);
+            const h = Math.min(pL, pad + cH - y);
+            const isRecorte = (w < pW - 1 || h < pL - 1);
+            rects += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${isRecorte ? 'rgba(255,0,170,0.25)' : 'rgba(139,27,247,0.2)'}" stroke="#8b1bf7" stroke-width="1"/>`;
+          }
+        }
+      } else if (paginacao === 'amarrado') {
+        let rowIdx = 0;
+        for (let y = pad; y < pad + cH; y += pL) {
+          const shift = (rowIdx % 2 === 1) ? (pW / 2) : 0;
+          for (let x = pad - (pW / 2); x < pad + cW; x += pW) {
+            const rx = Math.max(pad, x + shift);
+            const rw = Math.min(x + shift + pW, pad + cW) - rx;
+            const rh = Math.min(pL, pad + cH - y);
+            if (rw > 1 && rh > 1) {
+              const isRecorte = (rw < pW - 1 || rh < pL - 1);
+              rects += `<rect x="${rx}" y="${y}" width="${rw}" height="${rh}" fill="${isRecorte ? 'rgba(255,0,170,0.25)' : 'rgba(0,255,255,0.2)'}" stroke="#00ffff" stroke-width="1"/>`;
+            }
+          }
+          rowIdx++;
+        }
+      } else {
+        // Diagonal 45°
+        rects += `
+          <g transform="rotate(45, ${svgW/2}, ${svgH/2})">
+            ${Array.from({length: 12}).map((_, i) => 
+              Array.from({length: 12}).map((_, j) => 
+                `<rect x="${100 + i*32}" y="${-40 + j*32}" width="30" height="30" fill="rgba(255,234,0,0.18)" stroke="#ffea00" stroke-width="1"/>`
+              ).join('')
+            ).join('')}
+          </g>
+        `;
+      }
+
+      $('svgContainer').innerHTML = `
+        <svg width="100%" height="240" viewBox="0 0 ${svgW} ${svgH}" class="select-none overflow-hidden">
+          <defs>
+            <clipPath id="clipRoom">
+              <rect x="${pad}" y="${pad}" width="${cW}" height="${cH}" rx="4"/>
+            </clipPath>
+          </defs>
+          <!-- Contorno do Ambiente -->
+          <rect x="${pad}" y="${pad}" width="${cW}" height="${cH}" fill="#0e0e17" stroke="#ffffff" stroke-width="2" rx="4"/>
+          <!-- Peças Paginação -->
+          <g clip-path="url(#clipRoom)">
+            ${rects}
+          </g>
+          <!-- Cotas -->
+          <text x="${svgW/2}" y="${pad - 8}" text-anchor="middle" font-size="11" font-family="JetBrains Mono" fill="#94a3b8">Largura do Ambiente (m)</text>
+          <text x="${pad - 8}" y="${svgH/2}" text-anchor="middle" font-size="11" font-family="JetBrains Mono" fill="#94a3b8" transform="rotate(-90, ${pad - 8}, ${svgH/2})">Comprimento (m)</text>
+          <!-- Legenda -->
+          <circle cx="${svgW - 140}" cy="${svgH - 8}" r="4" fill="#8b1bf7"/>
+          <text x="${svgW - 130}" y="${svgH - 5}" font-size="9" fill="#94a3b8">Peça Inteira</text>
+          <circle cx="${svgW - 60}" cy="${svgH - 8}" r="4" fill="#ff00aa"/>
+          <text x="${svgW - 50}" y="${svgH - 5}" font-size="9" fill="#94a3b8">Recorte</text>
+        </svg>
+      `;
+    }
+
+    // Diagrama 2: Estrutura Metálica de Drywall
+    function renderSvgDrywall(l, h, espacamento, numMontantes) {
+      $('diagramaTipo').textContent = `Elevação: L=${l}m x H=${h}m (Eixos ${espacamento}mm)`;
+      
+      const svgW = 480;
+      const svgH = 240;
+      const padX = 40;
+      const padY = 30;
+      const wWall = svgW - 2 * padX;
+      const hWall = svgH - 2 * padY;
+
+      const passoPx = wWall / (numMontantes - 1);
+
+      let studs = '';
+      for (let i = 0; i < numMontantes; i++) {
+        const x = padX + i * passoPx;
+        studs += `
+          <line x1="${x}" y1="${padY}" x2="${x}" y2="${padY + hWall}" stroke="#00ffff" stroke-width="3" stroke-linecap="round"/>
+          <text x="${x}" y="${padY + hWall + 15}" font-size="8" fill="#64748b" text-anchor="middle" font-family="JetBrains Mono">M${i+1}</text>
+        `;
+      }
+
+      $('svgContainer').innerHTML = `
+        <svg width="100%" height="240" viewBox="0 0 ${svgW} ${svgH}" class="select-none">
+          <!-- Chapa Translúcida de Fundo -->
+          <rect x="${padX}" y="${padY}" width="${wWall}" height="${hWall}" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.15)" stroke-dasharray="4,4"/>
+          
+          <!-- Guias Superior e Inferior (Aço Laranja) -->
+          <line x1="${padX}" y1="${padY}" x2="${padX + wWall}" y2="${padY}" stroke="#ff8800" stroke-width="6" stroke-linecap="square"/>
+          <line x1="${padX}" y1="${padY + hWall}" x2="${padX + wWall}" y2="${padY + hWall}" stroke="#ff8800" stroke-width="6" stroke-linecap="square"/>
+          
+          <!-- Montantes Verticais -->
+          ${studs}
+
+          <!-- Cotas de Dimensão -->
+          <text x="${svgW/2}" y="${padY - 10}" text-anchor="middle" font-size="11" font-family="JetBrains Mono" fill="#ff8800" font-weight="bold">Guia Superior (${l} m)</text>
+          <text x="${svgW/2}" y="${svgH - 2}" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#64748b">Eixos espaçados a cada ${espacamento} mm</text>
+          <text x="${padX - 10}" y="${svgH/2}" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#00ffff" transform="rotate(-90, ${padX - 10}, ${svgH/2})">H = ${h} m</text>
+        </svg>
+      `;
+    }
+
+    // Diagrama 3: Parede de Pintura com Vãos
+    function renderSvgPintura(aBruta, aVaos, aLiq) {
+      $('diagramaTipo').textContent = `Elevação da Parede: ${aLiq.toFixed(1)} m² líquida`;
+      
+      const svgW = 480;
+      const svgH = 240;
+      
+      $('svgContainer').innerHTML = `
+        <svg width="100%" height="240" viewBox="0 0 ${svgW} ${svgH}" class="select-none">
+          <!-- Parede Principal (Área Pintável Rosa Neon) -->
+          <rect x="40" y="30" width="400" height="170" fill="rgba(255,0,170,0.18)" stroke="#ff00aa" stroke-width="2" rx="4"/>
+          
+          <!-- Porta Descontada -->
+          <rect x="80" y="100" width="45" height="100" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5"/>
+          <circle cx="120" cy="150" r="2.5" fill="#fbcfe8"/>
+          <text x="102" y="92" font-size="9" fill="#818cf8" text-anchor="middle">Porta</text>
+
+          <!-- Janela Descontada -->
+          <rect x="250" y="55" width="80" height="60" fill="#0c4a6e" stroke="#38bdf8" stroke-width="1.5"/>
+          <line x1="290" y1="55" x2="290" y2="115" stroke="#38bdf8" stroke-width="1"/>
+          <text x="290" y="47" font-size="9" fill="#38bdf8" text-anchor="middle">Janela</text>
+
+          <!-- Cotas e Textos -->
+          <text x="240" y="18" text-anchor="middle" font-size="11" font-family="JetBrains Mono" fill="#ff00aa" font-weight="bold">Área Bruta: ${aBruta} m²</text>
+          <text x="240" y="160" text-anchor="middle" font-size="12" font-family="JetBrains Mono" fill="#ffffff" font-weight="bold">Área Efetiva: ${aLiq.toFixed(1)} m²</text>
+          <text x="240" y="180" text-anchor="middle" font-size="10" font-family="JetBrains Mono" fill="#94a3b8">Desconto de vãos: -${aVaos} m²</text>
+        </svg>
+      `;
+    }
+
+    // Diagrama 4: Corte Esquemático de Camadas
+    function renderSvgCamadas(tipo, esp) {
+      $('diagramaTipo').textContent = `Corte Esquemático de Camadas: ${tipo.toUpperCase()}`;
+      const svgW = 480;
+      const svgH = 240;
+
+      $('svgContainer').innerHTML = `
+        <svg width="100%" height="240" viewBox="0 0 ${svgW} ${svgH}" class="select-none font-sans">
+          <!-- Base: Alvenaria ou Laje -->
+          <rect x="50" y="40" width="100" height="150" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+          <text x="100" y="120" text-anchor="middle" font-size="11" fill="#cbd5e1" font-weight="bold">Base Alvenaria</text>
+
+          <!-- Camada 1: Chapisco -->
+          <rect x="150" y="40" width="15" height="150" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
+          <text x="157" y="30" text-anchor="middle" font-size="9" fill="#f59e0b">Chapisco (5mm)</text>
+
+          <!-- Camada 2: Emboço / Regularização -->
+          <rect x="165" y="40" width="55" height="150" fill="#94a3b8" stroke="#cbd5e1" stroke-width="1"/>
+          <text x="192" y="30" text-anchor="middle" font-size="9" fill="#94a3b8">${tipo.toUpperCase()} (${esp}mm)</text>
+
+          <!-- Camada 3: Acabamento Superficial -->
+          <rect x="220" y="40" width="10" height="150" fill="#ff00aa" stroke="#db2777" stroke-width="1"/>
+          <text x="225" y="30" text-anchor="middle" font-size="9" fill="#ff00aa">Acabamento</text>
+
+          <!-- Indicadores de Detalhe -->
+          <line x1="230" y1="90" x2="330" y2="90" stroke="#ff00aa" stroke-dasharray="3,3"/>
+          <text x="340" y="93" font-size="10" fill="#ff00aa" font-weight="bold">Pintura / Cerâmica</text>
+
+          <line x1="220" y1="130" x2="330" y2="130" stroke="#94a3b8" stroke-dasharray="3,3"/>
+          <text x="340" y="133" font-size="10" fill="#cbd5e1">Massa de Regularização</text>
+
+          <line x1="165" y1="160" x2="330" y2="160" stroke="#f59e0b" stroke-dasharray="3,3"/>
+          <text x="340" y="163" font-size="10" fill="#f59e0b">Ponte de Aderência</text>
+        </svg>
+      `;
+    }
+
+    // =========================================================
+    // MULTI-AMBIENTES E WHATSAPP (Item 6)
+    // =========================================================
+    function adicionarAmbienteObra() {
+      if (!ultimoResultado) calcular();
+      const nome = $('nomeAmbiente').value.trim() || 'Cômodo Sem Nome';
+      const obs = $('obsAmbiente').value.trim();
+
+      const ambiente = {
+        id: Date.now(),
+        nome,
+        obs,
+        servico: ultimoResultado.modulo,
+        area: ultimoResultado.area,
+        itens: [...ultimoResultado.itens]
+      };
+
+      ambientesObra.push(ambiente);
+      atualizarContadorAmbientes();
+      renderAmbientesModal();
+      showToast(`Ambiente "${nome}" adicionado com sucesso!`);
+    }
+
+    function removerAmbiente(id) {
+      ambientesObra = ambientesObra.filter(a => a.id !== id);
+      atualizarContadorAmbientes();
+      renderAmbientesModal();
+    }
+
+    function limparTodosAmbientes() {
+      if (confirm("Deseja remover todos os ambientes salvos?")) {
+        ambientesObra = [];
+        atualizarContadorAmbientes();
+        renderAmbientesModal();
+      }
+    }
+
+    function atualizarContadorAmbientes() {
+      const c = ambientesObra.length;
+      $('contAmbientes').textContent = c;
+      const mc = $('modalContAmbientes');
+      if (mc) mc.textContent = c;
+    }
+
+    function toggleModalObra() {
+      const m = $('modalObra');
+      if (m.classList.contains('hidden')) {
+        m.classList.remove('hidden');
+        renderAmbientesModal();
+      } else {
+        m.classList.add('hidden');
+      }
+    }
+
+    function renderAmbientesModal() {
+      const divTabela = $('listaAmbientesTabela');
+      const divConsol = $('listaConsolidadaCompras');
+
+      if (ambientesObra.length === 0) {
+        divTabela.innerHTML = '<p class="text-gray-500 italic text-center py-4">Nenhum cômodo adicionado ainda.</p>';
+        divConsol.innerHTML = '<p class="text-gray-500 italic text-center py-4">Adicione ambientes para gerar a lista de compras consolidada.</p>';
+        return;
+      }
+
+      // 1. Tabela de Ambientes
+      let htmlT = '';
+      ambientesObra.forEach((amb, idx) => {
+        htmlT += `
+          <div class="p-3 bg-dark-700/60 rounded-xl border border-white/5 flex items-center justify-between">
+            <div>
+              <div class="font-bold text-white text-sm">${amb.nome} <span class="text-xs font-normal text-gray-400">(${amb.obs})</span></div>
+              <div class="text-xs text-neon-pink">${amb.servico} • ${amb.area.toFixed(1)} m²</div>
+            </div>
+            <button onclick="removerAmbiente(${amb.id})" class="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-white/5 transition" title="Remover">✕</button>
+          </div>
+        `;
+      });
+      divTabela.innerHTML = htmlT;
+
+      // 2. Consolidação de Itens
+      const mapaTotal = {};
+      ambientesObra.forEach(amb => {
+        amb.itens.forEach(it => {
+          const key = it.nome;
+          if (!mapaTotal[key]) {
+            mapaTotal[key] = { qtd: 0, unid: it.unid };
+          }
+          mapaTotal[key].qtd += it.qtd;
+        });
+      });
+
+      let htmlC = '';
+      for (const [nome, dado] of Object.entries(mapaTotal)) {
+        htmlC += `
+          <div class="flex justify-between border-b border-white/5 pb-1">
+            <span class="text-gray-300">• ${nome}</span>
+            <span class="text-neon-pink font-bold">${typeof dado.qtd === 'number' ? dado.qtd.toLocaleString('pt-BR', {maximumFractionDigits: 1}) : dado.qtd} ${dado.unid}</span>
+          </div>
+        `;
+      }
+      divConsol.innerHTML = htmlC;
+    }
+
+    function copiarPedidoWhatsApp() {
+      if (ambientesObra.length === 0) {
+        alert("Adicione ao menos um cômodo à obra para gerar a cotação!");
+        return;
+      }
+
+      const mapaTotal = {};
+      ambientesObra.forEach(amb => {
+        amb.itens.forEach(it => {
+          const key = it.nome;
+          if (!mapaTotal[key]) mapaTotal[key] = { qtd: 0, unid: it.unid };
+          mapaTotal[key].qtd += it.qtd;
+        });
+      });
+
+      let msg = `*SOLICITAÇÃO DE COTAÇÃO - MATERIAIS DE ACABAMENTO*\n`;
+      msg += `*Obra:* ${$('obsAmbiente').value || 'Reforma Residencial'}\n`;
+      msg += `*Data:* ${new Date().toLocaleDateString('pt-BR')}\n\n`;
+      msg += `*CÔMODOS COTADOS:*` + ambientesObra.map(a => `\n- ${a.nome} (${a.servico}: ${a.area.toFixed(1)} m²)`).join('') + '\n\n';
+      msg += `*LISTA CONSOLIDADA DE MATERIAIS:*`;
+
+      for (const [nome, dado] of Object.entries(mapaTotal)) {
+        msg += `\n• *${dado.qtd} ${dado.unid}* - ${nome}`;
+      }
+
+      msg += `\n\n_Favor responder com prazo de entrega e condições comerciais._`;
+
+      navigator.clipboard.writeText(msg).then(() => {
+        alert("✅ Lista de cotação copiada para a área de transferência! Cole diretamente no WhatsApp do seu fornecedor.");
+      });
+    }
+
+    function copiarMemorialTexto() {
+      const txt = $('memorial').textContent;
+      navigator.clipboard.writeText(txt).then(() => {
+        alert("Memorial copiado!");
+      });
+    }
+
+    function showToast(msg) {
+      const div = document.createElement('div');
+      div.className = 'fixed bottom-5 right-5 z-50 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-2xl animate-bounce';
+      div.textContent = msg;
+      document.body.appendChild(div);
+      setTimeout(() => div.remove(), 2500);
+    }
+
+    // =========================================================
+    // INTEGRAÇÃO COM A SUÍTE ECALC (Item 3)
+    // =========================================================
+
+    // 1. Memorial ABNT Completo (sem páginas em branco)
+    function gerarMemorialAcabamentos() {
+      if (!ultimoResultado) calcular();
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        alert('Módulo de Memorial não disponível');
+        return;
+      }
+
+      const res = ultimoResultado;
+      const modNome = res.modulo;
+
+      const normasMap = {
+        'Pintura': 'ABNT NBR 13245 (Tintas para Edificação) e Padrões ABRAFATI',
+        'Piso': 'ABNT NBR 13753 (Revestimento Cerâmico) e NBR 14081 (Argamassas)',
+        'Drywall': 'ABNT NBR 15758 (Sistemas Construtivos em Chapas de Gesso)',
+        'Chapisco/Emboço': 'ABNT NBR 13749 (Revestimento de Paredes e Tetos de Argamassas)',
+        'Contrapiso': 'ABNT NBR 13753 (Contrapiso e Regularização de Pisos)',
+        'Impermeabilização': 'ABNT NBR 9575 (Seleção e Projeto) e NBR 9574 (Execução)',
+        'Rodapés': 'Práticas Recomendadas ABNT de Acabamentos e Revestimentos',
+        'Forro': 'ABNT NBR 15758 (Forros Estruturados e Gesso em Placas)'
+      };
+
+      const normaRef = normasMap[modNome] || 'Normas Técnicas Brasileiras ABNT';
+
+      const inputsTab = [
+        { label: 'Ambiente / Cômodo', val: $('nomeAmbiente').value },
+        { label: 'Referência / Local', val: $('obsAmbiente').value },
+        { label: 'Módulo Técnico', val: modNome },
+        { label: 'Área Total de Intervenção', val: `${res.area.toFixed(2)} m²` }
+      ];
+
+      const resultadosTab = res.itens.map(it => ({
+        label: it.nome,
+        val: `${it.qtd} ${it.unid}`,
+        status: 'ok'
+      }));
+
+      // Tabela HTML personalizada de materiais e custos
+      let htmlTabela = `
+        <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:8px;">
+          <thead>
+            <tr style="background:#f1f5f9; border-bottom:2px solid #cbd5e1;">
+              <th style="padding:6px; text-align:left;">Item / Insumo</th>
+              <th style="padding:6px; text-align:center;">Qtd</th>
+              <th style="padding:6px; text-align:center;">Unid</th>
+              <th style="padding:6px; text-align:right;">Preço Unit. (R$)</th>
+              <th style="padding:6px; text-align:right;">Total (R$)</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      res.itens.forEach(it => {
+        const pu = precosInsumos[it.nome] || PRECOS_PADRAO[it.nome] || 0;
+        const tot = it.qtd * pu;
+        htmlTabela += `
+          <tr style="border-bottom:1px solid #e2e8f0;">
+            <td style="padding:6px;">${it.nome}</td>
+            <td style="padding:6px; text-align:center; font-weight:bold;">${it.qtd}</td>
+            <td style="padding:6px; text-align:center;">${it.unid}</td>
+            <td style="padding:6px; text-align:right;">${pu.toFixed(2)}</td>
+            <td style="padding:6px; text-align:right; font-weight:bold;">${tot.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+      htmlTabela += '</tbody></table>';
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: `Memorial de Quantitativos e Especificação Técnica — ${modNome}`,
+        norma: normaRef,
+        elemento: `${$('nomeAmbiente').value} (${$('obsAmbiente').value}) — ${res.area.toFixed(1)} m²`,
+        inputs: inputsTab,
+        resultados: resultadosTab,
+        verificacoes: [
+          { item: 'Conformidade de Consumo Normativo', exigido: 'Consumo por m² ABNT', obtido: 'Conforme', status: 'ok' },
+          { item: 'Previsão de Perdas e Recortes', exigido: '5% a 15% conforme elemento', obtido: 'Atendido', status: 'ok' },
+          { item: 'Compatibilidade de Insumos', exigido: 'Especificação técnica do fabricante', obtido: 'Conforme', status: 'ok' }
+        ],
+        tabelas: [
+          { titulo: 'Tabela Orçamentária de Materiais e Insumos', html: htmlTabela }
+        ],
+        notas: [
+          'Todos os quantitativos incluem margens técnicas de recorte, emendas e perdas usuais de canteiro.',
+          'A execução deve seguir rigorosamente as prescrições de cura, juntas de dilatação e testes prévios de estanqueidade.',
+          'Valores orçamentários calculados com base em medianas de insumos civis e BDI integrado.'
+        ]
+      });
+    }
+
+    // 2. Exportação OfficeClone
+    function exportarOfficeClone() {
+      if (!ultimoResultado) calcular();
+      const res = ultimoResultado;
+
+      const csvData = [
+        ['ITEM', 'DISCRIMINACAO DO MATERIAL', 'QUANTIDADE', 'UNIDADE', 'PRECO UNITARIO (R$)', 'TOTAL (R$)']
+      ];
+
+      res.itens.forEach((it, idx) => {
+        const pu = precosInsumos[it.nome] || PRECOS_PADRAO[it.nome] || 0;
+        const tot = it.qtd * pu;
+        csvData.push([
+          idx + 1,
+          it.nome,
+          it.qtd,
+          it.unid,
+          pu.toFixed(2),
+          tot.toFixed(2)
+        ]);
+      });
+
+      localStorage.setItem('officeclone_import_data', JSON.stringify({
+        filename: `Orcamento_Acabamentos_${res.modulo}_${$('nomeAmbiente').value}.csv`,
+        rows: csvData
+      }));
+      window.open('../office/excel/', '_blank');
+    }
+
+    // 3. Exportação CADClone e DXF
+    function gerarDxfConteudoAcabamentos() {
+      if (typeof window.ECALC_CAD === 'undefined') return null;
+      const builder = window.ECALC_CAD.createBuilder();
+
+      const l = parseFloat($('pi_l')?.value) || 60;
+      const w = parseFloat($('pi_w')?.value) || 60;
+      const paginacao = $('pi_paginacao')?.value || 'reto';
+
+      // Desenhar contorno do ambiente modelo (6m x 4m) em mm
+      builder.addRect(0, 0, 6000, 4000, '0', 7);
+      builder.addText(100, 4100, 150, `PAGINACAO DE PISO - ${$('nomeAmbiente').value} (${l}x${w}cm)`, 'TEXTO', 7);
+
+      const pW = w * 10;
+      const pL = l * 10;
+
+      for (let x = 0; x < 6000; x += pW) {
+        for (let y = 0; y < 4000; y += pL) {
+          const rx = x;
+          const ry = y;
+          const rw = Math.min(pW, 6000 - x);
+          const rh = Math.min(pL, 4000 - y);
+          builder.addRect(rx, ry, rw, rh, 'CONCRETO', 4);
+        }
+      }
+
+      builder.addDimension(0, 0, 6000, 0, -250, '6000 mm', 'COTAS');
+      builder.addDimension(0, 0, 0, 4000, -250, '4000 mm', 'COTAS');
+
+      return builder.build();
+    }
+
+    function abrirNoCadCloneAcabamentos() {
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoAcabamentos();
+      if (dxf) {
+        window.ECALC_CAD.abrirNoCadClone(dxf, `Paginacao_${$('nomeAmbiente').value}.dxf`);
+      }
+    }
+
+    function baixarDxfAcabamentos() {
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoAcabamentos();
+      if (dxf) {
+        window.ECALC_CAD.baixarDXF(dxf, `Paginacao_${$('nomeAmbiente').value}.dxf`);
+      }
+    }
+
+    // Inicialização ao carregar o DOM
     document.addEventListener('DOMContentLoaded', () => {
       if ($('year')) $('year').textContent = new Date().getFullYear();
+      calcular();
+    });
+
+    $('btnReset').addEventListener('click', () => {
+      if (confirm("Deseja redefinir os parâmetros deste módulo?")) {
+        location.reload();
+      }
     });
   </script>
-    <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js"></script>
+
+  <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
+  <script src="assets/suite/suite-nav.js"></script>
+  <script src="assets/suite/suite-memorial.js"></script>
+  <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>
