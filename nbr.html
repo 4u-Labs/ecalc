@@ -4042,8 +4042,8 @@
                 const score = relevanceScore(norma, currentSearch);
                 const scoreBadge = currentSearch ? `<span class="bg-white/25 text-[11px] font-bold px-2 py-0.5 rounded-full">Score: ${score}</span>` : '';
                 const hasLocalPdf = !!pdfMap[norma.id];
-                const nrBuiltinPath = getNrPdfPath(norma.id);
-                const hasBuiltinPdf = !hasLocalPdf && !!nrBuiltinPath;
+                const builtinPath = getBuiltinPdfPath(norma.id);
+                const hasBuiltinPdf = !hasLocalPdf && !!builtinPath;
 
                 let pdfActionHtml = '';
                 if (hasLocalPdf) {
@@ -4054,20 +4054,23 @@
                                 <span>PDF Completo</span>
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             </button>
-                            <button onclick="deleteCardPdf(event, '${norma.id}', '${norma.codigo}')" class="w-7 h-7 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 flex items-center justify-center transition text-xs border border-red-200 shadow-2xs hover:scale-105 active:scale-95 cursor-pointer" title="${nrBuiltinPath ? 'Remover anexo customizado e restaurar PDF oficial integrado' : 'Excluir PDF anexado desta norma'}">
+                            <button onclick="deleteCardPdf(event, '${norma.id}', '${norma.codigo}')" class="w-7 h-7 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 flex items-center justify-center transition text-xs border border-red-200 shadow-2xs hover:scale-105 active:scale-95 cursor-pointer" title="${builtinPath ? 'Remover anexo customizado e restaurar PDF integrado' : 'Excluir PDF anexado desta norma'}">
                                 <i class="fas fa-trash-can text-xs"></i>
                             </button>
                         </div>
                     `;
                 } else if (hasBuiltinPdf) {
+                    const isNr = norma.id.toLowerCase().startsWith('nr');
+                    const label = isNr ? 'PDF Oficial' : 'PDF Completo';
+                    const tooltip = isNr ? 'Abrir PDF oficial consolidado vigente já integrado no projeto' : 'Abrir PDF completo integrado (disponibilizado publicamente por universidade/órgão público)';
                     pdfActionHtml = `
                         <div class="flex items-center gap-1">
-                            <button onclick="event.stopPropagation(); openPdfById('${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 border border-emerald-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Abrir PDF oficial consolidado vigente já integrado no projeto">
+                            <button onclick="event.stopPropagation(); openPdfById('${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 border border-emerald-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="${tooltip}">
                                 <i class="fas fa-file-pdf text-emerald-600"></i>
-                                <span>PDF Oficial</span>
+                                <span>${label}</span>
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             </button>
-                            <button onclick="attachPdfDirectly(event, '${norma.id}')" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 flex items-center gap-1 transition text-xs border border-slate-200 shadow-2xs cursor-pointer" title="Anexar versão própria / anotada desta NR">
+                            <button onclick="attachPdfDirectly(event, '${norma.id}')" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 flex items-center gap-1 transition text-xs border border-slate-200 shadow-2xs cursor-pointer" title="Anexar versão própria / anotada desta norma">
                                 <i class="fas fa-paperclip text-[11px]"></i>
                             </button>
                         </div>
@@ -4334,15 +4337,16 @@
             document.getElementById('modalHeader').className = `bg-gradient-to-r ${colors[norma.cor] || 'from-slate-700 to-slate-900'} text-white pt-5 sm:pt-6 pb-4 sm:pb-5 px-4 sm:px-6 shrink-0 shadow-xs`;
 
             const hasLocalPdf = !!pdfMap[norma.id];
-            const nrPath = getNrPdfPath(norma.id);
-            const hasBuiltinPdf = !hasLocalPdf && !!nrPath;
+            const builtinPath = getBuiltinPdfPath(norma.id);
+            const hasBuiltinPdf = !hasLocalPdf && !!builtinPath;
             const hasAnyPdf = hasLocalPdf || hasBuiltinPdf;
+            const isNr = norma.id.toLowerCase().startsWith('nr');
 
             const delModalBtn = document.getElementById('modalDeletePdfBtn');
             if (delModalBtn) {
                 if (hasLocalPdf) {
                     delModalBtn.classList.remove('hidden');
-                    delModalBtn.setAttribute('data-tip', nrPath ? 'Remover anexo customizado e restaurar PDF oficial integrado' : 'Excluir PDF anexado desta norma');
+                    delModalBtn.setAttribute('data-tip', builtinPath ? 'Remover anexo customizado e restaurar PDF integrado' : 'Excluir PDF anexado desta norma');
                 } else {
                     delModalBtn.classList.add('hidden');
                 }
@@ -4352,8 +4356,9 @@
             if (openModalBtn) {
                 if (hasAnyPdf) {
                     openModalBtn.classList.remove('opacity-40');
-                    openModalBtn.title = hasLocalPdf ? 'Abrir PDF salvo no navegador' : 'Abrir PDF oficial consolidado vigente integrado';
-                    openModalBtn.innerHTML = `<i class="fas fa-file-pdf text-xs"></i><span class="hidden md:inline font-semibold">${hasLocalPdf ? 'Abrir PDF Local' : 'Abrir PDF Oficial'}</span>`;
+                    const label = hasLocalPdf ? 'Abrir PDF Local' : (isNr ? 'Abrir PDF Oficial' : 'Abrir PDF Completo');
+                    openModalBtn.title = hasLocalPdf ? 'Abrir PDF salvo no navegador' : (isNr ? 'Abrir PDF oficial consolidado vigente integrado' : 'Abrir PDF completo integrado');
+                    openModalBtn.innerHTML = `<i class="fas fa-file-pdf text-xs"></i><span class="hidden md:inline font-semibold">${label}</span>`;
                 } else {
                     openModalBtn.classList.add('opacity-40');
                     openModalBtn.title = 'Sem PDF anexado para esta norma';
@@ -4369,7 +4374,7 @@
 
             let metaText = 'Consulta rápida • resumo técnico';
             if (hasLocalPdf) metaText = 'Consulta rápida • PDF local anexado';
-            else if (hasBuiltinPdf) metaText = 'Consulta rápida • PDF oficial vigente anexado';
+            else if (hasBuiltinPdf) metaText = isNr ? 'Consulta rápida • PDF oficial vigente anexado' : 'Consulta rápida • PDF completo integrado';
             document.getElementById('modalMeta').textContent = metaText;
 
             const isFav = favorites.includes(norma.id);
@@ -4919,20 +4924,39 @@
             sel.innerHTML = options;
         }
 
-        function getNrPdfPath(normaId) {
+        const builtinNbrPdfs = new Set([
+            'nbr5410', 'nbr5626', 'nbr5674', 'nbr6122', 'nbr6492', 'nbr7229',
+            'nbr8160', 'nbr8681', 'nbr9050', 'nbr9077', 'nbr10151', 'nbr10844',
+            'nbr13434', 'nbr13969', 'nbr14718', 'nbr14931', 'nbr15575', 'nbr16280'
+        ]);
+
+        function getBuiltinPdfPath(normaId) {
             if (!normaId || typeof normaId !== 'string') return null;
             const cleanId = normaId.toLowerCase().trim();
-            if (!cleanId.startsWith('nr')) return null;
-            const num = parseInt(cleanId.replace('nr', ''), 10);
-            if (isNaN(num) || num === 2 || num === 27) return null;
-            return `docs/nrs/nr-${String(num).padStart(2, '0')}.pdf`;
+            if (cleanId.startsWith('nr') && !cleanId.startsWith('nbr')) {
+                const num = parseInt(cleanId.replace('nr', ''), 10);
+                if (isNaN(num) || num === 2 || num === 27) return null;
+                return `docs/nrs/nr-${String(num).padStart(2, '0')}.pdf`;
+            }
+            if (builtinNbrPdfs.has(cleanId)) {
+                return `docs/nbrs/${cleanId}.pdf`;
+            }
+            return null;
+        }
+
+        function getNrPdfPath(normaId) {
+            return getBuiltinPdfPath(normaId);
         }
 
         async function updatePdfCount() {
-            // 36 NRs oficiais gratuitas já integradas ao projeto + anexos locais de NBRs
-            let count = 36;
+            // 36 NRs oficiais + 18 NBRs públicas integradas = 54 normas prontas no projeto
+            let count = 36 + builtinNbrPdfs.size;
             for (const id in (pdfMap || {})) {
-                if (!id.startsWith('nr')) {
+                const cleanId = id.toLowerCase().trim();
+                const isNr = cleanId.startsWith('nr') && !cleanId.startsWith('nbr');
+                const isBuiltinNbr = builtinNbrPdfs.has(cleanId);
+                // Incrementa se o usuário anexou PDF para uma norma que não tinha PDF nativo
+                if (!isNr && !isBuiltinNbr) {
                     count++;
                 }
             }
@@ -5037,19 +5061,19 @@
                     return;
                 }
             }
-            // 2. PDF oficial integrado no projeto (36 NRs oficiais gratuitas)
-            const nrPath = getNrPdfPath(normaId);
-            if (nrPath) {
-                window.open(nrPath, '_blank', 'noopener,noreferrer');
+            // 2. PDF integrado no projeto (36 NRs oficiais + 18 NBRs públicas)
+            const builtinPath = getBuiltinPdfPath(normaId);
+            if (builtinPath) {
+                window.open(builtinPath, '_blank', 'noopener,noreferrer');
                 return;
             }
             showToast('Nenhum PDF disponível para esta norma', 'info');
         }
 
         function openOfficialPdfDirect(normaId) {
-            const nrPath = getNrPdfPath(normaId);
-            if (nrPath) {
-                window.open(nrPath, '_blank', 'noopener,noreferrer');
+            const builtinPath = getBuiltinPdfPath(normaId);
+            if (builtinPath) {
+                window.open(builtinPath, '_blank', 'noopener,noreferrer');
                 return;
             }
             const off = officialLinks[normaId];
@@ -5148,14 +5172,22 @@
                 event.preventDefault();
             }
             const nome = normaCodigo || normaId;
-            if (!confirm(`Deseja realmente excluir o PDF anexado da ${nome}?`)) return;
+            const hasBuiltin = !!getBuiltinPdfPath(normaId);
+            const msg = hasBuiltin
+                ? `Deseja remover o anexo local da norma ${nome} e restaurar o PDF integrado original?`
+                : `Deseja realmente excluir o PDF anexado da ${nome}?`;
+            if (!confirm(msg)) return;
             await removePdf(normaId);
         }
 
         async function deleteCurrentNormaPdf() {
             if (!currentNorma) return;
-            if (!confirm(`Deseja realmente excluir o PDF anexado de ${currentNorma.codigo}?`)) return;
             const id = currentNorma.id;
+            const hasBuiltin = !!getBuiltinPdfPath(id);
+            const msg = hasBuiltin
+                ? `Deseja remover o anexo local da norma ${currentNorma.codigo} e restaurar o PDF integrado original?`
+                : `Deseja realmente excluir o PDF anexado de ${currentNorma.codigo}?`;
+            if (!confirm(msg)) return;
             await removePdf(id);
             if (currentNorma && currentNorma.id === id) {
                 openModal(id);
@@ -5182,8 +5214,8 @@
             if (currentNorma && currentNorma.id === normaId) {
                 openModal(normaId);
             }
-            const isNr = getNrPdfPath(normaId);
-            showToast(isNr ? 'Anexo local removido. PDF oficial integrado restaurado!' : 'PDF removido com sucesso!', 'info');
+            const hasBuiltin = !!getBuiltinPdfPath(normaId);
+            showToast(hasBuiltin ? 'Anexo local removido. PDF integrado restaurado!' : 'PDF removido com sucesso!', 'info');
         }
 
         function renderBiblioteca() {
@@ -5204,9 +5236,10 @@
                 })
                 .map(n => {
                     const hasLocal = !!pdfMap[n.id];
-                    const nrPath = getNrPdfPath(n.id);
-                    const hasBuiltin = !hasLocal && !!nrPath;
+                    const builtinPath = getBuiltinPdfPath(n.id);
+                    const hasBuiltin = !hasLocal && !!builtinPath;
                     const hasAny = hasLocal || hasBuiltin;
+                    const isNr = n.id.toLowerCase().startsWith('nr');
 
                     const lnk = officialLinks[n.id];
                     const officialBtn = lnk?.url
@@ -5225,10 +5258,13 @@
                             <button class="px-3 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition text-sm cursor-pointer" onclick="openPdfById('${n.id}')"><i class="fas fa-file-pdf mr-1.5"></i>Abrir PDF</button>
                         `;
                     } else if (hasBuiltin) {
-                        statusBadge = '<span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 font-semibold"><i class="fas fa-circle-check mr-1 text-blue-600"></i>Oficial Integrado</span>';
-                        subText = '<div class="text-xs text-blue-700 mt-1"><i class="fas fa-file-pdf mr-1 text-blue-600"></i>PDF oficial vigente pronto no projeto</div>';
+                        const badgeText = isNr ? 'Oficial Integrado' : 'Documento Integrado';
+                        const infoText = isNr ? 'PDF oficial vigente pronto no projeto' : 'PDF completo integrado pronto no projeto';
+                        const btnLabel = isNr ? 'Abrir PDF Oficial' : 'Abrir PDF Completo';
+                        statusBadge = `<span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 font-semibold"><i class="fas fa-circle-check mr-1 text-blue-600"></i>${badgeText}</span>`;
+                        subText = `<div class="text-xs text-blue-700 mt-1"><i class="fas fa-file-pdf mr-1 text-blue-600"></i>${infoText}</div>`;
                         pdfBtn = `
-                            <button class="px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition text-sm font-semibold cursor-pointer shadow-xs" onclick="openPdfById('${n.id}')"><i class="fas fa-file-pdf mr-1.5"></i>Abrir PDF Oficial</button>
+                            <button class="px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition text-sm font-semibold cursor-pointer shadow-xs" onclick="openPdfById('${n.id}')"><i class="fas fa-file-pdf mr-1.5"></i>${btnLabel}</button>
                             <button class="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition text-sm cursor-pointer" onclick="attachPdfDirectly(event, '${n.id}')" title="Substituir por versão própria anotada"><i class="fas fa-paperclip mr-1.5"></i>Anexar local</button>
                         `;
                     } else {
