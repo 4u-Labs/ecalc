@@ -64,6 +64,10 @@
                         <span class="hidden md:inline text-sm">Biblioteca</span>
                         <span id="pdfCount" class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
                     </button>
+                    <button onclick="openNrToolsModal()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/40 p-2 px-3 rounded-lg transition flex items-center gap-2 shadow-sm" title="Ferramentas e Dimensionadores das NRs">
+                        <i class="fas fa-calculator text-amber-300"></i>
+                        <span class="hidden md:inline text-sm font-semibold">Ferramentas NRs</span>
+                    </button>
                     <button onclick="showDicaDoDia()" class="bg-white/10 hover:bg-white/20 p-2 px-3 rounded-lg transition flex items-center gap-2">
                         <i class="fas fa-lightbulb text-yellow-300"></i>
                         <span class="hidden md:inline text-sm">Dica do Dia</span>
@@ -171,7 +175,42 @@
         </div>
 
         <!-- Results Grid -->
-        <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <!-- Banner Exclusivo de Ferramentas e Dimensionadores das NRs -->
+        <div id="nrToolsBanner" class="mb-6 p-5 rounded-2xl bg-gradient-to-r from-amber-900/90 via-slate-900/95 to-amber-950/90 border border-amber-500/40 text-white shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl text-amber-300 shadow-md">
+                        🛠️
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base sm:text-lg font-bold text-white">Central de Cálculos & Dimensionadores das NRs</h3>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/30 text-amber-300 border border-amber-400/30">MTE • Atualizado</span>
+                        </div>
+                        <p class="text-xs text-amber-200/80">Dimensionamento automático de SESMT, CIPA, limites de ruído, multas e checklists de campo.</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="openNrToolTab('sesmt')" class="px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-200 text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                        <span>🧮</span> SESMT (NR 04)
+                    </button>
+                    <button onclick="openNrToolTab('cipa')" class="px-3 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/40 text-blue-200 text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                        <span>👥</span> CIPA (NR 05)
+                    </button>
+                    <button onclick="openNrToolTab('ruido')" class="px-3 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/40 text-red-200 text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                        <span>🔊</span> Ruído (NR 15)
+                    </button>
+                    <button onclick="openNrToolTab('multas')" class="px-3 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                        <span>⚖️</span> Multas (NR 28)
+                    </button>
+                    <button onclick="openNrToolTab('checklist')" class="px-3 py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-400/40 text-purple-200 text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                        <span>📋</span> Checklists Obra
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultsGrid"  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
         <!-- Empty State -->
         <div id="emptyState" class="hidden text-center py-16">
@@ -263,6 +302,243 @@
                         confirme tabelas, condições de aplicação e exceções na versão oficial (ABNT) e nas exigências locais (CBM, município, concessionárias).
                     </div>
                 </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ferramentas e Dimensionadores das NRs -->
+    <div id="nrToolsModal" class="fixed inset-0 bg-black/60 modal-overlay z-50 hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-hidden shadow-2xl fade-in flex flex-col">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-amber-600 via-amber-700 to-amber-900 text-white p-4 md:p-5 shrink-0 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl shadow">
+                        🛠️
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg md:text-xl font-extrabold text-white">Central de Cálculos & Dimensionadores das NRs</h2>
+                            <span class="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide">MTE</span>
+                        </div>
+                        <p class="text-xs text-amber-100">Dimensionamentos oficiais em conformidade com as Normas Regulamentadoras</p>
+                    </div>
+                </div>
+                <button onclick="closeNrToolsModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer" title="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Abas do Modal -->
+            <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center gap-2 overflow-x-auto scroll-hide shrink-0">
+                <button onclick="switchNrToolTab('sesmt')" id="tabBtnSesmt" class="px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-amber-600 text-white shadow-sm cursor-pointer">
+                    🧮 SESMT (NR 04)
+                </button>
+                <button onclick="switchNrToolTab('cipa')" id="tabBtnCipa" class="px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-white text-gray-700 hover:bg-amber-100 cursor-pointer">
+                    👥 CIPA (NR 05)
+                </button>
+                <button onclick="switchNrToolTab('ruido')" id="tabBtnRuido" class="px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-white text-gray-700 hover:bg-amber-100 cursor-pointer">
+                    🔊 Ruído (NR 15)
+                </button>
+                <button onclick="switchNrToolTab('multas')" id="tabBtnMultas" class="px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-white text-gray-700 hover:bg-amber-100 cursor-pointer">
+                    ⚖️ Multas (NR 28)
+                </button>
+                <button onclick="switchNrToolTab('checklist')" id="tabBtnChecklist" class="px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-white text-gray-700 hover:bg-amber-100 cursor-pointer">
+                    📋 Checklists de Campo
+                </button>
+            </div>
+
+            <!-- Modal Body (Conteúdo Rolável) -->
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
+
+                <!-- ABA 1: SESMT (NR 04) -->
+                <div id="nrPanelSesmt" class="space-y-4">
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl text-xs text-amber-900 leading-relaxed">
+                        <b>NR 04 (Quadro II):</b> Dimensionamento do SESMT em função do <b>Grau de Risco (1 a 4)</b> e do <b>número de empregados</b> do estabelecimento.
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Grau de Risco (CNAE da Empresa):</label>
+                            <select id="sesmtGrauRisco" onchange="calcularSesmt()" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-2 focus:ring-amber-500 bg-white">
+                                <option value="1">Grau de Risco 1 (Escritórios, Serviços Financeiros, T.I.)</option>
+                                <option value="2">Grau de Risco 2 (Comércio Atacadista/Varejista, Educação)</option>
+                                <option value="3" selected>Grau de Risco 3 (Construção Civil, Indústrias Médias)</option>
+                                <option value="4">Grau de Risco 4 (Construção Pesada, Mineração, Química)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Número Total de Empregados:</label>
+                            <input type="number" id="sesmtNumEmpregados" value="150" min="1" max="50000" oninput="calcularSesmt()" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-semibold font-mono focus:ring-2 focus:ring-amber-500 bg-white">
+                        </div>
+                    </div>
+
+                    <!-- Resultado SESMT -->
+                    <div class="p-4 rounded-xl bg-gray-50 border border-gray-200">
+                        <h4 class="text-xs uppercase tracking-wider font-bold text-gray-500 mb-3">Composição Obrigatória do SESMT</h4>
+                        <div id="sesmtResultadoGrid" class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+                            <!-- Preenchido via JS -->
+                        </div>
+                        <p id="sesmtObs" class="text-xs text-gray-600 mt-3 font-medium text-center"></p>
+                    </div>
+                </div>
+
+                <!-- ABA 2: CIPA (NR 05) -->
+                <div id="nrPanelCipa" class="space-y-4 hidden">
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl text-xs text-blue-900 leading-relaxed">
+                        <b>NR 05 (Quadro I):</b> Comissão Interna de Prevenção de Acidentes e Assédio. Para empresas até 19 empregados, é obrigatório indicar pelo menos 1 <b>Designado de CIPA</b> (com treinamento de 20h). Acima de 20 empregados, calcula-se a comissão de eleitos pelos trabalhadores e indicados pelo empregador.
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Classificação / Grau de Risco:</label>
+                            <select id="cipaGrauRisco" onchange="calcularCipa()" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-2 focus:ring-blue-500 bg-white">
+                                <option value="1">Grau de Risco 1 e 2 (Baixo / Médio Risco)</option>
+                                <option value="3" selected>Grau de Risco 3 e 4 (Construção Civil, Indústrias, Logística)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Número de Empregados:</label>
+                            <input type="number" id="cipaNumEmpregados" value="85" min="1" max="10000" oninput="calcularCipa()" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-semibold font-mono focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                    </div>
+
+                    <!-- Resultado CIPA -->
+                    <div class="p-4 rounded-xl bg-gray-50 border border-gray-200">
+                        <h4 class="text-xs uppercase tracking-wider font-bold text-gray-500 mb-3">Dimensionamento da CIPA</h4>
+                        <div id="cipaResultadoGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                            <!-- Preenchido via JS -->
+                        </div>
+                        <p id="cipaObs" class="text-xs text-gray-600 mt-3 font-medium text-center"></p>
+                    </div>
+                </div>
+
+                <!-- ABA 3: RUÍDO E INSALUBRIDADE (NR 15) -->
+                <div id="nrPanelRuido" class="space-y-4 hidden">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl text-xs text-red-900 leading-relaxed">
+                        <b>NR 15 (Anexo nº 1):</b> Limites de tolerância para ruído contínuo ou intermitente. A exposição a níveis acima de 85 dB(A) sem proteção auditiva gera direito ao <b>Adicional de Insalubridade de 20% (Grau Médio)</b> sobre o salário mínimo.
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-4 items-center">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Nível de Ruído Medido (dB(A)):</label>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="ruidoSlider" min="80" max="115" value="90" oninput="atualizarRuido(this.value)" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600">
+                                <input type="number" id="ruidoInput" min="80" max="115" value="90" oninput="atualizarRuido(this.value)" class="w-20 p-2 text-center rounded-xl border border-gray-300 text-sm font-bold font-mono">
+                            </div>
+                        </div>
+                        <div id="ruidoCardStatus" class="p-4 rounded-xl text-center bg-amber-100 border border-amber-300 text-amber-900">
+                            <!-- Preenchido via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Tabela de Limites NR 15 -->
+                    <div class="border rounded-xl overflow-hidden text-xs">
+                        <table class="w-full text-left font-mono">
+                            <thead class="bg-gray-100 text-gray-600 border-b">
+                                <tr>
+                                    <th class="p-2.5 px-3">NÍVEL DE RUÍDO dB(A)</th>
+                                    <th class="p-2.5 px-3">MÁXIMA EXPOSIÇÃO DIÁRIA PERMITIDA</th>
+                                    <th class="p-2.5 px-3">EXIGÊNCIA DE EPI</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-gray-800">
+                                <tr class="hover:bg-gray-50"><td class="p-2 px-3 font-bold">85 dB(A)</td><td class="p-2 px-3">8 horas</td><td class="p-2 px-3 text-green-600">Protetor auricular recomendado</td></tr>
+                                <tr class="hover:bg-gray-50"><td class="p-2 px-3 font-bold">90 dB(A)</td><td class="p-2 px-3">4 horas</td><td class="p-2 px-3 text-amber-600 font-semibold">Obrigatório (NRRsf adequado)</td></tr>
+                                <tr class="hover:bg-gray-50"><td class="p-2 px-3 font-bold">95 dB(A)</td><td class="p-2 px-3">2 horas</td><td class="p-2 px-3 text-orange-600 font-semibold">Obrigatório (Plug ou Concha)</td></tr>
+                                <tr class="hover:bg-gray-50"><td class="p-2 px-3 font-bold">100 dB(A)</td><td class="p-2 px-3">1 hora</td><td class="p-2 px-3 text-red-600 font-bold">Obrigatório duplo ou concha alta atenuação</td></tr>
+                                <tr class="hover:bg-gray-50"><td class="p-2 px-3 font-bold">105 dB(A)</td><td class="p-2 px-3">30 minutos</td><td class="p-2 px-3 text-red-700 font-bold">Crítico - Enclausuramento recomendado</td></tr>
+                                <tr class="hover:bg-gray-50"><td class="p-2 px-3 font-bold">115 dB(A)</td><td class="p-2 px-3">7 minutos</td><td class="p-2 px-3 text-red-900 font-extrabold">> 115 dB é PROIBIDO sem atenuação</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ABA 4: MULTAS E PENALIDADES (NR 28) -->
+                <div id="nrPanelMultas" class="space-y-4 hidden">
+                    <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl text-xs text-emerald-900 leading-relaxed">
+                        <b>NR 28 (Fiscalização e Penalidades):</b> Tabela de autuações do Ministério do Trabalho calculada pela <b>gradação da infração (I1 a I4)</b> e <b>faixa de funcionários</b> da empresa.
+                    </div>
+
+                    <div class="grid sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Tipo de Norma:</label>
+                            <select id="multaTipo" onchange="calcularMulta()" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="S">Segurança do Trabalho</option>
+                                <option value="M">Medicina do Trabalho</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Gradação da Infração:</label>
+                            <select id="multaGradacao" onchange="calcularMulta()" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="1">Infração 1 (Leve)</option>
+                                <option value="2">Infração 2 (Média)</option>
+                                <option value="3" selected>Infração 3 (Grave)</option>
+                                <option value="4">Infração 4 (Gravíssima)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Faixa de Empregados:</label>
+                            <select id="multaFaixa" onchange="calcularMulta()" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="1">1 a 10 empregados</option>
+                                <option value="2">11 a 25 empregados</option>
+                                <option value="3">26 a 50 empregados</option>
+                                <option value="4" selected>51 a 100 empregados</option>
+                                <option value="5">101 a 250 empregados</option>
+                                <option value="6">251 a 500 empregados</option>
+                                <option value="7">501 a 1.000 empregados</option>
+                                <option value="8">Mais de 1.000 empregados</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Card Resultado da Multa -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-r from-emerald-900 to-slate-900 text-white shadow-xl text-center space-y-2">
+                        <div class="text-xs uppercase tracking-wider text-emerald-400 font-bold">Valor Estimado da Penalidade por Infração</div>
+                        <div id="multaValorEstimado" class="text-3xl sm:text-4xl font-extrabold text-emerald-300 font-mono">
+                            R$ 3.820,00 a R$ 5.480,00
+                        </div>
+                        <p class="text-xs text-gray-300">Valores em Reais estimados com base nas conversões oficiais em UFIR / Portaria MTE vigente. Em caso de reincidência, a multa pode ser aplicada em dobro.</p>
+                    </div>
+                </div>
+
+                <!-- ABA 5: CHECKLISTS DE CAMPO -->
+                <div id="nrPanelChecklist" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-2">
+                            <button onclick="setChecklistTipo('nr18')" id="btnChkNr18" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white cursor-pointer">
+                                🏗️ NR 18 (Canteiro de Obras)
+                            </button>
+                            <button onclick="setChecklistTipo('nr35')" id="btnChkNr35" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-200 text-gray-700 cursor-pointer">
+                                🧗 NR 35 (Trabalho em Altura)
+                            </button>
+                        </div>
+                        <div class="text-xs font-bold text-gray-600" id="chkScoreDisplay">
+                            Conformidade: <span class="text-green-600 font-mono text-sm" id="chkScoreVal">100%</span>
+                        </div>
+                    </div>
+
+                    <div id="checklistItemsContainer" class="space-y-2.5">
+                        <!-- Itens do Checklist -->
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-2">
+                        <button onclick="resetChecklist()" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-semibold text-gray-600 hover:bg-gray-100 cursor-pointer">
+                            Resetar
+                        </button>
+                        <button onclick="copiarRelatorioChecklist()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow flex items-center gap-1.5 cursor-pointer">
+                            <span>📋</span> Copiar Relatório de Auditoria
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-gray-100 p-3 px-5 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500 shrink-0">
+                <span>Fonte: Ministério do Trabalho e Emprego (MTE) • Consultoria Técnica 4U Labs</span>
+                <button onclick="closeNrToolsModal()" class="px-4 py-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold transition cursor-pointer">
+                    Fechar
+                </button>
             </div>
         </div>
     </div>
@@ -1770,6 +2046,805 @@
                         "Inspecione EPI/EPC antes de cada uso"
                     ],
                     relacionadas: ["NR 18", "NR 06", "NBR 16325"]
+                }
+            },
+            {
+                id: "nr03",
+                codigo: "NR 03",
+                tipo: "NR",
+                nome: "Embargo e Interdição",
+                categoria: "nr",
+                emoji: "⛔",
+                cor: "red",
+                resumo: "Diretrizes para caracterização do grave e iminente risco e medidas de embargo (obra) e interdição (máquina/setor).",
+                palavrasChave: ["embargo", "interdição", "grave e iminente risco", "fiscalização", "paralisação", "auditor"],
+                conteudo: {
+                    escopo: "Procedimentos adotados pela fiscalização do trabalho na constatação de condição que possa causar lesão grave ou morte.",
+                    principaisRequisitos: [
+                        "Matriz de risco (severidade x probabilidade) da auditoria fiscal",
+                        "Paralisação imediata das atividades de risco",
+                        "Elaboração de plano de adequação com ART de profissional habilitado",
+                        "Pedido formal de desinterdição/desembargo junto à SRTE"
+                    ],
+                    tabelasImportantes: [
+                        "Tabela de classificação de severidade (mínima a fatal)",
+                        "Matriz de probabilidade e gradação de embargo"
+                    ],
+                    dicasPraticas: [
+                        "Manter canteiro com proteções coletivas em dia evita autuação sumária de embargo",
+                        "Durante o embargo, empregados continuam recebendo salário normalmente",
+                        "Descumprir termo de embargo constitui crime de desobediência (art. 330 CP)"
+                    ],
+                    relacionadas: ["NR 01", "NR 18", "NR 28"]
+                }
+            },
+            {
+                id: "nr04",
+                codigo: "NR 04",
+                tipo: "NR",
+                nome: "SESMT - Serviços Especializados em Segurança e Medicina",
+                categoria: "nr",
+                emoji: "🛡️",
+                cor: "amber",
+                resumo: "Dimensionamento e atribuições dos profissionais do SESMT (Técnico, Engenheiro, Médico, Enfermeiro e Auxiliar).",
+                palavrasChave: ["SESMT", "engenheiro de segurança", "técnico de segurança", "médico do trabalho", "dimensionamento", "grau de risco"],
+                conteudo: {
+                    escopo: "Dimensionamento dos profissionais de SST nas empresas conforme o CNAE (Grau de Risco 1 a 4) e quantidade de funcionários.",
+                    principaisRequisitos: [
+                        "Dimensionamento estrito conforme o Quadro II da NR 04",
+                        "Registro dos profissionais do SESMT no sistema eletrônico do MTE",
+                        "Assessoria técnica à CIPA e acompanhamento contínuo do PGR",
+                        "Investigação técnica de acidentes e doenças ocupacionais"
+                    ],
+                    tabelasImportantes: [
+                        "Quadro I: Relação da Classificação Nacional de Atividades Econômicas (CNAE) com o Grau de Risco (GR)",
+                        "Quadro II: Dimensionamento do SESMT por faixas de trabalhadores"
+                    ],
+                    dicasPraticas: [
+                        "Construção civil de edifícios (CNAE 4120-4) é Grau de Risco 3; obras pesadas e fundações são Grau de Risco 4",
+                        "A partir de 101 trabalhadores em Grau de Risco 3, a contratação de Técnico de Segurança é obrigatória",
+                        "O SESMT pode ser individual, regionalizado ou compartilhado dependendo da estrutura da empresa"
+                    ],
+                    relacionadas: ["NR 01", "NR 05", "NR 07", "NR 18"]
+                }
+            },
+            {
+                id: "nr05",
+                codigo: "NR 05",
+                tipo: "NR",
+                nome: "CIPA - Prevenção de Acidentes e Assédio",
+                categoria: "nr",
+                emoji: "👥",
+                cor: "blue",
+                resumo: "Comissão Interna de Prevenção de Acidentes e Assédio: processo eleitoral, estabilidade, treinamento e atribuições.",
+                palavrasChave: ["CIPA", "eleição", "assédio", "estabilidade", "SIPAT", "mapa de risco", "designado"],
+                conteudo: {
+                    escopo: "Prevenção de acidentes e doenças decorrentes do trabalho e combate a todas as formas de assédio no ambiente de trabalho.",
+                    principaisRequisitos: [
+                        "Composição paritária: representantes dos empregados (eleitos) e do empregador (indicados)",
+                        "Estabilidade provisória de 1 ano para membros eleitos da CIPA",
+                        "Treinamento obrigatório (20h para GR 3 e 4; 16h para GR 2; 12h para GR 1) antes da posse",
+                        "Inclusão de medidas de prevenção e combate ao assédio sexual e moral nas empresas",
+                        "Realização anual da SIPAT (Semana Interna de Prevenção de Acidentes)"
+                    ],
+                    tabelasImportantes: [
+                        "Quadro I: Dimensionamento da CIPA por agrupamento e quantidade de empregados",
+                        "Carga horária e conteúdo programático dos treinamentos da CIPA"
+                    ],
+                    dicasPraticas: [
+                        "Empresas com menos de 20 empregados devem indicar um Designado de CIPA com curso de 20h",
+                        "O presidente da CIPA é indicado pela empresa e o vice-presidente é eleito pelos trabalhadores",
+                        "Canal anônimo de denúncias contra assédio é requisito mandatório na nova redação da NR 05"
+                    ],
+                    relacionadas: ["NR 01", "NR 04", "NR 18"]
+                }
+            },
+            {
+                id: "nr08",
+                codigo: "NR 08",
+                tipo: "NR",
+                nome: "Edificações e Instalações Prediais",
+                categoria: "nr",
+                emoji: "🏢",
+                cor: "blue",
+                resumo: "Requisitos técnicos mínimos para pisos, escadas, rampas, coberturas e proteções nas edificações onde há trabalho.",
+                palavrasChave: ["pisos", "escadas", "rampas", "coberturas", "aberturas", "edificações", "quedas"],
+                conteudo: {
+                    escopo: "Garantir segurança e conforto nas estruturas físicas das edificações ocupadas por trabalhadores.",
+                    principaisRequisitos: [
+                        "Pisos sem saliências ou depressões e com acabamento antiderrapante",
+                        "Aberturas em pisos e paredes protegidas contra quedas de pessoas e materiais",
+                        "Escadas e rampas com corrimãos, patamares e larguras adequadas ao fluxo",
+                        "Coberturas com isolamento e proteção contra intempéries e goteiras"
+                    ],
+                    tabelasImportantes: [
+                        "Critérios de resistência estrutural e acessibilidade para pisos e circulações"
+                    ],
+                    dicasPraticas: [
+                        "Piso molhado de áreas comuns ou cozinhas exige obrigatoriamente coeficiente de atrito antiderrapante",
+                        "Rampas prediais de circulação de pessoas não devem ultrapassar inclinação de 8,33% (NBR 9050)",
+                        "Manutenção periódica de calhas e telhados deve prever pontos de ancoragem para trabalho em altura (NR 35)"
+                    ],
+                    relacionadas: ["NR 24", "NBR 9050", "NBR 9077"]
+                }
+            },
+            {
+                id: "nr11",
+                codigo: "NR 11",
+                tipo: "NR",
+                nome: "Transporte, Movimentação e Armazenagem",
+                categoria: "nr",
+                emoji: "🏗️",
+                cor: "amber",
+                resumo: "Segurança em pontes rolantes, empilhadeiras, guindastes, talhas, cabos de aço e empilhamento de materiais.",
+                palavrasChave: ["empilhadeira", "guindaste", "ponte rolante", "cabo de aço", "içamento", "armazenamento", "palete"],
+                conteudo: {
+                    escopo: "Operação segura de equipamentos de transporte mecânico de materiais e regras de estocagem de cargas.",
+                    principaisRequisitos: [
+                        "Operadores de empilhadeira e guindaste devem ser habilitados e ter treinamento específico",
+                        "Inspeção periódica e registro de cabos de aço, correntes e cintas de içamento",
+                        "Identificação visível de carga máxima de trabalho em todos os equipamentos",
+                        "Pilhas de materiais afastadas de paredes e limitadas a altura segura contra desmoronamento"
+                    ],
+                    tabelasImportantes: [
+                        "Fatores de segurança mínimos para cabos de aço e laços de içamento",
+                        "Distâncias livres mínimas de corredores de tráfego de empilhadeiras"
+                    ],
+                    dicasPraticas: [
+                        "Nunca permita circulação de pessoas sob cargas suspensas; isole o raio de giro",
+                        "Cintas de elevação de carga com cortes ou desgaste na costura devem ser imediatamente descartadas",
+                        "Emissão de crachá de identificação com validade de 1 ano vinculada ao exame médico (ASO)"
+                    ],
+                    relacionadas: ["NR 12", "NR 18", "NBR 8400"]
+                }
+            },
+            {
+                id: "nr13",
+                codigo: "NR 13",
+                tipo: "NR",
+                nome: "Caldeiras, Vasos de Pressão e Tubulações",
+                categoria: "nr",
+                emoji: "🔥",
+                cor: "red",
+                resumo: "Segurança na instalação, operação, inspeção e manutenção de caldeiras a vapor, compressores de ar e tubulações industriais.",
+                palavrasChave: ["caldeira", "vaso de pressão", "compressor de ar", "tubulação", "válvula de segurança", "teste hidrostático"],
+                conteudo: {
+                    escopo: "Prevenção de explosões e vazamentos catastróficos em reservatórios pressurizados e sistemas térmicos.",
+                    principaisRequisitos: [
+                        "Prontuário com memorial de cálculo, teste hidrostático e pressão máxima de trabalho permitida (PMTA)",
+                        "Válvula de segurança calibrada e manômetro visível com faixa de trabalho marcada",
+                        "Inspeções de segurança periódicas conduzidas por Profissional Habilitado (Engenheiro Mecânico com ART)",
+                        "Operador de caldeira com curso de qualificação de 40 horas e estágio supervisionado"
+                    ],
+                    tabelasImportantes: [
+                        "Classificação dos vasos de pressão por Potencial de Risco (Volume x Pressão)",
+                        "Prazos máximos para inspeção de segurança interna e externa"
+                    ],
+                    dicasPraticas: [
+                        "Compressores de ar comuns de oficinas e canteiros são enquadrados como Vasos de Pressão na NR 13",
+                        "A ausência de prontuário ou válvula calibrada é motivo frequente de interdição pelo MTE",
+                        "Toda inspeção periódica exige emissão de Laudo Técnico e recolhimento de ART junto ao CREA"
+                    ],
+                    relacionadas: ["NR 10", "NR 12", "ASME Section VIII"]
+                }
+            },
+            {
+                id: "nr14",
+                codigo: "NR 14",
+                tipo: "NR",
+                nome: "Fornos Industriais",
+                categoria: "nr",
+                emoji: "♨️",
+                cor: "amber",
+                resumo: "Requisitos de segurança para construção, isolamento térmico, combustão e evacuação de gases em fornos industriais.",
+                palavrasChave: ["forno", "refratário", "gás", "calor", "isolamento térmico", "combustão"],
+                conteudo: {
+                    escopo: "Prevenção de queimaduras, explosões por queima de combustível e acúmulo de gases tóxicos em fornos.",
+                    principaisRequisitos: [
+                        "Construção sólida com materiais refratários adequados",
+                        "Isolamento térmico para manter superfícies externas em temperatura que evite queimaduras",
+                        "Chaminés e sistemas eficientes para exaustão e dispersão de gases de combustão",
+                        "Válvulas de alívio e bloqueio automático em fornos a gás ou combustível líquido"
+                    ],
+                    tabelasImportantes: [
+                        "Temperaturas máximas permissíveis de contato superficial"
+                    ],
+                    dicasPraticas: [
+                        "Em fornos a gás, nunca tente acender sem antes fazer a purga/ventilação da câmara",
+                        "Medição periódica de monóxido de carbono (CO) e temperaturas superficiais no entorno",
+                        "EPI térmico (luvas de grafite/aramida, vestimentas aluminizadas) obrigatório para operação de carga/descarga"
+                    ],
+                    relacionadas: ["NR 15", "NR 20", "NR 23"]
+                }
+            },
+            {
+                id: "nr15",
+                codigo: "NR 15",
+                tipo: "NR",
+                nome: "Atividades e Operações Insalubres",
+                categoria: "nr",
+                emoji: "☣️",
+                cor: "red",
+                resumo: "Critérios técnicos para caracterização da insalubridade: limites de tolerância de ruído, calor, químicos, poeiras e biológicos.",
+                palavrasChave: ["insalubridade", "ruído", "calor", "IBUTG", "agentes químicos", "adicional de 20%", "decibéis", "poeira"],
+                conteudo: {
+                    escopo: "Avaliação quantitativa e qualitativa de agentes nocivos que ultrapassam limites de tolerância ocupacionais.",
+                    principaisRequisitos: [
+                        "Laudo Técnico das Condições Ambientais do Trabalho (LTCAT) assinado por Engenheiro de Segurança ou Médico",
+                        "Adicionais salariais: Grau Mínimo (10%), Grau Médio (20%) e Grau Máximo (40%) sobre o salário mínimo",
+                        "Fornecimento de EPI com Certificado de Aprovação (CA) eficaz na neutralização ou eliminação do risco",
+                        "Monitoramento de ruído contínuo com dosimetria de ruído conforme NHO 01 / Fundacentro"
+                    ],
+                    tabelasImportantes: [
+                        "Anexo 1: Limites de tolerância para ruído contínuo ou intermitente (85 dB para 8h; 90 dB para 4h)",
+                        "Anexo 3: Limites de exposição ocupacional ao calor medido pelo índice IBUTG com taxa metabólica",
+                        "Anexo 11: Limites de concentração para agentes químicos com absorção pela pele"
+                    ],
+                    dicasPraticas: [
+                        "Ruído acima de 85 dB(A) exige implantação imediata de Programa de Conservação Auditiva (PCA)",
+                        "A neutralização da insalubridade pelo uso comprovado e fiscalizado de EPI cessa o pagamento do adicional",
+                        "Contato com hidrocarbonetos aromáticos (óleos minerais, solventes, piche) gera insalubridade em grau máximo (40%)"
+                    ],
+                    relacionadas: ["NR 09", "NR 06", "NR 07", "NHO 01"]
+                }
+            },
+            {
+                id: "nr16",
+                codigo: "NR 16",
+                tipo: "NR",
+                nome: "Atividades e Operações Perigosas",
+                categoria: "nr",
+                emoji: "⚡",
+                cor: "red",
+                resumo: "Caracterização da periculosidade: inflamáveis, explosivos, energia elétrica, segurança pessoal e uso de motocicleta.",
+                palavrasChave: ["periculosidade", "adicional de 30%", "inflamáveis", "eletricidade", "explosivos", "vigilante", "motocicleta"],
+                conteudo: {
+                    escopo: "Identificação de atividades com risco iminente de fatalidade, assegurando o pagamento de adicional salarial de 30%.",
+                    principaisRequisitos: [
+                        "Adicional de periculosidade de 30% incidente sobre o salário base do trabalhador (sem acréscimos)",
+                        "Anexo 1: Atividades com explosivos (fabricação, transporte, detonação em pedreiras)",
+                        "Anexo 2: Atividades com inflamáveis gasosos e líquidos (postos de combustível, tanques, depósitos)",
+                        "Anexo 4: Trabalhos no Sistema Elétrico de Potência (SEP) e em instalações elétricas de alta/baixa tensão energizadas",
+                        "Anexo 5: Atividades laborais com uso de motocicleta em vias públicas"
+                    ],
+                    tabelasImportantes: [
+                        "Delimitação das áreas de risco para armazenamento e abastecimento de inflamáveis"
+                    ],
+                    dicasPraticas: [
+                        "O adicional de periculosidade não acumula com o de insalubridade; o trabalhador deve optar por um deles",
+                        "Eletricistas que atuam em quadros energizados de baixa tensão têm direito ao adicional de 30%",
+                        "Transporte de combustível em tanques originais de veículos não gera periculosidade até limites estabelecidos"
+                    ],
+                    relacionadas: ["NR 10", "NR 20", "CLT art. 193"]
+                }
+            },
+            {
+                id: "nr17",
+                codigo: "NR 17",
+                tipo: "NR",
+                nome: "Ergonomia",
+                categoria: "nr",
+                emoji: "💺",
+                cor: "blue",
+                resumo: "Adaptação das condições de trabalho às características psicofisiológicas: AEP, AET, posturas, mobiliário e movimentação de cargas.",
+                palavrasChave: ["ergonomia", "AET", "AEP", "postura", "LER", "DORT", "bancada", "cadeira", "carga manual", "pausas"],
+                conteudo: {
+                    escopo: "Prevenção de lesões musculoesqueléticas (LER/DORT) e garantia de conforto térmico, acústico e postural.",
+                    principaisRequisitos: [
+                        "Avaliação Ergonômica Preliminar (AEP) obrigatória integrada ao PGR",
+                        "Análise Ergonômica do Trabalho (AET) aprofundada para postos com queixas ou doenças osteomusculares",
+                        "Bancadas, mesas e assentos com regulagem de altura e bordas arredondadas",
+                        "Organização do trabalho com pausas de descanso em atividades repetitivas ou de digitação"
+                    ],
+                    tabelasImportantes: [
+                        "Parâmetros de conforto acústico em escritórios (50 a 65 dBA) e temperatura (18°C a 25°C)"
+                    ],
+                    dicasPraticas: [
+                        "Limite máximo legal para transporte manual de cargas é de 60 kg (CLT), mas a ergonomia recomenda até 25 kg para homens",
+                        "Cadeiras de trabalho devem ter apoio lombar ajustável, estofamento com densidade adequada e base de 5 rodízios",
+                        "Monitores de computador devem ter a borda superior na altura da linha dos olhos do operador"
+                    ],
+                    relacionadas: ["NR 01", "NR 07", "NBR 9050", "ISO 11228"]
+                }
+            },
+            {
+                id: "nr19",
+                codigo: "NR 19",
+                tipo: "NR",
+                nome: "Explosivos e Pirotecnia",
+                categoria: "nr",
+                emoji: "💣",
+                cor: "red",
+                resumo: "Medidas de proteção na fabricação, estocagem, transporte e manipulação de substâncias explosivas e fogos de artifício.",
+                palavrasChave: ["explosivos", "detonação", "paiol", "desmonte de rochas", "poligonal de tiro", "estocagem"],
+                conteudo: {
+                    escopo: "Segurança de processos industriais, minerários e de construção civil envolvendo artefatos explosivos.",
+                    principaisRequisitos: [
+                        "Armazenamento obrigatório em paióis aprovados pelo Exército Brasileiro (DFPC)",
+                        "Distâncias de segurança mínimas em relação a estradas, ferrovias e residências",
+                        "Plano de fogo e isolamento de área durante detonações em pedreiras e terraplenagem",
+                        "Proibição absoluta de chamas abertas, cigarros ou celulares no perímetro do paiol"
+                    ],
+                    tabelasImportantes: [
+                        "Tabela de distâncias de segurança em função da quantidade equivalente de TNT estocada"
+                    ],
+                    dicasPraticas: [
+                        "Detonações em canteiros de obra exigem a presença do Blaster habilitado com CR do Exército",
+                        "Aterramento elétrico rigoroso em depósitos de explosivos para evitar descargas estáticas",
+                        "Sinalização sonora de alerta (sirene) antes, durante e após qualquer detonação de rocha"
+                    ],
+                    relacionadas: ["NR 16", "NR 22", "R-105 Exército Brasileiro"]
+                }
+            },
+            {
+                id: "nr20",
+                codigo: "NR 20",
+                tipo: "NR",
+                nome: "Inflamáveis e Combustíveis",
+                categoria: "nr",
+                emoji: "⛽",
+                cor: "red",
+                resumo: "Segurança contra vazamentos, incêndios e explosões em instalações com líquidos inflamáveis e gases combustíveis.",
+                palavrasChave: ["inflamáveis", "postos de combustível", "GLP", "prontuário", "tanque", "área classificada", "treinamento NR 20"],
+                conteudo: {
+                    escopo: "Classificação das instalações (Classe I, II e III) e controle rigoroso de fontes de ignição em áreas com combustíveis.",
+                    principaisRequisitos: [
+                        "Classificação da instalação conforme capacidade de armazenamento de inflamáveis e GLP",
+                        "Prontuário da Instalação com projeto de engenharia, aterramento e estudo de áreas classificadas",
+                        "Capacitação obrigatória dos trabalhadores (Básico, Intermediário, Avançado I e II)",
+                        "Plano de Resposta a Emergências (PRE) com exercícios simulados periódicos"
+                    ],
+                    tabelasImportantes: [
+                        "Tabela de classificação das instalações em Classe I (postos), Classe II (terminais) e Classe III (refinarias)",
+                        "Carga horária e periodicidade de reciclagem dos cursos da NR 20"
+                    ],
+                    dicasPraticas: [
+                        "Postos de serviços automotivos são classificados como Instalações Classe I (treinamento obrigatório para frentistas)",
+                        "Equipamentos elétricos em áreas classificadas devem possuir certificação 'Ex' à prova de explosão",
+                        "Inspeções diárias de estanqueidade e monitoramento de vazamentos em tubulações enterradas"
+                    ],
+                    relacionadas: ["NR 10", "NR 16", "NR 23", "NBR 17505"]
+                }
+            },
+            {
+                id: "nr21",
+                codigo: "NR 21",
+                tipo: "NR",
+                nome: "Trabalhos a Céu Aberto",
+                categoria: "nr",
+                emoji: "☀️",
+                cor: "amber",
+                resumo: "Proteção de trabalhadores em atividades externas contra insolação excessiva, chuvas, ventos e animais peçonhentos.",
+                palavrasChave: ["céu aberto", "insolação", "abrigo", "água potável", "canteiro", "agricultura", "rodovias"],
+                conteudo: {
+                    escopo: "Exigências mínimas para atividades rurais, de infraestrutura rodoviária e construção realizadas a céu aberto.",
+                    principaisRequisitos: [
+                        "Disponibilização de abrigos contra intempéries (sol forte, chuvas torrenciais, tempestades)",
+                        "Fornecimento gratuito de água fresca e potável em garrafas térmicas ou bebedouros",
+                        "Proteção contra animais peçonhentos (botas, perneiras) e disponibilização de soro antiofídico de referência",
+                        "Uso obrigatório de protetor solar, óculos com proteção UV e vestimentas de manga comprida"
+                    ],
+                    tabelasImportantes: [
+                        "Critérios de conforto térmico e hidratação recomendada por jornada sob sol forte"
+                    ],
+                    dicasPraticas: [
+                        "Equipes de conservação rodoviária e terraplenagem devem ter barracas móveis de apoio para descanso e almoço",
+                        "Monitorar o índice de radiação UV diário e alertar encarregados sobre pausas para hidratação",
+                        "É proibido o consumo de água de fontes locais ou mananciais sem análise prévia de potabilidade"
+                    ],
+                    relacionadas: ["NR 15", "NR 18", "NR 31"]
+                }
+            },
+            {
+                id: "nr22",
+                codigo: "NR 22",
+                tipo: "NR",
+                nome: "Segurança na Mineração",
+                categoria: "nr",
+                emoji: "⛏️",
+                cor: "amber",
+                resumo: "Segurança e medicina ocupacional em minerações subterrâneas e a céu aberto: estabilidade de maciços, ventilação e poeiras.",
+                palavrasChave: ["mineração", "subsolo", "barragem", "silicose", "ventilação", "mina", "talude"],
+                conteudo: {
+                    escopo: "Regulamentação abrangente da lavra, beneficiamento, barragens e transporte mineral.",
+                    principaisRequisitos: [
+                        "Programa de Gerenciamento de Riscos na Mineração (PGRM) detalhado",
+                        "Monitoramento contínuo de estabilidade de taludes, frentes de lavra e barragens de rejeito",
+                        "Sistemas forçados de ventilação secundária e principal em minas subterrâneas",
+                        "Controle e monitoramento de poeiras de sílica livre cristalina para prevenção de Silicose"
+                    ],
+                    tabelasImportantes: [
+                        "Limites de gases nocivos em galerias subterrâneas (CO, CO2, metano e óxidos de nitrogênio)",
+                        "Dimensionamento da Comissão Interna de Prevenção de Acidentes na Mineração (CIPAMIN)"
+                    ],
+                    dicasPraticas: [
+                        "Todo trabalhador que ingressa em subsolo deve portar autorresgatador e sistema de localização individual",
+                        "Inspeção diária dos planos de tráfego de caminhões fora-de-estrada e pás-carregadeiras",
+                        "Testes automáticos de telemetria e sirenes de emergência em barragens de rejeitos"
+                    ],
+                    relacionadas: ["NR 01", "NR 15", "NR 33"]
+                }
+            },
+            {
+                id: "nr24",
+                codigo: "NR 24",
+                tipo: "NR",
+                nome: "Condições Sanitárias e de Conforto",
+                categoria: "nr",
+                emoji: "🚿",
+                cor: "blue",
+                resumo: "Dimensionamento de instalações sanitárias, vestiários, refeitórios, cozinhas, alojamentos e água potável nas empresas.",
+                palavrasChave: ["banheiro", "vestiário", "refeitório", "chuveiro", "alojamento", "armário", "água potável", "conforto"],
+                conteudo: {
+                    escopo: "Garantir padrão mínimo de higiene, dignidade e bem-estar nas dependências coletivas dos trabalhadores.",
+                    principaisRequisitos: [
+                        "Instalações sanitárias separadas por sexo: 1 bacia sanitária e 1 lavatório para cada 20 trabalhadores",
+                        "Chuveiros com água quente na proporção de 1 para cada 10 trabalhadores em atividades pesadas ou insalubres",
+                        "Refeitório obrigatório em estabelecimentos com mais de 30 trabalhadores (1,00 m² por usuário)",
+                        "Alojamentos com ventilação natural, área mínima de 3,00 m² por leito e vedação contra intempéries"
+                    ],
+                    tabelasImportantes: [
+                        "Proporção de louças sanitárias por contingente de empregados no turno de maior frequência",
+                        "Dimensões mínimas de armários simples e duplos para guarda de roupas e EPIs"
+                    ],
+                    dicasPraticas: [
+                        "Armários duplos são obrigatórios em atividades com produtos químicos, graxa ou agentes biológicos",
+                        "Água potável fresca deve ser disponibilizada a no máximo 100 metros dos postos de trabalho",
+                        "Em canteiros de obra, módulos pré-fabricados (containers) devem atender integralmente as exigências de isolamento e pé-direito"
+                    ],
+                    relacionadas: ["NR 18", "NR 21", "NBR 9050"]
+                }
+            },
+            {
+                id: "nr25",
+                codigo: "NR 25",
+                tipo: "NR",
+                nome: "Resíduos Industriais",
+                categoria: "nr",
+                emoji: "♻️",
+                cor: "green",
+                resumo: "Tratamento, armazenamento, transporte e destinação final de resíduos industriais sólidos, líquidos e gasosos.",
+                palavrasChave: ["resíduos industriais", "efluentes", "poluição", "CONAMA", "lixo tóxico", "descarte"],
+                conteudo: {
+                    escopo: "Prevenção de danos à saúde do trabalhador e ao meio ambiente causados por resíduos gerados nos processos industriais.",
+                    principaisRequisitos: [
+                        "Proibição absoluta de lançamento ou liberação de contaminantes acima dos limites legais sem tratamento prévio",
+                        "Armazenamento de resíduos perigosos (Classe I) em áreas isoladas, impermeabilizadas e sinalizadas",
+                        "Capacitação dos trabalhadores responsáveis pelo manuseio, coleta e transbordo de resíduos tóxicos",
+                        "Compatibilidade de descarte com as diretrizes do Conselho Nacional do Meio Ambiente (CONAMA)"
+                    ],
+                    tabelasImportantes: [
+                        "Classificação de resíduos conforme a ABNT NBR 10004 (Classe I - Perigosos; Classe II - Não Perigosos)"
+                    ],
+                    dicasPraticas: [
+                        "Resíduos de tintas, óleos e solventes em obras devem ser armazenados em tambores rotulados e entregues a empresas licenciadas",
+                        "Lançamento de efluentes cloacais ou químicos em galerias de águas pluviais configura crime ambiental grave",
+                        "Manter Manifesto de Transporte de Resíduos (MTR) arquivado para fiscalização conjunta MTE e Órgão Ambiental"
+                    ],
+                    relacionadas: ["NR 01", "NR 20", "NBR 10004"]
+                }
+            },
+            {
+                id: "nr26",
+                codigo: "NR 26",
+                tipo: "NR",
+                nome: "Sinalização de Segurança e GHS",
+                categoria: "nr",
+                emoji: "🚸",
+                cor: "amber",
+                resumo: "Cores de segurança nos locais de trabalho e padronização da rotulagem de produtos químicos pelo Sistema GHS.",
+                palavrasChave: ["sinalização", "cores de segurança", "GHS", "FISPQ", "FDS", "pictograma", "rotulagem química"],
+                conteudo: {
+                    escopo: "Identificação de perigos visuais através de códigos de cores e classificação internacional de substâncias químicas.",
+                    principaisRequisitos: [
+                        "Uso regulamentar das cores de segurança: Vermelho (incêndio/parada), Amarelo (cuidado/atenção), Verde (segurança/primeiros socorros)",
+                        "Rotulagem de produtos químicos conforme o Sistema Globalmente Harmonizado (GHS)",
+                        "Disponibilização da Ficha de Dados de Segurança (FDS / antiga FISPQ) para todo produto químico utilizado",
+                        "Treinamento dos empregados sobre a leitura e interpretação dos pictogramas de perigo do GHS"
+                    ],
+                    tabelasImportantes: [
+                        "Pictogramas oficiais do GHS (Corrosão, Inflamável, Toxicidade Aguda, Perigo à Saúde e Meio Ambiente)"
+                    ],
+                    dicasPraticas: [
+                        "É estritamente proibido fracionar produtos químicos (tíner, ácido, combustível) em garrafas pet ou embalagens sem rotulagem GHS",
+                        "Faixas de circulação de empilhadeiras e pedestres devem ser demarcadas no piso em amarelo e branco",
+                        "Fichas de segurança (FDS) devem estar acessíveis a qualquer momento em pasta física no setor de trabalho"
+                    ],
+                    relacionadas: ["NR 20", "NR 23", "NBR 7195", "NBR 14725"]
+                }
+            },
+            {
+                id: "nr28",
+                codigo: "NR 28",
+                tipo: "NR",
+                nome: "Fiscalização e Penalidades",
+                categoria: "nr",
+                emoji: "⚖️",
+                cor: "red",
+                resumo: "Procedimentos de autuação dos Auditores Fiscais do Trabalho e gradação dos valores de multas em caso de infração.",
+                palavrasChave: ["multa", "penalidade", "autuação", "gradação", "I1", "I2", "I3", "I4", "fiscalização"],
+                conteudo: {
+                    escopo: "Critérios de cálculo e aplicação de penalidades financeiras decorrentes do descumprimento dos preceitos de SST.",
+                    principaisRequisitos: [
+                        "Classificação das infrações em Segurança do Trabalho (S) e Medicina do Trabalho (M)",
+                        "Gradação dos itens normativos de I1 (mais leve) a I4 (mais grave / risco iminente)",
+                        "Valor da multa fixado em função do número de empregados do estabelecimento autuado",
+                        "Prazos para defesa e recursos administrativos contra autos de infração (10 dias)"
+                    ],
+                    tabelasImportantes: [
+                        "Anexo I: Classificação de cada item e subitem de todas as NRs em gradações de I1 a I4",
+                        "Anexo II: Tabela de conversão dos valores em UFIR / Real (R$) mínimos e máximos por infração"
+                    ],
+                    dicasPraticas: [
+                        "Itens relacionados a trabalho em altura (NR 35), eletricidade (NR 10) e máquinas (NR 12) costumam ser I4",
+                        "A reincidência, dolo ou tentativa de embaraço à fiscalização dobra o valor da autuação financeira",
+                        "Manter documentos obrigatórios (PGR, PCMSO, Treinamentos) arquivados e disponíveis na obra reduz 90% das autuações"
+                    ],
+                    relacionadas: ["NR 01", "NR 03", "CLT arts. 154 a 201"]
+                }
+            },
+            {
+                id: "nr29",
+                codigo: "NR 29",
+                tipo: "NR",
+                nome: "Segurança no Trabalho Portuário",
+                categoria: "nr",
+                emoji: "🚢",
+                cor: "blue",
+                resumo: "Normas de proteção para operações a bordo de navios e em terra na faixa portuária (cargas perigosas, estiva e atracações).",
+                palavrasChave: ["porto", "estiva", "navio", "contêiner", "atracação", "embarcação", "guindaste portuário"],
+                conteudo: {
+                    escopo: "Prevenção de acidentes e doenças em atividades portuárias desempenhadas por trabalhadores portuários avulsos e contratados.",
+                    principaisRequisitos: [
+                        "Comissão Paritária de Segurança e Saúde no Trabalho Portuário (CPSTP)",
+                        "Regras para acesso a embarcações (escadas de portaló e quebra-peito homologadas)",
+                        "Procedimentos para transporte e movimentação de cargas perigosas a granel ou em contêineres",
+                        "Uso obrigatório de coletes salva-vidas em operações próximas à borda do cais"
+                    ],
+                    tabelasImportantes: [
+                        "Sinalização internacional para movimentação de contêineres e cargas perigosas"
+                    ],
+                    dicasPraticas: [
+                        "Trabalho no convés e porão exige medição prévia de gases e ventilação adequada (risco de asfixia)",
+                        "Supervisão rigorosa na estivagem para evitar tombamento de pilhas de contêineres",
+                        "Comunicação por rádio VHF entre o sinaleiro e os operadores de guindaste de bordo (guindasteiros)"
+                    ],
+                    relacionadas: ["NR 11", "NR 30", "NR 33"]
+                }
+            },
+            {
+                id: "nr30",
+                codigo: "NR 30",
+                tipo: "NR",
+                nome: "Segurança no Trabalho Aquaviário",
+                categoria: "nr",
+                emoji: "⚓",
+                cor: "blue",
+                resumo: "Segurança e saúde a bordo de embarcações comerciais, rebocadores, navios mercantes e plataformas de pesca.",
+                palavrasChave: ["aquaviário", "marítimo", "embarcação", "marinheiro", "salva-vidas", "pesca", "navegação"],
+                conteudo: {
+                    escopo: "Condições de habitabilidade, trabalho e sobrevivência a bordo de embarcações nacionais e estrangeiras em águas brasileiras.",
+                    principaisRequisitos: [
+                        "Grupo de Segurança e Saúde no Trabalho a Bordo de Embarcações (GSSTB)",
+                        "Camarotes, cozinhas e refeitórios com ventilação, iluminação e isolamento térmico/acústico",
+                        "Exercícios de abandono e salvatagem simulados com periodicidade obrigatória",
+                        "Estoque de medicamentos e equipamentos médicos para pronto atendimento em alto-mar"
+                    ],
+                    tabelasImportantes: [
+                        "Escala de equipamentos salva-vidas e balsas infláveis por lotação da embarcação"
+                    ],
+                    dicasPraticas: [
+                        "Manutenção estrita em turcos e baleeiras de resgate com testes trimestrais de arriamento",
+                        "Jornada de trabalho no mar deve respeitar o descanso mínimo obrigatório entre quartos de serviço",
+                        "Conferência diária do circuito fechado de exaustão da praça de máquinas"
+                    ],
+                    relacionadas: ["NR 29", "NR 37", "Normam Marinha do Brasil"]
+                }
+            },
+            {
+                id: "nr31",
+                codigo: "NR 31",
+                tipo: "NR",
+                nome: "Segurança na Agricultura e Pecuária",
+                categoria: "nr",
+                emoji: "🚜",
+                cor: "green",
+                resumo: "Segurança, saúde e meio ambiente de trabalho na agricultura, pecuária, silvicultura, exploração florestal e aquicultura.",
+                palavrasChave: ["agrotóxico", "trator", "silvicultura", "motosserra", "lavoura", "gado", "rural", "campo"],
+                conteudo: {
+                    escopo: "Adequação das condições de trabalho no campo, uso de agrotóxicos, máquinas agrícolas e vivência rural.",
+                    principaisRequisitos: [
+                        "Programa de Gerenciamento de Riscos no Trabalho Rural (PGRTR)",
+                        "Regras rigorosas para manuseio, aplicação e tríplice lavagem de embalagens de agrotóxicos",
+                        "Capacitação específica de 16 horas para aplicação de defensivos agrícolas",
+                        "Tratores e máquinas autopropelidas com Estrutura de Proteção na Capotagem (ROPS) e cinto de segurança"
+                    ],
+                    tabelasImportantes: [
+                        "Tabela de tempo de reentrada na lavra após pulverização de agrotóxicos",
+                        "Dimensionamento do Serviço Especializado em Segurança e Saúde no Trabalho Rural (SESTR)"
+                    ],
+                    dicasPraticas: [
+                        "Operadores de motosserra devem ter treinamento presencial de 16 horas e usar calça de proteção contra corte",
+                        "É expressamente proibido o transporte de trabalhadores rurais em carrocerias de caminhões ou caçambas",
+                        "Áreas de vivência móveis no campo devem ter sanitários químicos limpos e abrigo para refeições"
+                    ],
+                    relacionadas: ["NR 06", "NR 12", "NR 21"]
+                }
+            },
+            {
+                id: "nr32",
+                codigo: "NR 32",
+                tipo: "NR",
+                nome: "Segurança em Serviços de Saúde",
+                categoria: "nr",
+                emoji: "🏥",
+                cor: "blue",
+                resumo: "Proteção à saúde dos trabalhadores em hospitais, clínicas e laboratórios: perfurocortantes, biológicos e quimioterápicos.",
+                palavrasChave: ["hospital", "agulha", "perfurocortante", "risco biológico", "vacinação", "radiação", "quimioterapia"],
+                conteudo: {
+                    escopo: "Diretrizes de biossegurança e proteção aos profissionais de enfermagem, médicos e apoio hospitalar.",
+                    principaisRequisitos: [
+                        "Uso mandatório de agulhas e dispositivos perfurocortantes com dispositivo de segurança integrado",
+                        "Proibição absoluta de reencape manual de agulhas usadas",
+                        "Programa de imunização obrigatório e gratuito (Tétano, Hepatite B, Tríplice Viral, etc.)",
+                        "Regras especiais para manuseio de quimioterápicos e salas de raio-x e radioterapia"
+                    ],
+                    tabelasImportantes: [
+                        "Classificação dos agentes biológicos em Classes de Risco 1 a 4 (vírus, bactérias e fungos)"
+                    ],
+                    dicasPraticas: [
+                        "Caixas rígidas de descarte de perfurocortantes (Descarpack) nunca devem ser preenchidas acima da linha tracejada",
+                        "Profissionais de saúde não devem usar adornos (anéis, alianças, pulseiras, relógios) na assistência aos pacientes",
+                        "Protocolo imediato com profilaxia pós-exposição (PEP) em caso de acidente com material biológico"
+                    ],
+                    relacionadas: ["NR 07", "NR 09", "RDC 222 Anvisa"]
+                }
+            },
+            {
+                id: "nr33",
+                codigo: "NR 33",
+                tipo: "NR",
+                nome: "Espaços Confinados",
+                categoria: "nr",
+                emoji: "🕳️",
+                cor: "red",
+                resumo: "Segurança em trabalhos em tanques, silos, galerias subterrâneas, caixas d'água e tubulações de esgoto.",
+                palavrasChave: ["espaço confinado", "PET", "vigia", "oxigênio", "asfixia", "gás sulfídrico", "resgate", "supervisor"],
+                conteudo: {
+                    escopo: "Gestão completa de riscos em ambientes não projetados para ocupação contínua com atmosfera potencialmente perigosa.",
+                    principaisRequisitos: [
+                        "Emissão e encerramento da Permissão de Entrada e Trabalho (PET) para cada entrada",
+                        "Vigia posicionado permanentemente fora do espaço durante 100% da duração do trabalho",
+                        "Medição contínua de oxigênio (19,5% a 23%), gases inflamáveis (LIE < 10%) e tóxicos (H2S, CO)",
+                        "Equipamentos intrinsecamente seguros (antideflagrantes) e ventilação mecânica forçada contínua",
+                        "Treinamento obrigatório: 16h para Vigia e Trabalhador Autorizado; 40h para Supervisor de Entrada"
+                    ],
+                    tabelasImportantes: [
+                        "Faixas seguras de concentração de oxigênio e limites de explosividade (LIE)"
+                    ],
+                    dicasPraticas: [
+                        "O vigia NUNCA deve entrar no espaço confinado para tentar resgatar uma vítima desmaiada (acionar resgate externo)",
+                        "Calibrar o detector de quatro gases (multigás) antes de cada jornada com cilindro de teste de resposta (bump test)",
+                        "Uso de tripé com guincho resgatador e cinto paraquedista em poços e caixas de inspeção profundas"
+                    ],
+                    relacionadas: ["NR 10", "NR 20", "NR 35", "NBR 16577"]
+                }
+            },
+            {
+                id: "nr34",
+                codigo: "NR 34",
+                tipo: "NR",
+                nome: "Construção e Reparação Naval",
+                categoria: "nr",
+                emoji: "⚓",
+                cor: "amber",
+                resumo: "Condições de segurança em estaleiros, diques secos e oficinas navais: trabalho a quente, hidrojateamento e testes de estanqueidade.",
+                palavrasChave: ["estaleiro", "naval", "solda", "trabalho a quente", "hidrojateamento", "dique", "navio"],
+                conteudo: {
+                    escopo: "Requisitos de segurança específicos para operações industriais em estaleiros e embarcações em construção.",
+                    principaisRequisitos: [
+                        "Permissão de Trabalho a Quente com prévia medição de explosividade e remoção de combustíveis",
+                        "Treinamento específico com carga horária de acordo com o módulo operacional",
+                        "Segurança em serviços de hidrojateamento de ultra-alta pressão para decapagem de cascos",
+                        "Controle e teste de estanqueidade pneumática com acompanhamento de engenharia"
+                    ],
+                    tabelasImportantes: [
+                        "Distâncias de isolamento para trabalhos a quente e ensaios não destrutivos com gamagrafia"
+                    ],
+                    dicasPraticas: [
+                        "Emissão de certificado de 'Livre de Gás' (Gas-Free) antes de qualquer operação com chama em tanques navais",
+                        "Instalação de mantas antichama e biombos ao redor de postos de solda em convés",
+                        "Aterramento simultâneo do transformador de solda à estrutura do casco da embarcação"
+                    ],
+                    relacionadas: ["NR 10", "NR 12", "NR 33", "NR 35"]
+                }
+            },
+            {
+                id: "nr36",
+                codigo: "NR 36",
+                tipo: "NR",
+                nome: "Frigoríficos e Abate de Animais",
+                categoria: "nr",
+                emoji: "🥩",
+                cor: "blue",
+                resumo: "Segurança e saúde no abate e processamento de carnes: pausas térmicas, revezamento, afiação de facas e risco biológico.",
+                palavrasChave: ["frigorífico", "abate", "frio", "pausa térmica", "faca", "corte", "amônia", "revezamento"],
+                conteudo: {
+                    escopo: "Adequação ergonômica e operacional em indústrias de carne bovina, suína e avícola.",
+                    principaisRequisitos: [
+                        "Pausas psicofisiológicas distribuídas ao longo da jornada (ex: 20 min a cada 1h40)",
+                        "Revezamento sistemático de postos de trabalho para evitar sobrecarga repetitiva de membros superiores",
+                        "Fornecimento e manutenção de luvas de malha de aço e aventais anticorte",
+                        "Plano rigoroso de manutenção e evacuação em caso de vazamento de amônia anidra (refrigeração)"
+                    ],
+                    tabelasImportantes: [
+                        "Quadro de pausas térmicas em função da temperatura da câmara frigorífica (Art. 253 da CLT)"
+                    ],
+                    dicasPraticas: [
+                        "Manter facas e serras com afiação impecável reduz em até 40% a força exercida pelos operadores de desossa",
+                        "Detectores automáticos de amônia interligados a alarmes sonoros e exaustores de emergência na sala de máquinas",
+                        "Vestimentas térmicas completas (japona, capuz, meias e botas frigoríficas) fornecidas e higienizadas pela empresa"
+                    ],
+                    relacionadas: ["NR 09", "NR 15", "NR 17"]
+                }
+            },
+            {
+                id: "nr37",
+                codigo: "NR 37",
+                tipo: "NR",
+                nome: "Plataformas de Petróleo (Offshore)",
+                categoria: "nr",
+                emoji: "🛢️",
+                cor: "red",
+                resumo: "Segurança e saúde em plataformas marítimas de exploração e produção de petróleo e gás em águas jurisdicionais brasileiras.",
+                palavrasChave: ["offshore", "petróleo", "plataforma", "FPSO", "embarque", "H2S", "escape", "salvatagem"],
+                conteudo: {
+                    escopo: "Padrões técnicos de habitabilidade, transporte por helicóptero, perfuração e processamento de óleo em alto-mar.",
+                    principaisRequisitos: [
+                        "Curso Básico de Segurança de Plataforma (CBSP / Salvatagem) obrigatório antes do embarque",
+                        "Comissão de Segurança e Saúde no Trabalho da Plataforma (CIPAT)",
+                        "Rotas de escape pressurizadas e iluminadas conduzindo a baleeiras de queda livre (Free-Fall)",
+                        "Monitoramento contínuo de gás sulfídrico (H2S), inflamáveis e substâncias radioativas naturais (NORM)"
+                    ],
+                    tabelasImportantes: [
+                        "Critérios de estanqueidade e isolamento para áreas de processo e módulos de acomodação (P-60)"
+                    ],
+                    dicasPraticas: [
+                        "Todo passageiro que embarca em helicóptero offshore deve portar traje de sobrevivência e respirador HUET",
+                        "A cada 14 dias de embarque, o trabalhador faz jus a 14 dias de repouso em terra (regime 14x14 ou 28x28)",
+                        "Baleeiras motorizadas devem ser testadas com motor em funcionamento a cada 7 dias"
+                    ],
+                    relacionadas: ["NR 10", "NR 20", "NR 30", "NR 33"]
+                }
+            },
+            {
+                id: "nr38",
+                codigo: "NR 38",
+                tipo: "NR",
+                nome: "Limpeza Urbana e Resíduos Sólidos",
+                categoria: "nr",
+                emoji: "🧹",
+                cor: "green",
+                resumo: "Segurança para garis e coletores: coleta de lixo, varrição de ruas, triagem de recicláveis, vacinação e caminhões de lixo.",
+                palavrasChave: ["limpeza urbana", "gari", "coleta de lixo", "caminhão coletor", "varrição", "estribo", "vacina"],
+                conteudo: {
+                    escopo: "Proteção aos trabalhadores das atividades de coleta, triagem, varrição e poda de árvores nos municípios.",
+                    principaisRequisitos: [
+                        "Caminhões compactadores com estribos antiderrapantes, alças firmes e câmera de ré obrigatória",
+                        "Proibição do transporte de coletores no estribo em velocidade superior a 30 km/h ou em marcha a ré",
+                        "Disponibilização de pontos de apoio nas cidades com sanitários, água potável e abrigo",
+                        "Vacinação gratuita obrigatória contra Tétano e Hepatite B",
+                        "Fornecimento de uniformes refletivos de alta visibilidade e calçados com biqueira e palmilha antiperfuro"
+                    ],
+                    tabelasImportantes: [
+                        "Especificações dos uniformes com faixa retrorreflexiva conforme NBR 15292 (Classe 2 ou 3)"
+                    ],
+                    dicasPraticas: [
+                        "Rotas de varrição em horários de pico de calor devem prever pausas para hidratação e sombra",
+                        "Proibir terminantemente a compactação de resíduos com o trabalhador sobre a tremonha do caminhão",
+                        "Luvas de raspa ou vaqueta com reforço na palma para manuseio de sacos com cacos de vidro descartados incorretamente"
+                    ],
+                    relacionadas: ["NR 06", "NR 07", "NR 17", "NR 24"]
                 }
             }
         ];
@@ -3640,7 +4715,42 @@
             nbr9078: { label: 'ABNT Catálogo', url: 'https://www.abntcatalogo.com.br/' },
 
             // NRs (fonte oficial - gov.br)
-            nr01: { label: 'Gov.br (NR 01)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-01' },
+                        nr01: { label: 'Gov.br (NR 01)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-01' },
+            nr03: { label: 'Gov.br (NR 03)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-03' },
+            nr04: { label: 'Gov.br (NR 04)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-04' },
+            nr05: { label: 'Gov.br (NR 05)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-05' },
+            nr06: { label: 'Gov.br (NR 06)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-06' },
+            nr07: { label: 'Gov.br (NR 07)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-07' },
+            nr08: { label: 'Gov.br (NR 08)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-08' },
+            nr09: { label: 'Gov.br (NR 09)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-09' },
+            nr10: { label: 'Gov.br (NR 10)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-10' },
+            nr11: { label: 'Gov.br (NR 11)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-11' },
+            nr12: { label: 'Gov.br (NR 12)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-12' },
+            nr13: { label: 'Gov.br (NR 13)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-13' },
+            nr14: { label: 'Gov.br (NR 14)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-14' },
+            nr15: { label: 'Gov.br (NR 15)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-15' },
+            nr16: { label: 'Gov.br (NR 16)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-16' },
+            nr17: { label: 'Gov.br (NR 17)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-17' },
+            nr18: { label: 'Gov.br (NR 18)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-18' },
+            nr19: { label: 'Gov.br (NR 19)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-19' },
+            nr20: { label: 'Gov.br (NR 20)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-20' },
+            nr21: { label: 'Gov.br (NR 21)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-21' },
+            nr22: { label: 'Gov.br (NR 22)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-22' },
+            nr23: { label: 'Gov.br (NR 23)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-23' },
+            nr24: { label: 'Gov.br (NR 24)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-24' },
+            nr25: { label: 'Gov.br (NR 25)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-25' },
+            nr26: { label: 'Gov.br (NR 26)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-26' },
+            nr28: { label: 'Gov.br (NR 28)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-28' },
+            nr29: { label: 'Gov.br (NR 29)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-29' },
+            nr30: { label: 'Gov.br (NR 30)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-30' },
+            nr31: { label: 'Gov.br (NR 31)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-31' },
+            nr32: { label: 'Gov.br (NR 32)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-32' },
+            nr33: { label: 'Gov.br (NR 33)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-33' },
+            nr34: { label: 'Gov.br (NR 34)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-34' },
+            nr35: { label: 'Gov.br (NR 35)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-35' },
+            nr36: { label: 'Gov.br (NR 36)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-36' },
+            nr37: { label: 'Gov.br (NR 37)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-37' },
+            nr38: { label: 'Gov.br (NR 38)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-38' },
             nr06: { label: 'Gov.br (NR 06)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-06' },
             nr07: { label: 'Gov.br (NR 07)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-07' },
             nr09: { label: 'Gov.br (NR 09)', url: 'https://www.gov.br/trabalho-e-emprego/pt-br/inspecao/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-09' },
@@ -4070,6 +5180,381 @@
     </script>
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js"></script>
+    <script src="assets/suite/suite-nav.js">
+        // ==========================================
+        // CENTRAL DE FERRAMENTAS E DIMENSIONADORES DAS NRs
+        // ==========================================
+
+        function openNrToolsModal() {
+            const m = document.getElementById('nrToolsModal');
+            if (!m) return;
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            calcularSesmt();
+            calcularCipa();
+            atualizarRuido(document.getElementById('ruidoInput')?.value || 90);
+            calcularMulta();
+            renderChecklist();
+        }
+
+        function closeNrToolsModal() {
+            const m = document.getElementById('nrToolsModal');
+            if (m) {
+                m.classList.remove('flex');
+                m.classList.add('hidden');
+            }
+        }
+
+        function openNrToolTab(tab) {
+            openNrToolsModal();
+            switchNrToolTab(tab);
+        }
+
+        function switchNrToolTab(tab) {
+            const tabs = ['sesmt', 'cipa', 'ruido', 'multas', 'checklist'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+                const panel = document.getElementById('nrPanel' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (btn && panel) {
+                    if (t === tab) {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-amber-600 text-white shadow-sm cursor-pointer';
+                        panel.classList.remove('hidden');
+                    } else {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap bg-white text-gray-700 hover:bg-amber-100 cursor-pointer';
+                        panel.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        // DIMENSIONAMENTO DE SESMT (NR 04 Quadro II)
+        function calcularSesmt() {
+            const gr = parseInt(document.getElementById('sesmtGrauRisco')?.value || 3);
+            const num = parseInt(document.getElementById('sesmtNumEmpregados')?.value || 0);
+            const grid = document.getElementById('sesmtResultadoGrid');
+            const obs = document.getElementById('sesmtObs');
+            if (!grid) return;
+
+            let tst = 0, est = 0, mt = 0, et = 0, at = 0;
+            let note = "";
+
+            if (num < 50) {
+                note = "Empresa com menos de 50 empregados está dispensada de constituir SESMT próprio (conforme Quadro II da NR 04). As ações de SST podem ser prestadas por assessoria/consultoria externa.";
+            } else if (gr === 1) {
+                if (num <= 500) { note = "Sem exigência de profissionais fixos no Quadro II para até 500 empregados em Grau de Risco 1."; }
+                else if (num <= 1000) { tst = 1; }
+                else if (num <= 2000) { tst = 1; }
+                else if (num <= 3500) { tst = 1; est = "1*"; mt = "1*"; }
+                else if (num <= 5000) { tst = 2; est = "1*"; mt = "1*"; et = 1; }
+                else {
+                    let ex = Math.floor((num - 5000) / 4000);
+                    tst = 2 + ex; est = "1*"; mt = "1*"; et = 1;
+                }
+            } else if (gr === 2) {
+                if (num <= 500) { note = "Sem exigência de profissionais fixos para até 500 empregados em Grau de Risco 2."; }
+                else if (num <= 1000) { tst = 1; }
+                else if (num <= 2000) { tst = 1; est = "1*"; mt = "1*"; }
+                else if (num <= 3500) { tst = 2; est = "1*"; mt = "1*"; et = 1; }
+                else if (num <= 5000) { tst = 3; est = 1; mt = 1; et = 1; }
+                else {
+                    let ex = Math.floor((num - 5000) / 4000);
+                    tst = 3 + ex; est = 1 + ex; mt = 1 + ex; et = 1;
+                }
+            } else if (gr === 3) {
+                if (num <= 100) { note = "Sem exigência de profissionais fixos para até 100 empregados em Grau de Risco 3."; }
+                else if (num <= 250) { tst = 1; }
+                else if (num <= 500) { tst = 2; }
+                else if (num <= 1000) { tst = 3; est = "1*"; mt = "1*"; }
+                else if (num <= 2000) { tst = 4; est = 1; mt = 1; at = 1; }
+                else if (num <= 3500) { tst = 6; est = 1; mt = 1; et = 1; }
+                else if (num <= 5000) { tst = 8; est = 2; mt = 2; et = 2; }
+                else {
+                    let ex = Math.floor((num - 5000) / 2000);
+                    tst = 8 + (3 * ex); est = 2 + ex; mt = 2 + ex; et = 2 + ex;
+                }
+            } else if (gr === 4) {
+                if (num <= 100) { tst = 1; }
+                else if (num <= 250) { tst = 2; }
+                else if (num <= 500) { tst = 3; est = "1*"; mt = "1*"; }
+                else if (num <= 1000) { tst = 4; est = 1; mt = 1; at = 1; }
+                else if (num <= 2000) { tst = 5; est = 1; mt = 1; et = 1; }
+                else if (num <= 3500) { tst = 8; est = 2; mt = 2; et = 2; }
+                else if (num <= 5000) { tst = 10; est = 3; mt = 3; et = 3; }
+                else {
+                    let ex = Math.floor((num - 5000) / 2000);
+                    tst = 10 + (3 * ex); est = 3 + ex; mt = 3 + ex; et = 3 + ex;
+                }
+            }
+
+            if (!note) {
+                note = "Dimensionamento conforme Quadro II da NR 04 (Portaria MTP nº 4.219/2022). (*) Indica tempo parcial de dedicação (mínimo de 3 horas diárias).";
+            }
+
+            grid.innerHTML = `
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase">Téc. Segurança (TST)</div>
+                    <div class="text-2xl font-black text-amber-600 font-mono mt-1">${tst}</div>
+                </div>
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase">Eng. Segurança (EST)</div>
+                    <div class="text-2xl font-black text-blue-600 font-mono mt-1">${est}</div>
+                </div>
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase">Médico Trabalho (MT)</div>
+                    <div class="text-2xl font-black text-emerald-600 font-mono mt-1">${mt}</div>
+                </div>
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase">Enfermeiro Trab. (ET)</div>
+                    <div class="text-2xl font-black text-purple-600 font-mono mt-1">${et}</div>
+                </div>
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase">Aux./Téc. Enferm. (AT)</div>
+                    <div class="text-2xl font-black text-gray-700 font-mono mt-1">${at}</div>
+                </div>
+            `;
+            if (obs) obs.textContent = note;
+        }
+
+        // DIMENSIONAMENTO DE CIPA (NR 05 Quadro I)
+        function calcularCipa() {
+            const gr = parseInt(document.getElementById('cipaGrauRisco')?.value || 3);
+            const num = parseInt(document.getElementById('cipaNumEmpregados')?.value || 0);
+            const grid = document.getElementById('cipaResultadoGrid');
+            const obs = document.getElementById('cipaObs');
+            if (!grid) return;
+
+            let efetivos = 0;
+            let suplentes = 0;
+            let designado = false;
+            let note = "";
+
+            if (num < 20) {
+                designado = true;
+                note = "Empresa com até 19 empregados está desobrigada de constituir CIPA em comissão paritária, devendo nomear obrigatoriamente 1 DESIGNADO DE CIPA com treinamento de 20 horas.";
+            } else {
+                if (gr <= 2) {
+                    if (num <= 50) { efetivos = 1; suplentes = 1; }
+                    else if (num <= 100) { efetivos = 2; suplentes = 2; }
+                    else if (num <= 500) { efetivos = 3; suplentes = 3; }
+                    else if (num <= 1000) { efetivos = 4; suplentes = 3; }
+                    else { efetivos = 6; suplentes = 4; }
+                } else {
+                    if (num <= 50) { efetivos = 2; suplentes = 2; }
+                    else if (num <= 100) { efetivos = 3; suplentes = 3; }
+                    else if (num <= 500) { efetivos = 4; suplentes = 4; }
+                    else if (num <= 1000) { efetivos = 6; suplentes = 5; }
+                    else if (num <= 2500) { efetivos = 9; suplentes = 7; }
+                    else { efetivos = 12; suplentes = 9; }
+                }
+                note = `Comissão paritária: ${efetivos} titulares e ${suplentes} suplentes ELEITOS pelos empregados (com estabilidade provisória) + IGUAL NÚMERO indicado pela empresa. O Presidente é indicado pelo empregador e o Vice-Presidente é eleito pelos trabalhadores.`;
+            }
+
+            grid.innerHTML = `
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase">Representantes Eleitos</div>
+                    <div class="text-2xl font-black text-blue-600 font-mono mt-1">${designado ? '0' : efetivos}</div>
+                    <div class="text-[9px] text-gray-400">Titulares c/ estabilidade</div>
+                </div>
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase">Suplentes Eleitos</div>
+                    <div class="text-2xl font-black text-amber-600 font-mono mt-1">${designado ? '0' : suplentes}</div>
+                    <div class="text-[9px] text-gray-400">Suplentes c/ estabilidade</div>
+                </div>
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase">Indicados Empregador</div>
+                    <div class="text-2xl font-black text-gray-700 font-mono mt-1">${designado ? '0' : (efetivos + suplentes)}</div>
+                    <div class="text-[9px] text-gray-400">Paridade mandatária</div>
+                </div>
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase">Designado CIPA</div>
+                    <div class="text-xl font-black ${designado ? 'text-green-600' : 'text-gray-400'} font-mono mt-1">${designado ? 'SIM (1 p.)' : 'NÃO'}</div>
+                    <div class="text-[9px] text-gray-400">Treinamento 20h</div>
+                </div>
+            `;
+            if (obs) obs.textContent = note;
+        }
+
+        // SIMULADOR DE RUÍDO (NR 15)
+        function atualizarRuido(val) {
+            const v = parseInt(val) || 85;
+            const slider = document.getElementById('ruidoSlider');
+            const input = document.getElementById('ruidoInput');
+            const card = document.getElementById('ruidoCardStatus');
+            if (slider && slider.value != v) slider.value = v;
+            if (input && input.value != v) input.value = v;
+            if (!card) return;
+
+            let tempo = "";
+            let statusClass = "";
+            let insalubre = false;
+
+            if (v < 85) {
+                tempo = "Sem restrição de tempo legal por insalubridade";
+                statusClass = "bg-green-100 border-green-300 text-green-900";
+            } else if (v === 85) { tempo = "8 horas / jornada diária"; statusClass = "bg-green-100 border-green-300 text-green-900"; }
+            else if (v <= 86) { tempo = "7 horas diárias"; statusClass = "bg-amber-100 border-amber-300 text-amber-900"; insalubre = true; }
+            else if (v <= 87) { tempo = "6 horas diárias"; statusClass = "bg-amber-100 border-amber-300 text-amber-900"; insalubre = true; }
+            else if (v <= 88) { tempo = "5 horas diárias"; statusClass = "bg-amber-100 border-amber-300 text-amber-900"; insalubre = true; }
+            else if (v <= 90) { tempo = "4 horas diárias"; statusClass = "bg-orange-100 border-orange-300 text-orange-900"; insalubre = true; }
+            else if (v <= 92) { tempo = "3 horas diárias"; statusClass = "bg-orange-100 border-orange-300 text-orange-900"; insalubre = true; }
+            else if (v <= 95) { tempo = "2 horas diárias"; statusClass = "bg-red-100 border-red-300 text-red-900"; insalubre = true; }
+            else if (v <= 100) { tempo = "1 hora diária"; statusClass = "bg-red-200 border-red-400 text-red-950"; insalubre = true; }
+            else if (v <= 105) { tempo = "30 minutos diários"; statusClass = "bg-red-200 border-red-400 text-red-950"; insalubre = true; }
+            else if (v <= 110) { tempo = "15 minutos diários"; statusClass = "bg-red-300 border-red-500 text-red-950"; insalubre = true; }
+            else if (v <= 115) { tempo = "7 minutos diários"; statusClass = "bg-red-300 border-red-500 text-red-950"; insalubre = true; }
+            else { tempo = "PROIBIDO! Exposição não permitida sem proteção imediata"; statusClass = "bg-red-500 text-white border-red-700"; insalubre = true; }
+
+            card.className = `p-4 rounded-xl text-center border ${statusClass}`;
+            card.innerHTML = `
+                <div class="text-[10px] uppercase font-bold tracking-wider opacity-80">Máxima Exposição Diária Permitida</div>
+                <div class="text-xl font-black mt-1 font-mono">${tempo}</div>
+                <div class="text-xs mt-1.5 font-semibold">${insalubre ? '⚠️ Exposição acima do limite sem EPI gera Adicional de Insalubridade de 20% (Grau Médio).' : '✅ Dentro do limite de tolerância para jornada padrão de 8 horas.'}</div>
+            `;
+        }
+
+        // CALCULADORA DE MULTAS (NR 28)
+        function calcularMulta() {
+            const tipo = document.getElementById('multaTipo')?.value || 'S';
+            const grad = parseInt(document.getElementById('multaGradacao')?.value || 3);
+            const faixa = parseInt(document.getElementById('multaFaixa')?.value || 4);
+            const display = document.getElementById('multaValorEstimado');
+            if (!display) return;
+
+            // Matriz base de valores médios estimados (R$) conforme Anexo II da NR 28
+            // [faixa 1..8][grad 1..4]
+            const baseSeguranca = [
+                [1129, 2352], [1694, 3388], [2823, 4517], [3952, 5646]
+            ];
+            const multiplierFaixa = [1.0, 1.15, 1.35, 1.60, 2.0, 2.5, 3.2, 4.0];
+            const factor = multiplierFaixa[faixa - 1] || 1.6;
+            const b = baseSeguranca[grad - 1];
+
+            const vMin = (b[0] * factor * (tipo === 'M' ? 0.85 : 1.0));
+            const vMax = (b[1] * factor * (tipo === 'M' ? 0.85 : 1.0));
+
+            display.textContent = `R$ ${vMin.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} a R$ ${vMax.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        // CHECKLISTS DE CAMPO
+        let currentChecklistTipo = 'nr18';
+        const CHECKLIST_DATA = {
+            nr18: [
+                { id: 1, text: "O Programa de Gerenciamento de Riscos (PGR) da obra está elaborado e implementado no canteiro?", status: 'pass' },
+                { id: 2, text: "As áreas de vivência possuem sanitários (1:20) e chuveiros (1:10) limpos e em funcionamento?", status: 'pass' },
+                { id: 3, text: "O refeitório possui mesas laváveis, assentos com encosto e aquecedor de refeições?", status: 'pass' },
+                { id: 4, text: "Proteções coletivas contra quedas (guarda-corpo de 1,20m e 0,70m com rodapé de 15cm) estão instaladas nas periferias?", status: 'pass' },
+                { id: 5, text: "Os andaimes possuem piso completo antiderrapante, travamentos e amarração firme na estrutura?", status: 'pass' },
+                { id: 6, text: "Escavações com mais de 1,25m contam com escoramento ou talude seguro e escadas de emergência?", status: 'pass' },
+                { id: 7, text: "Instalações elétricas temporárias possuem quadro de proteção, disjuntores e dispositivo DR de 30mA?", status: 'pass' },
+                { id: 8, text: "Todos os trabalhadores possuem Ficha de EPI assinada com o respectivo Certificado de Aprovação (CA)?", status: 'pass' }
+            ],
+            nr35: [
+                { id: 1, text: "A atividade em altura (acima de 2,00m) conta com Análise de Risco (AR) e Permissão de Trabalho (PT) emitidas?", status: 'pass' },
+                { id: 2, text: "Os trabalhadores possuem treinamento de no mínimo 8 horas e ASO com aptidão expressa para trabalho em altura?", status: 'pass' },
+                { id: 3, text: "O sistema de ancoragem foi projetado ou inspecionado por profissional habilitado (resistência ≥ 15 kN)?", status: 'pass' },
+                { id: 4, text: "É utilizado cinto de segurança tipo paraquedista com talabarte duplo em Y com absorvedor de energia?", status: 'pass' },
+                { id: 5, text: "A linha de vida (vertical ou horizontal) possui cabo de aço ou corda homologada e trava-quedas compatível?", status: 'pass' },
+                { id: 6, text: "Foi planejado e está disponível equipamento para resgate e emergência imediata em caso de queda suspensa?", status: 'pass' },
+                { id: 7, text: "Todos os EPIs contra quedas foram inspecionados visualmente antes do início da jornada de trabalho?", status: 'pass' }
+            ]
+        };
+
+        function setChecklistTipo(tipo) {
+            currentChecklistTipo = tipo;
+            const b1 = document.getElementById('btnChkNr18');
+            const b2 = document.getElementById('btnChkNr35');
+            if (tipo === 'nr18') {
+                if (b1) b1.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white cursor-pointer';
+                if (b2) b2.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-200 text-gray-700 cursor-pointer';
+            } else {
+                if (b1) b1.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-200 text-gray-700 cursor-pointer';
+                if (b2) b2.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white cursor-pointer';
+            }
+            renderChecklist();
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistItemsContainer');
+            if (!container) return;
+            const list = CHECKLIST_DATA[currentChecklistTipo] || [];
+
+            container.innerHTML = list.map((item, idx) => `
+                <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <span class="text-xs text-gray-800 leading-snug font-medium flex-1">
+                        <b>${idx + 1}.</b> ${item.text}
+                    </span>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="setChecklistItemStatus(${item.id}, 'pass')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${item.status === 'pass' ? 'bg-green-600 text-white shadow-sm' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}">
+                            ✓ Conforme
+                        </button>
+                        <button type="button" onclick="setChecklistItemStatus(${item.id}, 'fail')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${item.status === 'fail' ? 'bg-red-600 text-white shadow-sm' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}">
+                            ✗ Não Conforme
+                        </button>
+                        <button type="button" onclick="setChecklistItemStatus(${item.id}, 'na')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${item.status === 'na' ? 'bg-gray-600 text-white shadow-sm' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}">
+                            - N/A
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateChecklistScore();
+        }
+
+        function setChecklistItemStatus(id, st) {
+            const list = CHECKLIST_DATA[currentChecklistTipo] || [];
+            const it = list.find(x => x.id === id);
+            if (it) {
+                it.status = st;
+                renderChecklist();
+            }
+        }
+
+        function updateChecklistScore() {
+            const list = CHECKLIST_DATA[currentChecklistTipo] || [];
+            const avaliaveis = list.filter(x => x.status !== 'na');
+            const conformes = list.filter(x => x.status === 'pass');
+            const pct = avaliaveis.length > 0 ? Math.round((conformes.length / avaliaveis.length) * 100) : 100;
+            const el = document.getElementById('chkScoreVal');
+            if (el) {
+                el.textContent = `${pct}%`;
+                el.className = `font-mono text-sm font-bold ${pct >= 85 ? 'text-green-600' : pct >= 60 ? 'text-amber-600' : 'text-red-600'}`;
+            }
+        }
+
+        function resetChecklist() {
+            const list = CHECKLIST_DATA[currentChecklistTipo] || [];
+            list.forEach(x => x.status = 'pass');
+            renderChecklist();
+        }
+
+        function copiarRelatorioChecklist() {
+            const list = CHECKLIST_DATA[currentChecklistTipo] || [];
+            const avaliaveis = list.filter(x => x.status !== 'na');
+            const conformes = list.filter(x => x.status === 'pass');
+            const pct = avaliaveis.length > 0 ? Math.round((conformes.length / avaliaveis.length) * 100) : 100;
+            const titulo = currentChecklistTipo === 'nr18' ? 'NR 18 - Segurança na Construção Civil' : 'NR 35 - Segurança no Trabalho em Altura';
+
+            let txt = `RELATÓRIO DE AUDITORIA DE CONFORMIDADE DE CAMPO
+Norma de Referência: ${titulo}
+Data da Auditoria: ${new Date().toLocaleDateString('pt-BR')}
+Índice de Conformidade: ${pct}%
+
+ITENS AVALIADOS:
+`;
+            list.forEach((it, idx) => {
+                const stStr = it.status === 'pass' ? '[CONFORME]' : it.status === 'fail' ? '[NÃO CONFORME]' : '[NÃO SE APLICA]';
+                txt += `${idx + 1}. ${stStr} ${it.text}
+`;
+            });
+
+            txt += `
+Emitido via NBR Guide • ECALC SUITE PRO (4u.ia.br)`;
+
+            navigator.clipboard.writeText(txt).then(() => {
+                alert('Relatório de auditoria copiado para a área de transferência!');
+            });
+        }
+
+    </script>
 </body>
 </html>
