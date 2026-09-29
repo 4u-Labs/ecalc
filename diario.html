@@ -188,14 +188,14 @@
                 </div>
 
                 <form id="diarioForm" class="space-y-8">
-                    <!-- Data, Horário e Clima -->
-                    <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Data, Horário e Condição da Obra (Item 2) -->
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-3">📅 Data do Registro</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">📅 Data do Registro</label>
                             <input type="date" id="dataRegistro" required class="input-style text-lg">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-3">🕐 Horário de Trabalho</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">🕐 Horário de Trabalho</label>
                             <div class="flex gap-2 items-center">
                                 <input type="time" id="horaInicio" class="input-style text-center" value="07:00">
                                 <span class="text-gray-400 font-bold">às</span>
@@ -203,36 +203,120 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-3">🌤️ Clima</label>
-                            <div class="grid grid-cols-4 gap-2">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="clima" value="ensolarado" class="hidden peer" checked>
-                                    <div class="weather-card peer-checked:selected peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-gray-50 border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-100">
-                                        <span class="text-2xl">☀️</span>
-                                        <p class="text-xs font-semibold mt-1">Sol</p>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-sm font-bold text-gray-700">🚧 Condição do Canteiro</label>
+                                <span class="text-xs text-gray-400 font-normal">Respaldo CREA</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <div class="grid grid-cols-3 gap-1.5 flex-1">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="condicaoObra" value="praticavel" class="hidden peer" checked onchange="atualizarCampoParalisacao()">
+                                        <div class="border-2 border-gray-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-800 rounded-xl py-2 px-1 text-center transition hover:bg-gray-50">
+                                            <span class="text-lg">🟢</span>
+                                            <p class="text-[11px] font-bold mt-0.5">Praticável</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="condicaoObra" value="parcial" class="hidden peer" onchange="atualizarCampoParalisacao()">
+                                        <div class="border-2 border-gray-200 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800 rounded-xl py-2 px-1 text-center transition hover:bg-gray-50">
+                                            <span class="text-lg">🟡</span>
+                                            <p class="text-[11px] font-bold mt-0.5">Parcial</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="condicaoObra" value="impraticavel" class="hidden peer" onchange="atualizarCampoParalisacao()">
+                                        <div class="border-2 border-gray-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-800 rounded-xl py-2 px-1 text-center transition hover:bg-gray-50">
+                                            <span class="text-lg">🔴</span>
+                                            <p class="text-[11px] font-bold mt-0.5">Impraticável</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="w-24 flex flex-col justify-end" title="Horas paralisadas por intempéries">
+                                    <label class="block text-[10px] font-semibold text-gray-500 mb-1 text-center">⏱️ Paralisação</label>
+                                    <div class="relative">
+                                        <input type="number" id="horasParalisadas" min="0" max="24" step="0.5" value="0" class="input-style text-center font-bold text-red-600 text-sm py-2 px-1">
+                                        <span class="absolute right-2 top-2.5 text-xs text-gray-400 font-bold pointer-events-none">h</span>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clima por Turno: Manhã e Tarde (Item 2) -->
+                    <div class="bg-gradient-to-r from-amber-50/70 via-orange-50/40 to-blue-50/70 p-4 rounded-2xl border border-amber-200 shadow-sm">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <!-- Turno da Manhã -->
+                            <div>
+                                <label class="block text-xs font-bold text-amber-800 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                                    <span>🌅</span> Clima - Turno da Manhã
                                 </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="clima" value="nublado" class="hidden peer">
-                                    <div class="weather-card peer-checked:selected peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-gray-50 border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-100">
-                                        <span class="text-2xl">⛅</span>
-                                        <p class="text-xs font-semibold mt-1">Nublado</p>
-                                    </div>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="climaManha" value="ensolarado" class="hidden peer" checked>
+                                        <div class="weather-card peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-white border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-50 transition shadow-sm">
+                                            <span class="text-xl">☀️</span>
+                                            <p class="text-xs font-semibold mt-0.5">Sol</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="climaManha" value="nublado" class="hidden peer">
+                                        <div class="weather-card peer-checked:bg-gradient-to-br peer-checked:from-gray-400 peer-checked:to-gray-600 peer-checked:text-white bg-white border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-50 transition shadow-sm">
+                                            <span class="text-xl">⛅</span>
+                                            <p class="text-xs font-semibold mt-0.5">Nublado</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="climaManha" value="chuvoso" class="hidden peer">
+                                        <div class="weather-card peer-checked:bg-gradient-to-br peer-checked:from-blue-400 peer-checked:to-blue-600 peer-checked:text-white bg-white border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-50 transition shadow-sm">
+                                            <span class="text-xl">🌧️</span>
+                                            <p class="text-xs font-semibold mt-0.5">Chuva</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="climaManha" value="tempestade" class="hidden peer">
+                                        <div class="weather-card peer-checked:bg-gradient-to-br peer-checked:from-purple-500 peer-checked:to-indigo-600 peer-checked:text-white bg-white border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-50 transition shadow-sm">
+                                            <span class="text-xl">⛈️</span>
+                                            <p class="text-xs font-semibold mt-0.5">Tempest.</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Turno da Tarde -->
+                            <div>
+                                <label class="block text-xs font-bold text-blue-800 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                                    <span>🌇</span> Clima - Turno da Tarde
                                 </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="clima" value="chuvoso" class="hidden peer">
-                                    <div class="weather-card peer-checked:selected peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-gray-50 border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-100">
-                                        <span class="text-2xl">🌧️</span>
-                                        <p class="text-xs font-semibold mt-1">Chuva</p>
-                                    </div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="clima" value="tempestade" class="hidden peer">
-                                    <div class="weather-card peer-checked:selected peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-gray-50 border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-100">
-                                        <span class="text-2xl">⛈️</span>
-                                        <p class="text-xs font-semibold mt-1">Tempest.</p>
-                                    </div>
-                                </label>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="climaTarde" value="ensolarado" class="hidden peer" checked>
+                                        <div class="weather-card peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500 peer-checked:text-white bg-white border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-50 transition shadow-sm">
+                                            <span class="text-xl">☀️</span>
+                                            <p class="text-xs font-semibold mt-0.5">Sol</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="climaTarde" value="nublado" class="hidden peer">
+                                        <div class="weather-card peer-checked:bg-gradient-to-br peer-checked:from-gray-400 peer-checked:to-gray-600 peer-checked:text-white bg-white border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-50 transition shadow-sm">
+                                            <span class="text-xl">⛅</span>
+                                            <p class="text-xs font-semibold mt-0.5">Nublado</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="climaTarde" value="chuvoso" class="hidden peer">
+                                        <div class="weather-card peer-checked:bg-gradient-to-br peer-checked:from-blue-400 peer-checked:to-blue-600 peer-checked:text-white bg-white border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-50 transition shadow-sm">
+                                            <span class="text-xl">🌧️</span>
+                                            <p class="text-xs font-semibold mt-0.5">Chuva</p>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="climaTarde" value="tempestade" class="hidden peer">
+                                        <div class="weather-card peer-checked:bg-gradient-to-br peer-checked:from-purple-500 peer-checked:to-indigo-600 peer-checked:text-white bg-white border-2 border-gray-200 peer-checked:border-transparent rounded-xl p-2 text-center hover:bg-gray-50 transition shadow-sm">
+                                            <span class="text-xl">⛈️</span>
+                                            <p class="text-xs font-semibold mt-0.5">Tempest.</p>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -254,20 +338,128 @@
                         <p class="text-gray-400 text-xs mt-2">💡 Clique no equipamento para selecionar e informe as horas de uso</p>
                     </div>
 
-                    <!-- Atividades Realizadas - Card -->
+                    <!-- Atividades Realizadas - Card com Chips Rápidos (Item 3) -->
                     <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-5 border-2 border-green-200 hover:border-green-400 transition-all">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-2.5 rounded-xl shadow-md">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-green-800">Atividades Realizadas</h3>
-                                <p class="text-green-600 text-xs">Descreva detalhadamente as atividades do dia</p>
+                        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-2.5 rounded-xl shadow-md">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-green-800">Atividades Realizadas</h3>
+                                    <p class="text-green-600 text-xs">Descreva detalhadamente as frentes de serviço ou use as inserções rápidas</p>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Chips de Inserção Rápida de Atividades (Item 3) -->
+                        <div class="mb-4 bg-white/90 backdrop-blur-sm p-3.5 rounded-xl border border-green-200 shadow-sm space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-green-900 uppercase tracking-wide flex items-center gap-1.5">
+                                    <span>⚡</span> Inserção Rápida de Atividades (Clique para adicionar):
+                                </span>
+                                <span class="text-[11px] text-gray-500">Adiciona no final com marcador •</span>
+                            </div>
+
+                            <!-- Filtro de Categorias de Chips -->
+                            <div class="flex flex-wrap gap-1.5 border-b border-gray-100 pb-2">
+                                <button type="button" onclick="filtrarChipsAtividades('todas')" class="chip-cat-btn active text-xs font-semibold px-2.5 py-1 rounded-lg bg-green-600 text-white transition" data-cat="todas">Todas</button>
+                                <button type="button" onclick="filtrarChipsAtividades('estrutura')" class="chip-cat-btn text-xs font-semibold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition" data-cat="estrutura">🏗️ Estrutura & Fundações</button>
+                                <button type="button" onclick="filtrarChipsAtividades('alvenaria')" class="chip-cat-btn text-xs font-semibold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition" data-cat="alvenaria">🧱 Alvenaria & Vedações</button>
+                                <button type="button" onclick="filtrarChipsAtividades('instalacoes')" class="chip-cat-btn text-xs font-semibold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition" data-cat="instalacoes">⚡ Instalações</button>
+                                <button type="button" onclick="filtrarChipsAtividades('acabamento')" class="chip-cat-btn text-xs font-semibold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition" data-cat="acabamento">🎨 Acabamentos</button>
+                            </div>
+
+                            <!-- Grade de Chips Rápidos -->
+                            <div id="chipsAtividadesContainer" class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+                                <!-- Preenchido dinamicamente via JS -->
+                            </div>
+                        </div>
+
                         <textarea id="atividades" rows="6" placeholder="• Concretagem da laje do 2º pavimento\n• Montagem das formas dos pilares\n• Instalação de tubulação elétrica\n• Execução de contrapiso\n• Marcação de alvenaria..." class="w-full px-4 py-3 border-2 border-green-200 bg-white rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 text-gray-700 placeholder-gray-400"></textarea>
+                    </div>
+
+                    <!-- Card de Controle Tecnológico de Concretagem (Item 4 - NBR 12655 / NBR 14931) -->
+                    <div class="bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-50 rounded-2xl p-5 border-2 border-blue-200 hover:border-blue-400 transition-all shadow-sm">
+                        <div class="flex items-center justify-between flex-wrap gap-3 mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-2.5 rounded-xl shadow-md">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-bold text-blue-900">Controle Tecnológico de Concretagem</h3>
+                                        <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-200 uppercase tracking-wider">NBR 12655 / NBR 14931</span>
+                                    </div>
+                                    <p class="text-blue-600 text-xs">Rastreabilidade técnica do concreto usinado, abatimento (slump) e corpos de prova</p>
+                                </div>
+                            </div>
+
+                            <!-- Toggle switch: Houve Concretagem? -->
+                            <label class="inline-flex items-center cursor-pointer bg-white px-3.5 py-2 rounded-xl border border-blue-200 shadow-sm hover:bg-blue-50/50 transition">
+                                <input type="checkbox" id="houveConcretagem" class="sr-only peer" onchange="toggleCardConcretagem()">
+                                <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 relative"></div>
+                                <span class="ml-2.5 text-xs font-bold text-blue-950">Houve concretagem hoje?</span>
+                            </label>
+                        </div>
+
+                        <!-- Campos de Concretagem (expandem quando ativado) -->
+                        <div id="concretagemCampos" class="hidden space-y-4 pt-4 mt-2 border-t border-blue-200/60">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-blue-900 mb-1">Peça / Elemento Estrutural Concretado *</label>
+                                    <input type="text" id="concElemento" placeholder="Ex: Laje e vigas do 2º Pavimento (Eixos A-D)" class="input-style bg-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-900 mb-1">Volume Lançado (m³) *</label>
+                                    <input type="number" id="concVolume" step="0.1" min="0" placeholder="Ex: 36.5" class="input-style bg-white text-sm font-bold text-blue-700">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-900 mb-1">fck Especificado</label>
+                                    <select id="concFck" class="input-style bg-white text-sm font-semibold">
+                                        <option value="">Selecione...</option>
+                                        <option value="C20">C20 (20 MPa)</option>
+                                        <option value="C25">C25 (25 MPa)</option>
+                                        <option value="C30" selected>C30 (30 MPa)</option>
+                                        <option value="C35">C35 (35 MPa)</option>
+                                        <option value="C40">C40 (40 MPa)</option>
+                                        <option value="C45">C45 (45 MPa)</option>
+                                        <option value="C50">C50 (50 MPa)</option>
+                                        <option value="Outro">Outro fck</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-900 mb-1">Slump Test Medido (cm)</label>
+                                    <input type="text" id="concSlump" placeholder="Ex: 12 ± 2" class="input-style bg-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-900 mb-1">Usina Fornecedora</label>
+                                    <input type="text" id="concUsina" placeholder="Ex: Supermix Concreto" class="input-style bg-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-900 mb-1">Nº NF / Lacre Caminhão</label>
+                                    <input type="text" id="concNf" placeholder="Ex: NF 45892 / Lacre 1290" class="input-style bg-white text-sm">
+                                </div>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-900 mb-1">Corpos de Prova (CPs) Moldados</label>
+                                    <input type="text" id="concCps" placeholder="Ex: 6 CPs (idades 7d, 28d e contraprova)" class="input-style bg-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-900 mb-1">Laboratório Tecnológico / Ensaio</label>
+                                    <input type="text" id="concLaboratorio" placeholder="Ex: Lab Falcone / Lab Interno da Usina" class="input-style bg-white text-sm">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Materiais Utilizados - Card -->
@@ -579,6 +771,43 @@
                             </div>
                         </div>
 
+                        <!-- Registros Oficiais e Legais (Item 6 - CONFEA / Receita Federal / Município) -->
+                        <div class="bg-amber-50/50 rounded-2xl p-5 border border-amber-200">
+                            <h3 class="font-bold text-amber-900 mb-3 flex items-center gap-2">
+                                <span>📜</span> Registros Oficiais & Conformidade Legal (CONFEA / CNO / Alvará)
+                            </h3>
+                            <div class="grid md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Nº da ART / RRT de Execução</label>
+                                    <input type="text" id="obraArt" placeholder="Ex: ART-SP 2025/094821" class="input-style bg-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">CNO da Obra (Receita Federal)</label>
+                                    <input type="text" id="obraCno" placeholder="Ex: 90.001.00234/78" class="input-style bg-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Nº Alvará / Processo Municipal</label>
+                                    <input type="text" id="obraAlvara" placeholder="Ex: Alvará nº 1042/2025" class="input-style bg-white text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Avanço Físico Global Estimado -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                        <span>📊</span> % de Avanço Físico Global Estimado da Obra
+                                    </label>
+                                    <span id="obraAvancoValor" class="text-sm font-bold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">0%</span>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <input type="range" id="obraAvancoFisico" min="0" max="100" step="1" value="0" class="w-full accent-amber-600 cursor-pointer" oninput="atualizarDisplayAvanco(this.value)">
+                                    <div class="w-20">
+                                        <input type="number" id="obraAvancoNum" min="0" max="100" step="1" value="0" class="input-style text-center font-bold text-sm bg-white" oninput="atualizarSliderAvanco(this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Assinaturas no PDF -->
                         <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200">
                             <div class="flex items-start justify-between gap-4 mb-3">
@@ -804,25 +1033,49 @@
             </div>
             <form id="editarRegistroForm" class="p-8 space-y-6">
                 <input type="hidden" id="editId">
-                <div class="grid md:grid-cols-3 gap-4">
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Data</label>
-                        <input type="date" id="editData" required class="input-style">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Data</label>
+                        <input type="date" id="editData" required class="input-style text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Horário</label>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Horário</label>
                         <div class="flex gap-2 items-center">
-                            <input type="time" id="editHoraInicio" class="input-style text-center text-sm">
+                            <input type="time" id="editHoraInicio" class="input-style text-center text-xs">
                             <span class="text-gray-400">-</span>
-                            <input type="time" id="editHoraFim" class="input-style text-center text-sm">
+                            <input type="time" id="editHoraFim" class="input-style text-center text-xs">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Clima</label>
-                        <select id="editClima" class="input-style">
-                            <option value="ensolarado">☀️ Ensolarado</option>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Condição Canteiro</label>
+                        <select id="editCondicaoObra" class="input-style text-xs">
+                            <option value="praticavel">🟢 Praticável</option>
+                            <option value="parcial">🟡 Parcial</option>
+                            <option value="impraticavel">🔴 Impraticável</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Horas Paralisação</label>
+                        <input type="number" id="editHorasParalisadas" min="0" max="24" step="0.5" value="0" class="input-style text-center text-xs font-bold text-red-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                    <div>
+                        <label class="block text-xs font-bold text-amber-800 mb-1">🌅 Clima Turno Manhã</label>
+                        <select id="editClimaManha" class="input-style text-xs">
+                            <option value="ensolarado">☀️ Sol</option>
                             <option value="nublado">⛅ Nublado</option>
-                            <option value="chuvoso">🌧️ Chuvoso</option>
+                            <option value="chuvoso">🌧️ Chuva</option>
+                            <option value="tempestade">⛈️ Tempestade</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-800 mb-1">🌇 Clima Turno Tarde</label>
+                        <select id="editClimaTarde" class="input-style text-xs">
+                            <option value="ensolarado">☀️ Sol</option>
+                            <option value="nublado">⛅ Nublado</option>
+                            <option value="chuvoso">🌧️ Chuva</option>
                             <option value="tempestade">⛈️ Tempestade</option>
                         </select>
                     </div>
@@ -842,6 +1095,73 @@
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Atividades</label>
                     <textarea id="editAtividades" rows="3" class="input-style resize-none"></textarea>
+                </div>
+
+                <!-- Controle Tecnológico de Concretagem no Modal de Edição -->
+                <div class="bg-blue-50/70 p-4 rounded-xl border border-blue-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                            <span>🏗️</span> Controle Tecnológico de Concretagem (NBR 12655)
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="editHouveConcretagem" class="sr-only peer" onchange="toggleEditCardConcretagem()">
+                            <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600 relative"></div>
+                            <span class="ml-2 text-xs font-bold text-blue-950">Houve concretagem?</span>
+                        </label>
+                    </div>
+
+                    <div id="editConcretagemCampos" class="hidden space-y-3 pt-2 border-t border-blue-200/60">
+                        <div class="grid md:grid-cols-3 gap-3">
+                            <div class="md:col-span-2">
+                                <label class="block text-[11px] font-bold text-blue-900 mb-1">Peça / Elemento Concretado</label>
+                                <input type="text" id="editConcElemento" placeholder="Ex: Laje 2º Pavimento" class="input-style bg-white text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-blue-900 mb-1">Volume (m³)</label>
+                                <input type="number" id="editConcVolume" step="0.1" min="0" placeholder="0.0" class="input-style bg-white text-xs font-bold">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-blue-900 mb-1">fck</label>
+                                <select id="editConcFck" class="input-style bg-white text-xs font-semibold">
+                                    <option value="">Selecione...</option>
+                                    <option value="C20">C20</option>
+                                    <option value="C25">C25</option>
+                                    <option value="C30">C30</option>
+                                    <option value="C35">C35</option>
+                                    <option value="C40">C40</option>
+                                    <option value="C45">C45</option>
+                                    <option value="C50">C50</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-blue-900 mb-1">Slump (cm)</label>
+                                <input type="text" id="editConcSlump" placeholder="Ex: 12 ± 2" class="input-style bg-white text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-blue-900 mb-1">Usina Fornecedora</label>
+                                <input type="text" id="editConcUsina" placeholder="Ex: Supermix" class="input-style bg-white text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-blue-900 mb-1">Nº NF / Lacre</label>
+                                <input type="text" id="editConcNf" placeholder="Ex: NF 45892" class="input-style bg-white text-xs">
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-blue-900 mb-1">Corpos de Prova (CPs)</label>
+                                <input type="text" id="editConcCps" placeholder="Ex: 6 CPs (7d, 28d)" class="input-style bg-white text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-blue-900 mb-1">Laboratório Tecnológico</label>
+                                <input type="text" id="editConcLaboratorio" placeholder="Ex: Lab Falcone" class="input-style bg-white text-xs">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
@@ -966,7 +1286,7 @@
             'Plataforma Elevatória', 'Policorte', 'Guincho de Coluna'
         ];
 
-        // Registro de exemplo (Diário #0000) - MODELO DE PREENCHIMENTO
+        // Registro de exemplo (Diário #0000) - MODELO DE PREENCHIMENTO COM NOVAS FEATURES
         const registroExemplo = {
             id: 0,
             numero: 0,
@@ -974,6 +1294,21 @@
             horaInicio: '07:00',
             horaFim: '17:00',
             clima: 'ensolarado',
+            climaManha: 'ensolarado',
+            climaTarde: 'nublado',
+            condicaoObra: 'praticavel',
+            horasParalisadas: 0,
+            concretagem: {
+                houve: true,
+                elemento: 'Laje e vigas do 2º pavimento (Trecho B)',
+                volume: 120,
+                fck: 'C30',
+                slump: '12 ± 2',
+                usina: 'Supermix Concreto S/A',
+                nf: 'NF-e 48.912 / Lacre 99281',
+                cps: '6 CPs (idades 7d e 28d)',
+                laboratorio: 'Falcone Engenharia e Controle Tecnológico'
+            },
             equipe: {
                 'Mestre de Obras': 1,
                 'Encarregado': 1,
@@ -997,13 +1332,13 @@
             atividades: `• Concretagem da laje do 2º pavimento - Volume: 120m³ de concreto FCK 30\n• Montagem das formas dos pilares P12 a P18 do 3º pavimento\n• Instalação de tubulação elétrica no 1º pavimento (eletrodutos e caixas)\n• Execução de contrapiso na área de garagem - espessura 8cm\n• Marcação de alvenaria do térreo (eixos A e B)\n• Preparação da armadura para os pilares do próximo pavimento`,
             materiais: `• Concreto usinado FCK 30 - 120m³ (4 caminhões)\n• Aço CA-50 ∅ 12,5mm - 800kg\n• Aço CA-60 ∅ 5mm - 200kg\n• Eletrodutos 3/4\" - 150 unidades\n• Caixas de passagem 4x2 - 45 unidades\n• Areia média lavada - 8m³\n• Cimento CP-II Z-32 - 40 sacos (50kg cada)\n• Arame recozido nº 18 - 15kg`,
             ocorrencias: `• Atraso de 2 horas na entrega do concreto devido ao trânsito intenso na região\n• Identificado pequeno deslocamento na forma do pilar P15 - corrigido imediatamente antes da concretagem\n• Falta de EPI (capacete) em 2 colaboradores - advertência verbal aplicada e situação regularizada\n• Bomba de concreto apresentou problema mecânico às 14h - resolvido em 30 minutos`,
-            observacoes: `• Tempo ensolarado durante todo o dia, temperatura média de 28°C\n• Visita do engenheiro fiscal da prefeitura às 14h - aprovado sem ressalvas\n• Previsão para amanhã: início da desforma da laje após período de cura de 24h\n• Equipe de armadores iniciará montagem da ferragem dos pilares do 3º pavimento\n• Reunião de segurança realizada às 07h15 com toda a equipe (DDS)\n• Almoxarifado solicitou reposição de cimento e aço para os próximos dias`,
+            observacoes: `• Manhã de sol e tarde parcialmente nublada, sem paralisações de chuva\n• Visita do engenheiro fiscal da prefeitura às 14h - aprovado sem ressalvas\n• Previsão para amanhã: início da desforma da laje após período de cura de 24h\n• Equipe de armadores iniciará montagem da ferragem dos pilares do 3º pavimento\n• Reunião de segurança realizada às 07h15 com toda a equipe (DDS)\n• Almoxarifado solicitou reposição de cimento e aço para os próximos dias`,
             fotos: [],
             criadoEm: '2025-01-13T08:00:00.000Z',
             isExemplo: true
         };
 
-        // Dados da obra exemplo
+        // Dados da obra exemplo com ART, CNO, Alvará e Avanço Físico (Item 6)
         const obraExemplo = {
             nome: 'Edifício Residencial Vista Verde',
             contrato: 'CONT-2025-0042',
@@ -1012,6 +1347,10 @@
             construtora: 'Construtora XYZ S.A.',
             engenheiro: 'Eng. Carlos Alberto Silva',
             crea: 'CREA-SP 123456789',
+            art: 'ART-SP 2025/994821',
+            cno: '90.001.00428/71',
+            alvara: 'Alvará nº 1042/2025',
+            avancoFisico: 35,
             dataInicio: '2025-01-02',
             dataFim: '2026-06-30',
             logo: '',
@@ -1045,6 +1384,147 @@
         const SEED_KEY = 'diarioObra_seeded_v1';
         const WELCOME_DISMISS_KEY = 'diarioObra_welcomeDismissed_v1';
 
+
+        // ==================== FEATURES ESPECIAIS (ITENS 2, 3, 4, 6) ====================
+
+        // Item 3: Chips de Inserção Rápida de Atividades
+        const atividadesRapidas = [
+            { cat: 'estrutura', texto: 'Concretagem de laje' },
+            { cat: 'estrutura', texto: 'Concretagem de pilares e vigas' },
+            { cat: 'estrutura', texto: 'Armação e amarração de ferragem de vigas/lajes' },
+            { cat: 'estrutura', texto: 'Montagem e travamento de formas' },
+            { cat: 'estrutura', texto: 'Desforma e reescoramento de laje' },
+            { cat: 'estrutura', texto: 'Escavação e regularização de fundações/sapatas' },
+            { cat: 'estrutura', texto: 'Lançamento de concreto magro' },
+            { cat: 'estrutura', texto: 'Cura úmida contínua do concreto' },
+
+            { cat: 'alvenaria', texto: 'Alvenaria de vedação com bloco cerâmico/concreto' },
+            { cat: 'alvenaria', texto: 'Marcação de alvenaria e primeira fiada' },
+            { cat: 'alvenaria', texto: 'Chapisco e emboço em paredes internas' },
+            { cat: 'alvenaria', texto: 'Reboco desempenado em áreas internas' },
+            { cat: 'alvenaria', texto: 'Reboco e acabamento de fachada externa' },
+            { cat: 'alvenaria', texto: 'Instalação de vergas e contravergas pré-moldadas' },
+            { cat: 'alvenaria', texto: 'Encunhamento e fixação de alvenaria na estrutura' },
+
+            { cat: 'instalacoes', texto: 'Passagem de eletrodutos e caixas elétricas na laje' },
+            { cat: 'instalacoes', texto: 'Passagem e enfiação de circuitos elétricos' },
+            { cat: 'instalacoes', texto: 'Montagem e ligação do Quadro de Distribuição (QD)' },
+            { cat: 'instalacoes', texto: 'Instalação de tubulações de água fria/quente' },
+            { cat: 'instalacoes', texto: 'Montagem de prumadas e ramais de esgoto sanitário' },
+            { cat: 'instalacoes', texto: 'Teste hidrostático de estanqueidade em tubulações' },
+            { cat: 'instalacoes', texto: 'Tubulação e caixas de águas pluviais' },
+
+            { cat: 'acabamento', texto: 'Execução de contrapiso regularizado/sarrafeado' },
+            { cat: 'acabamento', texto: 'Assentamento de piso porcelanato/cerâmico' },
+            { cat: 'acabamento', texto: 'Revestimento cerâmico de paredes em áreas molhadas' },
+            { cat: 'acabamento', texto: 'Aplicação de impermeabilização (manta/resina)' },
+            { cat: 'acabamento', texto: 'Aplicação de gesso liso e forro de drywall' },
+            { cat: 'acabamento', texto: 'Emassamento e lixamento de paredes' },
+            { cat: 'acabamento', texto: 'Pintura látex PVA/Acrílica (primeira demão)' },
+            { cat: 'acabamento', texto: 'Instalação de portas, esquadrias e ferragens' }
+        ];
+
+        let categoriaAtivaChips = 'todas';
+
+        function renderChipsAtividades() {
+            const container = document.getElementById('chipsAtividadesContainer');
+            if (!container) return;
+
+            const itens = categoriaAtivaChips === 'todas'
+                ? atividadesRapidas
+                : atividadesRapidas.filter(a => a.cat === categoriaAtivaChips);
+
+            container.innerHTML = itens.map(item => `
+                <button type="button"
+                        onclick="inserirAtividadeChip('${item.texto.replace(/'/g, "\\'")}')"
+                        class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg px-2.5 py-1 transition flex items-center gap-1 font-medium shadow-xs">
+                    <span>+</span> ${item.texto}
+                </button>
+            `).join('');
+        }
+
+        function filtrarChipsAtividades(cat) {
+            categoriaAtivaChips = cat;
+            document.querySelectorAll('.chip-cat-btn').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.classList.add('bg-green-600', 'text-white', 'active');
+                    btn.classList.remove('bg-gray-100', 'text-gray-700');
+                } else {
+                    btn.classList.remove('bg-green-600', 'text-white', 'active');
+                    btn.classList.add('bg-gray-100', 'text-gray-700');
+                }
+            });
+            renderChipsAtividades();
+        }
+
+        function inserirAtividadeChip(texto) {
+            const textarea = document.getElementById('atividades');
+            if (!textarea) return;
+            const valorAtual = textarea.value.trim();
+            const novoItem = `• ${texto}`;
+            if (!valorAtual) {
+                textarea.value = novoItem;
+            } else {
+                textarea.value = valorAtual + '\n' + novoItem;
+            }
+            textarea.focus();
+            showToast(`Adicionado: "${texto}"`);
+        }
+
+        // Item 4: Controle Tecnológico de Concretagem Toggle
+        function toggleCardConcretagem() {
+            const check = document.getElementById('houveConcretagem');
+            const campos = document.getElementById('concretagemCampos');
+            if (check && campos) {
+                if (check.checked) {
+                    campos.classList.remove('hidden');
+                } else {
+                    campos.classList.add('hidden');
+                }
+            }
+        }
+
+        function toggleEditCardConcretagem() {
+            const check = document.getElementById('editHouveConcretagem');
+            const campos = document.getElementById('editConcretagemCampos');
+            if (check && campos) {
+                if (check.checked) {
+                    campos.classList.remove('hidden');
+                } else {
+                    campos.classList.add('hidden');
+                }
+            }
+        }
+
+        // Item 2: Atualização do campo de paralisação
+        function atualizarCampoParalisacao() {
+            const radio = document.querySelector('input[name="condicaoObra"]:checked');
+            const inputParal = document.getElementById('horasParalisadas');
+            if (!inputParal) return;
+            if (radio && radio.value === 'praticavel') {
+                if (parseFloat(inputParal.value) > 0 && confirm('A condição do canteiro é "Praticável". Deseja zerar as horas de paralisação?')) {
+                    inputParal.value = 0;
+                }
+            }
+        }
+
+        // Item 6: Sincronização Slider e Input de Avanço Físico
+        function atualizarDisplayAvanco(val) {
+            const num = Math.min(100, Math.max(0, parseInt(val) || 0));
+            const disp = document.getElementById('obraAvancoValor');
+            const inputNum = document.getElementById('obraAvancoNum');
+            if (disp) disp.textContent = `${num}%`;
+            if (inputNum && inputNum.value != num) inputNum.value = num;
+        }
+
+        function atualizarSliderAvanco(val) {
+            const num = Math.min(100, Math.max(0, parseInt(val) || 0));
+            const slider = document.getElementById('obraAvancoFisico');
+            const disp = document.getElementById('obraAvancoValor');
+            if (slider && slider.value != num) slider.value = num;
+            if (disp) disp.textContent = `${num}%`;
+        }
+
         // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             const isFirstTime = !localStorage.getItem(SEED_KEY);
@@ -1070,6 +1550,7 @@
             updateNumeroDiario();
             carregarDadosObra();
             setupPhotoUpload();
+            renderChipsAtividades();
             updateHeaderObra();
             updateBtnDuplicar();
 
@@ -1232,8 +1713,37 @@
             document.getElementById('horaInicio').value = registro.horaInicio || '07:00';
             document.getElementById('horaFim').value = registro.horaFim || '17:00';
 
-            const climaRadio = document.querySelector(`input[name="clima"][value="${registro.clima}"]`);
-            if (climaRadio) climaRadio.checked = true;
+            // Clima e Condição (Item 2)
+            const cManha = registro.climaManha || registro.clima || 'ensolarado';
+            const cTarde = registro.climaTarde || registro.clima || 'ensolarado';
+            const condicao = registro.condicaoObra || 'praticavel';
+            const horasParal = registro.horasParalisadas || 0;
+
+            const radioManha = document.querySelector(`input[name="climaManha"][value="${cManha}"]`);
+            if (radioManha) radioManha.checked = true;
+            const radioTarde = document.querySelector(`input[name="climaTarde"][value="${cTarde}"]`);
+            if (radioTarde) radioTarde.checked = true;
+            const radioCond = document.querySelector(`input[name="condicaoObra"][value="${condicao}"]`);
+            if (radioCond) radioCond.checked = true;
+            if (document.getElementById('horasParalisadas')) {
+                document.getElementById('horasParalisadas').value = horasParal;
+            }
+
+            // Concretagem (Item 4)
+            const conc = registro.concretagem || {};
+            const checkConc = document.getElementById('houveConcretagem');
+            if (checkConc) {
+                checkConc.checked = !!conc.houve;
+                toggleCardConcretagem();
+            }
+            if (document.getElementById('concElemento')) document.getElementById('concElemento').value = conc.elemento || '';
+            if (document.getElementById('concVolume')) document.getElementById('concVolume').value = conc.volume || '';
+            if (document.getElementById('concFck')) document.getElementById('concFck').value = conc.fck || 'C30';
+            if (document.getElementById('concSlump')) document.getElementById('concSlump').value = conc.slump || '';
+            if (document.getElementById('concUsina')) document.getElementById('concUsina').value = conc.usina || '';
+            if (document.getElementById('concNf')) document.getElementById('concNf').value = conc.nf || '';
+            if (document.getElementById('concCps')) document.getElementById('concCps').value = conc.cps || '';
+            if (document.getElementById('concLaboratorio')) document.getElementById('concLaboratorio').value = conc.laboratorio || '';
 
             renderEquipeForm('equipePresente', registro.equipe || {});
 
@@ -1376,6 +1886,15 @@
             document.getElementById('obraDataInicio').value = dadosObra.dataInicio || '';
             document.getElementById('obraDataFim').value = dadosObra.dataFim || '';
 
+            // Dados Oficiais (Item 6)
+            if (document.getElementById('obraArt')) document.getElementById('obraArt').value = dadosObra.art || '';
+            if (document.getElementById('obraCno')) document.getElementById('obraCno').value = dadosObra.cno || '';
+            if (document.getElementById('obraAlvara')) document.getElementById('obraAlvara').value = dadosObra.alvara || '';
+            const avanco = (dadosObra.avancoFisico !== undefined) ? dadosObra.avancoFisico : 0;
+            if (document.getElementById('obraAvancoFisico')) document.getElementById('obraAvancoFisico').value = avanco;
+            if (document.getElementById('obraAvancoNum')) document.getElementById('obraAvancoNum').value = avanco;
+            if (document.getElementById('obraAvancoValor')) document.getElementById('obraAvancoValor').textContent = `${avanco}%`;
+
             // Assinaturas
             if (!Array.isArray(dadosObra.assinaturas)) dadosObra.assinaturas = [];
             renderAssinaturas();
@@ -1514,6 +2033,12 @@
             dadosObra.crea = document.getElementById('obraCrea').value;
             dadosObra.dataInicio = document.getElementById('obraDataInicio').value;
             dadosObra.dataFim = document.getElementById('obraDataFim').value;
+
+            // Dados Oficiais (Item 6)
+            dadosObra.art = document.getElementById('obraArt')?.value || '';
+            dadosObra.cno = document.getElementById('obraCno')?.value || '';
+            dadosObra.alvara = document.getElementById('obraAlvara')?.value || '';
+            dadosObra.avancoFisico = parseInt(document.getElementById('obraAvancoFisico')?.value) || 0;
 
             // assinaturas já são geridas dinamicamente (adicionar/remover/reordenar) e salvas automaticamente,
             // mas garantimos o tipo
@@ -1705,7 +2230,29 @@
         document.getElementById('diarioForm').addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const climaRadio = document.querySelector('input[name="clima"]:checked');
+            // Clima e Condições do Canteiro (Item 2)
+            const cManhaRadio = document.querySelector('input[name="climaManha"]:checked');
+            const cTardeRadio = document.querySelector('input[name="climaTarde"]:checked');
+            const condicaoRadio = document.querySelector('input[name="condicaoObra"]:checked');
+            const horasParal = parseFloat(document.getElementById('horasParalisadas')?.value) || 0;
+
+            const climaManhaVal = cManhaRadio ? cManhaRadio.value : 'ensolarado';
+            const climaTardeVal = cTardeRadio ? cTardeRadio.value : 'ensolarado';
+            const condicaoVal = condicaoRadio ? condicaoRadio.value : 'praticavel';
+
+            // Concretagem (Item 4)
+            const houveConc = document.getElementById('houveConcretagem')?.checked || false;
+            const concretagemDados = {
+                houve: houveConc,
+                elemento: document.getElementById('concElemento')?.value?.trim() || '',
+                volume: parseFloat(document.getElementById('concVolume')?.value) || 0,
+                fck: document.getElementById('concFck')?.value || '',
+                slump: document.getElementById('concSlump')?.value?.trim() || '',
+                usina: document.getElementById('concUsina')?.value?.trim() || '',
+                nf: document.getElementById('concNf')?.value?.trim() || '',
+                cps: document.getElementById('concCps')?.value?.trim() || '',
+                laboratorio: document.getElementById('concLaboratorio')?.value?.trim() || ''
+            };
 
             const equipePresente = {};
             funcoes.forEach(funcao => {
@@ -1722,7 +2269,12 @@
                 data: document.getElementById('dataRegistro').value,
                 horaInicio: document.getElementById('horaInicio').value,
                 horaFim: document.getElementById('horaFim').value,
-                clima: climaRadio ? climaRadio.value : 'ensolarado',
+                clima: climaManhaVal, // compatibilidade retroativa
+                climaManha: climaManhaVal,
+                climaTarde: climaTardeVal,
+                condicaoObra: condicaoVal,
+                horasParalisadas: horasParal,
+                concretagem: concretagemDados,
                 equipe: equipePresente,
                 equipamentos: {...equipamentosSelecionados},
                 atividades: document.getElementById('atividades').value,
@@ -1749,7 +2301,21 @@
             document.getElementById('dataRegistro').valueAsDate = new Date();
             document.getElementById('horaInicio').value = '07:00';
             document.getElementById('horaFim').value = '17:00';
-            document.querySelector('input[name="clima"][value="ensolarado"]').checked = true;
+
+            const mRadio = document.querySelector('input[name="climaManha"][value="ensolarado"]');
+            if (mRadio) mRadio.checked = true;
+            const tRadio = document.querySelector('input[name="climaTarde"][value="ensolarado"]');
+            if (tRadio) tRadio.checked = true;
+            const condRadio = document.querySelector('input[name="condicaoObra"][value="praticavel"]');
+            if (condRadio) condRadio.checked = true;
+            if (document.getElementById('horasParalisadas')) document.getElementById('horasParalisadas').value = 0;
+
+            const checkConc = document.getElementById('houveConcretagem');
+            if (checkConc) {
+                checkConc.checked = false;
+                toggleCardConcretagem();
+            }
+
             fotosTemp = [];
             equipamentosSelecionados = {};
             renderPhotoPreview();
@@ -1813,10 +2379,68 @@
             };
 
             const r = lista[historicoState.index];
-            const clima = climaInfo[r.clima] || climaInfo.ensolarado;
+            const climaMKey = r.climaManha || r.clima || 'ensolarado';
+            const climaTKey = r.climaTarde || r.clima || 'ensolarado';
+            const climaM = climaInfo[climaMKey] || climaInfo.ensolarado;
+            const climaT = climaInfo[climaTKey] || climaInfo.ensolarado;
+            const clima = climaM; // gradiente principal
             const numeroStr = String(r.numero ?? 0).padStart(4, '0');
             const isExemplo = r.isExemplo ? '<span class="ml-2 bg-white/90 text-amber-600 px-2 py-0.5 rounded-full text-xs font-bold animate-pulse">📋 MODELO</span>' : '';
             const horasTrab = calcularHorasTrabalhadas(r.horaInicio, r.horaFim);
+
+            // Badges de Condição do Canteiro
+            let condicaoBadge = '';
+            if (r.condicaoObra === 'impraticavel') {
+                condicaoBadge = `<span class="bg-red-500/90 text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-xs">🔴 Impraticável ${r.horasParalisadas > 0 ? `(${r.horasParalisadas}h paral.)` : ''}</span>`;
+            } else if (r.condicaoObra === 'parcial') {
+                condicaoBadge = `<span class="bg-amber-500/90 text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-xs">🟡 Parcial ${r.horasParalisadas > 0 ? `(${r.horasParalisadas}h paral.)` : ''}</span>`;
+            } else {
+                condicaoBadge = `<span class="bg-emerald-500/90 text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-xs">🟢 Praticável</span>`;
+            }
+
+            // Bloco de Concretagem (Item 4)
+            const concretagemHtml = (r.concretagem && r.concretagem.houve) ? `
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-4 shadow-xs">
+                    <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🏗️</span>
+                            <div>
+                                <h4 class="font-bold text-blue-900 text-sm">Controle Tecnológico de Concretagem</h4>
+                                <p class="text-blue-600 text-xs">NBR 12655 / NBR 14931 — Rastreabilidade & Ensaios</p>
+                            </div>
+                        </div>
+                        <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-xs">
+                            ${r.concretagem.fck || 'fck'} • ${r.concretagem.volume || 0} m³
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs bg-white/80 p-3 rounded-xl border border-blue-100">
+                        <div>
+                            <span class="text-gray-400 block text-[10px] uppercase font-bold">Elemento Concretado</span>
+                            <span class="font-semibold text-gray-800">${r.concretagem.elemento || 'N/A'}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 block text-[10px] uppercase font-bold">Slump Test Medido</span>
+                            <span class="font-semibold text-gray-800">${r.concretagem.slump ? `${r.concretagem.slump} cm` : 'N/A'}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 block text-[10px] uppercase font-bold">Usina / Fornecedor</span>
+                            <span class="font-semibold text-gray-800">${r.concretagem.usina || 'N/A'}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 block text-[10px] uppercase font-bold">NF / Lacre</span>
+                            <span class="font-semibold text-gray-800">${r.concretagem.nf || 'N/A'}</span>
+                        </div>
+                        <div class="md:col-span-2">
+                            <span class="text-gray-400 block text-[10px] uppercase font-bold">Corpos de Prova (CPs)</span>
+                            <span class="font-semibold text-gray-800">${r.concretagem.cps || 'N/A'}</span>
+                        </div>
+                        <div class="md:col-span-2">
+                            <span class="text-gray-400 block text-[10px] uppercase font-bold">Laboratório Tecnológico</span>
+                            <span class="font-semibold text-gray-800">${r.concretagem.laboratorio || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+            ` : '';
 
             const equipeHtml = Object.entries(r.equipe || {}).map(([funcao, qtd]) =>
                 `<span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
@@ -1847,13 +2471,20 @@
             container.innerHTML = `
                 <div class="space-y-4">
                     <div id="registro-${r.id}" class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-                        <div class="bg-gradient-to-r ${clima.color} text-white px-6 py-4 flex justify-between items-center">
+                        <div class="bg-gradient-to-r ${clima.color} text-white px-6 py-4 flex justify-between items-center flex-wrap gap-3">
                             <div class="flex items-center gap-4">
-                                <span class="text-4xl">${clima.icon}</span>
+                                <div class="bg-white/20 backdrop-blur-sm p-2 rounded-2xl flex items-center gap-2">
+                                    <span class="text-2xl" title="Manhã: ${climaM.label}">🌅 ${climaM.icon}</span>
+                                    <span class="text-white/40">|</span>
+                                    <span class="text-2xl" title="Tarde: ${climaT.label}">🌇 ${climaT.icon}</span>
+                                </div>
                                 <div>
-                                    <p class="text-white/80 text-sm font-medium">Diário #${numeroStr}${isExemplo}</p>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <p class="text-white/80 text-sm font-medium">Diário #${numeroStr}${isExemplo}</p>
+                                        ${condicaoBadge}
+                                    </div>
                                     <p class="font-bold text-lg">${formatDate(r.data)}</p>
-                                    ${r.horaInicio && r.horaFim ? `<p class="text-white/80 text-xs">🕐 ${r.horaInicio} às ${r.horaFim} (${horasTrab}h)</p>` : ''}
+                                    ${r.horaInicio && r.horaFim ? `<p class="text-white/80 text-xs">🕐 ${r.horaInicio} às ${r.horaFim} (${horasTrab}h) • M: ${climaM.label} | T: ${climaT.label}</p>` : ''}
                                 </div>
                             </div>
                             <div class="flex gap-2">
@@ -1880,6 +2511,7 @@
                                 <p class="text-gray-700 whitespace-pre-line bg-gray-50 p-4 rounded-xl">${r.atividades}</p>
                             </div>
                             ` : ''}
+                            ${concretagemHtml}
                             ${r.materiais ? `
                             <div>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">🧱 Materiais</p>
@@ -1981,7 +2613,27 @@
             document.getElementById('editData').value = registro.data;
             document.getElementById('editHoraInicio').value = registro.horaInicio || '07:00';
             document.getElementById('editHoraFim').value = registro.horaFim || '17:00';
-            document.getElementById('editClima').value = registro.clima;
+            if (document.getElementById('editClimaManha')) document.getElementById('editClimaManha').value = registro.climaManha || registro.clima || 'ensolarado';
+            if (document.getElementById('editClimaTarde')) document.getElementById('editClimaTarde').value = registro.climaTarde || registro.clima || 'ensolarado';
+            if (document.getElementById('editCondicaoObra')) document.getElementById('editCondicaoObra').value = registro.condicaoObra || 'praticavel';
+            if (document.getElementById('editHorasParalisadas')) document.getElementById('editHorasParalisadas').value = registro.horasParalisadas || 0;
+
+            // Concretagem (Item 4)
+            const conc = registro.concretagem || {};
+            const checkConc = document.getElementById('editHouveConcretagem');
+            if (checkConc) {
+                checkConc.checked = !!conc.houve;
+                toggleEditCardConcretagem();
+            }
+            if (document.getElementById('editConcElemento')) document.getElementById('editConcElemento').value = conc.elemento || '';
+            if (document.getElementById('editConcVolume')) document.getElementById('editConcVolume').value = conc.volume || '';
+            if (document.getElementById('editConcFck')) document.getElementById('editConcFck').value = conc.fck || 'C30';
+            if (document.getElementById('editConcSlump')) document.getElementById('editConcSlump').value = conc.slump || '';
+            if (document.getElementById('editConcUsina')) document.getElementById('editConcUsina').value = conc.usina || '';
+            if (document.getElementById('editConcNf')) document.getElementById('editConcNf').value = conc.nf || '';
+            if (document.getElementById('editConcCps')) document.getElementById('editConcCps').value = conc.cps || '';
+            if (document.getElementById('editConcLaboratorio')) document.getElementById('editConcLaboratorio').value = conc.laboratorio || '';
+
             document.getElementById('editAtividades').value = registro.atividades || '';
             document.getElementById('editMateriais').value = registro.materiais || '';
             document.getElementById('editOcorrencias').value = registro.ocorrencias || '';
@@ -2014,12 +2666,35 @@
                     if (qtd > 0) equipeEditada[funcao] = qtd;
                 });
 
+                const editHouveConc = document.getElementById('editHouveConcretagem')?.checked || false;
+                const editConcretagemDados = {
+                    houve: editHouveConc,
+                    elemento: document.getElementById('editConcElemento')?.value?.trim() || '',
+                    volume: parseFloat(document.getElementById('editConcVolume')?.value) || 0,
+                    fck: document.getElementById('editConcFck')?.value || '',
+                    slump: document.getElementById('editConcSlump')?.value?.trim() || '',
+                    usina: document.getElementById('editConcUsina')?.value?.trim() || '',
+                    nf: document.getElementById('editConcNf')?.value?.trim() || '',
+                    cps: document.getElementById('editConcCps')?.value?.trim() || '',
+                    laboratorio: document.getElementById('editConcLaboratorio')?.value?.trim() || ''
+                };
+
+                const editClimaManhaVal = document.getElementById('editClimaManha')?.value || 'ensolarado';
+                const editClimaTardeVal = document.getElementById('editClimaTarde')?.value || 'ensolarado';
+                const editCondicaoVal = document.getElementById('editCondicaoObra')?.value || 'praticavel';
+                const editHorasParalVal = parseFloat(document.getElementById('editHorasParalisadas')?.value) || 0;
+
                 registros[index] = {
                     ...registros[index],
                     data: document.getElementById('editData').value,
                     horaInicio: document.getElementById('editHoraInicio').value,
                     horaFim: document.getElementById('editHoraFim').value,
-                    clima: document.getElementById('editClima').value,
+                    clima: editClimaManhaVal, // retrocompatibilidade
+                    climaManha: editClimaManhaVal,
+                    climaTarde: editClimaTardeVal,
+                    condicaoObra: editCondicaoVal,
+                    horasParalisadas: editHorasParalVal,
+                    concretagem: editConcretagemDados,
                     equipe: equipeEditada,
                     equipamentos: {...editEquipamentosSelecionados},
                     atividades: document.getElementById('editAtividades').value,
@@ -2286,11 +2961,25 @@
                 }
                 if (dadosObra.cliente) {
                     doc.text(`Cliente: ${dadosObra.cliente}`, infoX, infoY, { align: 'right' });
+                    infoY += 4;
+                }
+
+                // Dados Oficiais (Item 6: ART, CNO, Alvará, Avanço)
+                const oficiaisList = [];
+                if (dadosObra.art) oficiaisList.push(`ART/RRT: ${dadosObra.art}`);
+                if (dadosObra.cno) oficiaisList.push(`CNO: ${dadosObra.cno}`);
+                if (dadosObra.alvara) oficiaisList.push(`Alvará: ${dadosObra.alvara}`);
+                if (dadosObra.avancoFisico !== undefined && dadosObra.avancoFisico !== '') oficiaisList.push(`Avanço Físico: ${dadosObra.avancoFisico}%`);
+
+                if (oficiaisList.length > 0) {
+                    doc.setFontSize(7);
+                    doc.setTextColor(180, 83, 9);
+                    doc.text(oficiaisList.join('  •  '), marginLeft, y + 18);
                 }
 
                 doc.setDrawColor(234, 88, 12);
                 doc.setLineWidth(0.5);
-                doc.line(marginLeft, y + 20, pageWidth - marginRight, y + 20);
+                doc.line(marginLeft, y + 21, pageWidth - marginRight, y + 21);
 
                 return y + 25;
             }
@@ -2453,9 +3142,13 @@
                 doc.setTextColor(180, 83, 9);
                 doc.text(`Diário #${numeroStr}`, marginLeft + 5, y + 3);
 
-                doc.setFontSize(10);
+                doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
-                doc.text(`${formatDateSimple(r.data)} | ${climaLabels[r.clima] || 'N/A'}`, marginLeft + 45, y + 3);
+                const cMStr = climaLabels[r.climaManha || r.clima] || 'Sol';
+                const cTStr = climaLabels[r.climaTarde || r.clima] || 'Sol';
+                const condStr = (r.condicaoObra === 'impraticavel') ? '🔴 Impraticável' : ((r.condicaoObra === 'parcial') ? '🟡 Parcial' : '🟢 Praticável');
+                const paralStr = (r.horasParalisadas > 0) ? ` (${r.horasParalisadas}h paral.)` : '';
+                doc.text(`${formatDateSimple(r.data)} | M: ${cMStr} • T: ${cTStr} | ${condStr}${paralStr}`, marginLeft + 35, y + 3);
 
                 const totalPessoas = Object.values(r.equipe || {}).reduce((a, b) => a + b, 0);
                 let infoExtra = `${totalPessoas} pessoas`;
@@ -2522,6 +3215,30 @@
                         y += 4;
                     });
                     y += 3;
+                }
+
+                // Controle Tecnológico de Concretagem (Item 4 - NBR 12655 / NBR 14931)
+                if (r.concretagem && r.concretagem.houve) {
+                    y = checkNewPage(y, 24);
+                    doc.setFillColor(239, 246, 255);
+                    doc.roundedRect(marginLeft, y - 3, contentWidth, 20, 2, 2, 'F');
+                    doc.setDrawColor(191, 219, 254);
+                    doc.setLineWidth(0.3);
+                    doc.roundedRect(marginLeft, y - 3, contentWidth, 20, 2, 2, 'D');
+
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(8.5);
+                    doc.setTextColor(29, 78, 216);
+                    doc.text('CONTROLE TECNOLÓGICO DE CONCRETAGEM (NBR 12655 / NBR 14931):', marginLeft + 4, y + 2);
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(30, 41, 59);
+                    const concL1 = `Peça/Elemento: ${r.concretagem.elemento || 'N/A'}  |  Volume: ${r.concretagem.volume || 0} m³  |  fck: ${r.concretagem.fck || 'N/A'}  |  Slump: ${r.concretagem.slump || 'N/A'} cm`;
+                    const concL2 = `Usina: ${r.concretagem.usina || 'N/A'}  |  NF/Lacre: ${r.concretagem.nf || 'N/A'}  |  CPs: ${r.concretagem.cps || 'N/A'}  |  Lab: ${r.concretagem.laboratorio || 'N/A'}`;
+                    doc.text(concL1, marginLeft + 4, y + 8);
+                    doc.text(concL2, marginLeft + 4, y + 13);
+                    y += 22;
                 }
 
                 // Materiais
@@ -2743,7 +3460,10 @@ function importarJSON() {
                     if (shared.responsavel) dadosObra.engenheiro = shared.responsavel;
                     if (shared.crea) dadosObra.crea = shared.crea;
                     if (shared.local) dadosObra.endereco = shared.local;
-                    if (shared.art) dadosObra.contrato = `ART/RRT: ${shared.art}`;
+                    if (shared.art) {
+                        dadosObra.art = shared.art;
+                        if (!dadosObra.contrato) dadosObra.contrato = `ART/RRT: ${shared.art}`;
+                    }
                     saveData();
                     if (typeof updateHeaderObra === 'function') updateHeaderObra();
                     if (typeof carregarDadosObra === 'function') carregarDadosObra();
