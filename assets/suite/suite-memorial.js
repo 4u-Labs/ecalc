@@ -283,49 +283,137 @@
                 color: #0f172a;
             }
 
-            /* PRINT CSS: Strict A4 Optimization */
+            /* PRINT CSS: Strict A4 Optimization - Zero Blank Pages */
             @media print {
-                body * {
-                    visibility: hidden;
+                /* 1. When memorial modal is active, completely remove all other body elements from print layout flow */
+                body.ecalc-memorial-open > *:not(#ecalc-memorial-modal),
+                body:has(#ecalc-memorial-modal.active) > *:not(#ecalc-memorial-modal) {
+                    display: none !important;
+                    height: 0 !important;
+                    max-height: 0 !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    overflow: hidden !important;
+                    visibility: hidden !important;
                 }
-                .ecalc-memorial-modal,
-                .ecalc-memorial-modal * {
-                    visibility: visible;
+
+                /* 2. Reset html and body so their height matches only the printed document */
+                html, body {
+                    background: #ffffff !important;
+                    color: #000000 !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    height: auto !important;
+                    min-height: 0 !important;
+                    max-height: none !important;
+                    overflow: visible !important;
+                    width: 100% !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
                 }
-                .ecalc-memorial-modal {
-                    position: absolute !important;
+
+                /* 3. Modal container behaves as standard flow document root */
+                #ecalc-memorial-modal.active,
+                .ecalc-memorial-modal.active {
+                    display: block !important;
+                    position: static !important;
+                    inset: auto !important;
                     top: 0 !important;
                     left: 0 !important;
                     width: 100% !important;
-                    background: #ffffff !important;
-                    padding: 0 !important;
+                    height: auto !important;
+                    min-height: 0 !important;
+                    max-height: none !important;
                     margin: 0 !important;
-                    display: block !important;
+                    padding: 0 !important;
+                    background: #ffffff !important;
                     overflow: visible !important;
+                    box-shadow: none !important;
+                    backdrop-filter: none !important;
                 }
+
+                #ecalc-memorial-modal *,
+                .ecalc-memorial-modal * {
+                    visibility: visible !important;
+                }
+
+                /* 4. Hide screen actions (buttons) */
                 .ecalc-memorial-actions {
                     display: none !important;
                 }
+
+                /* 5. A4 Sheet: fits exactly into printable area with no overflow or trailing blank pages */
                 .ecalc-a4-sheet {
                     width: 100% !important;
-                    min-height: auto !important;
+                    max-width: 100% !important;
+                    min-height: 0 !important;
                     height: auto !important;
                     box-shadow: none !important;
-                    padding: 8mm 10mm !important;
-                    margin: 0 !important;
+                    border: none !important;
+                    padding: 0 !important;
+                    margin: 0 auto !important;
                     background: #ffffff !important;
+                    box-sizing: border-box !important;
+                    page-break-after: avoid !important;
+                    break-after: avoid !important;
                 }
+
+                /* 6. Section spacing and break controls */
                 .ecalc-sheet-header,
                 .ecalc-table-project,
                 .ecalc-sec-title,
+                .ecalc-data-grid,
+                .ecalc-formula-box,
                 .ecalc-drawing-box,
                 .ecalc-sheet-footer {
-                    break-inside: avoid;
-                    page-break-inside: avoid;
+                    break-inside: avoid !important;
+                    page-break-inside: avoid !important;
                 }
+
+                /* Compact spacing in print to ensure clean pagination */
+                .ecalc-sec-title {
+                    margin: 8px 0 4px 0 !important;
+                    font-size: 9pt !important;
+                }
+                .ecalc-data-grid {
+                    margin-bottom: 6px !important;
+                    padding: 5px 8px !important;
+                    font-size: 8pt !important;
+                    gap: 3px 10px !important;
+                }
+                .ecalc-data-row {
+                    padding-bottom: 1px !important;
+                }
+                .ecalc-formula-box {
+                    padding: 4px 8px !important;
+                    margin: 4px 0 !important;
+                    font-size: 8pt !important;
+                }
+                .ecalc-table-project {
+                    margin-bottom: 6px !important;
+                    font-size: 8pt !important;
+                }
+                .ecalc-table-project td {
+                    padding: 3px 6px !important;
+                }
+                .ecalc-drawing-box {
+                    margin: 6px 0 !important;
+                    padding: 6px !important;
+                }
+                .ecalc-drawing-box svg {
+                    max-height: 120px !important;
+                    width: auto !important;
+                }
+                .ecalc-sheet-footer {
+                    margin-top: 10px !important;
+                    padding-top: 8px !important;
+                    break-inside: avoid !important;
+                    page-break-inside: avoid !important;
+                }
+
                 @page {
                     size: A4 portrait;
-                    margin: 8mm;
+                    margin: 8mm 10mm;
                 }
             }
         `;
@@ -522,13 +610,49 @@
         `;
 
         modal.classList.add('active');
+        document.body.classList.add('ecalc-memorial-open');
 
-        document.getElementById('ecalc-mem-close-btn').onclick = () => modal.classList.remove('active');
-        document.getElementById('ecalc-mem-print-btn').onclick = () => window.print();
+        function fecharMemorial() {
+            modal.classList.remove('active');
+            document.body.classList.remove('ecalc-memorial-open');
+        }
+
+        document.getElementById('ecalc-mem-close-btn').onclick = fecharMemorial;
+        document.getElementById('ecalc-mem-print-btn').onclick = () => {
+            document.body.classList.add('ecalc-memorial-open');
+            window.print();
+        };
 
         modal.onclick = (e) => {
-            if (e.target === modal) modal.classList.remove('active');
+            if (e.target === modal) fecharMemorial();
         };
+
+        if (!window._ecalcMemorialListenersSet) {
+            window._ecalcMemorialListenersSet = true;
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const m = document.getElementById('ecalc-memorial-modal');
+                    if (m && m.classList.contains('active')) {
+                        m.classList.remove('active');
+                        document.body.classList.remove('ecalc-memorial-open');
+                    }
+                }
+            });
+
+            window.addEventListener('beforeprint', () => {
+                const m = document.getElementById('ecalc-memorial-modal');
+                if (m && m.classList.contains('active')) {
+                    document.body.classList.add('ecalc-memorial-open');
+                }
+            });
+
+            window.addEventListener('afterprint', () => {
+                const m = document.getElementById('ecalc-memorial-modal');
+                if (!m || !m.classList.contains('active')) {
+                    document.body.classList.remove('ecalc-memorial-open');
+                }
+            });
+        }
     }
 
     // Expose API

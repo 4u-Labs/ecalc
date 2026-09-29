@@ -70,6 +70,19 @@
 
         @media print {
             body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .no-print { display: none !important; }
+
+            /* Isolamento de impressão do Memorial ECALC */
+            body.ecalc-memorial-open > *:not(#ecalc-memorial-modal),
+            body:has(#ecalc-memorial-modal.active) > *:not(#ecalc-memorial-modal) {
+                display: none !important;
+                height: 0 !important;
+                max-height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                visibility: hidden !important;
+            }
         }
     </style>
 
