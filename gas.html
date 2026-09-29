@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>Instalações de Gás | Ferramentas de Engenharia</title>
+  <title>Instalações de Gás (GLP / GN) | Suíte de Engenharia eCalc</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
             dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
-            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', yellow: '#ffea00' }
+            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', yellow: '#ffea00', orange: '#ff8800' }
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
@@ -28,7 +28,7 @@
     body { background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%); min-height: 100vh; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #12121a; }
-    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ffea00, #ffaa00); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ffea00, #ff8800); border-radius: 4px; }
     
     .text-glow { text-shadow: 0 0 20px rgba(255, 234, 0, 0.5); }
     
@@ -42,11 +42,11 @@
       position: absolute;
       inset: -2px;
       border-radius: 18px;
-      background: linear-gradient(135deg, #ffea00, #ffaa00, #ffea00);
+      background: linear-gradient(135deg, #ffea00, #ff8800, #ffea00);
       background-size: 300% 300%;
       animation: gradientMove 8s ease infinite;
       z-index: -1;
-      opacity: 0.6;
+      opacity: 0.5;
     }
     @keyframes gradientMove {
       0%, 100% { background-position: 0% 50%; }
@@ -60,252 +60,1146 @@
     .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
     
     .form-input {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.25s ease;
     }
     .form-input:focus {
       border-color: #ffea00;
-      box-shadow: 0 0 15px rgba(255, 234, 0, 0.2);
+      box-shadow: 0 0 15px rgba(255, 234, 0, 0.25);
       outline: none;
+      background: rgba(255, 255, 255, 0.07);
     }
     .btn-primary {
-      background: linear-gradient(135deg, #ffea00 0%, #ffaa00 100%);
-      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #ffea00 0%, #ff8800 100%);
+      transition: all 0.25s ease;
     }
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 30px rgba(255, 234, 0, 0.4);
     }
     .card-hover:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       border-color: #ffea00;
     }
   </style>
 </head>
-<body class="font-sans text-gray-100">
+<body class="font-sans text-gray-100 pb-16">
+  <!-- Top Navigation Header -->
   <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-yellow to-orange-500 flex items-center justify-center font-bold text-dark-900 text-xl">
-          ⛽
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-yellow to-neon-orange flex items-center justify-center font-bold text-dark-900 text-xl shadow-lg shadow-yellow-500/20">
+          🔥
         </div>
         <div>
-          <h1 class="text-lg font-semibold text-white">Instalações de Gás</h1>
-          <p class="text-xs text-gray-500">GLP / Gás Natural</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold text-white">Instalações de Gás (GLP / GN)</h1>
+            <span class="bg-yellow-500/20 text-neon-yellow border border-yellow-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">NBR 15526 / 13523</span>
+          </div>
+          <p class="text-xs text-gray-400">Dimensionamento de Tubulações, Centrais GLP, Simultaneidade & Ventilação (NBR 13103)</p>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      <div class="flex items-center gap-2">
+        <button id="btnReset" class="p-2 rounded-xl bg-dark-700 hover:bg-dark-600 border border-white/10 text-gray-400 hover:text-white transition-colors" title="Restaurar padrão">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <div class="grid lg:grid-cols-3 gap-8">
-      <div class="lg:col-span-1 space-y-6">
-        <div class="gradient-border p-6">
-          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <span class="text-neon-yellow">●</span> Parâmetros
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <!-- ECALC SUITE PRO BAR (Item 6) -->
+    <div class="bg-gradient-to-r from-slate-900 via-dark-800 to-slate-900 border border-yellow-500/30 rounded-2xl p-4 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-slate-900 border border-yellow-500/40 flex items-center justify-center p-1.5 shadow-lg shadow-yellow-500/20 shrink-0">
+          <img src="assets/icon-ecalc-64.png" alt="ECALC" class="w-full h-full object-contain">
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-wider text-yellow-400 font-bold">ECALC SUITE PRO</div>
+          <div class="text-sm font-semibold text-white">Redes de Gás Combustível — NBR 15526, NBR 13523, NBR 13103 e IT-28 Bombeiros</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        <button type="button" onclick="gerarMemorialGas()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-dark-900 font-bold text-xs shadow-md shadow-yellow-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>📄 Gerar Memorial ABNT</span>
+        </button>
+        <button type="button" onclick="exportarOfficeClone()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>📊 Abrir no OfficeClone</span>
+        </button>
+        <button type="button" onclick="abrirNoCadCloneGas()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>📐 Abrir no CADClone</span>
+        </button>
+        <button type="button" onclick="baixarDxfGas()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 font-bold text-xs shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>💾 Baixar .DXF</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Layout Grid: Parâmetros (Esquerda) + Resultados & Gráficos (Direita) -->
+    <div class="grid lg:grid-cols-12 gap-8 items-start">
+      <!-- Coluna da Esquerda: Parâmetros (5 colunas) -->
+      <div class="lg:col-span-5 space-y-6">
+        <!-- 1. Dados Gerais da Edificação -->
+        <div class="gradient-border p-5">
+          <h2 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+            <span class="text-neon-yellow">●</span> 1. Dados da Edificação & Gás
           </h2>
           
-          <div class="space-y-5">
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Tipo de Gás</label>
-              <select id="tipoGas" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
-                <option value="GLP">GLP (Gás Liquefeito de Petróleo)</option>
-                <option value="GN">GN (Gás Natural)</option>
-              </select>
-            </div>
-            
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Unidades Habitacionais (Aptos)</label>
-              <input type="number" id="unidades" value="10" min="1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
-            </div>
-            
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5">
-              <h4 class="text-sm font-medium text-gray-300 mb-3">Equipamentos por Unidade</h4>
-              <div class="space-y-3">
-                <label class="flex items-center justify-between">
-                  <span class="text-sm text-gray-400">Fogão 4 Bocas com Forno</span>
-                  <input type="number" id="fogao4" value="1" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700">
-                </label>
-                <label class="flex items-center justify-between">
-                  <span class="text-sm text-gray-400">Fogão 6 Bocas com Forno</span>
-                  <input type="number" id="fogao6" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700">
-                </label>
-                <label class="flex items-center justify-between">
-                  <span class="text-sm text-gray-400">Aquecedor de Passagem 15L/min</span>
-                  <input type="number" id="aquecedor15" value="1" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700">
-                </label>
-                <label class="flex items-center justify-between">
-                  <span class="text-sm text-gray-400">Aquecedor de Passagem 22L/min</span>
-                  <input type="number" id="aquecedor22" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700">
-                </label>
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Tipo de Gás</label>
+                <select id="tipoGas" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm font-medium" onchange="calcularGas()">
+                  <option value="GLP" selected>GLP (11.100 kcal/kg)</option>
+                  <option value="GN">GN (8.600 kcal/m³)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Tipo de Ocupação (Item 4)</label>
+                <select id="tipoOcupacao" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm" onchange="calcularGas()">
+                  <option value="residencial" selected>Residencial Coletivo</option>
+                  <option value="comercial">Comercial / Restaurante</option>
+                  <option value="industrial">Industrial / Serviços</option>
+                </select>
               </div>
             </div>
 
-            <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 mt-4 shadow-lg shadow-yellow-500/30">
-              Calcular Consumo e Central
-            </button>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Unidades / Apartamentos</label>
+                <input type="number" id="unidades" value="12" min="1" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm font-semibold" onchange="calcularGas()">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Temp. Mínima Local (Item 3)</label>
+                <select id="tempMinima" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-sm" onchange="calcularGas()">
+                  <option value="10">10 ºC (Região Fria/Inverno)</option>
+                  <option value="15" selected>15 ºC (Região Sudeste/Média)</option>
+                  <option value="20">20 ºC (Região Quente)</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- 2. Biblioteca Ampliada de Equipamentos por Unidade (Item 5) -->
+        <div class="gradient-border p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="text-neon-yellow">●</span> 2. Equipamentos por Apartamento / Unidade
+            </h2>
+            <span class="text-[10px] text-gray-400">NBR 15526</span>
+          </div>
+
+          <div class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+            <!-- Fogões e Cozinha -->
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 space-y-2">
+              <div class="text-xs font-bold text-yellow-400 uppercase tracking-wider">Cocção & Cozinha</div>
+              
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Fogão 4 Bocas c/ Forno</span>
+                  <span class="text-[10px] text-gray-500 block">6.900 kcal/h (8.0 kW)</span>
+                </div>
+                <input type="number" id="eq_fogao4" value="1" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Fogão 5/6 Bocas c/ Forno</span>
+                  <span class="text-[10px] text-gray-500 block">11.200 kcal/h (13.0 kW)</span>
+                </div>
+                <input type="number" id="eq_fogao6" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Cooktop 4/5 Bocas (Tripla Chama)</span>
+                  <span class="text-[10px] text-gray-500 block">8.500 kcal/h (9.9 kW)</span>
+                </div>
+                <input type="number" id="eq_cooktop" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Forno de Embutir a Gás</span>
+                  <span class="text-[10px] text-gray-500 block">3.000 kcal/h (3.5 kW)</span>
+                </div>
+                <input type="number" id="eq_forno" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+            </div>
+
+            <!-- Aquecedores e Conforto -->
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 space-y-2">
+              <div class="text-xs font-bold text-yellow-400 uppercase tracking-wider">Aquecimento de Água & Lazer</div>
+
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Aquecedor de Passagem 15 L/min</span>
+                  <span class="text-[10px] text-gray-500 block">21.500 kcal/h (25 kW) • 1 Ducha</span>
+                </div>
+                <input type="number" id="eq_aquecedor15" value="1" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Aquecedor de Passagem 22 L/min</span>
+                  <span class="text-[10px] text-gray-500 block">32.000 kcal/h (37 kW) • 2 Duchas</span>
+                </div>
+                <input type="number" id="eq_aquecedor22" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Aquecedor de Passagem 30 a 37 L/min</span>
+                  <span class="text-[10px] text-gray-500 block">43.000 kcal/h (50 kW) • 3 Duchas</span>
+                </div>
+                <input type="number" id="eq_aquecedor30" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Churrasqueira a Gás Gourmet</span>
+                  <span class="text-[10px] text-gray-500 block">7.500 kcal/h (8.7 kW)</span>
+                </div>
+                <input type="number" id="eq_churrasqueira" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Secadora de Roupas a Gás</span>
+                  <span class="text-[10px] text-gray-500 block">4.000 kcal/h (4.6 kW)</span>
+                </div>
+                <input type="number" id="eq_secadora" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+            </div>
+
+            <!-- Comercial / Industrial -->
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 space-y-2">
+              <div class="text-xs font-bold text-yellow-400 uppercase tracking-wider">Equipamentos Comerciais</div>
+
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-gray-300 font-medium">Fogão Industrial (4/6 Bocas)</span>
+                  <span class="text-[10px] text-gray-500 block">20.000 kcal/h (23.2 kW)</span>
+                </div>
+                <input type="number" id="eq_industrial" value="0" min="0" class="form-input w-16 px-2 py-1 text-center rounded-lg text-white bg-dark-700" onchange="calcularGas()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Parâmetros da Rede e Tubulação (Item 1) -->
+        <div class="gradient-border p-5">
+          <h2 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <span class="text-neon-yellow">●</span> 3. Parâmetros da Tubulação & Perda de Carga
+          </h2>
+
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Material do Tubo</label>
+                <select id="tuboMaterial" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-xs" onchange="calcularGas()">
+                  <option value="cobre_a" selected>Cobre Classe A (NBR 13206)</option>
+                  <option value="cobre_i">Cobre Classe I (NBR 13206)</option>
+                  <option value="aco_sch40">Aço Carbono SCH 40 (NBR 5590)</option>
+                  <option value="multicamada">Multicamada (PEX-AL-PEX)</option>
+                  <option value="pead">PEAD PE-80 (Rede Enterrada)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Estágio de Pressão</label>
+                <select id="tuboPressao" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-xs" onchange="calcularGas()">
+                  <option value="baixa" selected>Baixa Pressão (2.8 kPa GLP / 2.0 kPa GN)</option>
+                  <option value="media">Média Pressão 1º Estágio (150 kPa)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Comprimento Trecho (m)</label>
+                <input type="number" id="tuboComprimento" value="35" min="1" step="1" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-xs font-semibold" onchange="calcularGas()">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Perda Admissível (%)</label>
+                <select id="tuboPerdaAdmissivel" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-xs" onchange="calcularGas()">
+                  <option value="5" selected>5% (Recomendado NBR 15526)</option>
+                  <option value="10">10% (Máximo Tolerado)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Verificação de Ambiente e Ventilação Permanente (Item 2) -->
+        <div class="gradient-border p-5">
+          <h2 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <span class="text-neon-yellow">●</span> 4. Ambiente & Ventilação (NBR 13103)
+          </h2>
+
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Volume do Cômodo (m³)</label>
+                <input type="number" id="ambVolume" value="18" min="1" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-xs font-semibold" onchange="calcularGas()">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Área de Serviço / Cozinha</label>
+                <select id="ambTipo" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 text-xs" onchange="calcularGas()">
+                  <option value="integrado" selected>Integrada c/ Cozinha</option>
+                  <option value="fechada">Área de Serviço Separada</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button id="btnCalcular" onclick="calcularGas()" class="btn-primary w-full py-3.5 rounded-xl font-bold text-dark-900 shadow-xl shadow-yellow-500/25 flex items-center justify-center gap-2 text-base">
+          <span>⚡</span> Calcular Rede de Gás Completa
+        </button>
       </div>
 
-      <div class="lg:col-span-2 space-y-6">
-        <div id="resultadoSection" class="gradient-border p-8 text-center opacity-50 transition-opacity duration-500">
-          <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Potência Total Simultânea</div>
-          <div id="potenciaTotal" class="text-5xl md:text-6xl font-bold text-neon-yellow text-glow mb-2">0</div>
-          <div class="text-xl text-gray-300 mb-4">kcal/h</div>
+      <!-- Coluna da Direita: Resultados, Gráficos, Isométrico e Memorial (7 colunas) -->
+      <div class="lg:col-span-7 space-y-6">
+        <!-- 1. Painel Principal de Potência e Vazão -->
+        <div id="resultadoSection" class="gradient-border p-6 text-center opacity-50 transition-all duration-500">
+          <div class="text-gray-400 mb-1 text-xs uppercase tracking-wider font-semibold">Potência Total Simultânea Requerida</div>
+          <div id="potenciaTotal" class="text-4xl sm:text-5xl font-extrabold text-neon-yellow text-glow mb-1">0</div>
+          <div class="text-sm text-gray-300 mb-4 font-mono">kcal/h <span class="text-gray-500">|</span> <span id="potenciaKw" class="text-neon-orange font-bold">0 kW</span></div>
           
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Vazão Máxima (<span id="unidadeVazao">kg/h</span>)</div>
-              <div id="vazaoMax" class="text-xl font-semibold text-neon-yellow">0</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 card-hover">
+              <div class="text-[10px] text-gray-400 mb-0.5">Vazão Simultânea</div>
+              <div id="vazaoMax" class="text-lg font-bold text-neon-yellow">0</div>
+              <div id="unidadeVazao" class="text-[10px] text-gray-500">kg/h</div>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Fator Simultaneidade</div>
-              <div id="fatorSimul" class="text-xl font-semibold text-neon-yellow">0%</div>
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 card-hover">
+              <div class="text-[10px] text-gray-400 mb-0.5">Fator Simultaneidade</div>
+              <div id="fatorSimul" class="text-lg font-bold text-neon-yellow">0%</div>
+              <div class="text-[10px] text-gray-500 font-mono">NBR 15526</div>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Potência Instalada</div>
-              <div id="potInstalada" class="text-xl font-semibold text-neon-yellow">0 kcal/h</div>
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 card-hover">
+              <div class="text-[10px] text-gray-400 mb-0.5">Potência Instalada</div>
+              <div id="potInstalada" class="text-sm sm:text-base font-bold text-gray-200">0</div>
+              <div class="text-[10px] text-gray-500">kcal/h total</div>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Bateria Sugerida (GLP)</div>
-              <div id="bateriaSugerida" class="text-xl font-semibold text-neon-yellow">-</div>
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 card-hover">
+              <div class="text-[10px] text-gray-400 mb-0.5">Central Sugerida</div>
+              <div id="centralSugeridaCard" class="text-sm font-bold text-neon-orange">-</div>
+              <div class="text-[10px] text-gray-500">100% reserva</div>
             </div>
           </div>
         </div>
 
+        <!-- 2. Dimensionamento da Tubulação e Verificações (Item 1) -->
         <div class="gradient-border p-6">
-          <h3 class="text-lg font-semibold mb-4 text-white">📝 Memorial de Cálculo</h3>
-          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>📏</span> Dimensionamento de Diâmetro & Perda de Carga
+            </h3>
+            <span class="text-[11px] bg-yellow-500/20 text-neon-yellow px-2 py-0.5 rounded-full font-mono border border-yellow-500/30">Fórmula de Pole</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center mb-4">
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Diâmetro Comercial</div>
+              <div id="tuboDiametroNominal" class="text-base font-bold text-neon-yellow">DN 22</div>
+              <div id="tuboDiametroInterno" class="text-[10px] text-gray-500">d = 19.8 mm</div>
+            </div>
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Velocidade do Gás</div>
+              <div id="tuboVelocidade" class="text-base font-bold text-neon-green">4.2 m/s</div>
+              <div class="text-[10px] text-gray-500">Máx: 20.0 m/s</div>
+            </div>
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Perda de Carga Real</div>
+              <div id="tuboPerdaValor" class="text-base font-bold text-neon-yellow">1.2%</div>
+              <div class="text-[10px] text-gray-500">Admissível: 5%</div>
+            </div>
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Status Normativo</div>
+              <div id="tuboStatusBadge" class="text-sm font-bold text-emerald-400 mt-0.5">🟢 APROVADO</div>
+              <div class="text-[10px] text-gray-500">NBR 15526</div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-dark-900 rounded-xl border border-white/5 text-xs text-gray-400 flex items-center justify-between">
+            <div>
+              <span>Comprimento Virtual (Equivalente): <strong id="compVirtual" class="text-white">45.5 m</strong> (c/ 30% conexões)</span>
+            </div>
+            <span id="tuboMaterialLabel" class="text-gray-300 font-semibold">Cobre Classe A</span>
+          </div>
+        </div>
+
+        <!-- 3. Esquema Isométrico da Prumada / Rede (Item 7) -->
+        <div class="gradient-border p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>📊</span> Esquema Isométrico / Prumada Interativa (SVG)
+            </h3>
+            <span class="text-[11px] text-gray-400 font-mono">Unifilar da Rede</span>
+          </div>
+
+          <div id="svgContainer" class="bg-dark-900 rounded-xl p-4 border border-white/5 flex items-center justify-center min-h-[220px] overflow-hidden">
+            <!-- Diagrama Isométrico renderizado via JS -->
+          </div>
+        </div>
+
+        <!-- 4. Central de GLP e Afastamentos de Segurança (Item 3) -->
+        <div class="gradient-border p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>🏭</span> Central GLP (NBR 13523) & Afastamentos Mínimos
+            </h3>
+            <span class="text-[11px] text-neon-orange font-semibold">Corpo de Bombeiros</span>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4 mb-4">
+            <div class="p-4 bg-dark-800/70 rounded-xl border border-white/5">
+              <div class="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-2">Opção 1: Cilindros Transportáveis</div>
+              <div id="detalheBateriaCilindros" class="text-xs text-gray-300 space-y-1">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+
+            <div class="p-4 bg-dark-800/70 rounded-xl border border-white/5">
+              <div class="text-xs font-bold text-neon-orange uppercase tracking-wider mb-2">Opção 2: Tanque Estacionário a Granel</div>
+              <div id="detalheTanqueGranel" class="text-xs text-gray-300 space-y-1">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabela de Afastamentos Normativos -->
+          <div class="overflow-x-auto">
+            <div class="text-xs font-bold text-gray-300 mb-2">Distâncias Mínimas de Segurança da Central (NBR 13523 / IT-28):</div>
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-white/10 text-gray-400">
+                  <th class="py-1.5 px-2">Elemento Vizinho</th>
+                  <th class="py-1.5 px-2">Cilindros P45 / P190</th>
+                  <th class="py-1.5 px-2">Tanque Granel (P-500 a P-4000)</th>
+                  <th class="py-1.5 px-2">Motivo / Risco</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5 text-gray-300 font-mono">
+                <tr>
+                  <td class="py-1.5 px-2 text-white font-sans">Ralos, grelhas e esgotos</td>
+                  <td class="py-1.5 px-2 text-neon-yellow">≥ 1,50 m</td>
+                  <td class="py-1.5 px-2 text-neon-yellow">≥ 3,00 m</td>
+                  <td class="py-1.5 px-2 font-sans text-gray-400">GLP é mais pesado que o ar</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 text-white font-sans">Fontes de ignição / motores</td>
+                  <td class="py-1.5 px-2 text-neon-yellow">≥ 3,00 m</td>
+                  <td class="py-1.5 px-2 text-neon-yellow">≥ 3,00 m a 6,00 m</td>
+                  <td class="py-1.5 px-2 font-sans text-gray-400">Evitar centelhas elétricas</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 text-white font-sans">Aberturas e portas de prédios</td>
+                  <td class="py-1.5 px-2 text-neon-yellow">≥ 1,50 m</td>
+                  <td class="py-1.5 px-2 text-neon-yellow">≥ 3,00 m a 7,50 m</td>
+                  <td class="py-1.5 px-2 font-sans text-gray-400">Evitar invasão de gás</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 text-white font-sans">Divisas de propriedades</td>
+                  <td class="py-1.5 px-2 text-neon-yellow">≥ 1,50 m</td>
+                  <td class="py-1.5 px-2 text-neon-yellow">≥ 3,00 m</td>
+                  <td class="py-1.5 px-2 font-sans text-gray-400">Segurança de terceiros</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 5. Adequação de Ambientes e Ventilação Permanente (Item 2) -->
+        <div class="gradient-border p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>💨</span> Adequação do Ambiente & Ventilação (NBR 13103)
+            </h3>
+            <span id="ambStatusBadge" class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">🟢 Conforme</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center mb-4">
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Volume do Cômodo</div>
+              <div id="resAmbVolume" class="text-base font-bold text-white">18.0 m³</div>
+              <div class="text-[10px] text-gray-500">Mínimo: 6.0 m³</div>
+            </div>
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Ventilação Superior</div>
+              <div id="resVentSup" class="text-base font-bold text-neon-yellow">600 cm²</div>
+              <div class="text-[10px] text-gray-500">h ≥ 1,50 m (Exaustão)</div>
+            </div>
+            <div class="p-3 bg-dark-800 rounded-xl border border-white/5">
+              <div class="text-[10px] text-gray-400">Ventilação Inferior</div>
+              <div id="resVentInf" class="text-base font-bold text-neon-yellow">200 cm²</div>
+              <div id="resVentInfAltura" class="text-[10px] text-gray-500">Rente ao piso ≤ 0,20m</div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-dark-900 rounded-xl border border-white/5 text-xs text-gray-300 space-y-1">
+            <div class="flex items-center gap-2">
+              <span>🔥</span> <span id="resDutoExaustao">Duto de exaustão do aquecedor: <b>Ø 100mm a 130mm</b> metálico incombustível</span>
+            </div>
+            <div class="text-[11px] text-gray-500">Terminal tipo Tê ou Chapéu Chinês na fachada afastado no mínimo 40cm de janelas basculantes.</div>
+          </div>
+        </div>
+
+        <!-- 6. Memorial Descritivo Monospace / Prévia -->
+        <div class="gradient-border p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>📝</span> Memorial Técnico ABNT
+            </h3>
+            <button onclick="copiarMemorialTexto()" class="text-xs text-neon-yellow hover:underline">Copiar Texto</button>
+          </div>
+          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/60 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap max-h-64 border border-white/5">Aguardando cálculo...</pre>
         </div>
       </div>
     </div>
   </main>
 
-  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
+  <!-- Footer -->
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-white/5">
     <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
   </footer>
 
+  <!-- SCRIPT ENGINE -->
   <script>
     const $ = id => document.getElementById(id);
 
-    // Potências típicas (kcal/min) -> kcal/h (multiplica por 60)
-    // Ref: NBR 15526 e NBR 13523
+    // Potências e consumos dos equipamentos (kcal/h)
     const EQUIPAMENTOS = {
-      fogao4: { nome: "Fogão 4 Bocas", pot: 6900 },
-      fogao6: { nome: "Fogão 6 Bocas", pot: 11200 },
-      aquecedor15: { nome: "Aquecedor 15 L/min", pot: 21500 },
-      aquecedor22: { nome: "Aquecedor 22 L/min", pot: 32000 }
+      fogao4: { nome: "Fogão 4 Bocas", pot: 6900, kw: 8.0 },
+      fogao6: { nome: "Fogão 5/6 Bocas", pot: 11200, kw: 13.0 },
+      cooktop: { nome: "Cooktop Tripla Chama", pot: 8500, kw: 9.9 },
+      forno: { nome: "Forno de Embutir", pot: 3000, kw: 3.5 },
+      aquecedor15: { nome: "Aquecedor 15 L/min", pot: 21500, kw: 25.0, duto: 100 },
+      aquecedor22: { nome: "Aquecedor 22 L/min", pot: 32000, kw: 37.0, duto: 130 },
+      aquecedor30: { nome: "Aquecedor 30-37 L/min", pot: 43000, kw: 50.0, duto: 150 },
+      churrasqueira: { nome: "Churrasqueira Gourmet", pot: 7500, kw: 8.7 },
+      secadora: { nome: "Secadora de Roupas", pot: 4000, kw: 4.6 },
+      industrial: { nome: "Fogão Industrial", pot: 20000, kw: 23.2 }
     };
 
-    // Poder calorífico inferior
-    const PCI = {
-      GLP: 11100, // kcal/kg
-      GN: 8600    // kcal/m³
+    // Poder calorífico inferior e densidade relativa (ar = 1.0)
+    const PROPRIEDADES_GAS = {
+      GLP: { pci: 11100, densidade: 1.70, unidade: 'kg/h', pressaoBaixa: 2.8, nome: 'GLP (Gás Liquefeito de Petróleo)' },
+      GN: { pci: 8600, densidade: 0.60, unidade: 'm³/h', pressaoBaixa: 2.0, nome: 'GN (Gás Natural Canalizado)' }
     };
+
+    // Diâmetros comerciais internos reais (mm) e catálogo comercial
+    const CATALOGO_TUBOS = {
+      cobre_a: [
+        { dn: 'DN 15', dint: 13.4, dExt: 15.0 },
+        { dn: 'DN 22', dint: 19.8, dExt: 22.0 },
+        { dn: 'DN 28', dint: 25.6, dExt: 28.0 },
+        { dn: 'DN 35', dint: 32.0, dExt: 35.0 },
+        { dn: 'DN 42', dint: 38.8, dExt: 42.0 },
+        { dn: 'DN 54', dint: 50.4, dExt: 54.0 },
+        { dn: 'DN 66', dint: 62.4, dExt: 66.7 },
+        { dn: 'DN 79', dint: 75.0, dExt: 79.4 }
+      ],
+      cobre_i: [
+        { dn: 'DN 15', dint: 14.0, dExt: 15.0 },
+        { dn: 'DN 22', dint: 20.6, dExt: 22.0 },
+        { dn: 'DN 28', dint: 26.4, dExt: 28.0 },
+        { dn: 'DN 35', dint: 33.0, dExt: 35.0 },
+        { dn: 'DN 42', dint: 40.0, dExt: 42.0 },
+        { dn: 'DN 54', dint: 51.6, dExt: 54.0 }
+      ],
+      aco_sch40: [
+        { dn: '1/2"', dint: 15.8, dExt: 21.3 },
+        { dn: '3/4"', dint: 21.0, dExt: 26.7 },
+        { dn: '1"', dint: 26.6, dExt: 33.4 },
+        { dn: '1.1/4"', dint: 35.1, dExt: 42.2 },
+        { dn: '1.1/2"', dint: 40.9, dExt: 48.3 },
+        { dn: '2"', dint: 52.5, dExt: 60.3 },
+        { dn: '2.1/2"', dint: 62.7, dExt: 73.0 },
+        { dn: '3"', dint: 77.9, dExt: 88.9 }
+      ],
+      multicamada: [
+        { dn: 'DN 16', dint: 12.0, dExt: 16.0 },
+        { dn: 'DN 20', dint: 16.0, dExt: 20.0 },
+        { dn: 'DN 26', dint: 20.0, dExt: 26.0 },
+        { dn: 'DN 32', dint: 26.0, dExt: 32.0 }
+      ],
+      pead: [
+        { dn: 'DE 20', dint: 16.0, dExt: 20.0 },
+        { dn: 'DE 32', dint: 26.0, dExt: 32.0 },
+        { dn: 'DE 40', dint: 32.6, dExt: 40.0 },
+        { dn: 'DE 63', dint: 51.4, dExt: 63.0 },
+        { dn: 'DE 90', dint: 73.6, dExt: 90.0 }
+      ]
+    };
+
+    let ultimoCalculoGas = null;
 
     function calcularGas() {
       const tipoGas = $('tipoGas').value;
+      const tipoOcupacao = $('tipoOcupacao').value;
       const unidades = parseInt($('unidades').value) || 1;
-      
-      let potInstaladaApto = 0;
-      let eqList = [];
+      const tempMin = parseInt($('tempMinima').value) || 15;
 
-      ['fogao4', 'fogao6', 'aquecedor15', 'aquecedor22'].forEach(key => {
-        let qtd = parseInt($(key).value) || 0;
+      const matTubo = $('tuboMaterial').value;
+      const pressaoTubo = $('tuboPressao').value;
+      const compReal = parseFloat($('tuboComprimento').value) || 20;
+      const perdaAdmissivelPct = parseFloat($('tuboPerdaAdmissivel').value) || 5;
+
+      const volAmbiente = parseFloat($('ambVolume').value) || 15;
+
+      // 1. Potência Instalada
+      let potApto = 0;
+      let eqLista = [];
+      let temAquecedor = false;
+      let dutoAquecedorMax = 100;
+
+      const chaves = ['fogao4', 'fogao6', 'cooktop', 'forno', 'aquecedor15', 'aquecedor22', 'aquecedor30', 'churrasqueira', 'secadora', 'industrial'];
+      chaves.forEach(k => {
+        const inputEl = $(`eq_${k}`);
+        const qtd = inputEl ? parseInt(inputEl.value) || 0 : 0;
         if (qtd > 0) {
-          potInstaladaApto += EQUIPAMENTOS[key].pot * qtd;
-          eqList.push(`${qtd}x ${EQUIPAMENTOS[key].nome}`);
+          const item = EQUIPAMENTOS[k];
+          potApto += item.pot * qtd;
+          eqLista.push(`${qtd}x ${item.nome} (${(item.pot * qtd).toLocaleString('pt-BR')} kcal/h)`);
+          if (k.startsWith('aquecedor')) {
+            temAquecedor = true;
+            if (item.duto > dutoAquecedorMax) dutoAquecedorMax = item.duto;
+          }
         }
       });
 
-      const potInstaladaTotal = potInstaladaApto * unidades;
+      const potInstTotal = potApto * unidades;
 
-      // Fator de Simultaneidade (F) - NBR 15526
-      // Fórmula genérica aproximada para N equipamentos/aparelhos (ou tabela)
-      // Aqui vamos usar um Fator simplificado baseado no número de apartamentos
-      let f = 1;
-      if (unidades >= 2 && unidades <= 4) f = 0.65;
-      else if (unidades > 4 && unidades <= 10) f = 0.45;
-      else if (unidades > 10 && unidades <= 20) f = 0.35;
-      else if (unidades > 20 && unidades <= 50) f = 0.25;
-      else if (unidades > 50) f = 0.18;
+      // 2. Curva Contínua de Simultaneidade Oficial (NBR 15526) (Item 4)
+      let f = 1.0;
+      if (unidades === 1) {
+        f = 1.0;
+      } else if (tipoOcupacao === 'comercial') {
+        // Restaurantes e praças de alimentação: simultaneidade alta no pico
+        f = Math.max(0.65, 1.0 / Math.pow(unidades, 0.25));
+      } else if (tipoOcupacao === 'industrial') {
+        f = 0.80;
+      } else {
+        // Residencial Multifamiliar Contínuo NBR 15526
+        // F = 1 / sqrt(N), com limites práticos de conforto
+        f = Math.max(0.12, 1.0 / Math.sqrt(unidades));
+        if (unidades <= 3) f = 0.70;
+        else if (unidades <= 6) f = 0.55;
+      }
 
-      const potSimultanea = potInstaladaTotal * f;
-      
-      const vazao = potSimultanea / PCI[tipoGas];
-      const unidadeMedida = tipoGas === 'GLP' ? 'kg/h' : 'm³/h';
+      const potSimultanea = potInstTotal * f;
+      const potKw = potSimultanea / 860; // 1 kW = 860 kcal/h
+      const vazao = potSimultanea / PROPRIEDADES_GAS[tipoGas].pci;
+      const unidadeVazao = PROPRIEDADES_GAS[tipoGas].unidade;
 
-      // Dimensionar Bateria GLP (Se for o caso)
-      let bateria = "N/A (GN)";
-      if (tipoGas === 'GLP') {
-        // Capacidade de vaporização do P45 é aprox. 1.0 kg/h
-        // P190 é aprox. 3.5 kg/h (a 20ºC)
-        const capP45 = 1.0;
-        const capP190 = 3.5;
-        
-        let qtdP45 = Math.ceil(vazao / capP45);
-        let qtdP190 = Math.ceil(vazao / capP190);
-        
-        if (qtdP45 <= 6) {
-           bateria = `${qtdP45}x P45 em uso (+ ${qtdP45} reserva)`;
+      // 3. Dimensionamento de Tubulação e Perda de Carga (Item 1)
+      // Comprimento equivalente: L_eq = L * 1.30
+      const compEquiv = compReal * 1.30;
+      const densidade = PROPRIEDADES_GAS[tipoGas].densidade;
+
+      // Conversão de vazão volumétrica em m³/h para o cálculo
+      // Se for GLP, massa específica ~ 2.2 kg/m³ a 20ºC
+      const vazaoM3h = (tipoGas === 'GLP') ? (vazao / 2.25) : vazao;
+
+      const tubosDisponiveis = CATALOGO_TUBOS[matTubo] || CATALOGO_TUBOS.cobre_a;
+      let tuboSelecionado = tubosDisponiveis[0];
+      let perdaCargaReal = 0;
+      let velReal = 0;
+      let tuboAprovado = false;
+
+      // Perda de Carga por Pole ou Renouard
+      // Pole Baixa Pressão: deltaP (mmca) = (22200 * S * L * Q^2) / (d^4.8)
+      // Pressão inicial: 280 mmca (GLP) ou 200 mmca (GN)
+      const pressaoInicialMmca = (tipoGas === 'GLP') ? 280 : 200;
+      const perdaMaxMmca = pressaoInicialMmca * (perdaAdmissivelPct / 100);
+
+      for (let i = 0; i < tubosDisponiveis.length; i++) {
+        const t = tubosDisponiveis[i];
+        const d = t.dint; // mm
+
+        // Velocidade v = 353.7 * Q / d²
+        const vel = (353.7 * vazaoM3h) / (d * d);
+
+        // Perda de carga mmca
+        let deltaP = 0;
+        if (pressaoTubo === 'baixa') {
+          deltaP = (22200 * densidade * compEquiv * Math.pow(vazaoM3h, 2)) / Math.pow(d, 4.8);
         } else {
-           bateria = `${qtdP190}x P190 em uso (+ ${qtdP190} reserva)`;
+          // Média Pressão (150 kPa)
+          // DeltaP aproximado relativo
+          deltaP = (12000 * densidade * compEquiv * Math.pow(vazaoM3h, 1.82)) / Math.pow(d, 4.82);
+        }
+
+        const pctPerda = (deltaP / pressaoInicialMmca) * 100;
+
+        if (vel <= 20.0 && pctPerda <= perdaAdmissivelPct) {
+          tuboSelecionado = t;
+          perdaCargaReal = pctPerda;
+          velReal = vel;
+          tuboAprovado = true;
+          break;
+        }
+
+        // Se for o último e ainda não aprovou, fica com o maior
+        if (i === tubosDisponiveis.length - 1) {
+          tuboSelecionado = t;
+          perdaCargaReal = pctPerda;
+          velReal = vel;
+          tuboAprovado = (vel <= 20.0);
         }
       }
 
-      // UI
+      // 4. Central de GLP e Afastamentos (Item 3)
+      let bateriaCilindrosTexto = '';
+      let tanqueGranelTexto = '';
+      let centralSugeridaCurta = 'N/A (GN)';
+
+      if (tipoGas === 'GLP') {
+        // Capacidade real de vaporização por temperatura
+        const capVapP45 = (tempMin <= 10) ? 0.7 : ((tempMin <= 15) ? 1.0 : 1.2);
+        const capVapP190 = (tempMin <= 10) ? 2.5 : ((tempMin <= 15) ? 3.5 : 4.5);
+
+        const qtdP45Uso = Math.ceil(vazao / capVapP45);
+        const qtdP190Uso = Math.ceil(vazao / capVapP190);
+
+        if (qtdP45Uso <= 6) {
+          centralSugeridaCurta = `${qtdP45Uso}+${qtdP45Uso} P-45`;
+        } else if (qtdP190Uso <= 4) {
+          centralSugeridaCurta = `${qtdP190Uso}+${qtdP190Uso} P-190`;
+        } else {
+          centralSugeridaCurta = `Tanque Granel P-1000/2000`;
+        }
+
+        bateriaCilindrosTexto = `
+          <div>• <b>Bateria P-45:</b> ${qtdP45Uso} em uso + ${qtdP45Uso} reserva (${qtdP45Uso * 2} cilindros)</div>
+          <div class="text-[11px] text-gray-400">Vaporização natural a ${tempMin}ºC: ${(qtdP45Uso * capVapP45).toFixed(1)} kg/h</div>
+          <div class="mt-1">• <b>Bateria P-190:</b> ${qtdP190Uso} em uso + ${qtdP190Uso} reserva (${qtdP190Uso * 2} cilindros)</div>
+          <div class="text-[11px] text-gray-400">Vaporização natural a ${tempMin}ºC: ${(qtdP190Uso * capVapP190).toFixed(1)} kg/h</div>
+        `;
+
+        // Tanques Estacionários a Granel
+        // P-500 (vap ~5kg/h), P-1000 (vap ~8kg/h), P-2000 (vap ~14kg/h), P-4000 (vap ~22kg/h)
+        let tanqueSugerido = '1x Tanque P-500 (Vaporização ~5 kg/h)';
+        let precisaVaporizador = false;
+
+        if (vazao <= 5.0) {
+          tanqueSugerido = '1x Tanque Estacionário P-500 (210 kg)';
+        } else if (vazao <= 8.5) {
+          tanqueSugerido = '1x Tanque Estacionário P-1000 (420 kg)';
+        } else if (vazao <= 14.0) {
+          tanqueSugerido = '1x Tanque Estacionário P-2000 (840 kg)';
+        } else if (vazao <= 22.0) {
+          tanqueSugerido = '1x Tanque Estacionário P-4000 (1.680 kg)';
+        } else {
+          tanqueSugerido = '2x Tanques P-2000 ou P-4000';
+          precisaVaporizador = true;
+        }
+
+        tanqueGranelTexto = `
+          <div>• <b>Capacidade Sugerida:</b> ${tanqueSugerido}</div>
+          <div class="text-[11px] text-gray-400">Abastecimento direto a granel por caminhão tanque</div>
+          <div class="mt-1">${precisaVaporizador ? '<span class="text-neon-orange font-bold">⚠️ Requer Vaporizador Elétrico Forçado</span> (demanda de pico > vaporização natural)' : '<span class="text-emerald-400">✓ Vaporização Natural Suficiente</span>'}</div>
+        `;
+      } else {
+        bateriaCilindrosTexto = '<p class="text-gray-400 italic">Gás Natural Canalizado (GN). Abastecimento contínuo via rede da concessionária sem necessidade de cilindros.</p>';
+        tanqueGranelTexto = '<p class="text-gray-400 italic">Medição por Regulador Geral / Estação de Medição da Concessionária (Comgás / Naturgy).</p>';
+      }
+
+      // 5. Adequação de Ambientes e Ventilação Permanente (NBR 13103) (Item 2)
+      // Volume mínimo 6m³
+      const volumeConforme = volAmbiente >= 6.0;
+      // Ventilação Superior: 600 cm² mínimo ou função da potência
+      const ventSupCm2 = Math.max(600, Math.ceil(potApto / 40));
+      // Ventilação Inferior: 200 cm² a 400 cm²
+      const ventInfCm2 = Math.max(200, Math.ceil(potApto / 80));
+
+      // 6. Atualização Visual da Interface
       $('resultadoSection').classList.remove('opacity-50');
       $('resultadoSection').classList.add('pulse-glow');
-      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 800);
 
-      $('potenciaTotal').textContent = potSimultanea.toLocaleString('pt-BR', {maximumFractionDigits: 0});
-      $('unidadeVazao').textContent = unidadeMedida;
-      $('vazaoMax').textContent = vazao.toLocaleString('pt-BR', {maximumFractionDigits: 2});
-      $('fatorSimul').textContent = (f * 100).toFixed(0) + '%';
-      $('potInstalada').textContent = potInstaladaTotal.toLocaleString('pt-BR');
-      $('bateriaSugerida').textContent = bateria;
+      $('potenciaTotal').textContent = potSimultanea.toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+      $('potenciaKw').textContent = `${potKw.toFixed(1)} kW`;
+      $('vazaoMax').textContent = vazao.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      $('unidadeVazao').textContent = unidadeVazao;
+      $('fatorSimul').textContent = `${(f * 100).toFixed(1)}%`;
+      $('potInstalada').textContent = potInstTotal.toLocaleString('pt-BR');
+      $('centralSugeridaCard').textContent = centralSugeridaCurta;
 
-      $('memorial').textContent = `MEMORIAL DE PRÉ-DIMENSIONAMENTO - GÁS (${tipoGas})
+      // Tubulação
+      $('tuboDiametroNominal').textContent = tuboSelecionado.dn;
+      $('tuboDiametroInterno').textContent = `d_int = ${tuboSelecionado.dint} mm`;
+      $('tuboVelocidade').textContent = `${velReal.toFixed(1)} m/s`;
+      $('tuboPerdaValor').textContent = `${perdaCargaReal.toFixed(2)}%`;
+      $('compVirtual').textContent = `${compEquiv.toFixed(1)} m`;
+
+      const rotulosMat = {
+        cobre_a: 'Cobre Classe A',
+        cobre_i: 'Cobre Classe I',
+        aco_sch40: 'Aço Carbono SCH 40',
+        multicamada: 'Multicamada PEX-AL-PEX',
+        pead: 'PEAD PE-80 Enterrado'
+      };
+      $('tuboMaterialLabel').textContent = rotulosMat[matTubo] || matTubo;
+
+      const badgeTubo = $('tuboStatusBadge');
+      if (tuboAprovado) {
+        badgeTubo.className = 'text-sm font-bold text-emerald-400 mt-0.5';
+        badgeTubo.textContent = '🟢 APROVADO';
+      } else {
+        badgeTubo.className = 'text-sm font-bold text-red-400 mt-0.5';
+        badgeTubo.textContent = '🔴 REDIMENSIONAR';
+      }
+
+      // Central GLP
+      $('detalheBateriaCilindros').innerHTML = bateriaCilindrosTexto;
+      $('detalheTanqueGranel').innerHTML = tanqueGranelTexto;
+
+      // Ambiente e Ventilação
+      $('resAmbVolume').textContent = `${volAmbiente.toFixed(1)} m³`;
+      $('resVentSup').textContent = `${ventSupCm2} cm²`;
+      $('resVentInf').textContent = `${ventInfCm2} cm²`;
+
+      if (tipoGas === 'GLP') {
+        $('resVentInfAltura').textContent = 'Rente ao piso h ≤ 0,20m (GLP denso)';
+      } else {
+        $('resVentInfAltura').textContent = 'Admissão h ≤ 0,80m (GN leve)';
+      }
+
+      $('resDutoExaustao').innerHTML = `Duto de exaustão do aquecedor: <b>Ø ${dutoAquecedorMax}mm</b> metálico incombustível`;
+
+      const badgeAmb = $('ambStatusBadge');
+      if (volumeConforme) {
+        badgeAmb.className = 'text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20';
+        badgeAmb.textContent = '🟢 Conforme NBR 13103';
+      } else {
+        badgeAmb.className = 'text-xs font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20';
+        badgeAmb.textContent = '⚠️ Volume Insuficiente (< 6m³)';
+      }
+
+      // 7. Renderizar Esquema Isométrico SVG (Item 7)
+      renderSvgIsometricoGas(tipoGas, centralSugeridaCurta, tuboSelecionado.dn, unidades, pressaoTubo);
+
+      // 8. Memorial Descritivo Completo
+      const memorialTxt = `MEMORIAL DE PRÉ-DIMENSIONAMENTO - INSTALAÇÕES DE GÁS (${tipoGas})
+Normas: ABNT NBR 15526:2016, NBR 13523:2019, NBR 13103:2020 e IT-28 Corpos de Bombeiros
 Data: ${new Date().toLocaleDateString('pt-BR')}
 
-1. EQUIPAMENTOS POR UNIDADE (APARTAMENTO)
-${eqList.length ? eqList.join('\n') : 'Nenhum equipamento.'}
-Potência Instalada por Apto: ${potInstaladaApto.toLocaleString('pt-BR')} kcal/h
+1. PARÂMETROS DA EDIFICAÇÃO
+- Tipo de Gás: ${PROPRIEDADES_GAS[tipoGas].nome}
+- Poder Calorífico Adotado: ${PROPRIEDADES_GAS[tipoGas].pci} kcal/${tipoGas === 'GLP' ? 'kg' : 'm³'}
+- Densidade Relativa do Gás (ar = 1,0): ${densidade}
+- Unidades Habitacionais / Clientes: ${unidades}
+- Tipo de Ocupação: ${tipoOcupacao.toUpperCase()}
 
-2. EDIFICAÇÃO
-Total de Unidades: ${unidades}
-Potência Instalada Total: ${potInstaladaTotal.toLocaleString('pt-BR')} kcal/h
+2. CONSUMO E SIMULTANEIDADE (NBR 15526)
+Equipamentos por Unidade:
+${eqLista.length ? eqLista.map(e => `  • ${e}`).join('\n') : '  • Nenhum equipamento selecionado.'}
+- Potência Instalada por Apto: ${potApto.toLocaleString('pt-BR')} kcal/h
+- Potência Instalada Total da Edificação: ${potInstTotal.toLocaleString('pt-BR')} kcal/h
+- Fator de Simultaneidade Adotado (Curva Contínua): ${(f * 100).toFixed(1)}% (F = ${f.toFixed(3)})
+- Potência Simultânea Total de Cálculo: ${potSimultanea.toLocaleString('pt-BR')} kcal/h (${potKw.toFixed(1)} kW)
+- Vazão Máxima Provável: ${vazao.toFixed(2)} ${unidadeVazao}
 
-3. SIMULTANEIDADE
-Fator Adotado: ${f} (${(f*100).toFixed(1)}%)
-Potência Adotada Total: ${potSimultanea.toLocaleString('pt-BR')} kcal/h
+3. DIMENSIONAMENTO DE TUBULAÇÃO E PERDA DE CARGA (NBR 15526 / FÓRMULA DE POLE)
+- Material Selecionado: ${rotulosMat[matTubo]}
+- Comprimento Real do Trecho Crítico: ${compReal} m (Virtual c/ conexões: ${compEquiv.toFixed(1)} m)
+- Estágio de Pressão: ${pressaoTubo === 'baixa' ? 'Baixa Pressão (Rede Interna 28/20 mbar)' : 'Média Pressão 1º Estágio (150 kPa)'}
+- Diâmetro Comercial Adotado: ${tuboSelecionado.dn} (Diâmetro Interno real: ${tuboSelecionado.dint} mm)
+- Velocidade de Escoamento: ${velReal.toFixed(2)} m/s (Limite Normativo NBR 15526: v <= 20,0 m/s)
+- Perda de Carga Calculada: ${perdaCargaReal.toFixed(2)}% (Limite Admissível: ${perdaAdmissivelPct}%)
+- Verificação Técnica: ${tuboAprovado ? 'CONFORME (Diâmetro e Velocidade aprovados)' : 'ATENÇÃO: Requer aumento de bitola comercial'}
 
-4. CONSUMO / VAZÃO
-Poder Calorífico (${tipoGas}): ${PCI[tipoGas]} kcal/${tipoGas==='GLP'?'kg':'m³'}
-Vazão Máxima Provável: ${vazao.toFixed(2)} ${unidadeMedida}
+4. CENTRAL DE GÁS GLP (NBR 13523) E AFASTAMENTOS DE SEGURANÇA
+${tipoGas === 'GLP' ? `- Sugestão Bateria Transportável: ${centralSugeridaCurta} a ${tempMin}ºC (100% reserva ativa)
+- Opção Tanque Estacionário a Granel: ${vazao <= 8.5 ? 'P-500 ou P-1000' : 'P-2000 ou P-4000'}
+- Afastamentos Mínimos Obrigatórios (IT-28):
+  • Ralos, canaletas e caixas de esgoto: >= 1,50 m (com mureta ou selo hídrico)
+  • Fontes de ignição e quadros elétricos: >= 3,00 m
+  • Aberturas de portas e janelas de edificações: >= 1,50 m a 3,00 m
+  • Divisa de propriedade: >= 1,50 m a 3,00 m` : '- Rede de Gás Natural (GN): Suprimento contínuo por ramal predial da concessionária local.'}
 
-5. CENTRAL GLP (NBR 13523)
-Sugestão de Bateria: ${bateria}
-(Considera 100% reserva: x cilindros em uso + x reserva)
+5. ADEQUAÇÃO DO AMBIENTE E VENTILAÇÃO PERMANENTE (NBR 13103)
+- Volume do Ambiente Analisado: ${volAmbiente.toFixed(1)} m³ (Exigência mínima: >= 6,0 m³) -> ${volumeConforme ? 'CONFORME' : 'NÃO CONFORME'}
+- Abertura de Ventilação Superior Permanente (Exaustão, h >= 1,50m): Área mínima de ${ventSupCm2} cm²
+- Abertura de Ventilação Inferior Permanente (Admissão Comburente): Área mínima de ${ventInfCm2} cm²
+  • Altura para GLP: Rente ao piso h <= 0,20 m (Gás mais denso que o ar)
+  • Altura para GN: h <= 0,80 m
+- Duto de Exaustão de Aquecedor: Diâmetro mínimo de ${dutoAquecedorMax} mm com terminal estanque externo.`;
 
-Nota: Valores estimativos. É obrigatória a elaboração de projeto executivo para aprovação em concessionária/bombeiros.`;
+      $('memorial').textContent = memorialTxt;
+
+      ultimoCalculoGas = {
+        tipoGas,
+        potSimultanea,
+        potKw,
+        vazao,
+        unidadeVazao,
+        fator: f,
+        tubo: tuboSelecionado,
+        velReal,
+        perdaCargaReal,
+        compEquiv,
+        centralSugeridaCurta,
+        volAmbiente,
+        ventSupCm2,
+        ventInfCm2,
+        memorialTxt
+      };
     }
 
-    $('btnCalcular').addEventListener('click', calcularGas);
-    $('btnReset').addEventListener('click', () => location.reload());
+    // =========================================================
+    // DIAGRAMA ISOMÉTRICO EM SVG (Item 7)
+    // =========================================================
+    function renderSvgIsometricoGas(tipoGas, central, bitolaTubo, unidades, pressao) {
+      const svgW = 540;
+      const svgH = 220;
 
+      const corGas = (tipoGas === 'GLP') ? '#ffea00' : '#00ffff';
+      const labelOrigem = (tipoGas === 'GLP') ? 'Central GLP (Bateria / Granel)' : 'Entrada GN (Cavalete Concessionária)';
+
+      $('svgContainer').innerHTML = `
+        <svg width="100%" height="220" viewBox="0 0 ${svgW} ${svgH}" class="select-none font-sans">
+          <!-- 1. Origem: Central GLP ou Cavalete GN -->
+          <rect x="25" y="60" width="80" height="90" fill="#1e1b4b" stroke="${corGas}" stroke-width="2" rx="8"/>
+          <text x="65" y="95" text-anchor="middle" font-size="20">🔥</text>
+          <text x="65" y="125" text-anchor="middle" font-size="9" fill="#ffffff" font-weight="bold">${tipoGas}</text>
+          <text x="65" y="140" text-anchor="middle" font-size="8" fill="#94a3b8">${tipoGas === 'GLP' ? 'Central' : 'Entrada'}</text>
+
+          <!-- Linha 1: Saída da Central para Regulador 1º Estágio -->
+          <line x1="105" y1="105" x2="155" y2="105" stroke="${corGas}" stroke-width="4"/>
+          
+          <!-- 2. Regulador 1º Estágio -->
+          <polygon points="155,95 180,105 155,115" fill="#f59e0b"/>
+          <polygon points="205,95 180,105 205,115" fill="#f59e0b"/>
+          <circle cx="180" cy="105" r="5" fill="#ffffff"/>
+          <text x="180" y="80" text-anchor="middle" font-size="8" fill="#f59e0b" font-weight="bold">Regulador 1º Est.</text>
+          <text x="180" y="130" text-anchor="middle" font-size="8" fill="#cbd5e1">150 kPa</text>
+
+          <!-- Linha 2: Prumada Geral -->
+          <line x1="205" y1="105" x2="275" y2="105" stroke="${corGas}" stroke-width="4"/>
+          <!-- Válvula de Bloqueio Geral -->
+          <circle cx="240" cy="105" r="4" fill="#ff0055"/>
+          <text x="240" y="125" text-anchor="middle" font-size="8" fill="#ff0055">Válvula</text>
+
+          <!-- 3. Prumada Vertical do Prédio -->
+          <line x1="275" y1="40" x2="275" y2="170" stroke="${corGas}" stroke-width="4"/>
+          <text x="285" y="35" font-size="9" fill="#ffffff" font-weight="bold">Prumada Geral</text>
+          <text x="285" y="48" font-size="8" fill="${corGas}" font-family="JetBrains Mono">${bitolaTubo}</text>
+
+          <!-- Ramificação Pavimento Típico -->
+          <line x1="275" y1="75" x2="335" y2="75" stroke="${corGas}" stroke-width="3"/>
+          <line x1="275" y1="140" x2="335" y2="140" stroke="${corGas}" stroke-width="3"/>
+
+          <!-- 4. Regulador 2º Estágio (28 mbar) -->
+          <polygon points="335,68 355,75 335,82" fill="#10b981"/>
+          <polygon points="375,68 355,75 375,82" fill="#10b981"/>
+          <text x="355" y="62" text-anchor="middle" font-size="8" fill="#10b981" font-weight="bold">Regulador 2º Est.</text>
+          <text x="355" y="94" text-anchor="middle" font-size="8" fill="#94a3b8">28 mbar</text>
+
+          <!-- Linha para Bateria de Medidores -->
+          <line x1="375" y1="75" x2="420" y2="75" stroke="${corGas}" stroke-width="3"/>
+
+          <!-- 5. Medidores Individuais (Apartamentos) -->
+          <rect x="420" y="55" width="45" height="40" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" rx="4"/>
+          <text x="442" y="75" text-anchor="middle" font-size="8" fill="#38bdf8" font-weight="bold">Medidor</text>
+          <text x="442" y="87" text-anchor="middle" font-size="7" fill="#cbd5e1">G-1.6</text>
+
+          <line x1="465" y1="75" x2="510" y2="75" stroke="${corGas}" stroke-width="2"/>
+          <text x="515" y="78" font-size="8" fill="#ffffff" font-weight="bold">Ramal Apto</text>
+
+          <!-- Pavimento Inferior -->
+          <rect x="420" y="120" width="45" height="40" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" rx="4"/>
+          <text x="442" y="140" text-anchor="middle" font-size="8" fill="#38bdf8" font-weight="bold">Medidor</text>
+          <text x="442" y="152" text-anchor="middle" font-size="7" fill="#cbd5e1">G-1.6</text>
+          <line x1="335" y1="140" x2="420" y2="140" stroke="${corGas}" stroke-width="2"/>
+          <line x1="465" y1="140" x2="510" y2="140" stroke="${corGas}" stroke-width="2"/>
+          <text x="515" y="143" font-size="8" fill="#ffffff" font-weight="bold">Ramal Apto</text>
+
+          <!-- Legenda de Pressões -->
+          <text x="25" y="195" font-size="9" fill="#94a3b8">
+            Origem: <tspan fill="${corGas}" font-weight="bold">${labelOrigem}</tspan> | Rede Interna Dimensionada para <tspan fill="#ffffff" font-weight="bold">${unidades} Unidades</tspan>
+          </text>
+        </svg>
+      `;
+    }
+
+    // =========================================================
+    // INTEGRAÇÃO COM A SUÍTE ECALC (Item 6)
+    // =========================================================
+
+    // 1. Memorial ABNT Completo (sem páginas em branco)
+    function gerarMemorialGas() {
+      if (!ultimoCalculoGas) calcularGas();
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        alert('Módulo de Memorial não disponível');
+        return;
+      }
+
+      const d = ultimoCalculoGas;
+
+      const inputsTab = [
+        { label: 'Gás Combustível', val: d.tipoGas === 'GLP' ? 'GLP (Gás Liquefeito de Petróleo)' : 'GN (Gás Natural)' },
+        { label: 'Unidades Habitacionais', val: `${$('unidades').value} apartamentos` },
+        { label: 'Tipo de Ocupação', val: $('tipoOcupacao').value.toUpperCase() },
+        { label: 'Material da Tubulação', val: $('tuboMaterialLabel').textContent },
+        { label: 'Comprimento do Trecho Crítico', val: `${$('tuboComprimento').value} metros` },
+        { label: 'Temperatura Mínima de Projeto', val: `${$('tempMinima').value} ºC` }
+      ];
+
+      const resultadosTab = [
+        { label: 'Potência Simultânea Requerida', val: `${d.potSimultanea.toLocaleString('pt-BR', {maximumFractionDigits:0})} kcal/h (${d.potKw.toFixed(1)} kW)`, status: 'ok' },
+        { label: 'Vazão Máxima Provável', val: `${d.vazao.toFixed(2)} ${d.unidadeVazao}`, status: 'ok' },
+        { label: 'Fator de Simultaneidade (NBR 15526)', val: `${(d.fator * 100).toFixed(1)}%`, status: 'ok' },
+        { label: 'Diâmetro Comercial Recomendado', val: `${d.tubo.dn} (d_int = ${d.tubo.dint} mm)`, status: 'ok' },
+        { label: 'Velocidade Máxima do Gás', val: `${d.velReal.toFixed(2)} m/s (Limite: 20 m/s)`, status: d.velReal <= 20 ? 'ok' : 'erro' },
+        { label: 'Perda de Carga Percentual', val: `${d.perdaCargaReal.toFixed(2)}% (Admissível: ${$('tuboPerdaAdmissivel').value}%)`, status: 'ok' },
+        { label: 'Central GLP / Suprimento', val: d.centralSugeridaCurta, status: 'ok' },
+        { label: 'Ventilação Superior (h >= 1,50m)', val: `${d.ventSupCm2} cm² (Exaustão)`, status: 'ok' },
+        { label: 'Ventilação Inferior (Admissão)', val: `${d.ventInfCm2} cm² (${d.tipoGas === 'GLP' ? 'Rente ao piso' : 'h <= 0,80m'})`, status: 'ok' }
+      ];
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial de Dimensionamento de Instalações Prediais de Gás',
+        norma: 'ABNT NBR 15526:2016, NBR 13523:2019, NBR 13103:2020 e IT-28 CBPMESP',
+        elemento: `Rede Predial de Gás Combustível (${d.tipoGas}) — ${$('unidades').value} Unidades`,
+        inputs: inputsTab,
+        resultados: resultadosTab,
+        verificacoes: [
+          { item: 'Velocidade do Gás na Tubulação', exigido: 'v <= 20,0 m/s (NBR 15526)', obtido: `${d.velReal.toFixed(2)} m/s`, status: d.velReal <= 20 ? 'ok' : 'erro' },
+          { item: 'Perda de Carga Máxima na Rede', exigido: `<= ${$('tuboPerdaAdmissivel').value}% da pressão inicial`, obtido: `${d.perdaCargaReal.toFixed(2)}%`, status: 'ok' },
+          { item: 'Volume Mínimo do Ambiente de Aparelhos', exigido: 'V >= 6,0 m³ (NBR 13103)', obtido: `${d.volAmbiente.toFixed(1)} m³`, status: d.volAmbiente >= 6 ? 'ok' : 'erro' },
+          { item: 'Abertura de Ventilação Superior', exigido: 'A >= 600 cm² (h >= 1,50m)', obtido: `${d.ventSupCm2} cm²`, status: 'ok' },
+          { item: 'Abertura de Ventilação Inferior', exigido: `A >= 200 cm² (${d.tipoGas === 'GLP' ? 'h <= 0,20m rente ao solo' : 'h <= 0,80m'})`, obtido: `${d.ventInfCm2} cm²`, status: 'ok' }
+        ],
+        notas: [
+          'O dimensionamento considera regulagem em 2 estágios (1º estágio a 150 kPa na central e 2º estágio a 28 mbar nos medidores).',
+          'A central de GLP deve obedecer rigorosamente os afastamentos de segurança da NBR 13523 em relação a ralos, aberturas e fontes de ignição.',
+          'Antes da liberação do gás, é obrigatória a realização de ensaio de estanqueidade pneumática com pressão de 1,5 vezes a pressão de trabalho durante no mínimo 60 minutos.'
+        ]
+      });
+    }
+
+    // 2. Exportação OfficeClone
+    function exportarOfficeClone() {
+      if (!ultimoCalculoGas) calcularGas();
+      const d = ultimoCalculoGas;
+
+      const csvData = [
+        ['ITEM', 'PARAMETRO DE PROJETO', 'VALOR', 'UNIDADE', 'NORMA TECNICA'],
+        [1, 'Tipo de Gas Combustivel', d.tipoGas, '-', 'NBR 15526'],
+        [2, 'Unidades Atendidas', $('unidades').value, 'apartamentos', 'NBR 15526'],
+        [3, 'Potencia Simultanea Requerida', d.potSimultanea.toFixed(0), 'kcal/h', 'NBR 15526'],
+        [4, 'Potencia em Quilowatts', d.potKw.toFixed(2), 'kW', 'NBR 15526'],
+        [5, 'Vazao Maxima Provavel', d.vazao.toFixed(2), d.unidadeVazao, 'NBR 15526'],
+        [6, 'Fator de Simultaneidade Adotado', (d.fator * 100).toFixed(1) + '%', '-', 'NBR 15526'],
+        [7, 'Material da Tubulacao', $('tuboMaterialLabel').textContent, '-', 'NBR 13206 / 5590'],
+        [8, 'Diametro Comercial Recomendado', d.tubo.dn, '-', 'NBR 15526'],
+        [9, 'Diametro Interno Real', d.tubo.dint, 'mm', 'NBR 15526'],
+        [10, 'Velocidade de Escoamento', d.velReal.toFixed(2), 'm/s (Max 20)', 'NBR 15526'],
+        [11, 'Perda de Carga Calculada', d.perdaCargaReal.toFixed(2) + '%', '-', 'Pole / Renouard'],
+        [12, 'Sugestao Central GLP', d.centralSugeridaCurta, '-', 'NBR 13523'],
+        [13, 'Volume do Ambiente de Gas', d.volAmbiente.toFixed(1), 'm3 (Min 6)', 'NBR 13103'],
+        [14, 'Area de Ventilacao Superior', d.ventSupCm2, 'cm2', 'NBR 13103'],
+        [15, 'Area de Ventilacao Inferior', d.ventInfCm2, 'cm2', 'NBR 13103']
+      ];
+
+      localStorage.setItem('officeclone_import_data', JSON.stringify({
+        filename: `Dimensionamento_Gas_${d.tipoGas}_${$('unidades').value}Aptos.csv`,
+        rows: csvData
+      }));
+      window.open('../office/excel/', '_blank');
+    }
+
+    // 3. Exportação CADClone e DXF
+    function gerarDxfConteudoGas() {
+      if (typeof window.ECALC_CAD === 'undefined') return null;
+      const builder = window.ECALC_CAD.createBuilder();
+
+      const d = ultimoCalculoGas || {};
+      const tipoGas = $('tipoGas').value;
+      const aptos = parseInt($('unidades').value) || 12;
+
+      // Desenho da prumada de gás em mm
+      builder.addText(100, 4200, 150, `ESQUEMA UNIFILAR DE GAS (${tipoGas}) - ${aptos} APARTAMENTOS`, 'TEXTO', 7);
+      builder.addText(100, 3950, 100, `Normas: ABNT NBR 15526:2016 e NBR 13523:2019`, 'TEXTO', 7);
+
+      // Central GLP / Cavalete GN
+      builder.addRect(200, 500, 800, 900, 'CONCRETO', 4);
+      builder.addText(300, 1000, 100, `${tipoGas} CENTRAL`, 'TEXTO', 2);
+
+      // Linha até Regulador 1º Estágio
+      builder.addLine(1000, 950, 1600, 950, 'ARMADURA', 1);
+      builder.addText(1200, 1050, 80, '150 kPa', 'TEXTO', 3);
+
+      // Prumada Geral Vertical
+      builder.addLine(2400, 400, 2400, 3500, 'ARMADURA', 1);
+      builder.addText(2450, 3550, 100, `PRUMADA GERAL (${d.tubo ? d.tubo.dn : 'DN 22'})`, 'TEXTO', 1);
+
+      // Ramais de Pavimentos (exemplo com 3 pavimentos esquemáticos)
+      const niveisY = [1200, 2000, 2800];
+      niveisY.forEach((y, idx) => {
+        builder.addLine(2400, y, 3200, y, 'ARMADURA', 1);
+        builder.addRect(3200, y - 150, 400, 300, '0', 3);
+        builder.addText(3300, y, 60, `MED. G-1.6`, 'TEXTO', 7);
+        builder.addLine(3600, y, 4200, y, 'ARMADURA', 1);
+        builder.addText(3700, y + 50, 60, `Apto ${idx + 1}`, 'TEXTO', 2);
+      });
+
+      builder.addDimension(2400, 400, 2400, 3500, 400, '3100 mm', 'COTAS');
+
+      return builder.build();
+    }
+
+    function abrirNoCadCloneGas() {
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoGas();
+      if (dxf) {
+        window.ECALC_CAD.abrirNoCadClone(dxf, `Prumada_Gas_${$('tipoGas').value}.dxf`);
+      }
+    }
+
+    function baixarDxfGas() {
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoGas();
+      if (dxf) {
+        window.ECALC_CAD.baixarDXF(dxf, `Prumada_Gas_${$('tipoGas').value}.dxf`);
+      }
+    }
+
+    function copiarMemorialTexto() {
+      const txt = $('memorial').textContent;
+      navigator.clipboard.writeText(txt).then(() => {
+        alert("Memorial de cálculo copiado com sucesso!");
+      });
+    }
+
+    // Inicialização ao carregar a página
     document.addEventListener('DOMContentLoaded', () => {
       if ($('year')) $('year').textContent = new Date().getFullYear();
+      calcularGas();
+    });
+
+    $('btnReset').addEventListener('click', () => {
+      if (confirm("Deseja restaurar os parâmetros padrões do aplicativo?")) {
+        location.reload();
+      }
     });
   </script>
-    <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js"></script>
+
+  <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
+  <script src="assets/suite/suite-nav.js"></script>
+  <script src="assets/suite/suite-memorial.js"></script>
+  <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>
