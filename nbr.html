@@ -5118,30 +5118,46 @@
 
         
         async function deleteCardPdf(event, normaId, normaCodigo) {
-            event.stopPropagation();
-            if (!confirm(`Deseja realmente excluir o PDF anexado da ${normaCodigo}?`)) return;
-            await removePdf(normaId);
-            if (currentNorma && currentNorma.id === normaId) {
-                openModal(normaId);
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
             }
+            const nome = normaCodigo || normaId;
+            if (!confirm(`Deseja realmente excluir o PDF anexado da ${nome}?`)) return;
+            await removePdf(normaId);
         }
 
         async function deleteCurrentNormaPdf() {
             if (!currentNorma) return;
             if (!confirm(`Deseja realmente excluir o PDF anexado de ${currentNorma.codigo}?`)) return;
-            await removePdf(currentNorma.id);
-            openModal(currentNorma.id);
+            const id = currentNorma.id;
+            await removePdf(id);
+            if (currentNorma && currentNorma.id === id) {
+                openModal(id);
+            }
         }
 
         async function removePdf(normaId) {
             const dbId = pdfMap[normaId];
-            if (!dbId) return;
-            await dbDeletePdf(dbId);
+            if (dbId) {
+                try {
+                    await dbDeletePdf(dbId);
+                } catch (err) {
+                    console.warn('Erro ao deletar PDF do IndexedDB:', err);
+                }
+            }
             delete pdfMap[normaId];
             savePdfMap();
             await updatePdfCount();
-            renderBiblioteca();
-            showToast('PDF removido', 'info');
+            renderResults();
+            buildPdfAssignSelect();
+            if (document.getElementById('bibliotecaList')) {
+                renderBiblioteca();
+            }
+            if (currentNorma && currentNorma.id === normaId) {
+                openModal(normaId);
+            }
+            showToast('PDF removido com sucesso!', 'info');
         }
 
         function renderBiblioteca() {
