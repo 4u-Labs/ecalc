@@ -4037,6 +4037,44 @@
                 const isFav = favorites.includes(norma.id);
                 const score = relevanceScore(norma, currentSearch);
                 const scoreBadge = currentSearch ? `<span class="bg-white/25 text-[11px] font-bold px-2 py-0.5 rounded-full">Score: ${score}</span>` : '';
+                const hasLocalPdf = !!pdfMap[norma.id];
+
+                let pdfActionHtml = '';
+                if (hasLocalPdf) {
+                    pdfActionHtml = `
+                        <button onclick="event.stopPropagation(); openPdfById('${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 border border-emerald-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Abrir PDF completo salvo localmente">
+                            <i class="fas fa-file-pdf text-emerald-600"></i>
+                            <span>PDF Completo</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        </button>
+                    `;
+                } else if (norma.tipo === 'NR') {
+                    pdfActionHtml = `
+                        <div class="flex items-center gap-1">
+                            <button onclick="event.stopPropagation(); openOfficialPdfDirect('${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition flex items-center gap-1.5 border border-amber-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Abrir texto e PDF oficial consolidado no portal Gov.br / MTE">
+                                <i class="fas fa-file-pdf text-amber-600"></i>
+                                <span>PDF Oficial</span>
+                                <i class="fas fa-arrow-up-right-from-square text-[9px] text-amber-700/80"></i>
+                            </button>
+                            <button onclick="attachPdfDirectly(event, '${norma.id}')" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-800 flex items-center justify-center transition text-xs border border-slate-200 shadow-2xs cursor-pointer" title="Anexar arquivo PDF offline desta NR">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    pdfActionHtml = `
+                        <div class="flex items-center gap-1">
+                            <button onclick="openCadernoPdf(event, '${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-bold transition flex items-center gap-1.5 border border-blue-200 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Gerar Caderno Técnico da norma completo para impressão ou salvar em PDF">
+                                <i class="fas fa-print text-blue-600"></i>
+                                <span>Caderno PDF</span>
+                            </button>
+                            <button onclick="attachPdfDirectly(event, '${norma.id}')" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-900 text-xs font-semibold transition flex items-center gap-1 border border-slate-200 shadow-2xs cursor-pointer" title="Anexar seu arquivo PDF desta NBR (armazenamento local privado seguro)">
+                                <i class="fas fa-paperclip text-[10px]"></i>
+                                <span class="hidden sm:inline">Anexar</span>
+                            </button>
+                        </div>
+                    `;
+                }
 
                 return `
                     <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200/90 overflow-hidden card-hover fade-in cursor-pointer flex flex-col h-full group transition-all duration-200" onclick="openModal('${norma.id}')">
@@ -4065,13 +4103,10 @@
                                     ${norma.palavrasChave.slice(0, 3).map(p => `<span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full font-medium">${p}</span>`).join('')}
                                     ${norma.palavrasChave.length > 3 ? `<span class="text-[10px] text-slate-400 self-center font-medium">+${norma.palavrasChave.length - 3}</span>` : ''}
                                 </div>
-                                <div class="flex items-center justify-between text-xs text-slate-400 font-medium pt-0.5">
-                                    <span class="flex items-center gap-1 text-[11px] text-slate-500">
-                                        <i class="fas ${norma.tipo === 'NR' ? 'fa-shield-halved text-amber-500' : 'fa-building text-blue-500'}"></i>
-                                        ${norma.tipo === 'NR' ? 'Norma MTE' : 'Norma ABNT'}
-                                    </span>
-                                    <span class="text-blue-600 font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-xs">
-                                        Ver ficha <i class="fas fa-arrow-right text-[10px]"></i>
+                                <div class="flex items-center justify-between text-xs text-slate-400 font-medium pt-1 border-t border-slate-50 gap-2">
+                                    ${pdfActionHtml}
+                                    <span class="text-blue-600 font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-xs shrink-0 cursor-pointer" title="Ver ficha técnica completa">
+                                        Ficha <i class="fas fa-arrow-right text-[10px]"></i>
                                     </span>
                                 </div>
                             </div>
@@ -4941,6 +4976,102 @@
 
             // limpa input
             event.target.value = '';
+        }
+
+        async 
+        // =====================
+        // AÇÕES DIRETAS DE PDF NOS CARDS
+        // =====================
+        async function openPdfById(normaId) {
+            const dbId = pdfMap[normaId];
+            if (!dbId) {
+                showToast('Nenhum PDF salvo para esta norma', 'info');
+                return;
+            }
+            const rec = await dbGetPdf(dbId);
+            if (!rec) {
+                showToast('PDF não encontrado no banco local', 'error');
+                return;
+            }
+            const blob = new Blob([rec.data], { type: rec.mime || 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank', 'noopener,noreferrer');
+            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        }
+
+        function openOfficialPdfDirect(normaId) {
+            const off = officialLinks[normaId];
+            if (off && off.url) {
+                window.open(off.url, '_blank', 'noopener,noreferrer');
+            } else {
+                window.open('https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes', '_blank', 'noopener,noreferrer');
+            }
+        }
+
+        function attachPdfDirectly(event, normaId) {
+            event.stopPropagation();
+            let input = document.getElementById('cardPdfUploadInput');
+            if (!input) {
+                input = document.createElement('input');
+                input.id = 'cardPdfUploadInput';
+                input.type = 'file';
+                input.accept = 'application/pdf';
+                input.className = 'hidden';
+                input.onchange = handleCardPdfUpload;
+                document.body.appendChild(input);
+            }
+            input.dataset.targetNorma = normaId;
+            input.click();
+        }
+
+        async function handleCardPdfUpload(event) {
+            const file = event.target.files?.[0];
+            const normaId = event.target.dataset.targetNorma;
+            if (!file || !normaId) return;
+
+            if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                showToast('Selecione um arquivo PDF válido', 'error');
+                return;
+            }
+
+            try {
+                const existingDbId = pdfMap[normaId];
+                if (existingDbId) {
+                    await dbDeletePdf(existingDbId);
+                }
+
+                const arr = await file.arrayBuffer();
+                const record = {
+                    normaId,
+                    name: file.name,
+                    size: file.size,
+                    mime: file.type || 'application/pdf',
+                    updatedAt: Date.now(),
+                    data: arr
+                };
+
+                const dbId = await dbPutPdf(record);
+                pdfMap[normaId] = dbId;
+                savePdfMap();
+                await updatePdfCount();
+                renderResults();
+                if (document.getElementById('bibliotecaList')) renderBiblioteca();
+                showToast(`PDF de ${file.name} salvo com sucesso!`, 'success');
+            } catch (err) {
+                console.error('Erro ao anexar PDF no card:', err);
+                showToast('Erro ao salvar PDF no banco local', 'error');
+            } finally {
+                event.target.value = '';
+            }
+        }
+
+        function openCadernoPdf(event, normaId) {
+            event.stopPropagation();
+            openModal(normaId);
+            setTimeout(() => {
+                setAllDetails(true);
+                window.print();
+            }, 400);
         }
 
         async function openPdfForCurrentNorma() {
