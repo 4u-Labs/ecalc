@@ -86,28 +86,199 @@ class AIDocumentGenerator {
     
     private function buildPGRPrompt(array $data, string $context): string {
         $riscos = implode(', ', $data['riscos'] ?? []);
-        return "$context\n\nGere um PGR (Programa de Gerenciamento de Riscos) COMPLETO e PROFISSIONAL conforme a NR-01 para:\n\nDADOS DA EMPRESA:\n- Razão Social: {$data['empresa']}\n- CNPJ: {$data['cnpj']}\n- Endereço: {$data['endereco']}\n- Ramo de Atividade: {$data['ramo']}\n- Número de Funcionários: {$data['funcionarios']}\n- Responsável Técnico: {$data['responsavel']}\n- CREA/Registro: {$data['crea']}\n- Riscos Identificados: {$riscos}\n- Informações Adicionais: {$data['plano_acao']}\n\nIMPORTANTE: Gere conteúdo REAL e DETALHADO, não use placeholders. Os itens devem ser STRINGS de texto, não objetos.\n\nResponda APENAS com o JSON abaixo (sem markdown):\n{\n    \"titulo\": \"PROGRAMA DE GERENCIAMENTO DE RISCOS - PGR\",\n    \"subtitulo\": \"Conforme NR-01 - {$data['empresa']}\",\n    \"secoes\": [\n        {\n            \"numero\": \"1\",\n            \"titulo\": \"IDENTIFICAÇÃO DA EMPRESA\",\n            \"conteudo\": \"Razão Social: {$data['empresa']}. CNPJ: {$data['cnpj']}. Endereço: {$data['endereco']}. Ramo: {$data['ramo']}. Funcionários: {$data['funcionarios']}.\",\n            \"itens\": []\n        },\n        {\n            \"numero\": \"2\",\n            \"titulo\": \"OBJETIVO\",\n            \"conteudo\": \"Este PGR tem por objetivo estabelecer diretrizes e requisitos para o gerenciamento de riscos ocupacionais...\",\n            \"itens\": [\"Identificar perigos e avaliar riscos\", \"Implementar medidas de prevenção\"]\n        },\n        {\n            \"numero\": \"3\",\n            \"titulo\": \"RESPONSÁVEL TÉCNICO\",\n            \"conteudo\": \"Nome: {$data['responsavel']}. Registro: {$data['crea']}.\",\n            \"itens\": []\n        },\n        {\n            \"numero\": \"4\",\n            \"titulo\": \"INVENTÁRIO DE RISCOS\",\n            \"conteudo\": \"Foram identificados os seguintes riscos ocupacionais:\",\n            \"itens\": [\"RISCO FÍSICO: Ruído - Fonte: máquinas e equipamentos - Medida: uso de protetor auricular\", \"RISCO QUÍMICO: Poeiras - Fonte: processos produtivos - Medida: uso de máscara PFF2\", \"inclua todos os riscos selecionados: $riscos com descrição detalhada como STRING\"]\n        },\n        {\n            \"numero\": \"5\",\n            \"titulo\": \"PLANO DE AÇÃO\",\n            \"conteudo\": \"Medidas de prevenção e controle a serem implementadas:\",\n            \"itens\": [\"Implementar programa de manutenção preventiva - Prazo: 30 dias - Responsável: Manutenção\", \"Realizar treinamentos de segurança - Prazo: 15 dias - Responsável: RH\"]\n        },\n        {\n            \"numero\": \"6\",\n            \"titulo\": \"MEDIDAS DE CONTROLE\",\n            \"conteudo\": \"Hierarquia de controles aplicada:\",\n            \"itens\": [\"Eliminação: remover fontes de risco quando possível\", \"Substituição: trocar processos perigosos por mais seguros\", \"Controle de Engenharia: instalação de proteções coletivas\", \"Controle Administrativo: procedimentos e sinalizações\", \"EPIs: fornecimento e uso obrigatório\"]\n        }\n    ],\n    \"validade\": \"2 anos a partir da data de emissão\"\n}\n\nREGRA CRÍTICA: Todos os \"itens\" devem ser STRINGS simples, nunca objetos. Gere conteúdo real baseado nos dados fornecidos.";
+        return "$context\n\n" .
+        "Você é um Engenheiro de Segurança do Trabalho Sênior, com profundo domínio da Norma Regulamentadora NR-01 (Gerenciamento de Riscos Ocupacionais - GRO / PGR) e normas técnicas brasileiras.\n" .
+        "Gere um PGR (Programa de Gerenciamento de Riscos) COMPLETO, EXTENSO, TÉCNICO E DE NÍVEL PROFISSIONAL EXECUTIVO para aprovação em auditorias e fiscalizações do Ministério do Trabalho.\n\n" .
+        "DADOS DA EMPRESA E ESTABELECIMENTO:\n" .
+        "- Razão Social: {$data['empresa']}\n" .
+        "- CNPJ: {$data['cnpj']}\n" .
+        "- Endereço: {$data['endereco']}\n" .
+        "- Ramo de Atividade: {$data['ramo']}\n" .
+        "- Efetivo de Funcionários: {$data['funcionarios']}\n" .
+        "- Responsável Técnico: {$data['responsavel']}\n" .
+        "- Registro CREA/Registro Profissional: {$data['crea']}\n" .
+        "- Riscos Prioritários Identificados: {$riscos}\n" .
+        "- Informações e Plano de Ação Específico: {$data['plano_acao']}\n\n" .
+        "ESTRUTURA TÉCNICA OBRIGATÓRIA (Elabore todas as 12 seções com alto nível de detalhamento técnico):\n" .
+        "1. IDENTIFICAÇÃO DA EMPRESA E DO ESTABELECIMENTO (Razão Social, CNPJ, CNAE, Grau de Risco conforme NR-04, Endereço, Efetivo, Turnos de Trabalho e Abrangência).\n" .
+        "2. RESPONSABILIDADE TÉCNICA E GESTÃO DO GRO (Engenheiro Responsável Técnico, Registro CREA, Emissão de ART de SST, Atribuições do SESMT e CIPA/Designado NR-05).\n" .
+        "3. OBJETIVOS E DIRETRIZES DA NR-01 (Compromisso com melhoria contínua, prevenção ativa de acidentes e doenças ocupacionais, e alinhamento à ISO 45001).\n" .
+        "4. MAPEAMENTO DE PROCESSOS E GRUPOS HOMOGÊNEOS DE EXPOSIÇÃO (GHE) (Definição dos postos de trabalho, tarefas executadas, máquinas operadas e número de trabalhadores expostos por GHE).\n" .
+        "5. METODOLOGIA DE AVALIAÇÃO DE RISCOS (Critérios de Severidade x Probabilidade em Matriz 5x5, Níveis de Risco Ocupacional: Baixo, Médio, Alto e Crítico conforme NR-01.5.4).\n" .
+        "6. INVENTÁRIO DETALHADO DE RISCOS OCUPACIONAIS (Identificação de Perigos e Fontes Geradoras: Físicos como ruído, vibrações, calor; Químicos como poeiras, fumos e vapores; Biológicos; Ergonômicos como esforço físico e postura; Mecânicos e Acidentes como trabalho em altura, máquinas rotativas e choques elétricos).\n" .
+        "7. MEDIDAS DE PREVENÇÃO E HIERARQUIA DE CONTROLES (Medidas de Eliminação do Perigo, Substituição, Proteções Coletivas EPCs, Controles Administrativos/Procedimentais e Equipamentos de Proteção Individual EPIs).\n" .
+        "8. PLANO DE AÇÃO ESTRUTURADO NO MODELO 5W2H (Detalhamento de ações preventivas: O que fazer, Por que fazer, Quem é o responsável, Onde aplicar, Quando concluir e Como executar com metas e prazos).\n" .
+        "9. MONITORAMENTO DAS EXPOSIÇÕES E INTERFACE COM O PCMSO (NR-07) (Critérios de medição quantitativa/qualitativa, exames admissionais, periódicos, de retorno e demissionais baseados no inventário).\n" .
+        "10. PROGRAMA DE TREINAMENTOS E CAPACITAÇÃO EM SST (Treinamento de integração NR-01, treinamentos específicos conforme as NRs aplicáveis, DDS diário e registro formal de capacitação).\n" .
+        "11. PLANO DE ATENDIMENTO A EMERGÊNCIAS (PAE) E REGISTRO DE ACIDENTES (Procedimentos para sinistros, rotas de fuga, kit de primeiros socorros, investigação de quase-acidentes e emissão de CAT).\n" .
+        "12. DISPOSIÇÕES FINAIS, INDICADORES E REVISÃO BIENAL (Critérios de reavaliação a cada 2 anos ou em modificações de processos, guarda dos registros por 20 anos, e assinaturas formais).\n\n" .
+        "Responda APENAS com o JSON estruturado abaixo (sem markdown, sem texto fora):\n" .
+        "{\n" .
+        "    \"titulo\": \"PROGRAMA DE GERENCIAMENTO DE RISCOS - PGR\",\n" .
+        "    \"subtitulo\": \"Conforme Norma Regulamentadora NR-01 - {$data['empresa']}\",\n" .
+        "    \"validade\": \"Validade: 2 anos a contar da data de emissão (Revisão periódica obrigatória)\",\n" .
+        "    \"secoes\": [\n" .
+        "        {\n" .
+        "            \"numero\": \"1\",\n" .
+        "            \"titulo\": \"IDENTIFICAÇÃO DA EMPRESA E DO ESTABELECIMENTO\",\n" .
+        "            \"conteudo\": \"texto detalhado...\",\n" .
+        "            \"itens\": [\"Item 1...\", \"Item 2...\"]\n" .
+        "        }\n" .
+        "    ]\n" .
+        "}";
     }
     
     private function buildPCMATPrompt(array $data, string $context): string {
         $funcoes = implode(', ', $data['funcoes'] ?? []);
-        return "$context\n\nGere um PCMAT COMPLETO e PROFISSIONAL conforme NR-18 para:\n\nDADOS DA OBRA:\n- Nome da Obra: {$data['obra']}\n- Contratante: {$data['contratante']}\n- Endereço: {$data['endereco']}\n- Tipo de Obra: {$data['tipo_obra']}\n- Número de Trabalhadores: {$data['trabalhadores']}\n- Data de Início: {$data['data_inicio']}\n- Previsão de Término: {$data['data_fim']}\n- Engenheiro Responsável: {$data['engenheiro']}\n- CREA: {$data['crea']}\n- Funções na Obra: {$funcoes}\n- Informações Adicionais: {$data['medidas']}\n\nIMPORTANTE: Gere conteúdo REAL. Todos os itens devem ser STRINGS simples.\n\nResponda APENAS com o JSON (sem markdown):\n{\n    \"titulo\": \"PCMAT - PROGRAMA DE CONDIÇÕES E MEIO AMBIENTE DE TRABALHO\",\n    \"subtitulo\": \"Conforme NR-18 - {$data['obra']}\",\n    \"secoes\": [\n        {\n            \"numero\": \"1\",\n            \"titulo\": \"IDENTIFICAÇÃO DA OBRA\",\n            \"conteudo\": \"Obra: {$data['obra']}. Contratante: {$data['contratante']}. Endereço: {$data['endereco']}. Tipo: {$data['tipo_obra']}. Trabalhadores: {$data['trabalhadores']}. Período: {$data['data_inicio']} a {$data['data_fim']}.\",\n            \"itens\": []\n        },\n        {\n            \"numero\": \"2\",\n            \"titulo\": \"RESPONSÁVEL TÉCNICO\",\n            \"conteudo\": \"Engenheiro: {$data['engenheiro']}. CREA: {$data['crea']}.\",\n            \"itens\": []\n        },\n        {\n            \"numero\": \"3\",\n            \"titulo\": \"OBJETIVO\",\n            \"conteudo\": \"Estabelecer diretrizes de segurança e saúde no trabalho para a obra, em conformidade com a NR-18.\",\n            \"itens\": [\"Garantir condições seguras de trabalho\", \"Prevenir acidentes e doenças ocupacionais\", \"Atender à legislação vigente\"]\n        },\n        {\n            \"numero\": \"4\",\n            \"titulo\": \"ÁREAS DE VIVÊNCIA\",\n            \"conteudo\": \"O canteiro de obras disporá das seguintes instalações:\",\n            \"itens\": [\"Instalações sanitárias e vestiários estruturados\", \"Refeitório com capacidade adequada\"]\n        },\n        {\n            \"numero\": \"5\",\n            \"titulo\": \"FUNÇÕES E EPIs OBRIGATÓRIOS\",\n            \"conteudo\": \"EPIs por função de trabalho:\",\n            \"itens\": [\"Pedreiro: capacete, óculos, luvas, botina com biqueira\", \"Eletricista: capacete, óculos, luvas isolantes, calçado isolante\", \"Todas as funções na obra: {$funcoes}\"]\n        }\n    ]\n}\n\nREGRA CRÍTICA: Todos os itens devem ser STRINGS simples.";
+        return "$context\n\n" .
+        "Você é um Engenheiro de Segurança do Trabalho e Engenheiro Civil Sênior no Brasil, especialista em NR-18 (Condições de Segurança e Saúde no Trabalho na Indústria da Construção) e NR-01.\n" .
+        "Gere um PCMAT (Programa de Condições e Meio Ambiente de Trabalho) EXTREMAMENTE DETALHADO, TÉCNICO, COMPLETO E APROFUNDADO para fiscalização de canteiro de obras pelo Ministério do Trabalho.\n\n" .
+        "DADOS DA OBRA:\n" .
+        "- Nome da Obra: {$data['obra']}\n" .
+        "- Contratante / Empresa: {$data['contratante']}\n" .
+        "- Endereço da Obra: {$data['endereco']}\n" .
+        "- Tipo de Obra: {$data['tipo_obra']}\n" .
+        "- Efetivo de Trabalhadores: {$data['trabalhadores']} trabalhadores\n" .
+        "- Período Previsto: {$data['data_inicio']} a {$data['data_fim']}\n" .
+        "- Engenheiro Responsável: {$data['engenheiro']}\n" .
+        "- Registro Profissional (CREA/CAU): {$data['crea']}\n" .
+        "- Funções no Canteiro: {$funcoes}\n" .
+        "- Especificações/Medidas Informadas: {$data['medidas']}\n\n" .
+        "ESTRUTURA TÉCNICA OBRIGATÓRIA (Desenvolva detalhadamente todas as 12 seções técnicas sem simplificações):\n" .
+        "1. IDENTIFICAÇÃO DO EMPREENDIMENTO E DADOS CADASTRAIS (Obra, Contratante, Endereço, CNAE 41.20-4, Grau de Risco 3/4 conforme NR-04, Área Construída estimada, Efetivo total, Turnos e Prazos).\n" .
+        "2. RESPONSABILIDADE TÉCNICA E GESTÃO DE SST (Engenheiro Responsável, CREA, emissão de ART de Segurança, atribuições da CIPA/CIPAMIN e do SESMT na obra).\n" .
+        "3. OBJETIVOS E DIRETRIZES LEGAIS (Fundamentação na Portaria SEPRT nº 3.733/2020 e NR-18 vigente, NR-01 GRO, metas de taxa de gravidade/frequência de acidentes).\n" .
+        "4. CRONOGRAMA E FASES CONSTRUTIVAS DA OBRA (Detalhamento técnico de todas as fases: 1. Demolição e Terraplenagem; 2. Fundações e Contenções; 3. Estrutura de Concreto/Aço; 4. Alvenarias e Vedações; 5. Instalações Elétricas e Hidrossanitárias; 6. Revestimentos e Acabamentos; 7. Fachadas e Trabalho em Altura; 8. Desmobilização e Limpeza Final).\n" .
+        "5. DIMENSIONAMENTO TÉCNICO DAS ÁREAS DE VIVÊNCIA (NR-18.4) (Cálculo quantitativo exato: instalações sanitárias com proporção de 1 bacia e 1 lavatório para cada 20 trabalhadores ou fração, 1 chuveiro com água quente para cada 10 trabalhadores; vestiários com armários individuais de dois compartimentos; refeitório com assentos para 100% dos trabalhadores no intervalo, bebedouro de água potável refrigerada a cada 25 trabalhadores; ambulatório/caixa de primeiros socorros).\n" .
+        "6. INVENTÁRIO DE RISCOS OCUPACIONAIS NA CONSTRUÇÃO CIVIL (Análise por Grupo de Risco: Riscos Físicos como ruído contínuo/intermitente de marteletes/serras com limite 85dB(A), vibrações mão-braço, radiação solar UV; Riscos Químicos como poeiras de sílica livre cristalina no corte de alvenarias, dermatoses por cimento e cal cáusticos, fumos de solda; Riscos Ergonômicos no manuseio de sacos e blocos; Riscos de Acidentes como queda com diferença de nível >2m, choque elétrico em quadros provisórios, soterramento em valas, quedas de objetos e ferramentas de lajes).\n" .
+        "7. MEDIDAS DE PROTEÇÃO COLETIVA (EPCs OBRIGATÓRIOS) (Sistemas de guarda-corpo e rodapé com 1,20m/0,70m/0,20m nas periferias e vãos; plataformas de proteção com bandeja principal na 1ª laje de 2,50m + 0,80m a 45º e bandejas secundárias a cada 3 lajes de 1,40m + 0,80m; telas fachadeiras 100%; fechamento de poços de elevador e aberturas de piso; linhas de vida em cabo de aço 8mm certificados para ancoragem; quadros elétricos blindados com disjuntor DR 30mA e aterramento SPDA).\n" .
+        "8. EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL (EPIs) POR FUNÇÃO (Lista técnica com especificação de CA para todas as funções: Pedreiro, Servente, Eletricista, Carpinteiro, Armador, Pintor, Encanador, Operador de Máquinas, Engenheiro/Visitantes; exigência de capacete com jugular, botinas com biqueira e palmilha anti-perfuração, óculos de proteção UV, protetor auricular NRRsf, cinto paraquedista com duplo talabarte e absorvedor de energia NR-35, luvas adequadas a cada risco, máscara PFF2).\n" .
+        "9. PROGRAMA DE CAPACITAÇÃO E TREINAMENTOS OBRIGATÓRIOS (Treinamento Admissional NR-18 de 4h antes de iniciar no canteiro; NR-35 Trabalho em Altura de 8h bienal; NR-10 Segurança em Eletricidade de 40h; NR-12 para operadores de betoneira e serra circular; Diálogo Diário de Segurança - DDS de 10 min matinal).\n" .
+        "10. PLANO DE RESPOSTA A EMERGÊNCIAS, RESGATE EM ALTURA E PRIMEIROS SOCORROS (Fluxograma de emergência, procedimentos de resgate em altura em até 15 minutos para evitar trauma de suspensão inerte, kit de primeiros socorros, telefones de socorro SAMU 192, Bombeiros 193 e hospital de referência, emissão de CAT).\n" .
+        "11. CRONOGRAMA FÍSICO DE IMPLEMENTAÇÃO E AUDITORIAS DE SST (Rotina diária de verificação de andaimes e ferramentas, semanal de proteções coletivas e mensal de extintores e instalações elétricas).\n" .
+        "12. DISPOSIÇÕES FINAIS E TERMO DE ENCERRAMENTO (Obrigatoriedade de manutenção no canteiro, guarda do histórico por 20 anos, campo de assinatura do Responsável Técnico com CREA e do Representante Legal do Contratante).\n\n" .
+        "IMPORTANTE: Todos os itens dentro de cada array \"itens\" devem ser STRINGS simples e detalhadas.\n" .
+        "Responda APENAS com o JSON estruturado abaixo (sem markdown, sem texto fora das chaves):\n" .
+        "{\n" .
+        "    \"titulo\": \"PCMAT - PROGRAMA DE CONDIÇÕES E MEIO AMBIENTE DE TRABALHO\",\n" .
+        "    \"subtitulo\": \"Conforme Norma Regulamentadora NR-18 - {$data['obra']}\",\n" .
+        "    \"validade\": \"Vigência: Durante toda a execução da obra ({$data['data_inicio']} a {$data['data_fim']})\",\n" .
+        "    \"secoes\": [\n" .
+        "        {\n" .
+        "            \"numero\": \"1\",\n" .
+        "            \"titulo\": \"IDENTIFICAÇÃO DO EMPREENDIMENTO E DADOS CADASTRAIS\",\n" .
+        "            \"conteudo\": \"texto detalhado...\",\n" .
+        "            \"itens\": [\"Item 1...\", \"Item 2...\"]\n" .
+        "        }\n" .
+        "    ]\n" .
+        "}";
     }
     
     private function buildAPRPrompt(array $data, string $context): string {
         $epis = implode(', ', $data['epis'] ?? []);
         $dataFormatada = date('d/m/Y', strtotime($data['data']));
-        return "$context\n\nGere uma APR (Análise Preliminar de Risco) COMPLETA e PROFISSIONAL para:\n\nDADOS DA ATIVIDADE:\n- Atividade: {$data['atividade']}\n- Local: {$data['local']}\n- Responsável: {$data['responsavel']}\n- Data: {$dataFormatada}\n- Tipo de Serviço: {$data['tipo_servico']}\n- Nível de Risco Estimado: {$data['nivel_risco']}\n- Riscos Descritos: {$data['riscos']}\n- Medidas Sugeridas: {$data['medidas']}\n- EPIs: {$epis}\n\nIMPORTANTE: Gere conteúdo REAL e DETALHADO. Todos os itens devem ser STRINGS, não objetos.\n\nResponda APENAS com o JSON (sem markdown):\n{\n    \"titulo\": \"ANÁLISE PRELIMINAR DE RISCO - APR\",\n    \"subtitulo\": \"{$data['atividade']} - {$data['local']}\",\n    \"secoes\": [\n        {\n            \"numero\": \"1\",\n            \"titulo\": \"IDENTIFICAÇÃO DA ATIVIDADE\",\n            \"conteudo\": \"Atividade: {$data['atividade']}. Local: {$data['local']}. Data: {$dataFormatada}. Tipo: {$data['tipo_servico']}. Responsável: {$data['responsavel']}.\",\n            \"itens\": []\n        },\n        {\n            \"numero\": \"2\",\n            \"titulo\": \"DESCRIÇÃO DA ATIVIDADE\",\n            \"conteudo\": \"Descreva detalhadamente o passo a passo da atividade, incluindo preparação, execução e finalização.\",\n            \"itens\": [\"Etapa 1: Preparação do local e isolamento da área\", \"Etapa 2: Verificação de condições de segurança\", \"Etapa 3: Execução da atividade principal\"]\n        },\n        {\n            \"numero\": \"3\",\n            \"titulo\": \"RISCOS IDENTIFICADOS E MEDIDAS DE CONTROLE\",\n            \"conteudo\": \"Análise dos riscos presentes na atividade:\",\n            \"itens\": [\"RISCO: Queda de altura - CAUSA: Trabalho em nível elevado - CONSEQUÊNCIA: Lesões graves - MEDIDA: Uso de cinto e linha de vida\", \"Adicione os riscos fornecidos: {$data['riscos']}\"]\n        },\n        {\n            \"numero\": \"4\",\n            \"titulo\": \"EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL\",\n            \"conteudo\": \"EPIs obrigatórios para execução da atividade:\",\n            \"itens\": [\"Capacete de segurança com jugular\", \"Óculos de proteção contra impactos\", \"Inclua: {$epis}\"]\n        }\n    ],\n    \"nivel_risco\": \"{$data['nivel_risco']}\"\n}\n\nREGRA: Todos os itens devem ser STRINGS simples.";
+        return "$context\n\n" .
+        "Você é um Especialista em Gestão de Riscos Ocupacionais e Engenheiro de Segurança do Trabalho no Brasil.\n" .
+        "Gere uma APR (Análise Preliminar de Risco) COMPLETA, DETALHADA E PROFISSIONAL para a atividade informada:\n\n" .
+        "DADOS DA ATIVIDADE:\n" .
+        "- Atividade: {$data['atividade']}\n" .
+        "- Local de Execução: {$data['local']}\n" .
+        "- Responsável Técnico / Supervisor: {$data['responsavel']}\n" .
+        "- Data da Análise: {$dataFormatada}\n" .
+        "- Tipo de Serviço: {$data['tipo_servico']}\n" .
+        "- Nível de Risco Inicial Estimado: {$data['nivel_risco']}\n" .
+        "- Riscos Específicos Descritos: {$data['riscos']}\n" .
+        "- Medidas Preventivas Sugeridas: {$data['medidas']}\n" .
+        "- EPIs Selecionados: {$epis}\n\n" .
+        "ESTRUTURA TÉCNICA OBRIGATÓRIA (Elabore todas as 10 seções detalhadamente):\n" .
+        "1. IDENTIFICAÇÃO DA ATIVIDADE, LOCAL E RESPONSABILIDADE (Atividade, Local, Data, Supervisor, Equipe envolvida e Classificação do Serviço).\n" .
+        "2. ESCOPO, CONDIÇÕES AMBIENTAIS E PRÉ-REQUISITOS (Condições climáticas aceitáveis, velocidade máxima de vento para trabalho em altura, iluminação e isolamento prévio).\n" .
+        "3. PASSO A PASSO SEQUENCIAL DA TAREFA (Detalhamento das etapas operacionais: Planejamento/Inspeção prévia, Transporte de materiais, Preparação do local, Execução da tarefa principal, Desmobilização e Limpeza).\n" .
+        "4. ANÁLISE DE PERIGOS, CAUSAS E DANOS POTENCIAIS (Mapeamento de quedas, choques, prensamentos, cortes, projeção de estilhaços, inalação de poeiras/vapores e esforços ergonômicos).\n" .
+        "5. AVALIAÇÃO DE RISCO INICIAL (Matriz de Severidade x Probabilidade com classificação do risco sem medidas de controle adicionais).\n" .
+        "6. MEDIDAS DE CONTROLE E PROTEÇÃO COLETIVA (EPCs) (Isolamento com fita zebrada e cones, linha de vida, aterramento temporário, telas, ventilação e proteções de máquinas).\n" .
+        "7. EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL (EPIs) OBRIGATÓRIOS (Especificação técnica completa com exigência de C.A. válido conforme NR-06).\n" .
+        "8. REQUISITOS PARA PERMISSÃO DE TRABALHO (PT) (Condições para liberação da PT para trabalho a quente, em altura NR-35 ou espaço confinado NR-33).\n" .
+        "9. AVALIAÇÃO DO RISCO RESIDUAL E CRITÉRIOS DE INTERRUPÇÃO (Garantia do Direito de Recusa do Trabalhador em caso de risco iminente).\n" .
+        "10. PLANO DE EMERGÊNCIA, RESGATE E ASSINATURAS DA EQUIPE (Primeiros socorros, canais de comunicação com SAMU 192/Bombeiros 193 e campo de assinatura de toda a equipe executora).\n\n" .
+        "Responda APENAS com o JSON estruturado (sem markdown, sem texto fora):\n" .
+        "{\n" .
+        "    \"titulo\": \"ANÁLISE PRELIMINAR DE RISCO - APR\",\n" .
+        "    \"subtitulo\": \"{$data['atividade']} - {$data['local']}\",\n" .
+        "    \"nivel_risco\": \"{$data['nivel_risco']}\",\n" .
+        "    \"secoes\": [\n" .
+        "        {\n" .
+        "            \"numero\": \"1\",\n" .
+        "            \"titulo\": \"IDENTIFICAÇÃO DA ATIVIDADE, LOCAL E RESPONSABILIDADE\",\n" .
+        "            \"conteudo\": \"texto detalhado...\",\n" .
+        "            \"itens\": [\"Item 1...\", \"Item 2...\"]\n" .
+        "        }\n" .
+        "    ]\n" .
+        "}";
     }
     
     private function buildTermoEPIPrompt(array $data, string $context): string {
-        return "$context\n\nGere um Termo de Responsabilidade de EPI PROFISSIONAL conforme NR-06 para:\n\nDADOS:\n- Funcionário: {$data['funcionario']}\n- CPF: {$data['cpf']}\n- Tipo de EPI: {$data['tipo_epi']}\n- Número do CA: {$data['ca']}\n- Data de Entrega: {$data['data_entrega']}\n- Data de Validade: {$data['validade']}\n- Observações: {$data['observacoes']}\n\nIMPORTANTE: Todas as obrigações devem ser STRINGS simples, não objetos.\n\nResponda APENAS com o JSON (sem markdown):\n{\n    \"titulo\": \"TERMO DE RESPONSABILIDADE DE EPI\",\n    \"subtitulo\": \"Conforme NR-06\",\n    \"termo_declaracao\": \"Eu, {$data['funcionario']}, portador(a) do CPF {$data['cpf']}, declaro ter recebido o Equipamento de Proteção Individual (EPI) especificado neste documento, comprometendo-me a utilizá-lo exclusivamente para a finalidade a que se destina...\",\n    \"obrigacoes_empregado\": [\n        \"Utilizar o EPI apenas para a finalidade a que se destina\",\n        \"Responsabilizar-se pela guarda e conservação do equipamento\",\n        \"Comunicar ao empregador qualquer alteração que torne o EPI impróprio para uso\"\n    ],\n    \"obrigacoes_empregador\": [\n        \"Adquirir o EPI adequado ao risco de cada atividade\",\n        \"Exigir o uso correto do equipamento\",\n        \"Fornecer ao trabalhador somente EPI aprovado pelo MTE com CA válido\"\n    ],\n    \"observacoes\": \"O não cumprimento das obrigações acima poderá acarretar em advertência, suspensão ou demissão por justa causa, conforme artigo 158 da CLT e NR-06.\"\n}";
+        return "$context\n\n" .
+        "Gere um Termo de Responsabilidade e Guarda de Equipamento de Proteção Individual (EPI) COMPLETO, FORMAL E COM EMBASAMENTO JURÍDICO conforme CLT (Art. 158 e 166) e NR-06:\n\n" .
+        "DADOS:\n" .
+        "- Funcionário: {$data['funcionario']}\n" .
+        "- CPF: {$data['cpf']}\n" .
+        "- Tipo de EPI: {$data['tipo_epi']}\n" .
+        "- Certificado de Aprovação (CA): {$data['ca']}\n" .
+        "- Data de Entrega: {$data['data_entrega']}\n" .
+        "- Validade Estimada: {$data['validade']}\n" .
+        "- Observações Adicionais: {$data['observacoes']}\n\n" .
+        "Responda APENAS com o JSON (sem markdown):\n" .
+        "{\n" .
+        "    \"titulo\": \"TERMO DE RESPONSABILIDADE E ENTREGA DE EPI\",\n" .
+        "    \"subtitulo\": \"Conforme Norma Regulamentadora NR-06 e Artigos 158 e 166 da CLT\",\n" .
+        "    \"termo_declaracao\": \"Eu, {$data['funcionario']}, inscrito(a) no CPF sob o nº {$data['cpf']}, declaro formalmente ter recebido da empresa empregadora o Equipamento de Proteção Individual (EPI) especificado neste termo, em perfeito estado de conservação e funcionamento, acompanhado de Certificado de Aprovação (CA nº {$data['ca']}) expedido pelo órgão competente, tendo recebido orientação e treinamento adequado sobre seu uso correto, higienização, guarda e conservação.\",\n" .
+        "    \"obrigacoes_empregado\": [\n" .
+        "        \"Usar o EPI fornecido exclusivamente para a finalidade a que se destina durante toda a jornada de trabalho\",\n" .
+        "        \"Responsabilizar-se integralmente pela guarda, limpeza e conservação do equipamento sob sua custódia\",\n" .
+        "        \"Comunicar imediatamente ao empregador ou SESMT qualquer alteração, desgaste ou dano que o torne impróprio para uso\",\n" .
+        "        \"Cumprir rigorosamente as determinações do empregador sobre o uso adequado, ciente de que a recusa injustificada constitui ato faltoso passível de sanções disciplinares conforme Art. 158 da CLT\"\n" .
+        "    ],\n" .
+        "    \"obrigacoes_empregador\": [\n" .
+        "        \"Adquirir e fornecer gratuitamente ao trabalhador o EPI adequado ao risco em perfeito estado de conservação\",\n" .
+        "        \"Exigir seu uso contínuo e fiscalizar a correta utilização nas frentes de trabalho\",\n" .
+        "        \"Fornecer ao trabalhador somente EPI aprovado pelo órgão nacional competente em SST com CA válido\",\n" .
+        "        \"Substituir imediatamente o EPI quando danificado ou extraviado e promover treinamento sobre uso correto\"\n" .
+        "    ],\n" .
+        "    \"observacoes\": \"O descumprimento das normas aqui estipuladas sujeitará o empregado às sanções disciplinares previstas no artigo 482 da CLT, incluindo advertência por escrito, suspensão disciplinar e demissão por justa causa. O empregado autoriza o desconto em folha em caso de extravio ou dano doloso conforme CLT Art. 462 § 1º.\"\n" .
+        "}";
     }
     
     private function buildCertificadoPrompt(array $data, string $context): string {
         preg_match('/NR-(\d+)/', $data['treinamento'], $matches);
         $nr = isset($matches[0]) ? $matches[0] : '';
-        return "$context\n\nGere o conteúdo para um Certificado de Treinamento PROFISSIONAL:\n\nDADOS:\n- Funcionário: {$data['funcionario']}\n- CPF: {$data['cpf']}\n- Treinamento: {$data['treinamento']}\n- Carga Horária: {$data['carga_horaria']} horas\n- Data de Realização: {$data['data_realizacao']}\n- Validade: {$data['validade']}\n- Instrutor/Empresa: {$data['instrutor']}\n\nIMPORTANTE: O conteúdo programático deve ser uma lista de STRINGS simples.\n\nResponda APENAS com o JSON (sem markdown):\n{\n    \"titulo\": \"CERTIFICADO DE CONCLUSÃO DE TREINAMENTO\",\n    \"treinamento\": \"{$data['treinamento']}\",\n    \"nr_referencia\": \"$nr\",\n    \"texto_certificacao\": \"Certificamos que o(a) profissional acima qualificado(a) concluiu com aproveitamento satisfatório o treinamento especificado.\",\n    \"conteudo_programatico\": [\n        \"Conceitos e definições básicas\",\n        \"Legislação aplicável e responsabilidades\",\n        \"Identificação e análise de riscos\",\n        \"Práticas seguras de trabalho\"\n    ],\n    \"carga_horaria\": \"{$data['carga_horaria']} horas\",\n    \"metodologia\": \"Teórico e Prático\",\n    \"observacoes_legais\": \"Este certificado atende aos requisitos legais estabelecidos na legislação trabalhista vigente.\"\n}";
+        return "$context\n\n" .
+        "Gere o conteúdo oficial para um Certificado de Conclusão de Treinamento de Segurança do Trabalho em estrita conformidade com a NR-01 (Anexo II) e a respectiva NR do curso:\n\n" .
+        "DADOS:\n" .
+        "- Funcionário / Participante: {$data['funcionario']}\n" .
+        "- CPF: {$data['cpf']}\n" .
+        "- Treinamento Realizado: {$data['treinamento']}\n" .
+        "- Carga Horária: {$data['carga_horaria']} horas\n" .
+        "- Data de Realização: {$data['data_realizacao']}\n" .
+        "- Data de Validade: {$data['validade']}\n" .
+        "- Instrutor e Entidade: {$data['instrutor']}\n\n" .
+        "Responda APENAS com o JSON (sem markdown):\n" .
+        "{\n" .
+        "    \"titulo\": \"CERTIFICADO DE CAPACITAÇÃO PROFISSIONAL EM SEGURANÇA DO TRABALHO\",\n" .
+        "    \"treinamento\": \"{$data['treinamento']}\",\n" .
+        "    \"nr_referencia\": \"$nr\",\n" .
+        "    \"texto_certificacao\": \"Certificamos que o(a) profissional {$data['funcionario']}, portador(a) do CPF {$data['cpf']}, concluiu com aproveitamento satisfatório o treinamento de {$data['treinamento']}, cumprindo integralmente o conteúdo programático teórico e prático e as diretrizes pedagógicas da Norma Regulamentadora NR-01.\",\n" .
+        "    \"conteudo_programatico\": [\n" .
+        "        \"Disposições legais e diretrizes normativas das NRs aplicáveis\",\n" .
+        "        \"Identificação de perigos, fontes geradoras e avaliação de riscos ocupacionais\",\n" .
+        "        \"Medidas de prevenção coletiva (EPC) e equipamentos de proteção individual (EPI)\",\n" .
+        "        \"Procedimentos operacionais seguros e práticas de trabalho em canteiro\",\n" .
+        "        \"Plano de emergência, procedimentos de evacuação e noções de primeiros socorros\"\n" .
+        "    ],\n" .
+        "    \"carga_horaria\": \"{$data['carga_horaria']} horas\",\n" .
+        "    \"metodologia\": \"Presencial com aulas teóricas e práticas simuladas\",\n" .
+        "    \"observacoes_legais\": \"Certificado emitido em conformidade com a Portaria SEPRT nº 6.730/2020 e NR-01 da Secretaria Especial de Previdência e Trabalho do Ministério da Economia. Válido em todo o território nacional.\"\n" .
+        "}";
     }
     
     private function callOpenAI(string $prompt): array {
@@ -122,15 +293,15 @@ class AIDocumentGenerator {
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'Você é um assistente especializado em Segurança do Trabalho. Sempre responda em JSON válido conforme solicitado.'
+                    'content' => 'Você é um assistente sênior e perito em Engenharia de Segurança do Trabalho e Construção Civil. Responda SEMPRE em JSON válido estruturado conforme solicitado, com rico detalhamento normativo.'
                 ],
                 [
                     'role' => 'user',
                     'content' => $prompt
                 ]
             ],
-            'temperature' => 0.7,
-            'max_tokens' => 4000,
+            'temperature' => 0.5,
+            'max_tokens' => 4096,
             'response_format' => ['type' => 'json_object']
         ];
         
@@ -176,13 +347,13 @@ class AIDocumentGenerator {
             'contents' => [
                 [
                     'parts' => [
-                        ['text' => $prompt . "\n\nIMPORTANTE: Responda APENAS com o JSON solicitado, sem texto adicional."]
+                        ['text' => $prompt . "\n\nIMPORTANTE: Responda APENAS com o JSON solicitado, sem blocos de código nem texto adicional."]
                     ]
                 ]
             ],
             'generationConfig' => [
-                'temperature' => 0.7,
-                'maxOutputTokens' => 4000
+                'temperature' => 0.5,
+                'maxOutputTokens' => 8192
             ]
         ];
         

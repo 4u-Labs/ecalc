@@ -185,12 +185,16 @@ if (empty($_SESSION['api_token'])) {
                     <span class="text-xl">📊</span>
                     <span>Dashboard</span>
                 </button>
+                <button onclick="showSection('obras')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="obras">
+                    <span class="text-xl">🏗️</span>
+                    <span>Minhas Obras</span>
+                </button>
                 <button onclick="showSection('pgr')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="pgr">
                     <span class="text-xl">🦺</span>
                     <span>Gerador de PGR</span>
                 </button>
                 <button onclick="showSection('pcmat')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="pcmat">
-                    <span class="text-xl">🏗️</span>
+                    <span class="text-xl">📄</span>
                     <span>Gerador de PCMAT</span>
                 </button>
                 <button onclick="showSection('apr')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left" data-section="apr">
@@ -277,56 +281,73 @@ if (empty($_SESSION['api_token'])) {
             </div>
             
             <!-- Stats Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover shadow-sm">
-                    <div class="flex items-center justify-between mb-3 sm:mb-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center">
-                            <span class="text-xl sm:text-2xl">🦺</span>
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div class="bg-slate-900/40 backdrop-blur-md border border-amber-500/30 hover:border-amber-400/60 rounded-xl sm:rounded-2xl p-3 sm:p-5 card-hover shadow-sm cursor-pointer transition-all" onclick="showSection('obras')">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <div class="w-9 h-9 sm:w-11 sm:h-11 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center">
+                            <span class="text-lg sm:text-2xl">🏗️</span>
                         </div>
-                        <span class="text-green-500 text-xs sm:text-sm font-medium">+12%</span>
+                        <span class="text-amber-400 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">Drive ☁️</span>
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white" id="stat-obras">0</h3>
+                    <p class="text-slate-400 text-xs mt-0.5">Obras no Drive</p>
+                </div>
+
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-5 card-hover shadow-sm">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <div class="w-9 h-9 sm:w-11 sm:h-11 bg-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center">
+                            <span class="text-lg sm:text-2xl">🦺</span>
+                        </div>
+                        <span class="text-green-500 text-[10px] sm:text-xs font-medium">NR-01</span>
                     </div>
                     <h3 class="text-xl sm:text-2xl font-bold text-white" id="stat-pgr">0</h3>
-                    <p class="text-slate-400 text-xs sm:text-sm">PGRs Gerados</p>
+                    <p class="text-slate-400 text-xs mt-0.5">PGRs Gerados</p>
                 </div>
                 
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover shadow-sm">
-                    <div class="flex items-center justify-between mb-3 sm:mb-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-cyan-500/20 text-cyan-400 rounded-xl flex items-center justify-center">
-                            <span class="text-xl sm:text-2xl">⚠️</span>
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-5 card-hover shadow-sm">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <div class="w-9 h-9 sm:w-11 sm:h-11 bg-cyan-500/20 text-cyan-400 rounded-xl flex items-center justify-center">
+                            <span class="text-lg sm:text-2xl">⚠️</span>
                         </div>
-                        <span class="text-green-500 text-xs sm:text-sm font-medium">+8%</span>
+                        <span class="text-green-500 text-[10px] sm:text-xs font-medium">Ativas</span>
                     </div>
                     <h3 class="text-xl sm:text-2xl font-bold text-white" id="stat-apr">0</h3>
-                    <p class="text-slate-400 text-xs sm:text-sm">APRs Ativas</p>
+                    <p class="text-slate-400 text-xs mt-0.5">APRs Digitais</p>
                 </div>
                 
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover shadow-sm">
-                    <div class="flex items-center justify-between mb-3 sm:mb-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-rose-500/20 text-rose-400 rounded-xl flex items-center justify-center">
-                            <span class="text-xl sm:text-2xl">🧤</span>
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-5 card-hover shadow-sm">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <div class="w-9 h-9 sm:w-11 sm:h-11 bg-rose-500/20 text-rose-400 rounded-xl flex items-center justify-center">
+                            <span class="text-lg sm:text-2xl">🧤</span>
                         </div>
                         <span class="pulse-dot w-2 h-2 bg-red-500 rounded-full"></span>
                     </div>
                     <h3 class="text-xl sm:text-2xl font-bold text-white" id="stat-epi-alert">0</h3>
-                    <p class="text-slate-400 text-xs sm:text-sm">EPIs Vencendo</p>
+                    <p class="text-slate-400 text-xs mt-0.5">EPIs Vencendo</p>
                 </div>
                 
-                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover shadow-sm">
-                    <div class="flex items-center justify-between mb-3 sm:mb-4">
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center">
-                            <span class="text-xl sm:text-2xl">🎓</span>
+                <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-5 card-hover shadow-sm">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <div class="w-9 h-9 sm:w-11 sm:h-11 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center">
+                            <span class="text-lg sm:text-2xl">🎓</span>
                         </div>
-                        <span class="text-yellow-500 text-[10px] sm:text-sm font-medium">5 pendentes</span>
+                        <span class="text-yellow-500 text-[10px] sm:text-xs font-medium">NRs</span>
                     </div>
                     <h3 class="text-xl sm:text-2xl font-bold text-white" id="stat-train">0</h3>
-                    <p class="text-slate-400 text-xs sm:text-sm">Treinamentos</p>
+                    <p class="text-slate-400 text-xs mt-0.5">Treinamentos</p>
                 </div>
             </div>
             
             <!-- Quick Actions -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-                    <h3 class="font-bold text-base sm:text-lg text-white mb-4">🚀 Ações Rápidas com IA</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-base sm:text-lg text-white">🚀 Ações Rápidas com IA</h3>
+                        <button onclick="showSection('obras')" class="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 cursor-pointer">
+                            <span>🏗️ Minhas Obras</span> →
+                        </button>
+                    </div>
                     <div class="grid grid-cols-2 gap-3 sm:gap-4">
                         <button onclick="showSection('pgr')" class="p-3 sm:p-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white border border-amber-500/30 rounded-xl hover:shadow-lg transition-all text-left">
                             <span class="text-xl sm:text-2xl block mb-1">🦺</span>
@@ -359,6 +380,80 @@ if (empty($_SESSION['api_token'])) {
                             <p class="text-xs sm:text-sm text-slate-400">Nenhum alerta no momento</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Obras Section -->
+        <section id="obras-section" class="hidden fade-in">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+                        <span>🏗️</span> Minhas Obras & Canteiros
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">
+                        Cadastre suas obras uma única vez. Seus dados serão sincronizados no Google Drive e usados em todos os documentos técnicos.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <button type="button" onclick="SafeWorkDrive.sync()" class="px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-white/10 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer" title="Sincronizar com o Google Drive">
+                        <span>☁️</span> <span id="drive-sync-btn-label">Sincronizar Drive</span>
+                    </button>
+                    <button type="button" onclick="SafeWorkDrive.openDriveFolder()" class="px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-purple-300 hover:text-purple-200 border border-purple-500/30 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer" title="Abrir pasta no Google Drive">
+                        <span>📂</span> <span>Pasta Drive</span>
+                    </button>
+                    <button type="button" onclick="openModal('obra-modal')" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-sm transition-all shadow-lg flex items-center gap-2 cursor-pointer">
+                        <span>➕</span> <span>Nova Obra</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Google Drive Status Card -->
+            <div id="drive-status-card" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-900/80 border border-white/10 flex items-center justify-between flex-wrap gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl shrink-0">
+                        ☁️
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <p class="text-xs font-bold text-white">Google Drive do Usuário</p>
+                            <span id="drive-badge-status" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-400 border border-white/10">○ Desconectado</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-0.5" id="drive-status-desc">
+                            Conecte seu Google Drive para que suas obras e documentos de IA fiquem salvos em nuvem na pasta "SafeWork Pro - Obras e Engenharia".
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="SafeWorkDrive.connect(true)" class="text-xs text-amber-400 hover:underline font-semibold" id="btn-drive-reconnect">
+                        Conectar Google Drive
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm mb-6">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <h3 class="font-bold text-base sm:text-lg text-white">Obras Cadastradas</h3>
+                    <span class="text-xs text-slate-400" id="obras-count-label">0 obras encontradas</span>
+                </div>
+                <div class="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                    <table class="w-full min-w-[760px] text-sm">
+                        <thead>
+                            <tr class="text-left text-slate-400 text-xs sm:text-sm border-b border-white/10">
+                                <th class="pb-3 font-medium">Nome da Obra / Local</th>
+                                <th class="pb-3 font-medium">Contratante / CNPJ</th>
+                                <th class="pb-3 font-medium">Responsável / CREA</th>
+                                <th class="pb-3 font-medium">Tipo / Efetivo</th>
+                                <th class="pb-3 font-medium">Período</th>
+                                <th class="pb-3 font-medium text-right">Ações & Documentos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="obras-table-body">
+                            <tr class="text-slate-500 text-center">
+                                <td colspan="6" class="py-8">Nenhuma obra cadastrada ainda. Clique em "Nova Obra" para começar.</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -692,6 +787,140 @@ if (empty($_SESSION['api_token'])) {
         </div>
     </div>
 
+    <!-- Modal Cadastro de Obra -->
+    <div id="obra-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-2 sm:p-6">
+        <div class="bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto max-h-[92vh] overflow-y-auto my-auto shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <span>🏗️</span> <span id="obra-modal-title">Cadastrar Nova Obra</span>
+                    </h3>
+                    <p class="text-xs sm:text-sm text-purple-400 mt-0.5">
+                        Os dados cadastrados serão salvos no Google Drive e autopreenchidos no PCMAT, PGR e APR.
+                    </p>
+                </div>
+                <button onclick="closeModal('obra-modal')" class="text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
+            </div>
+            
+            <form id="obra-form" onsubmit="saveObra(event)">
+                <input type="hidden" name="obra_id" id="obra-form-id" value="">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Nome da Obra / Canteiro *</label>
+                        <input type="text" name="nome_obra" id="obra-form-nome" required placeholder="Ex: Obra Receita Fazendária - Reforma Geral" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Razão Social / Contratante *</label>
+                        <input type="text" name="contratante" id="obra-form-contratante" required placeholder="Ex: Governo do Estado de Minas Gerais" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">CNPJ ou CPF do Contratante *</label>
+                        <input type="text" name="cnpj" id="obra-form-cnpj" required placeholder="Ex: 00.000.000/0001-00" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Tipo de Empreendimento *</label>
+                        <select name="tipo_obra" id="obra-form-tipo" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                            <option value="">Selecione...</option>
+                            <option value="Edificação Residencial">Edificação Residencial (Prédio/Condomínio)</option>
+                            <option value="Edificação Comercial">Edificação Comercial / Escritórios</option>
+                            <option value="Reforma Estrutural e Modernização">Reforma Estrutural e Modernização</option>
+                            <option value="Construção Industrial / Galpão">Construção Industrial / Galpão</option>
+                            <option value="Obras de Infraestrutura / Pavimentação">Obras de Infraestrutura / Pavimentação</option>
+                            <option value="Demolição e Desmonte">Demolição e Desmonte</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Endereço Completo do Canteiro *</label>
+                        <input type="text" name="endereco" id="obra-form-endereco" required placeholder="Ex: Rua Duque de Caxias, 89 - Centro, Belo Horizonte - MG" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Nº Estimado de Trabalhadores</label>
+                        <input type="number" name="trabalhadores" id="obra-form-trabalhadores" value="10" min="1" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Grau de Risco (NR-04) / CNAE</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select name="grau_risco" id="obra-form-grau" class="w-full px-3 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-amber-400">
+                                <option value="Grau 3" selected>Grau 3 (Padrão Obra)</option>
+                                <option value="Grau 4">Grau 4 (Pesado/Demolição)</option>
+                                <option value="Grau 2">Grau 2 (Instalações leves)</option>
+                                <option value="Grau 1">Grau 1 (Escritório)</option>
+                            </select>
+                            <input type="text" name="cnae" id="obra-form-cnae" placeholder="CNAE (41.20-4)" class="w-full px-3 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-amber-400">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Data de Início da Obra</label>
+                        <input type="date" name="data_inicio" id="obra-form-inicio" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Previsão de Conclusão</label>
+                        <input type="date" name="data_fim" id="obra-form-fim" required class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Engenheiro / Responsável Técnico *</label>
+                        <input type="text" name="engenheiro" id="obra-form-engenheiro" required placeholder="Ex: Eng. Fabiano Braga" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Registro Profissional (CREA/CAU) *</label>
+                        <input type="text" name="crea" id="obra-form-crea" required placeholder="Ex: CREA-MG 123456/D" class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Funções Ativas no Canteiro</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3" id="obra-form-funcoes">
+                            <label class="flex items-center gap-2 p-2.5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
+                                <input type="checkbox" name="funcoes" value="Pedreiro" checked class="rounded border-white/10 text-amber-500 focus:ring-amber-400">
+                                <span class="text-xs text-white">Pedreiro</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
+                                <input type="checkbox" name="funcoes" value="Servente" checked class="rounded border-white/10 text-amber-500 focus:ring-amber-400">
+                                <span class="text-xs text-white">Servente</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
+                                <input type="checkbox" name="funcoes" value="Carpinteiro" checked class="rounded border-white/10 text-amber-500 focus:ring-amber-400">
+                                <span class="text-xs text-white">Carpinteiro</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
+                                <input type="checkbox" name="funcoes" value="Armador" checked class="rounded border-white/10 text-amber-500 focus:ring-amber-400">
+                                <span class="text-xs text-white">Armador</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
+                                <input type="checkbox" name="funcoes" value="Eletricista" checked class="rounded border-white/10 text-amber-500 focus:ring-amber-400">
+                                <span class="text-xs text-white">Eletricista</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
+                                <input type="checkbox" name="funcoes" value="Pintor" checked class="rounded border-white/10 text-amber-500 focus:ring-amber-400">
+                                <span class="text-xs text-white">Pintor</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
+                                <input type="checkbox" name="funcoes" value="Encanador" class="rounded border-white/10 text-amber-500 focus:ring-amber-400">
+                                <span class="text-xs text-white">Encanador</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5">
+                                <input type="checkbox" name="funcoes" value="Operador de Máquinas" class="rounded border-white/10 text-amber-500 focus:ring-amber-400">
+                                <span class="text-xs text-white">Operador de Máquinas</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Observações Técnicas / Fases / Medidas Especiais</label>
+                        <textarea name="observacoes" id="obra-form-obs" rows="2" placeholder="Descreva particularidades do canteiro, taludes, linhas de transmissão próximas, etc." class="w-full px-4 py-3 border border-white/10 bg-slate-950/50 text-white rounded-xl focus:ring-2 focus:ring-amber-400 text-sm"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6 sm:mt-8">
+                    <button type="button" onclick="closeModal('obra-modal')" class="w-full sm:w-auto px-6 py-3 border border-white/10 rounded-xl text-slate-400 hover:bg-white/5 text-center">Cancelar</button>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                        <span>💾</span> <span>Salvar Obra & Sincronizar</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal PGR -->
     <div id="pgr-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 overflow-y-auto p-2 sm:p-6">
         <div class="bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto max-h-[92vh] overflow-y-auto my-auto shadow-2xl">
@@ -705,6 +934,20 @@ if (empty($_SESSION['api_token'])) {
                 <button onclick="closeModal('pgr-modal')" class="text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             </div>
             <form id="pgr-form" onsubmit="savePGR(event)">
+                <!-- Vinculação à Obra -->
+                <div class="mb-5 p-3.5 bg-gradient-to-r from-amber-500/15 to-purple-500/15 border border-amber-500/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">🏗️</span>
+                        <div>
+                            <p class="font-bold text-xs sm:text-sm text-amber-300">Vincular a uma Obra Cadastrada</p>
+                            <p class="text-[11px] text-slate-300">Preencha dados da empresa, canteiro e responsável com 1 clique</p>
+                        </div>
+                    </div>
+                    <select id="select-obra-pgr" onchange="preencherCamposComObra(this.value, 'pgr')" class="px-3.5 py-2 bg-slate-900 border border-white/20 text-white rounded-xl text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-amber-400 select-obra-dropdown min-w-[200px]">
+                        <option value="">-- Selecione uma Obra --</option>
+                    </select>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                         <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Empresa</label>
@@ -809,6 +1052,19 @@ if (empty($_SESSION['api_token'])) {
                 <button onclick="closeModal('pcmat-modal')" class="text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             </div>
             <form id="pcmat-form" onsubmit="savePCMAT(event)">
+                <!-- Vinculação à Obra -->
+                <div class="mb-5 p-3.5 bg-gradient-to-r from-blue-500/15 to-purple-500/15 border border-blue-500/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">🏗️</span>
+                        <div>
+                            <p class="font-bold text-xs sm:text-sm text-blue-300">Vincular a uma Obra Cadastrada</p>
+                            <p class="text-[11px] text-slate-300">Autopreencha dados do canteiro, prazos, engenheiro e funções com 1 clique</p>
+                        </div>
+                    </div>
+                    <select id="select-obra-pcmat" onchange="preencherCamposComObra(this.value, 'pcmat')" class="px-3.5 py-2 bg-slate-900 border border-white/20 text-white rounded-xl text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-blue-400 select-obra-dropdown min-w-[200px]">
+                        <option value="">-- Selecione uma Obra --</option>
+                    </select>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                         <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Nome da Obra</label>
@@ -921,6 +1177,19 @@ if (empty($_SESSION['api_token'])) {
                 <button onclick="closeModal('apr-modal')" class="text-slate-400 hover:text-white text-2xl transition-colors">&times;</button>
             </div>
             <form id="apr-form" onsubmit="saveAPR(event)">
+                <!-- Vinculação à Obra -->
+                <div class="mb-5 p-3.5 bg-gradient-to-r from-yellow-500/15 to-purple-500/15 border border-yellow-500/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">🏗️</span>
+                        <div>
+                            <p class="font-bold text-xs sm:text-sm text-yellow-300">Vincular a uma Obra Cadastrada</p>
+                            <p class="text-[11px] text-slate-300">Preencha local, responsável e dados do canteiro instantaneamente</p>
+                        </div>
+                    </div>
+                    <select id="select-obra-apr" onchange="preencherCamposComObra(this.value, 'apr')" class="px-3.5 py-2 bg-slate-900 border border-white/20 text-white rounded-xl text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-yellow-400 select-obra-dropdown min-w-[200px]">
+                        <option value="">-- Selecione uma Obra --</option>
+                    </select>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                         <label class="block text-xs sm:text-sm font-medium text-slate-300 mb-2">Atividade</label>
@@ -1379,6 +1648,7 @@ if (empty($_SESSION['api_token'])) {
                 localStorage.removeItem('user_role');
                 userData = null;
                 userCredits = 0;
+                SafeWorkDrive.disconnect();
                 updateAuthUI();
                 alert('Conta desconectada com sucesso.');
             }
@@ -1398,7 +1668,7 @@ if (empty($_SESSION['api_token'])) {
             openModal(modalId);
         }
 
-        // --- GOOGLE OAUTH 2.0 INTEGRATION (ECOSSISTEMA 4ULABS) ---
+        // --- GOOGLE OAUTH 2.0 INTEGRATION (ECOSSISTEMA 4ULABS & GOOGLE DRIVE) ---
         const GOOGLE_CLIENT_ID = '569266864432-pd09jbb5no9ekdhdr018fj643nopp817.apps.googleusercontent.com';
         let googleTokenClient = null;
 
@@ -1410,7 +1680,7 @@ if (empty($_SESSION['api_token'])) {
             try {
                 googleTokenClient = google.accounts.oauth2.initTokenClient({
                     client_id: GOOGLE_CLIENT_ID,
-                    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid',
+                    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/drive.file',
                     callback: async (response) => {
                         if (response && response.access_token) {
                             await processarGoogleToken(response.access_token);
@@ -1445,7 +1715,7 @@ if (empty($_SESSION['api_token'])) {
         }
 
         async function processarGoogleToken(accessToken) {
-            showLoading('Autenticando com sua Conta Google...');
+            showLoading('Autenticando com sua Conta Google e conectando Drive...');
             try {
                 const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                     headers: { Authorization: `Bearer ${accessToken}` }
@@ -1464,30 +1734,43 @@ if (empty($_SESSION['api_token'])) {
                     })
                 });
 
-                const data = await backendRes.json();
-                if (!data.success) {
-                    throw new Error(data.error || 'Erro na autenticação central');
+                const dataAuth = await backendRes.json();
+                if (!dataAuth.success) {
+                    throw new Error(dataAuth.error || 'Erro na autenticação central');
                 }
 
-                userToken = data.token;
-                userData = data.user;
-                userCredits = parseInt(data.user.credits || 0);
+                userToken = dataAuth.token;
+                userData = dataAuth.user;
+                userCredits = parseInt(dataAuth.user.credits || 0);
 
-                localStorage.setItem('keepai_token', data.token);
-                localStorage.setItem('user_profile', JSON.stringify(data.user));
+                localStorage.setItem('keepai_token', dataAuth.token);
+                localStorage.setItem('user_profile', JSON.stringify(dataAuth.user));
                 localStorage.setItem('user_credits', String(userCredits));
 
-                const emailLower = (data.user.email || '').toLowerCase().trim();
+                const emailLower = (dataAuth.user.email || '').toLowerCase().trim();
                 const isAdmin = (emailLower === 'fbr4g4@gmail.com' || emailLower === 'fb4g4@gmail.com');
                 if (isAdmin) {
                     localStorage.setItem('user_role', 'admin');
                 }
 
+                // Sincroniza token do Google Drive com SafeWorkDrive
+                localStorage.setItem('safework_drive_token', accessToken);
+                localStorage.setItem('safework_drive_token_exp', String(Date.now() + 3600 * 1000));
+                SafeWorkDrive.accessToken = accessToken;
+                SafeWorkDrive.tokenExpiresAt = Date.now() + 3600 * 1000;
+                SafeWorkDrive.updateBadge('connected');
+                
+                // Conecta pasta e sincroniza em background
+                SafeWorkDrive.getOrCreateFolder(accessToken).then(async () => {
+                    await SafeWorkDrive.loadObrasFromDrive();
+                    await SafeWorkDrive.syncObrasToDrive();
+                }).catch(e => console.warn('[Drive AutoSync]', e));
+
                 updateAuthUI();
                 updateCreditsUI();
                 closeModal('auth-modal');
                 hideLoading();
-                alert(`🎉 Bem-vindo(a), ${data.user.display_name || data.user.email}!`);
+                alert(`🎉 Bem-vindo(a), ${dataAuth.user.display_name || dataAuth.user.email}! Seu Google Drive foi sincronizado.`);
             } catch (err) {
                 hideLoading();
                 console.error('[GoogleAuth] Erro no login Google:', err);
@@ -1677,12 +1960,709 @@ if (empty($_SESSION['api_token'])) {
 
         // Data Storage
         let data = {
+            obras: JSON.parse(localStorage.getItem('safework_obras') || '[]'),
             pgr: JSON.parse(localStorage.getItem('pgr') || '[]'),
             pcmat: JSON.parse(localStorage.getItem('pcmat') || '[]'),
             apr: JSON.parse(localStorage.getItem('apr') || '[]'),
             epi: JSON.parse(localStorage.getItem('epi') || '[]'),
             treinamentos: JSON.parse(localStorage.getItem('treinamentos') || '[]')
         };
+
+        // --- GOOGLE DRIVE SYNCHRONIZATION & STORAGE SERVICE ---
+        const SafeWorkDrive = {
+            CLIENT_ID: '569266864432-pd09jbb5no9ekdhdr018fj643nopp817.apps.googleusercontent.com',
+            FOLDER_NAME: 'SafeWork Pro - Obras e Engenharia',
+            SCOPE: 'https://www.googleapis.com/auth/drive.file',
+            accessToken: localStorage.getItem('safework_drive_token') || null,
+            tokenExpiresAt: parseInt(localStorage.getItem('safework_drive_token_exp') || '0', 10),
+            folderId: localStorage.getItem('safework_drive_folder_id') || null,
+            obrasFileId: localStorage.getItem('safework_drive_obras_file_id') || null,
+            status: 'disconnected', // 'disconnected' | 'connected' | 'syncing' | 'synced' | 'error'
+            
+            init() {
+                this.accessToken = localStorage.getItem('safework_drive_token') || null;
+                this.tokenExpiresAt = parseInt(localStorage.getItem('safework_drive_token_exp') || '0', 10);
+                this.folderId = localStorage.getItem('safework_drive_folder_id') || null;
+                this.obrasFileId = localStorage.getItem('safework_drive_obras_file_id') || null;
+
+                if (this.accessToken && Date.now() < this.tokenExpiresAt - 60000) {
+                    this.status = 'connected';
+                    this.updateBadge('connected');
+                } else if (this.accessToken) {
+                    this.status = 'disconnected';
+                    this.updateBadge('disconnected');
+                } else {
+                    this.status = 'disconnected';
+                    this.updateBadge('disconnected');
+                }
+            },
+            
+            disconnect() {
+                this.accessToken = null;
+                this.tokenExpiresAt = 0;
+                localStorage.removeItem('safework_drive_token');
+                localStorage.removeItem('safework_drive_token_exp');
+                this.updateBadge('disconnected');
+            },
+
+            updateBadge(state = this.status) {
+                this.status = state;
+                const badge = document.getElementById('drive-badge-status');
+                const desc = document.getElementById('drive-status-desc');
+                const btnReconnect = document.getElementById('btn-drive-reconnect');
+                const syncBtnLabel = document.getElementById('drive-sync-btn-label');
+                
+                if (!badge) return;
+                
+                if (state === 'connected' || state === 'synced') {
+                    badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                    badge.textContent = state === 'synced' ? '● Nuvem Sincronizada' : '● Drive Conectado';
+                    if (desc) desc.textContent = 'Pasta "SafeWork Pro - Obras e Engenharia" conectada ao seu Google Drive. Suas obras e PDFs são salvos automaticamente.';
+                    if (btnReconnect) {
+                        btnReconnect.textContent = 'Reconectar Drive';
+                        btnReconnect.className = 'text-xs text-slate-400 hover:text-white underline font-medium cursor-pointer';
+                    }
+                    if (syncBtnLabel) syncBtnLabel.textContent = 'Sincronizado';
+                } else if (state === 'syncing') {
+                    badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse';
+                    badge.textContent = '⏳ Sincronizando...';
+                    if (syncBtnLabel) syncBtnLabel.textContent = 'Sincronizando...';
+                } else if (state === 'error') {
+                    badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/20 text-red-400 border border-red-500/30';
+                    badge.textContent = '⚠️ Erro ao Sincronizar';
+                    if (btnReconnect) btnReconnect.textContent = 'Tentar Novamente';
+                    if (syncBtnLabel) syncBtnLabel.textContent = 'Erro Drive';
+                } else {
+                    badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-400 border border-white/10';
+                    badge.textContent = '○ Desconectado';
+                    if (desc) desc.textContent = 'Conecte seu Google Drive para que suas obras e documentos de IA fiquem salvos em nuvem na pasta "SafeWork Pro - Obras e Engenharia".';
+                    if (btnReconnect) {
+                        btnReconnect.textContent = 'Conectar Google Drive';
+                        btnReconnect.className = 'text-xs text-amber-400 hover:underline font-semibold cursor-pointer';
+                    }
+                    if (syncBtnLabel) syncBtnLabel.textContent = 'Sincronizar Drive';
+                }
+            },
+            
+            async connect(interactive = true) {
+                if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+                    alert('Os serviços Google ainda estão carregando. Por favor, aguarde alguns instantes e tente novamente.');
+                    return;
+                }
+                
+                return new Promise((resolve, reject) => {
+                    const client = google.accounts.oauth2.initTokenClient({
+                        client_id: this.CLIENT_ID,
+                        scope: this.SCOPE,
+                        callback: async (resp) => {
+                            if (resp && resp.access_token) {
+                                this.accessToken = resp.access_token;
+                                const expiresIn = (resp.expires_in ? parseInt(resp.expires_in, 10) : 3600) * 1000;
+                                this.tokenExpiresAt = Date.now() + expiresIn;
+                                localStorage.setItem('safework_drive_token', this.accessToken);
+                                localStorage.setItem('safework_drive_token_exp', String(this.tokenExpiresAt));
+                                this.updateBadge('connected');
+                                
+                                try {
+                                    showLoading('Conectando pasta no Google Drive...');
+                                    await this.getOrCreateFolder(this.accessToken);
+                                    await this.loadObrasFromDrive();
+                                    await this.syncObrasToDrive();
+                                    hideLoading();
+                                    alert('🎉 Google Drive conectado com sucesso! Suas obras foram sincronizadas com a pasta "SafeWork Pro - Obras e Engenharia".');
+                                } catch (e) {
+                                    hideLoading();
+                                    console.error('[Drive] Erro pós-conexão:', e);
+                                }
+                                resolve(this.accessToken);
+                            } else {
+                                reject(new Error(resp?.error_description || 'Autorização do Google Drive cancelada.'));
+                            }
+                        },
+                        error_callback: (err) => {
+                            this.updateBadge('error');
+                            reject(err);
+                        }
+                    });
+                    client.requestAccessToken({ prompt: interactive ? 'consent' : '' });
+                });
+            },
+            
+            async getToken() {
+                if (this.accessToken && Date.now() < this.tokenExpiresAt - 60000) {
+                    return this.accessToken;
+                }
+                return null;
+            },
+            
+            async getOrCreateFolder(token) {
+                if (!token) token = await this.getToken();
+                if (!token) return null;
+                
+                if (this.folderId) {
+                    try {
+                        const checkRes = await fetch(`https://www.googleapis.com/drive/v3/files/${this.folderId}?fields=id,trashed`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        if (checkRes.ok) {
+                            const fData = await checkRes.json();
+                            if (!fData.trashed) return this.folderId;
+                        }
+                    } catch (_) {}
+                }
+                
+                // Procurar pasta existente pelo nome
+                const q = encodeURIComponent(`name = '${this.FOLDER_NAME}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`);
+                const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const resData = await res.json();
+                if (resData.files && resData.files.length > 0) {
+                    this.folderId = resData.files[0].id;
+                    localStorage.setItem('safework_drive_folder_id', this.folderId);
+                    return this.folderId;
+                }
+                
+                // Criar pasta caso não exista
+                const createRes = await fetch('https://www.googleapis.com/drive/v3/files?fields=id,name', {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: this.FOLDER_NAME,
+                        mimeType: 'application/vnd.google-apps.folder',
+                        description: 'Pasta oficial do SafeWork Pro - Obras cadastradas e laudos de segurança (PGR, PCMAT, APR)'
+                    })
+                });
+                const newFolder = await createRes.json();
+                this.folderId = newFolder.id;
+                localStorage.setItem('safework_drive_folder_id', this.folderId);
+                return this.folderId;
+            },
+            
+            async syncObrasToDrive() {
+                const token = await this.getToken();
+                if (!token) return false;
+                
+                this.updateBadge('syncing');
+                try {
+                    const folderId = await this.getOrCreateFolder(token);
+                    if (!folderId) throw new Error('Não foi possível obter a pasta no Drive');
+                    
+                    const payload = {
+                        app: 'SafeWork Pro',
+                        versao: '2.0',
+                        atualizado_em: new Date().toISOString(),
+                        total_obras: (data.obras || []).length,
+                        obras: data.obras || []
+                    };
+                    const payloadJson = JSON.stringify(payload, null, 2);
+                    
+                    // Buscar se já existe obras_safework.json
+                    let fileId = this.obrasFileId;
+                    if (!fileId) {
+                        const q = encodeURIComponent(`name = 'obras_safework.json' and '${folderId}' in parents and trashed = false`);
+                        const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        const searchData = await searchRes.json();
+                        if (searchData.files && searchData.files.length > 0) {
+                            fileId = searchData.files[0].id;
+                            this.obrasFileId = fileId;
+                            localStorage.setItem('safework_drive_obras_file_id', fileId);
+                        }
+                    }
+                    
+                    if (fileId) {
+                        const updateRes = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
+                            method: 'PATCH',
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: payloadJson
+                        });
+                        if (!updateRes.ok) {
+                            this.obrasFileId = null;
+                            localStorage.removeItem('safework_drive_obras_file_id');
+                            return await this.syncObrasToDrive();
+                        }
+                    } else {
+                        const metadata = {
+                            name: 'obras_safework.json',
+                            parents: [folderId],
+                            description: 'Base de dados de obras e canteiros cadastrados no SafeWork Pro'
+                        };
+                        const boundary = '-------SafeWorkDriveBoundary';
+                        const delimiter = "\r\n--" + boundary + "\r\n";
+                        const close_delim = "\r\n--" + boundary + "--";
+                        const multipartBody =
+                            delimiter +
+                            'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+                            JSON.stringify(metadata) +
+                            delimiter +
+                            'Content-Type: application/json\r\n\r\n' +
+                            payloadJson +
+                            close_delim;
+                            
+                        const createRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name', {
+                            method: 'POST',
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                'Content-Type': `multipart/related; boundary="${boundary}"`
+                            },
+                            body: multipartBody
+                        });
+                        if (createRes.ok) {
+                            const newFileData = await createRes.json();
+                            this.obrasFileId = newFileData.id;
+                            localStorage.setItem('safework_drive_obras_file_id', this.obrasFileId);
+                        }
+                    }
+                    
+                    this.updateBadge('synced');
+                    return true;
+                } catch (e) {
+                    console.error('[Drive] Erro ao sincronizar obras:', e);
+                    this.updateBadge('error');
+                    return false;
+                }
+            },
+            
+            async loadObrasFromDrive() {
+                const token = await this.getToken();
+                if (!token) return;
+                
+                try {
+                    const folderId = await this.getOrCreateFolder(token);
+                    if (!folderId) return;
+                    
+                    const q = encodeURIComponent(`name = 'obras_safework.json' and '${folderId}' in parents and trashed = false`);
+                    const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime)`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    const searchData = await searchRes.json();
+                    if (!searchData.files || searchData.files.length === 0) return;
+                    
+                    const fileId = searchData.files[0].id;
+                    this.obrasFileId = fileId;
+                    localStorage.setItem('safework_drive_obras_file_id', fileId);
+                    
+                    const contentRes = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (contentRes.ok) {
+                        const cloudData = await contentRes.json();
+                        if (cloudData && Array.isArray(cloudData.obras)) {
+                            const localMap = new Map((data.obras || []).map(o => [String(o.id), o]));
+                            cloudData.obras.forEach(cloudObra => {
+                                const key = String(cloudObra.id);
+                                if (!localMap.has(key)) {
+                                    localMap.set(key, cloudObra);
+                                } else {
+                                    const local = localMap.get(key);
+                                    if (cloudObra.atualizado_em && (!local.atualizado_em || cloudObra.atualizado_em > local.atualizado_em)) {
+                                        localMap.set(key, cloudObra);
+                                    }
+                                }
+                            });
+                            
+                            data.obras = Array.from(localMap.values());
+                            localStorage.setItem('safework_obras', JSON.stringify(data.obras));
+                            updateObrasTable();
+                            updateObrasSelects();
+                            console.log(`[Drive] ${data.obras.length} obras sincronizadas da nuvem.`);
+                        }
+                    }
+                } catch (e) {
+                    console.error('[Drive] Erro ao carregar obras do Drive:', e);
+                }
+            },
+            
+            async uploadPDF(filename, pdfBlob) {
+                const token = await this.getToken();
+                if (!token) return;
+                
+                try {
+                    const folderId = await this.getOrCreateFolder(token);
+                    if (!folderId) return;
+                    
+                    const metadata = {
+                        name: filename,
+                        parents: [folderId],
+                        mimeType: 'application/pdf',
+                        description: 'Documento técnico gerado com IA no SafeWork Pro'
+                    };
+                    
+                    const boundary = '-------SafeWorkPDFBoundary';
+                    const delimiter = "\r\n--" + boundary + "\r\n";
+                    const close_delim = "\r\n--" + boundary + "--";
+                    
+                    const reader = new FileReader();
+                    reader.onload = async () => {
+                        const binary = reader.result;
+                        const metadataBlob = new Blob([
+                            delimiter,
+                            'Content-Type: application/json; charset=UTF-8\r\n\r\n',
+                            JSON.stringify(metadata),
+                            delimiter,
+                            'Content-Type: application/pdf\r\n',
+                            'Content-Transfer-Encoding: base64\r\n\r\n',
+                            btoa(binary),
+                            close_delim
+                        ], { type: `multipart/related; boundary="${boundary}"` });
+                        
+                        const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink', {
+                            method: 'POST',
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            },
+                            body: metadataBlob
+                        });
+                        
+                        if (uploadRes.ok) {
+                            const resJson = await uploadRes.json();
+                            console.log('[Drive] PDF salvo no Drive:', resJson.name);
+                        }
+                    };
+                    reader.readAsBinaryString(pdfBlob);
+                } catch (e) {
+                    console.warn('[Drive] Aviso ao enviar PDF para o Drive:', e);
+                }
+            },
+            
+            async sync() {
+                const token = await this.getToken();
+                if (!token) {
+                    await this.connect(true);
+                    return;
+                }
+                showLoading('Sincronizando com o Google Drive...');
+                try {
+                    await this.loadObrasFromDrive();
+                    await this.syncObrasToDrive();
+                    hideLoading();
+                    alert(`☁️ Sincronização concluída com sucesso! ${data.obras.length} obras salvas no seu Google Drive.`);
+                } catch (e) {
+                    hideLoading();
+                    alert('Erro na sincronização: ' + e.message);
+                }
+            },
+            
+            openDriveFolder() {
+                if (this.folderId) {
+                    window.open(`https://drive.google.com/drive/folders/${this.folderId}`, '_blank');
+                } else if (this.accessToken) {
+                    this.getOrCreateFolder(this.accessToken).then(id => {
+                        if (id) window.open(`https://drive.google.com/drive/folders/${id}`, '_blank');
+                    });
+                } else {
+                    if (confirm('Seu Google Drive ainda não foi conectado. Deseja conectar agora para abrir a pasta de obras?')) {
+                        this.connect(true);
+                    }
+                }
+            }
+        };
+
+        // --- OBRAS MANAGEMENT MODULE ---
+        function updateObrasTable() {
+            const tbody = document.getElementById('obras-table-body');
+            const countLabel = document.getElementById('obras-count-label');
+            if (!tbody) return;
+            
+            const obras = data.obras || [];
+            if (countLabel) {
+                countLabel.textContent = `${obras.length} obra${obras.length === 1 ? '' : 's'} cadastrada${obras.length === 1 ? '' : 's'}`;
+            }
+            
+            if (obras.length === 0) {
+                tbody.innerHTML = `
+                    <tr class="text-slate-500 text-center">
+                        <td colspan="6" class="py-8">
+                            Nenhuma obra cadastrada ainda.<br>
+                            <span class="text-xs text-slate-400">Clique em "Nova Obra" para cadastrar seu primeiro canteiro e autopreencher todos os documentos.</span>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = obras.map(obra => {
+                const funcoesBadge = (obra.funcoes || []).length > 0
+                    ? `<span class="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-white/10">${(obra.funcoes || []).length} funções</span>`
+                    : '';
+                return `
+                    <tr class="border-b border-white/10 hover:bg-white/5 transition-colors">
+                        <td class="py-3.5 pr-2">
+                            <div class="font-bold text-white text-sm flex items-center gap-1.5">
+                                <span>🏗️</span> <span>${escapeHtml(obra.nome)}</span>
+                            </div>
+                            <div class="text-xs text-slate-400 truncate max-w-xs mt-0.5" title="${escapeHtml(obra.endereco)}">
+                                📍 ${escapeHtml(obra.endereco)}
+                            </div>
+                        </td>
+                        <td class="py-3.5 pr-2">
+                            <div class="text-xs font-semibold text-slate-200">${escapeHtml(obra.contratante)}</div>
+                            <div class="text-[11px] text-slate-400 font-mono">${escapeHtml(obra.cnpj)}</div>
+                        </td>
+                        <td class="py-3.5 pr-2">
+                            <div class="text-xs font-medium text-slate-300">${escapeHtml(obra.engenheiro)}</div>
+                            <div class="text-[11px] text-amber-400 font-mono">${escapeHtml(obra.crea)}</div>
+                        </td>
+                        <td class="py-3.5 pr-2">
+                            <div class="text-xs text-slate-200">${escapeHtml(obra.tipo || 'Geral')}</div>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                                <span class="text-[11px] text-cyan-300 font-semibold">👥 ${obra.trabalhadores || '0'} trab.</span>
+                                ${funcoesBadge}
+                            </div>
+                        </td>
+                        <td class="py-3.5 pr-2">
+                            <div class="text-[11px] text-slate-400">
+                                <div><span class="text-slate-500">Início:</span> ${formatDate(obra.data_inicio)}</div>
+                                <div><span class="text-slate-500">Término:</span> ${formatDate(obra.data_fim)}</div>
+                            </div>
+                        </td>
+                        <td class="py-3.5 text-right">
+                            <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                                <button type="button" onclick="gerarDocDaObra(${obra.id}, 'pcmat')" class="px-2.5 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer" title="Gerar PCMAT desta obra">
+                                    <span>📄</span> <span>PCMAT</span>
+                                </button>
+                                <button type="button" onclick="gerarDocDaObra(${obra.id}, 'pgr')" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer" title="Gerar PGR desta obra">
+                                    <span>🦺</span> <span>PGR</span>
+                                </button>
+                                <button type="button" onclick="gerarDocDaObra(${obra.id}, 'apr')" class="px-2.5 py-1 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 border border-yellow-500/30 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer" title="Gerar APR desta obra">
+                                    <span>⚠️</span> <span>APR</span>
+                                </button>
+                                <button type="button" onclick="editObra(${obra.id})" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-all cursor-pointer" title="Editar Obra">
+                                    <span>✏️</span>
+                                </button>
+                                <button type="button" onclick="deleteObra(${obra.id})" class="p-1.5 text-red-400 hover:text-red-300 rounded-lg hover:bg-red-500/10 transition-all cursor-pointer" title="Excluir Obra">
+                                    <span>🗑️</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function updateObrasSelects() {
+            const selects = [
+                document.getElementById('select-obra-pgr'),
+                document.getElementById('select-obra-pcmat'),
+                document.getElementById('select-obra-apr')
+            ];
+            
+            const obras = data.obras || [];
+            
+            selects.forEach(sel => {
+                if (!sel) return;
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="">-- Selecione uma Obra Cadastrada --</option>' +
+                    obras.map(o => `<option value="${o.id}">${escapeHtml(o.nome)} (${escapeHtml(o.contratante)})</option>`).join('');
+                if (currentVal) sel.value = currentVal;
+            });
+        }
+        
+        function saveObra(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const funcoes = [];
+            form.querySelectorAll('input[name="funcoes"]:checked').forEach(cb => funcoes.push(cb.value));
+            
+            const obraIdVal = document.getElementById('obra-form-id').value;
+            const isEditing = !!obraIdVal;
+            
+            const obraData = {
+                id: isEditing ? parseInt(obraIdVal, 10) : Date.now(),
+                nome: (formData.get('nome_obra') || '').trim(),
+                contratante: (formData.get('contratante') || '').trim(),
+                cnpj: (formData.get('cnpj') || '').trim(),
+                tipo: formData.get('tipo_obra') || '',
+                endereco: (formData.get('endereco') || '').trim(),
+                trabalhadores: parseInt(formData.get('trabalhadores') || '1', 10),
+                grau_risco: formData.get('grau_risco') || 'Grau 3',
+                cnae: (formData.get('cnae') || '').trim(),
+                data_inicio: formData.get('data_inicio') || '',
+                data_fim: formData.get('data_fim') || '',
+                engenheiro: (formData.get('engenheiro') || '').trim(),
+                crea: (formData.get('crea') || '').trim(),
+                funcoes: funcoes,
+                observacoes: (formData.get('observacoes') || '').trim(),
+                atualizado_em: new Date().toISOString()
+            };
+            
+            if (!obraData.nome || !obraData.contratante || !obraData.endereco) {
+                alert('Preencha os campos obrigatórios da obra (Nome, Contratante e Endereço).');
+                return;
+            }
+            
+            if (isEditing) {
+                const idx = data.obras.findIndex(o => o.id === obraData.id);
+                if (idx !== -1) {
+                    data.obras[idx] = obraData;
+                } else {
+                    data.obras.push(obraData);
+                }
+            } else {
+                obraData.criado_em = new Date().toISOString();
+                data.obras.push(obraData);
+            }
+            
+            localStorage.setItem('safework_obras', JSON.stringify(data.obras));
+            closeModal('obra-modal');
+            form.reset();
+            document.getElementById('obra-form-id').value = '';
+            document.getElementById('obra-modal-title').textContent = 'Cadastrar Nova Obra';
+            
+            updateObrasTable();
+            updateObrasSelects();
+            
+            // Sincroniza em segundo plano com o Google Drive
+            SafeWorkDrive.syncObrasToDrive();
+            
+            alert(isEditing ? '✅ Obra atualizada com sucesso!' : '✅ Obra cadastrada com sucesso! Agora você pode gerar PCMAT, PGR e APR instantaneamente.');
+        }
+        
+        function editObra(id) {
+            const obra = (data.obras || []).find(o => o.id === id);
+            if (!obra) return;
+            
+            document.getElementById('obra-form-id').value = obra.id;
+            document.getElementById('obra-modal-title').textContent = `Editar Obra: ${obra.nome}`;
+            
+            document.getElementById('obra-form-nome').value = obra.nome || '';
+            document.getElementById('obra-form-contratante').value = obra.contratante || '';
+            document.getElementById('obra-form-cnpj').value = obra.cnpj || '';
+            document.getElementById('obra-form-tipo').value = obra.tipo || '';
+            document.getElementById('obra-form-endereco').value = obra.endereco || '';
+            document.getElementById('obra-form-trabalhadores').value = obra.trabalhadores || 1;
+            document.getElementById('obra-form-grau').value = obra.grau_risco || 'Grau 3';
+            document.getElementById('obra-form-cnae').value = obra.cnae || '';
+            document.getElementById('obra-form-inicio').value = obra.data_inicio || '';
+            document.getElementById('obra-form-fim').value = obra.data_fim || '';
+            document.getElementById('obra-form-engenheiro').value = obra.engenheiro || '';
+            document.getElementById('obra-form-crea').value = obra.crea || '';
+            document.getElementById('obra-form-obs').value = obra.observacoes || '';
+            
+            // Checkboxes de funções
+            const formFuncoes = document.getElementById('obra-form-funcoes');
+            if (formFuncoes) {
+                const checks = formFuncoes.querySelectorAll('input[type="checkbox"]');
+                checks.forEach(cb => {
+                    cb.checked = (obra.funcoes || []).includes(cb.value);
+                });
+            }
+            
+            openModal('obra-modal');
+        }
+        
+        function deleteObra(id) {
+            const obra = (data.obras || []).find(o => o.id === id);
+            const nome = obra ? obra.nome : 'esta obra';
+            if (confirm(`Deseja realmente excluir "${nome}"? Ela deixará de aparecer para autopreenchimento nos novos laudos.`)) {
+                data.obras = (data.obras || []).filter(o => o.id !== id);
+                localStorage.setItem('safework_obras', JSON.stringify(data.obras));
+                updateObrasTable();
+                updateObrasSelects();
+                SafeWorkDrive.syncObrasToDrive();
+            }
+        }
+        
+        function preencherCamposComObra(obraId, modalType) {
+            if (!obraId) return;
+            const obra = (data.obras || []).find(o => String(o.id) === String(obraId));
+            if (!obra) return;
+            
+            if (modalType === 'pgr') {
+                const form = document.getElementById('pgr-form');
+                if (!form) return;
+                if (form.querySelector('input[name="empresa"]')) form.querySelector('input[name="empresa"]').value = obra.contratante;
+                if (form.querySelector('input[name="cnpj"]')) form.querySelector('input[name="cnpj"]').value = obra.cnpj;
+                if (form.querySelector('input[name="endereco"]')) form.querySelector('input[name="endereco"]').value = obra.endereco;
+                if (form.querySelector('select[name="ramo"]')) form.querySelector('select[name="ramo"]').value = 'Construção Civil';
+                if (form.querySelector('input[name="funcionarios"]')) form.querySelector('input[name="funcionarios"]').value = obra.trabalhadores;
+                if (form.querySelector('input[name="responsavel"]')) form.querySelector('input[name="responsavel"]').value = obra.engenheiro;
+                if (form.querySelector('input[name="crea"]')) form.querySelector('input[name="crea"]').value = obra.crea;
+                if (form.querySelector('textarea[name="plano_acao"]')) {
+                    const extra = `Obra: ${obra.nome} | Tipo: ${obra.tipo} | Funções ativas: ${(obra.funcoes || []).join(', ')}. ${obra.observacoes || ''}`;
+                    form.querySelector('textarea[name="plano_acao"]').value = extra.trim();
+                }
+                form.querySelectorAll('input[name="riscos"]').forEach(cb => {
+                    if (['Físico', 'Acidente', 'Altura', 'Elétrico', 'Ergonômico'].includes(cb.value)) {
+                        cb.checked = true;
+                    }
+                });
+            } else if (modalType === 'pcmat') {
+                const form = document.getElementById('pcmat-form');
+                if (!form) return;
+                if (form.querySelector('input[name="obra"]')) form.querySelector('input[name="obra"]').value = obra.nome;
+                if (form.querySelector('input[name="contratante"]')) form.querySelector('input[name="contratante"]').value = obra.contratante;
+                if (form.querySelector('input[name="endereco"]')) form.querySelector('input[name="endereco"]').value = obra.endereco;
+                if (form.querySelector('select[name="tipo_obra"]')) {
+                    const sel = form.querySelector('select[name="tipo_obra"]');
+                    const match = Array.from(sel.options).find(opt => obra.tipo.toLowerCase().includes(opt.value.toLowerCase()));
+                    if (match) sel.value = match.value;
+                    else sel.value = 'Edificação';
+                }
+                if (form.querySelector('input[name="trabalhadores"]')) form.querySelector('input[name="trabalhadores"]').value = obra.trabalhadores;
+                if (form.querySelector('input[name="data_inicio"]')) form.querySelector('input[name="data_inicio"]').value = obra.data_inicio;
+                if (form.querySelector('input[name="data_fim"]')) form.querySelector('input[name="data_fim"]').value = obra.data_fim;
+                if (form.querySelector('input[name="engenheiro"]')) form.querySelector('input[name="engenheiro"]').value = obra.engenheiro;
+                if (form.querySelector('input[name="crea"]')) form.querySelector('input[name="crea"]').value = obra.crea;
+                if (form.querySelector('textarea[name="medidas"]')) {
+                    form.querySelector('textarea[name="medidas"]').value = obra.observacoes || '';
+                }
+                form.querySelectorAll('input[name="funcoes"]').forEach(cb => {
+                    cb.checked = (obra.funcoes || []).some(f => f.toLowerCase() === cb.value.toLowerCase());
+                });
+            } else if (modalType === 'apr') {
+                const form = document.getElementById('apr-form');
+                if (!form) return;
+                if (form.querySelector('input[name="atividade"]')) form.querySelector('input[name="atividade"]').value = `Execução de Obras e Serviços Civis - ${obra.nome}`;
+                if (form.querySelector('input[name="local"]')) form.querySelector('input[name="local"]').value = `${obra.nome} (${obra.endereco})`;
+                if (form.querySelector('input[name="responsavel"]')) form.querySelector('input[name="responsavel"]').value = `${obra.engenheiro} (${obra.crea})`;
+                if (form.querySelector('input[name="data"]')) form.querySelector('input[name="data"]').value = new Date().toISOString().split('T')[0];
+                if (form.querySelector('select[name="tipo_servico"]')) form.querySelector('select[name="tipo_servico"]').value = 'Trabalho em Altura';
+                if (form.querySelector('select[name="nivel_risco"]')) form.querySelector('select[name="nivel_risco"]').value = 'Médio';
+                if (form.querySelector('textarea[name="riscos"]')) {
+                    form.querySelector('textarea[name="riscos"]').value = `Queda de nível, projeção de partículas, ruído excessivo, choque elétrico e prensamento de membros em canteiro de obras (${(obra.funcoes || []).join(', ')}).`;
+                }
+                if (form.querySelector('textarea[name="medidas"]')) {
+                    form.querySelector('textarea[name="medidas"]').value = `Uso obrigatório de cinto de segurança tipo paraquedista ancorado em linha de vida, guarda-corpos NR-18, aterramento elétrico DR 30mA, isolamento da área sob andaimes.`;
+                }
+                form.querySelectorAll('input[name="epis"]').forEach(cb => {
+                    if (['Capacete', 'Óculos', 'Luvas', 'Botina', 'Cinto'].includes(cb.value)) {
+                        cb.checked = true;
+                    }
+                });
+            }
+        }
+        
+        function gerarDocDaObra(obraId, docType) {
+            checkAuthAndOpen(`${docType}-modal`);
+            setTimeout(() => {
+                const sel = document.getElementById(`select-obra-${docType}`);
+                if (sel) {
+                    sel.value = String(obraId);
+                    preencherCamposComObra(obraId, docType);
+                }
+            }, 100);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
         // Loading Functions
         function showLoading(message = 'Analisando dados e criando conteúdo profissional...') {
@@ -1778,6 +2758,7 @@ if (empty($_SESSION['api_token'])) {
             // Update mobile header current section title
             const sectionTitles = {
                 'dashboard': 'Dashboard',
+                'obras': 'Minhas Obras',
                 'pgr': 'PGR (NR-01)',
                 'pcmat': 'PCMAT (NR-18)',
                 'apr': 'APR Digital',
@@ -2293,6 +3274,8 @@ if (empty($_SESSION['api_token'])) {
 
         // Update Stats
         function updateStats() {
+            const statObrasEl = document.getElementById('stat-obras');
+            if (statObrasEl) statObrasEl.textContent = (data.obras || []).length;
             document.getElementById('stat-pgr').textContent = data.pgr.length;
             document.getElementById('stat-apr').textContent = data.apr.length;
             document.getElementById('stat-train').textContent = data.treinamentos.length;
@@ -2503,210 +3486,309 @@ if (empty($_SESSION['api_token'])) {
             return parts.join(' | ');
         }
 
-        // PDF Generation with AI Content
+        // PDF Generation with AI Content (Formatação Executiva Multi-página NR-18 / NR-01)
         function generateAIPDF(type, item) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            const aiContent = item.aiContent;
+            const aiContent = item.aiContent || {};
+            const primaryColor = [15, 23, 42];    // Slate 900
+            const accentColor = [245, 158, 11];   // Amber 500
+            const secondaryColor = [30, 58, 95]; // SafeWork Blue
             
-            // Header
-            doc.setFillColor(30, 58, 95);
-            doc.rect(0, 0, 210, 40, 'F');
+            // --- HEADER CAPA / TOPO (PÁGINA 1) ---
+            doc.setFillColor(...primaryColor);
+            doc.rect(0, 0, 210, 42, 'F');
             
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(20);
+            doc.setFillColor(...accentColor);
+            doc.rect(0, 42, 210, 2.5, 'F');
+            
+            // Selo / Categoria
+            doc.setTextColor(245, 158, 11);
+            doc.setFontSize(8);
             doc.setFont('helvetica', 'bold');
+            doc.text('SAFEWORK PRO  •  DOCUMENTO TÉCNICO OFICIAL DE ENGENHARIA DE SEGURANÇA', 105, 12, { align: 'center' });
             
-            if (aiContent && aiContent.titulo) {
-                const titleLines = doc.splitTextToSize(aiContent.titulo, 170);
-                doc.text(titleLines, 105, 18, { align: 'center' });
-                if (aiContent.subtitulo) {
-                    doc.setFontSize(10);
-                    doc.text(aiContent.subtitulo, 105, 35, { align: 'center' });
-                }
-            } else {
-                doc.text(type, 105, 25, { align: 'center' });
-            }
+            // Título Principal
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(15);
+            doc.setFont('helvetica', 'bold');
+            const docTitle = aiContent.titulo || (
+                type === 'PCMAT' ? 'PLANO DE CONDIÇÕES E MEIO AMBIENTE DE TRABALHO (PCMAT - NR-18)' :
+                type === 'PGR' ? 'PROGRAMA DE GERENCIAMENTO DE RISCOS (PGR - NR-01)' :
+                type === 'APR' ? 'ANÁLISE PRELIMINAR DE RISCO (APR OPERACIONAL)' : type
+            );
+            const titleLines = doc.splitTextToSize(docTitle, 180);
+            doc.text(titleLines, 105, 22, { align: 'center' });
             
-            doc.setTextColor(0, 0, 0);
-            let y = 55;
+            // Subtítulo
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(203, 213, 225);
+            const subTitle = aiContent.subtitulo || 'Elaborado em estrita conformidade com as Normas Regulamentadoras do Ministério do Trabalho e Emprego';
+            doc.text(subTitle, 105, 36, { align: 'center' });
             
-            // Content from AI
-            if (aiContent && aiContent.secoes) {
+            // --- BOX DE METADADOS DA OBRA / EMPRESA ---
+            let y = 52;
+            doc.setFillColor(248, 250, 252);
+            doc.setDrawColor(226, 232, 240);
+            doc.roundedRect(15, y, 180, 28, 2, 2, 'FD');
+            
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...secondaryColor);
+            
+            const empresaNome = item.empresa || item.contratante || 'Não especificada';
+            const cnpjNum = item.cnpj || 'Não cadastrado';
+            const obraNome = item.obra || item.local || 'Canteiro Central';
+            const endObra = item.endereco || 'Endereço operacional';
+            const respTec = item.responsavel || item.engenheiro || 'Eng. de Segurança do Trabalho';
+            const creaNum = item.crea || 'Habilitado';
+            const dataEmissao = new Date().toLocaleDateString('pt-BR');
+            const dataValidade = item.validade ? formatDate(item.validade) : (item.data_fim ? formatDate(item.data_fim) : '12 meses');
+            
+            doc.text('DADOS DO EMPREENDIMENTO & RESPONSABILIDADE TÉCNICA', 20, y + 6);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(51, 65, 85);
+            doc.text(`Empresa/Contratante: ${empresaNome} (CNPJ: ${cnpjNum})`, 20, y + 12);
+            doc.text(`Obra/Canteiro: ${obraNome} - End: ${endObra}`.substring(0, 95), 20, y + 17);
+            doc.text(`Responsável Técnico: ${respTec} | Registro: ${creaNum}`, 20, y + 22);
+            doc.text(`Emissão: ${dataEmissao} | Validade Técnica: ${dataValidade}`, 125, y + 22);
+            
+            y += 36;
+            
+            // --- SEÇÕES GERADAS PELA IA ---
+            if (aiContent && aiContent.secoes && Array.isArray(aiContent.secoes)) {
                 aiContent.secoes.forEach(secao => {
-                    if (y > 250) {
+                    if (y > 245) {
                         doc.addPage();
-                        y = 20;
+                        y = 25;
                     }
                     
-                    // Section title
-                    doc.setFontSize(12);
+                    // Barra de destaque e título da seção
+                    doc.setFillColor(...accentColor);
+                    doc.rect(15, y - 4, 3, 8, 'F');
+                    
+                    doc.setFontSize(11);
                     doc.setFont('helvetica', 'bold');
-                    doc.setTextColor(30, 58, 95);
+                    doc.setTextColor(...primaryColor);
                     const tituloSecao = secao.numero ? `${secao.numero}. ${secao.titulo}` : secao.titulo;
-                    doc.text(tituloSecao, 20, y);
-                    y += 8;
+                    doc.text(tituloSecao, 22, y + 2);
+                    y += 9;
                     
-                    doc.setFontSize(10);
+                    // Conteúdo em parágrafo
+                    doc.setFontSize(9.5);
                     doc.setFont('helvetica', 'normal');
-                    doc.setTextColor(0, 0, 0);
+                    doc.setTextColor(30, 41, 59);
                     
-                    // Section content
                     if (secao.conteudo) {
                         const conteudoText = objectToText(secao.conteudo);
-                        const lines = doc.splitTextToSize(conteudoText, 170);
+                        const lines = doc.splitTextToSize(conteudoText, 175);
                         lines.forEach(line => {
-                            if (y > 280) {
-                                doc.addPage();
-                                y = 20;
-                            }
-                            doc.text(line, 20, y);
-                            y += 5;
-                        });
-                        y += 3;
-                    }
-                    
-                    // Section items (bullets)
-                    if (secao.itens && secao.itens.length > 0) {
-                        secao.itens.forEach(itemData => {
                             if (y > 275) {
                                 doc.addPage();
-                                y = 20;
+                                y = 25;
                             }
-                            const itemText = objectToText(itemData);
-                            const itemLines = doc.splitTextToSize(`• ${itemText}`, 165);
-                            itemLines.forEach(line => {
-                                if (y > 280) {
-                                    doc.addPage();
-                                    y = 20;
-                                }
-                                doc.text(line, 25, y);
-                                y += 5;
-                            });
+                            doc.text(line, 18, y);
+                            y += 4.8;
                         });
-                        y += 3;
+                        y += 2.5;
                     }
                     
-                    // Handle tables if present
+                    // Itens com marcadores estilizados
+                    if (secao.itens && secao.itens.length > 0) {
+                        secao.itens.forEach(itemData => {
+                            if (y > 272) {
+                                doc.addPage();
+                                y = 25;
+                            }
+                            const itemText = objectToText(itemData);
+                            const itemLines = doc.splitTextToSize(itemText, 168);
+                            
+                            doc.setTextColor(...accentColor);
+                            doc.text('▸', 18, y);
+                            doc.setTextColor(30, 41, 59);
+                            
+                            itemLines.forEach((line, idx) => {
+                                if (y > 275) {
+                                    doc.addPage();
+                                    y = 25;
+                                }
+                                doc.text(line, 23, y);
+                                y += 4.5;
+                            });
+                        });
+                        y += 2.5;
+                    }
+                    
+                    // Tabela estruturada (se presente)
                     if (secao.tabela && secao.tabela.cabecalho && secao.tabela.linhas) {
-                        if (y > 240) {
+                        if (y > 230) {
                             doc.addPage();
-                            y = 20;
+                            y = 25;
                         }
                         
                         const headers = secao.tabela.cabecalho;
-                        const colWidth = 170 / headers.length;
+                        const colWidth = 175 / headers.length;
                         
-                        // Table header
-                        doc.setFillColor(240, 240, 240);
-                        doc.rect(20, y - 4, 170, 8, 'F');
+                        // Cabeçalho da tabela
+                        doc.setFillColor(30, 41, 59);
+                        doc.rect(15, y - 4, 175, 7.5, 'F');
                         doc.setFont('helvetica', 'bold');
                         doc.setFontSize(8);
+                        doc.setTextColor(255, 255, 255);
                         headers.forEach((header, idx) => {
-                            doc.text(String(header).substring(0, 15), 22 + (idx * colWidth), y);
+                            doc.text(String(header).substring(0, 18), 17 + (idx * colWidth), y + 1);
                         });
-                        y += 8;
+                        y += 7.5;
                         
-                        // Table rows
+                        // Linhas da tabela com zebra
                         doc.setFont('helvetica', 'normal');
-                        secao.tabela.linhas.forEach(row => {
-                            if (y > 280) {
+                        doc.setFontSize(8);
+                        secao.tabela.linhas.forEach((row, rowIdx) => {
+                            if (y > 272) {
                                 doc.addPage();
-                                y = 20;
+                                y = 25;
                             }
+                            if (rowIdx % 2 === 0) {
+                                doc.setFillColor(248, 250, 252);
+                                doc.rect(15, y - 4, 175, 6.5, 'F');
+                            }
+                            doc.setDrawColor(226, 232, 240);
+                            doc.line(15, y + 2.5, 190, y + 2.5);
+                            
+                            doc.setTextColor(30, 41, 59);
                             if (Array.isArray(row)) {
                                 row.forEach((cell, idx) => {
-                                    const cellText = objectToText(cell).substring(0, 20);
-                                    doc.text(cellText, 22 + (idx * colWidth), y);
+                                    const cellText = objectToText(cell).substring(0, 26);
+                                    doc.text(cellText, 17 + (idx * colWidth), y);
                                 });
                             }
-                            y += 6;
+                            y += 6.5;
                         });
-                        y += 5;
+                        y += 4;
                     }
                     
-                    // Handle subsections
+                    // Subseções
                     if (secao.subsecoes && Array.isArray(secao.subsecoes)) {
                         secao.subsecoes.forEach(sub => {
-                            if (y > 270) {
+                            if (y > 265) {
                                 doc.addPage();
-                                y = 20;
+                                y = 25;
                             }
                             doc.setFont('helvetica', 'bold');
-                            doc.setFontSize(10);
-                            doc.text(`  ${sub.titulo || ''}`, 20, y);
-                            y += 6;
+                            doc.setFontSize(9.5);
+                            doc.setTextColor(...secondaryColor);
+                            doc.text(`§ ${sub.titulo || ''}`, 20, y);
+                            y += 5;
                             
                             doc.setFont('helvetica', 'normal');
                             doc.setFontSize(9);
+                            doc.setTextColor(51, 65, 85);
                             if (sub.conteudo) {
-                                const subLines = doc.splitTextToSize(objectToText(sub.conteudo), 165);
+                                const subLines = doc.splitTextToSize(objectToText(sub.conteudo), 170);
                                 subLines.forEach(line => {
-                                    if (y > 280) {
+                                    if (y > 275) {
                                         doc.addPage();
-                                        y = 20;
+                                        y = 25;
                                     }
-                                    doc.text(line, 25, y);
-                                    y += 5;
+                                    doc.text(line, 22, y);
+                                    y += 4.5;
                                 });
                             }
-                            y += 3;
+                            y += 2.5;
                         });
                     }
                     
-                    y += 5;
+                    y += 4;
                 });
             } else {
-                // Fallback: basic info
-                doc.setFontSize(11);
+                // Fallback básico estruturado
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(30, 41, 59);
                 if (type === 'PGR') {
-                    doc.text(`Empresa: ${item.empresa}`, 20, y); y += 7;
-                    doc.text(`CNPJ: ${item.cnpj}`, 20, y); y += 7;
-                    doc.text(`Endereço: ${item.endereco}`, 20, y); y += 7;
-                    doc.text(`Responsável: ${item.responsavel}`, 20, y); y += 7;
-                    doc.text(`Riscos: ${item.riscos.join(', ')}`, 20, y);
+                    doc.text(`Empresa: ${item.empresa}`, 20, y); y += 6;
+                    doc.text(`CNPJ: ${item.cnpj}`, 20, y); y += 6;
+                    doc.text(`Endereço: ${item.endereco}`, 20, y); y += 6;
+                    doc.text(`Responsável: ${item.responsavel}`, 20, y); y += 6;
+                    doc.text(`Riscos: ${(item.riscos || []).join(', ')}`, 20, y); y += 6;
                 } else if (type === 'PCMAT') {
-                    doc.text(`Obra: ${item.obra}`, 20, y); y += 7;
-                    doc.text(`Contratante: ${item.contratante}`, 20, y); y += 7;
-                    doc.text(`Endereço: ${item.endereco}`, 20, y); y += 7;
-                    doc.text(`Engenheiro: ${item.engenheiro}`, 20, y);
+                    doc.text(`Obra: ${item.obra}`, 20, y); y += 6;
+                    doc.text(`Contratante: ${item.contratante}`, 20, y); y += 6;
+                    doc.text(`Endereço: ${item.endereco}`, 20, y); y += 6;
+                    doc.text(`Engenheiro: ${item.engenheiro}`, 20, y); y += 6;
                 } else if (type === 'APR') {
-                    doc.text(`Atividade: ${item.atividade}`, 20, y); y += 7;
-                    doc.text(`Local: ${item.local}`, 20, y); y += 7;
-                    doc.text(`Responsável: ${item.responsavel}`, 20, y); y += 7;
-                    doc.text(`Nível de Risco: ${item.nivel_risco}`, 20, y);
+                    doc.text(`Atividade: ${item.atividade}`, 20, y); y += 6;
+                    doc.text(`Local: ${item.local}`, 20, y); y += 6;
+                    doc.text(`Responsável: ${item.responsavel}`, 20, y); y += 6;
+                    doc.text(`Nível de Risco: ${item.nivel_risco}`, 20, y); y += 6;
                 }
             }
             
-            // Signature area
-            y = Math.max(y + 20, 240);
-            if (y > 260) {
+            // --- CAMPO FORMAL DE ASSINATURAS ---
+            y = Math.max(y + 15, 235);
+            if (y > 250) {
                 doc.addPage();
-                y = 40;
+                y = 45;
             }
             
-            doc.setDrawColor(0);
+            doc.setDrawColor(148, 163, 184);
             doc.setLineWidth(0.5);
-            doc.line(20, y, 90, y);
-            doc.line(120, y, 190, y);
+            doc.line(20, y, 95, y);
+            doc.line(115, y, 190, y);
             
-            doc.setFontSize(9);
-            doc.setTextColor(0, 0, 0);
-            doc.text('Responsável Técnico', 55, y + 6, { align: 'center' });
-            doc.text('Representante da Empresa', 155, y + 6, { align: 'center' });
+            doc.setFontSize(8.5);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...primaryColor);
+            doc.text(respTec, 57.5, y + 5, { align: 'center' });
+            doc.text(empresaNome, 152.5, y + 5, { align: 'center' });
             
-            // Footer on all pages
-            const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Responsável Técnico - CREA: ${creaNum}`, 57.5, y + 9, { align: 'center' });
+            doc.text('Representante Legal / Contratante', 152.5, y + 9, { align: 'center' });
+            
+            // --- RODAPÉ E PAGINAÇÃO PROFISSIONAL EM TODAS AS PÁGINAS ---
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
                 doc.setPage(i);
-                doc.setFontSize(8);
-                doc.setTextColor(128, 128, 128);
-                doc.text(`Página ${i} de ${pageCount}`, 105, 290, { align: 'center' });
-                doc.text(`Documento gerado em ${new Date().toLocaleDateString('pt-BR')} - SafeWork Pro`, 105, 295, { align: 'center' });
+                
+                // Cabeçalho corrido nas páginas subsequentes
+                if (i > 1) {
+                    doc.setFontSize(7.5);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(148, 163, 184);
+                    doc.text(`${type} - ${obraNome} (${empresaNome})`, 18, 12);
+                    doc.text('SafeWork Pro Engenharia', 190, 12, { align: 'right' });
+                    doc.setDrawColor(226, 232, 240);
+                    doc.setLineWidth(0.3);
+                    doc.line(18, 14, 190, 14);
+                }
+                
+                // Linha de rodapé
+                doc.setDrawColor(226, 232, 240);
+                doc.setLineWidth(0.3);
+                doc.line(18, 284, 190, 284);
+                
+                doc.setFontSize(7.5);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100, 116, 139);
+                doc.text(`Documento emitido em ${dataEmissao} via SafeWork Pro Cloud • Conformidade NR-18 / NR-01`, 18, 289);
+                doc.text(`Página ${i} de ${totalPages}`, 190, 289, { align: 'right' });
             }
             
-            doc.save(`${type}_${Date.now()}.pdf`);
+            // Salvar arquivo localmente
+            const cleanDocName = (item.obra || item.empresa || item.atividade || 'Documento').replace(/[^a-zA-Z0-9]/g, '_');
+            const fileName = `${type}_${cleanDocName}_${Date.now()}.pdf`;
+            doc.save(fileName);
+            
+            // Salvar automaticamente no Google Drive se conectado
+            if (SafeWorkDrive.status === 'connected' || SafeWorkDrive.status === 'synced') {
+                SafeWorkDrive.uploadPDF(fileName, doc.output('blob'));
+            }
         }
 
         function generateTermoEPIAI(epi) {
@@ -2849,7 +3931,11 @@ if (empty($_SESSION['api_token'])) {
             doc.setTextColor(128, 128, 128);
             doc.text('SafeWork Pro - Sistema de Segurança do Trabalho', 105, 290, { align: 'center' });
             
-            doc.save(`Termo_EPI_${epi.funcionario.replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+            const fileName = `Termo_EPI_${epi.funcionario.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+            doc.save(fileName);
+            if (SafeWorkDrive.status === 'connected' || SafeWorkDrive.status === 'synced') {
+                SafeWorkDrive.uploadPDF(fileName, doc.output('blob'));
+            }
         }
 
         function generateCertificadoAI(t) {
@@ -2956,11 +4042,18 @@ if (empty($_SESSION['api_token'])) {
             doc.line(162, 182, 242, 182);
             doc.text('Responsável Técnico', 202, 188, { align: 'center' });
             
-            doc.save(`Certificado_${t.funcionario.replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+            const fileName = `Certificado_${t.funcionario.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+            doc.save(fileName);
+            if (SafeWorkDrive.status === 'connected' || SafeWorkDrive.status === 'synced') {
+                SafeWorkDrive.uploadPDF(fileName, doc.output('blob'));
+            }
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            SafeWorkDrive.init();
+            updateObrasTable();
+            updateObrasSelects();
             updatePGRTable();
             updatePCMATTable();
             updateAPRTable();
@@ -2974,8 +4067,14 @@ if (empty($_SESSION['api_token'])) {
             // Inicializa Google OAuth 2.0
             initGoogleAuth();
             
+            // Se já tem token do Drive, carrega obras em nuvem
+            if (SafeWorkDrive.accessToken) {
+                SafeWorkDrive.loadObrasFromDrive();
+            }
+            
             // Set current year in footer
-            document.getElementById('ano').textContent = new Date().getFullYear();
+            const anoEl = document.getElementById('ano');
+            if (anoEl) anoEl.textContent = new Date().getFullYear();
         });
 
         // --- EASTER EGG LOGO (5 CLIQUES PARA O LOGIN ADMIN) ---
