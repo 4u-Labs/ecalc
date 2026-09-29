@@ -200,57 +200,83 @@
                     </button>
                 </div>
 
-                <form id="diarioForm" class="space-y-8">
-                    <!-- Data, Horário e Condição da Obra (Item 2) -->
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">📅 Data do Registro</label>
-                            <input type="date" id="dataRegistro" required class="input-style text-lg">
+                <form id="diarioForm" class="space-y-6">
+                    <!-- Linha 1: Data e Horário de Trabalho -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="bg-gray-50/70 p-4 rounded-2xl border border-gray-200/80">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                <span>📅</span> Data do Registro
+                            </label>
+                            <input type="date" id="dataRegistro" required class="input-style text-base font-semibold text-gray-800 bg-white">
                         </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">🕐 Horário de Trabalho</label>
-                            <div class="flex gap-2 items-center">
-                                <input type="time" id="horaInicio" class="input-style text-center" value="07:00">
-                                <span class="text-gray-400 font-bold">às</span>
-                                <input type="time" id="horaFim" class="input-style text-center" value="17:00">
-                            </div>
-                        </div>
-                        <div>
+                        <div class="bg-gray-50/70 p-4 rounded-2xl border border-gray-200/80">
                             <div class="flex items-center justify-between mb-2">
-                                <label class="block text-sm font-bold text-gray-700">🚧 Condição do Canteiro</label>
-                                <span class="text-xs text-gray-400 font-normal">Respaldo CREA</span>
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+                                    <span>🕐</span> Horário de Trabalho
+                                </label>
+                                <span id="badgeJornada" class="text-xs font-bold text-amber-800 bg-amber-100/90 px-2.5 py-0.5 rounded-full shadow-2xs">10h de expediente</span>
                             </div>
-                            <div class="flex gap-2">
-                                <div class="grid grid-cols-3 gap-1.5 flex-1">
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="condicaoObra" value="praticavel" class="hidden peer" checked onchange="atualizarCampoParalisacao()">
-                                        <div class="border-2 border-gray-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-800 rounded-xl py-2 px-1 text-center transition hover:bg-gray-50">
-                                            <span class="text-lg">🟢</span>
-                                            <p class="text-[11px] font-bold mt-0.5">Praticável</p>
-                                        </div>
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="condicaoObra" value="parcial" class="hidden peer" onchange="atualizarCampoParalisacao()">
-                                        <div class="border-2 border-gray-200 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800 rounded-xl py-2 px-1 text-center transition hover:bg-gray-50">
-                                            <span class="text-lg">🟡</span>
-                                            <p class="text-[11px] font-bold mt-0.5">Parcial</p>
-                                        </div>
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="condicaoObra" value="impraticavel" class="hidden peer" onchange="atualizarCampoParalisacao()">
-                                        <div class="border-2 border-gray-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-800 rounded-xl py-2 px-1 text-center transition hover:bg-gray-50">
-                                            <span class="text-lg">🔴</span>
-                                            <p class="text-[11px] font-bold mt-0.5">Impraticável</p>
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="w-24 flex flex-col justify-end" title="Horas paralisadas por intempéries">
-                                    <label class="block text-[10px] font-semibold text-gray-500 mb-1 text-center">⏱️ Paralisação</label>
-                                    <div class="relative">
-                                        <input type="number" id="horasParalisadas" min="0" max="24" step="0.5" value="0" class="input-style text-center font-bold text-red-600 text-sm py-2 px-1">
-                                        <span class="absolute right-2 top-2.5 text-xs text-gray-400 font-bold pointer-events-none">h</span>
+                            <div class="flex gap-2 items-center">
+                                <input type="time" id="horaInicio" class="input-style text-center font-semibold bg-white" value="07:00" onchange="atualizarJornadaBadge()" oninput="atualizarJornadaBadge()">
+                                <span class="text-gray-400 font-bold px-1 text-sm">às</span>
+                                <input type="time" id="horaFim" class="input-style text-center font-semibold bg-white" value="17:00" onchange="atualizarJornadaBadge()" oninput="atualizarJornadaBadge()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Linha 2: Condição do Canteiro (Respaldo CREA) + Paralisação -->
+                    <div class="bg-gradient-to-r from-slate-50 via-gray-50 to-amber-50/30 p-5 rounded-2xl border border-gray-200 shadow-xs">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">🚧</span>
+                                <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wider">Condição do Canteiro de Obras</h4>
+                            </div>
+                            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full w-fit">
+                                <span>⚖️</span> Respaldo Técnico CREA / ART
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">Registro legal da operabilidade do canteiro para justificar cumprimento de prazos ou paralisações decorrentes de chuvas e intempéries.</p>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+                            <!-- 3 Seletores de Condição da Obra -->
+                            <div class="lg:col-span-9 grid grid-cols-3 gap-2.5 sm:gap-3">
+                                <label class="cursor-pointer select-none">
+                                    <input type="radio" name="condicaoObra" value="praticavel" class="hidden peer" checked onchange="atualizarCampoParalisacao()">
+                                    <div class="h-full border-2 border-gray-200 bg-white peer-checked:border-emerald-500 peer-checked:bg-emerald-50/90 peer-checked:shadow-sm rounded-xl p-3 text-center transition-all duration-150 hover:bg-gray-50 hover:border-gray-300 flex flex-col items-center justify-center">
+                                        <span class="text-2xl mb-1">🟢</span>
+                                        <p class="text-xs sm:text-sm font-bold text-gray-800 peer-checked:text-emerald-900">Praticável</p>
+                                        <p class="text-[10px] text-gray-400 peer-checked:text-emerald-700 hidden sm:block mt-0.5 font-medium">Trabalho normal</p>
                                     </div>
+                                </label>
+                                <label class="cursor-pointer select-none">
+                                    <input type="radio" name="condicaoObra" value="parcial" class="hidden peer" onchange="atualizarCampoParalisacao()">
+                                    <div class="h-full border-2 border-gray-200 bg-white peer-checked:border-amber-500 peer-checked:bg-amber-50/90 peer-checked:shadow-sm rounded-xl p-3 text-center transition-all duration-150 hover:bg-gray-50 hover:border-gray-300 flex flex-col items-center justify-center">
+                                        <span class="text-2xl mb-1">🟡</span>
+                                        <p class="text-xs sm:text-sm font-bold text-gray-800 peer-checked:text-amber-900">Parcial</p>
+                                        <p class="text-[10px] text-gray-400 peer-checked:text-amber-700 hidden sm:block mt-0.5 font-medium">Serviços limitados</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer select-none">
+                                    <input type="radio" name="condicaoObra" value="impraticavel" class="hidden peer" onchange="atualizarCampoParalisacao()">
+                                    <div class="h-full border-2 border-gray-200 bg-white peer-checked:border-red-500 peer-checked:bg-red-50/90 peer-checked:shadow-sm rounded-xl p-3 text-center transition-all duration-150 hover:bg-gray-50 hover:border-gray-300 flex flex-col items-center justify-center">
+                                        <span class="text-2xl mb-1">🔴</span>
+                                        <p class="text-xs sm:text-sm font-bold text-gray-800 peer-checked:text-red-900">Impraticável</p>
+                                        <p class="text-[10px] text-gray-400 peer-checked:text-red-700 hidden sm:block mt-0.5 font-medium">Paralisação total</p>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- Campo de Horas Paralisadas -->
+                            <div class="lg:col-span-3 bg-white p-3 rounded-xl border-2 border-gray-200 flex flex-col justify-between" title="Horas paralisadas por intempéries ou chuvas">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-xs font-bold text-gray-700">⏱️ Paralisação</label>
+                                    <span class="text-[10px] text-gray-400 font-medium">Intempéries</span>
                                 </div>
+                                <div class="relative my-auto">
+                                    <input type="number" id="horasParalisadas" min="0" max="24" step="0.5" value="0" class="input-style text-center font-bold text-red-600 text-lg py-2 pr-7 pl-2 bg-gray-50/70 border-gray-300 focus:bg-white">
+                                    <span class="absolute right-3 top-2.5 text-xs text-gray-400 font-bold pointer-events-none">h</span>
+                                </div>
+                                <p class="text-[10px] text-gray-400 text-center mt-1">Horas sem produção</p>
                             </div>
                         </div>
                     </div>
@@ -1515,9 +1541,25 @@
             const inputParal = document.getElementById('horasParalisadas');
             if (!inputParal) return;
             if (radio && radio.value === 'praticavel') {
-                if (parseFloat(inputParal.value) > 0 && confirm('A condição do canteiro é "Praticável". Deseja zerar as horas de paralisação?')) {
+                if (parseFloat(inputParal.value) > 0) {
                     inputParal.value = 0;
                 }
+            } else if (radio && (radio.value === 'parcial' || radio.value === 'impraticavel')) {
+                if (parseFloat(inputParal.value) === 0) {
+                    inputParal.focus();
+                }
+            }
+        }
+
+        // Atualização da tag de jornada de trabalho (ex: 10h de expediente)
+        function atualizarJornadaBadge() {
+            const hi = document.getElementById('horaInicio')?.value;
+            const hf = document.getElementById('horaFim')?.value;
+            const badge = document.getElementById('badgeJornada');
+            if (!badge) return;
+            if (hi && hf && typeof calcularHorasTrabalhadas === 'function') {
+                const horas = calcularHorasTrabalhadas(hi, hf);
+                badge.textContent = `${horas}h de expediente`;
             }
         }
 
@@ -1553,6 +1595,7 @@
             }
 
             setCurrentDate();
+            atualizarJornadaBadge();
             renderEquipeForm();
             renderEquipamentosForm();
             renderFuncoesList();
@@ -1725,6 +1768,7 @@
             document.getElementById('dataRegistro').valueAsDate = new Date();
             document.getElementById('horaInicio').value = registro.horaInicio || '07:00';
             document.getElementById('horaFim').value = registro.horaFim || '17:00';
+            atualizarJornadaBadge();
 
             // Clima e Condição (Item 2)
             const cManha = registro.climaManha || registro.clima || 'ensolarado';
@@ -2314,6 +2358,7 @@
             document.getElementById('dataRegistro').valueAsDate = new Date();
             document.getElementById('horaInicio').value = '07:00';
             document.getElementById('horaFim').value = '17:00';
+            atualizarJornadaBadge();
 
             const mRadio = document.querySelector('input[name="climaManha"][value="ensolarado"]');
             if (mRadio) mRadio.checked = true;
