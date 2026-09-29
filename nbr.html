@@ -223,56 +223,60 @@
     </main>
 
     <!-- Modal de Detalhes -->
-    <div id="detailModal" class="fixed inset-0 bg-black/50 modal-overlay z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden shadow-2xl fade-in flex flex-col">
-            <div id="modalHeader" class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 md:p-5 shrink-0">
+    <div id="detailModal" class="fixed inset-0 bg-black/65 backdrop-blur-sm modal-overlay z-[70] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-start justify-center">
+        <div class="bg-white rounded-2xl max-w-5xl w-full my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-hidden shadow-2xl fade-in flex flex-col border border-gray-200/50">
+            <div id="modalHeader" class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 sm:p-5 shrink-0">
                 <div class="flex items-start justify-between gap-3">
-                    <div class="min-w-0">
+                    <div class="min-w-0 pr-2">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span id="modalBadge" class="bg-white/20 px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide">NBR</span>
-                            <span id="modalCategoria" class="bg-white/15 px-2 py-0.5 rounded-full text-[11px] font-medium">Categoria</span>
-                            <span id="modalMeta" class="hidden sm:inline bg-white/10 px-2 py-0.5 rounded-full text-[11px]">Consulta rápida • resumo técnico</span>
+                            <span id="modalBadge" class="bg-white/25 px-2.5 py-0.5 rounded-full text-xs font-bold tracking-wide shadow-2xs">NBR</span>
+                            <span id="modalCategoria" class="bg-white/15 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">Categoria</span>
+                            <span id="modalMeta" class="hidden sm:inline bg-white/10 px-2.5 py-0.5 rounded-full text-[11px]">Consulta rápida • resumo técnico</span>
                         </div>
-                        <h2 id="modalTitle" class="text-xl md:text-2xl font-extrabold mt-1 leading-tight">NBR 6118</h2>
-                        <p id="modalSubtitle" class="text-white/85 mt-1 text-sm leading-snug">Projeto de estruturas de concreto</p>
+                        <h2 id="modalTitle" class="text-xl sm:text-2xl font-black mt-1.5 leading-tight tracking-tight">NBR 6118</h2>
+                        <p id="modalSubtitle" class="text-white/90 mt-1 text-xs sm:text-sm font-medium leading-snug line-clamp-2">Projeto de estruturas de concreto</p>
                     </div>
 
-                    <div class="no-print modal-actionbar flex items-center gap-2 overflow-x-auto scroll-hide max-w-[56vw] pb-1">
-                        <button onclick="openOfficialReference()" class="bg-white/10 hover:bg-white/20 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-2 tooltip whitespace-nowrap" data-tip="Abrir referência oficial (ABNT/Gov) em nova aba">
-                            <i class="fas fa-up-right-from-square"></i>
-                            <span class="hidden md:inline">Abrir oficial</span>
-                        </button>
-                        <button onclick="openPdfForCurrentNorma()" class="bg-white/10 hover:bg-white/20 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-2 tooltip whitespace-nowrap" data-tip="Abrir PDF anexado (se existir)">
-                            <i class="fas fa-file-pdf"></i>
-                            <span class="hidden md:inline">Abrir PDF</span>
-                        </button>
-                        <label class="bg-white/10 hover:bg-white/20 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-2 cursor-pointer tooltip whitespace-nowrap" data-tip="Anexar PDF desta norma (salvo localmente)">
-                            <i class="fas fa-paperclip"></i>
-                            <span class="hidden md:inline">Anexar</span>
-                            <input id="modalPdfInput" type="file" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event, true)">
-                        </label>
-                        <button onclick="copyLink()" class="bg-white/10 hover:bg-white/20 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-2 whitespace-nowrap">
-                            <i class="fas fa-link"></i>
-                            <span class="hidden md:inline">Copiar link</span>
-                        </button>
-                        <button onclick="printNorma()" class="bg-white/10 hover:bg-white/20 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-2 whitespace-nowrap">
-                            <i class="fas fa-print"></i>
-                            <span class="hidden md:inline">Imprimir</span>
-                        </button>
-                        <button onclick="closeModal()" class="bg-white/10 hover:bg-white/20 h-9 w-9 rounded-xl transition inline-flex items-center justify-center" aria-label="Fechar">
-                            <i class="fas fa-times"></i>
+                    <!-- Botões de Ação + Botão Fechar Isolado (Sempre Visível) -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <div class="no-print modal-actionbar flex items-center gap-1.5 overflow-x-auto scroll-hide max-w-[42vw] sm:max-w-[48vw] pb-0.5">
+                            <button onclick="openOfficialReference()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 tooltip whitespace-nowrap cursor-pointer shadow-2xs" data-tip="Abrir referência oficial (ABNT/Gov) em nova aba">
+                                <i class="fas fa-up-right-from-square text-xs"></i>
+                                <span class="hidden md:inline font-semibold">Abrir oficial</span>
+                            </button>
+                            <button onclick="openPdfForCurrentNorma()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 tooltip whitespace-nowrap cursor-pointer shadow-2xs" data-tip="Abrir PDF anexado (se existir)">
+                                <i class="fas fa-file-pdf text-xs"></i>
+                                <span class="hidden md:inline font-semibold">Abrir PDF</span>
+                            </button>
+                            <label class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 cursor-pointer tooltip whitespace-nowrap shadow-2xs" data-tip="Anexar PDF desta norma (salvo localmente)">
+                                <i class="fas fa-paperclip text-xs"></i>
+                                <span class="hidden md:inline font-semibold">Anexar</span>
+                                <input id="modalPdfInput" type="file" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event, true)">
+                            </label>
+                            <button onclick="copyLink()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs" title="Copiar link direto">
+                                <i class="fas fa-link text-xs"></i>
+                                <span class="hidden md:inline font-semibold">Copiar link</span>
+                            </button>
+                            <button onclick="printNorma()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs" title="Imprimir / Salvar PDF">
+                                <i class="fas fa-print text-xs"></i>
+                                <span class="hidden md:inline font-semibold">Imprimir</span>
+                            </button>
+                        </div>
+                        <!-- Botão Fechar Dedicado, Sempre Visível e em Destaque -->
+                        <button onclick="closeModal()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/35 active:scale-95 text-white flex items-center justify-center transition shrink-0 cursor-pointer shadow-sm ml-1" aria-label="Fechar" title="Fechar (Esc)">
+                            <i class="fas fa-times text-base"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="mt-3 flex items-center gap-2 flex-wrap no-print">
-                    <div class="flex-1 min-w-[220px] relative">
-                        <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-white/70"></i>
-                        <input id="modalSearch" type="text" placeholder="Filtrar seções (ex: checklist, rampa, fck, DR, extintor)" class="w-full h-10 bg-white/10 placeholder-white/60 text-white rounded-xl pl-10 pr-3 outline-none focus:ring-2 focus:ring-white/30" oninput="filterModalSections(this.value)">
+                <div class="mt-3.5 flex items-center gap-2 flex-wrap no-print">
+                    <div class="flex-1 min-w-[200px] relative">
+                        <i class="fas fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-white/70 text-xs"></i>
+                        <input id="modalSearch" type="text" placeholder="Filtrar seções (ex: checklist, rampa, fck, DR, extintor)" class="w-full h-9.5 bg-white/15 hover:bg-white/20 placeholder-white/70 text-white text-xs sm:text-sm rounded-xl pl-9 pr-3 outline-none focus:ring-2 focus:ring-white/40 transition" oninput="filterModalSections(this.value)">
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <button onclick="setAllDetails(true)" class="h-10 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs sm:text-sm transition whitespace-nowrap">Expandir tudo</button>
-                        <button onclick="setAllDetails(false)" class="h-10 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs sm:text-sm transition whitespace-nowrap">Recolher tudo</button>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="setAllDetails(true)" class="h-9.5 px-3 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-xs font-semibold transition whitespace-nowrap cursor-pointer">Expandir tudo</button>
+                        <button onclick="setAllDetails(false)" class="h-9.5 px-3 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-xs font-semibold transition whitespace-nowrap cursor-pointer">Recolher tudo</button>
                     </div>
                 </div>
             </div>
@@ -307,8 +311,8 @@
     </div>
 
     <!-- Modal de Ferramentas e Dimensionadores das NRs -->
-    <div id="nrToolsModal" class="fixed inset-0 bg-black/60 modal-overlay z-50 hidden items-center justify-center p-3 sm:p-4">
-        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-hidden shadow-2xl fade-in flex flex-col">
+    <div id="nrToolsModal" class="fixed inset-0 bg-black/65 backdrop-blur-sm modal-overlay z-[70] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-start justify-center">
+        <div class="bg-white rounded-2xl max-w-4xl w-full my-auto max-h-[calc(100vh-2.5rem)] overflow-hidden shadow-2xl fade-in flex flex-col border border-amber-200/40">
             <!-- Modal Header -->
             <div class="bg-gradient-to-r from-amber-600 via-amber-700 to-amber-900 text-white p-4 md:p-5 shrink-0 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -544,8 +548,8 @@
     </div>
 
     <!-- Modal Favoritos -->
-    <div id="favoritesModal" class="fixed inset-0 bg-black/50 modal-overlay z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-hidden shadow-2xl fade-in">
+    <div id="favoritesModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm modal-overlay z-[70] hidden overflow-y-auto p-3 sm:p-6 flex items-start justify-center">
+        <div class="bg-white rounded-2xl max-w-lg w-full my-auto max-h-[calc(100vh-3rem)] overflow-hidden shadow-2xl fade-in flex flex-col">
             <div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white p-6">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -563,8 +567,8 @@
     </div>
 
     <!-- Modal Biblioteca (PDFs/Links oficiais) -->
-    <div id="bibliotecaModal" class="fixed inset-0 bg-black/50 modal-overlay z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden shadow-2xl fade-in">
+    <div id="bibliotecaModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm modal-overlay z-[70] hidden overflow-y-auto p-3 sm:p-6 flex items-start justify-center">
+        <div class="bg-white rounded-2xl max-w-3xl w-full my-auto max-h-[calc(100vh-3rem)] overflow-hidden shadow-2xl fade-in flex flex-col">
             <div class="bg-gradient-to-r from-slate-700 to-slate-900 text-white p-6">
                 <div class="flex items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
@@ -603,8 +607,8 @@
     </div>
 
     <!-- Modal Vincular PDF (quando anexar pela Biblioteca) -->
-    <div id="pdfAssignModal" class="fixed inset-0 bg-black/50 modal-overlay z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl fade-in">
+    <div id="pdfAssignModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm modal-overlay z-[70] hidden overflow-y-auto p-3 sm:p-6 flex items-start justify-center">
+        <div class="bg-white rounded-2xl max-w-lg w-full my-auto max-h-[calc(100vh-3rem)] overflow-hidden shadow-2xl fade-in flex flex-col">
             <div class="bg-gradient-to-r from-slate-700 to-slate-900 text-white p-6">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -636,8 +640,8 @@
     </div>
 
     <!-- Modal Dica do Dia -->
-    <div id="dicaModal" class="fixed inset-0 bg-black/50 modal-overlay z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl fade-in">
+    <div id="dicaModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm modal-overlay z-[70] hidden overflow-y-auto p-3 sm:p-6 flex items-start justify-center">
+        <div class="bg-white rounded-2xl max-w-lg w-full my-auto max-h-[calc(100vh-3rem)] overflow-hidden shadow-2xl fade-in flex flex-col">
             <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 text-center">
                 <div class="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-lightbulb text-3xl"></i>
@@ -661,7 +665,7 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[80]">
         <div class="flex items-center gap-3">
             <i id="toastIcon" class="fas fa-check-circle text-green-400"></i>
             <span id="toastMessage">Ação realizada com sucesso!</span>
@@ -4032,29 +4036,44 @@
             grid.innerHTML = filtered.map(norma => {
                 const isFav = favorites.includes(norma.id);
                 const score = relevanceScore(norma, currentSearch);
-                const scoreBadge = currentSearch ? `<span class="bg-white/20 text-xs px-2 py-1 rounded-full">Relevância: ${score}</span>` : '';
+                const scoreBadge = currentSearch ? `<span class="bg-white/25 text-[11px] font-bold px-2 py-0.5 rounded-full">Score: ${score}</span>` : '';
 
                 return `
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover fade-in cursor-pointer" onclick="openModal('${norma.id}')">
-                        <div class="bg-gradient-to-r ${colors[norma.cor]} p-4 text-white">
-                            <div class="flex items-center justify-between">
-                                <span class="text-2xl">${norma.emoji}</span>
-                                <button onclick="event.stopPropagation(); toggleFavorite('${norma.id}')" class="p-1 hover:bg-white/20 rounded transition" aria-label="Favoritar">
-                                    <i class="${isFav ? 'fas' : 'far'} fa-star text-yellow-300"></i>
+                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200/90 overflow-hidden card-hover fade-in cursor-pointer flex flex-col h-full group transition-all duration-200" onclick="openModal('${norma.id}')">
+                        <div class="bg-gradient-to-r ${colors[norma.cor] || 'from-slate-600 to-slate-800'} p-4 text-white shrink-0 relative overflow-hidden">
+                            <div class="absolute -right-3 -bottom-3 opacity-15 text-6xl select-none pointer-events-none">${norma.emoji}</div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <span class="text-2xl filter drop-shadow-sm">${norma.emoji}</span>
+                                <button onclick="event.stopPropagation(); toggleFavorite('${norma.id}')" class="w-8 h-8 rounded-lg hover:bg-white/25 flex items-center justify-center transition active:scale-90" aria-label="Favoritar" title="Favoritar">
+                                    <i class="${isFav ? 'fas' : 'far'} fa-star text-yellow-300 text-sm"></i>
                                 </button>
                             </div>
-                            <div class="mt-2 flex items-center gap-2 flex-wrap">
-                                <span class="bg-white/20 text-xs px-2 py-1 rounded-full">${norma.tipo}</span>
-                                <span class="bg-white/15 text-xs px-2 py-1 rounded-full">${catLabel[norma.categoria] || norma.categoria}</span>
+                            <div class="mt-2.5 flex items-center gap-1.5 flex-wrap relative z-10">
+                                <span class="bg-white/25 backdrop-blur-xs text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-2xs">${norma.tipo}</span>
+                                <span class="bg-white/15 text-[11px] font-semibold px-2 py-0.5 rounded-full">${catLabel[norma.categoria] || norma.categoria}</span>
                                 ${scoreBadge}
                             </div>
-                            <h3 class="text-lg font-bold mt-2">${norma.codigo}</h3>
+                            <h3 class="text-xl font-black mt-1.5 tracking-tight relative z-10">${norma.codigo}</h3>
                         </div>
-                        <div class="p-4">
-                            <h4 class="font-semibold text-gray-800 mb-2">${norma.nome}</h4>
-                            <p class="text-sm text-gray-600 line-clamp-2">${norma.resumo}</p>
-                            <div class="mt-3 flex flex-wrap gap-1">
-                                ${norma.palavrasChave.slice(0, 4).map(p => `<span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">${p}</span>`).join('')}
+                        <div class="p-4 flex-1 flex flex-col justify-between bg-white">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm sm:text-base leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">${norma.nome}</h4>
+                                <p class="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">${norma.resumo}</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col gap-2.5">
+                                <div class="flex flex-wrap gap-1">
+                                    ${norma.palavrasChave.slice(0, 3).map(p => `<span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full font-medium">${p}</span>`).join('')}
+                                    ${norma.palavrasChave.length > 3 ? `<span class="text-[10px] text-slate-400 self-center font-medium">+${norma.palavrasChave.length - 3}</span>` : ''}
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-slate-400 font-medium pt-0.5">
+                                    <span class="flex items-center gap-1 text-[11px] text-slate-500">
+                                        <i class="fas ${norma.tipo === 'NR' ? 'fa-shield-halved text-amber-500' : 'fa-building text-blue-500'}"></i>
+                                        ${norma.tipo === 'NR' ? 'Norma MTE' : 'Norma ABNT'}
+                                    </span>
+                                    <span class="text-blue-600 font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-xs">
+                                        Ver ficha <i class="fas fa-arrow-right text-[10px]"></i>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -4108,17 +4127,17 @@
 
         function sectionItemList(items, iconClass = 'fas fa-check-circle text-green-500') {
             if (!items || items.length === 0) {
-                return `<p class="text-sm text-gray-500">Sem itens específicos cadastrados para esta seção.</p>`;
+                return `<p class="text-sm text-slate-500 italic py-1">Sem itens específicos cadastrados para esta seção.</p>`;
             }
             return `
-                <ul class="space-y-2">
+                <div class="space-y-2">
                     ${items.map(t => `
-                        <li class="flex items-start gap-2 text-gray-700">
-                            <i class="${iconClass} mt-1 flex-shrink-0"></i>
-                            <span class="text-sm">${escapeHtml(String(t))}</span>
-                        </li>
+                        <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-white border border-slate-200/70 hover:border-slate-300 shadow-2xs transition-colors">
+                            <i class="${iconClass} mt-1 flex-shrink-0 text-sm"></i>
+                            <span class="text-xs sm:text-sm text-slate-700 leading-snug">${escapeHtml(String(t))}</span>
+                        </div>
                     `).join('')}
-                </ul>
+                </div>
             `;
         }
 
@@ -4132,25 +4151,27 @@
         }
 
         function buildDetails(title, subtitle, bodyHtml, iconHtml, open = false, tags = []) {
-            const tagHtml = (tags || []).slice(0, 4).map(t => `<span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">${escapeHtml(t)}</span>`).join('');
+            const tagHtml = (tags || []).slice(0, 4).map(t => `<span class="bg-slate-100 text-slate-600 text-[11px] px-2.5 py-0.5 rounded-full font-medium border border-slate-200/60">${escapeHtml(t)}</span>`).join('');
             return `
-                <details class="group border border-gray-200 rounded-xl overflow-hidden" ${open ? 'open' : ''} data-section>
-                    <summary class="cursor-pointer select-none flex items-start gap-3 p-4 bg-white hover:bg-gray-50 transition">
-                        <div class="mt-0.5">
+                <details class="group bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all duration-200" ${open ? 'open' : ''} data-section>
+                    <summary class="cursor-pointer select-none flex items-start gap-3.5 p-3.5 sm:p-4 bg-white hover:bg-slate-50/80 transition-colors">
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200/70 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
                             ${iconHtml}
                         </div>
-                        <div class="flex-1">
-                            <div class="flex items-start justify-between gap-3">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
                                 <div>
-                                    <h3 class="font-semibold text-gray-900">${escapeHtml(title)}</h3>
-                                    ${subtitle ? `<p class="text-xs text-gray-500 mt-1">${escapeHtml(subtitle)}</p>` : ''}
+                                    <h3 class="font-bold text-slate-900 text-sm sm:text-base leading-tight">${escapeHtml(title)}</h3>
+                                    ${subtitle ? `<p class="text-xs text-slate-500 mt-0.5 leading-snug">${escapeHtml(subtitle)}</p>` : ''}
                                 </div>
-                                <div class="text-gray-400 group-open:rotate-180 transition-transform"><i class="fas fa-chevron-down"></i></div>
+                                <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 group-open:rotate-180 group-open:bg-blue-50 group-open:text-blue-600 group-hover:text-slate-600 transition-all shrink-0 mt-0.5">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
                             </div>
-                            <div class="mt-2 flex flex-wrap gap-2">${tagHtml}</div>
+                            ${tagHtml ? `<div class="mt-2.5 flex flex-wrap gap-1.5">${tagHtml}</div>` : ''}
                         </div>
                     </summary>
-                    <div class="p-4 bg-gray-50 border-t border-gray-200">
+                    <div class="p-4 sm:p-5 bg-slate-50/70 border-t border-slate-200/80 text-sm leading-relaxed">
                         ${bodyHtml}
                     </div>
                 </details>
@@ -4186,18 +4207,18 @@
 
             const tagBlocks = Object.keys(byTag).map(tag => {
                 const cards = byTag[tag].map(it => `
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    <div class="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-2xs hover:border-slate-300 transition-colors">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <div class="text-xs font-semibold text-gray-500">${escapeHtml(tag)}</div>
-                                <div class="mt-1 font-semibold text-gray-900">${escapeHtml(it.item)}</div>
+                                <span class="inline-block text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded">${escapeHtml(tag)}</span>
+                                <div class="mt-1.5 font-bold text-slate-800 text-sm">${escapeHtml(it.item)}</div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-lg font-extrabold text-gray-900">${escapeHtml(it.value)}</div>
-                                <div class="text-[11px] text-gray-500">ref. prática</div>
+                            <div class="text-right shrink-0">
+                                <div class="text-base sm:text-lg font-black text-blue-700 font-mono">${escapeHtml(it.value)}</div>
+                                <div class="text-[10px] text-slate-500 font-medium">ref. técnica</div>
                             </div>
                         </div>
-                        ${it.note ? `<div class="mt-2 text-sm text-gray-700 leading-relaxed">${escapeHtml(it.note)}</div>` : ''}
+                        ${it.note ? `<div class="mt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-2">${escapeHtml(it.note)}</div>` : ''}
                     </div>
                 `).join('');
 
@@ -4296,53 +4317,59 @@
 
             const overview = `
                 <div class="space-y-4">
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs">
                         <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <div class="text-xs text-gray-500">Objetivo</div>
-                                <div class="text-gray-800 mt-1">${escapeHtml(ref.objetivo)}</div>
+                            <div class="flex-1">
+                                <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200/60 uppercase tracking-wider mb-2">
+                                    <i class="fas fa-bullseye text-[10px]"></i> Objetivo Normativo
+                                </span>
+                                <div class="text-slate-800 text-sm sm:text-base font-medium mt-1 leading-relaxed">${escapeHtml(ref.objetivo)}</div>
                             </div>
-                            <button class="text-sm px-3 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition" onclick="copyText(currentReferenciaResumo())">
-                                <i class="fas fa-copy mr-2"></i> Copiar resumo
+                            <button class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 active:scale-95 transition shadow-2xs shrink-0 cursor-pointer" onclick="copyText(currentReferenciaResumo())">
+                                <i class="fas fa-copy mr-1.5"></i> Copiar
                             </button>
                         </div>
                         ${ref.quandoAplicar.length ? `
-                        <div class="mt-4">
-                            <div class="text-xs text-gray-500 mb-2">Quando aplicar</div>
-                            ${sectionItemList(ref.quandoAplicar, 'fas fa-location-dot text-blue-500')}
+                        <div class="mt-4 pt-3 border-t border-slate-100">
+                            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Quando aplicar / Campo de Aplicação</div>
+                            ${sectionItemList(ref.quandoAplicar, 'fas fa-location-dot text-blue-600')}
                         </div>
                         ` : ''}
                     </div>
 
-                    <div class="bg-white border border-gray-200 rounded-xl p-4">
-                        <div class="flex items-center justify-between gap-3 flex-wrap">
-                            <div>
-                                <div class="text-xs text-gray-500">Palavras-chave</div>
-                                <div class="mt-2">${chips}</div>
-                            </div>
-                        </div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Palavras-chave e Indexação</div>
+                        <div>${chips}</div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div class="bg-white border border-gray-200 rounded-xl p-4">
-                            <div class="flex items-center justify-between">
-                                <h4 class="font-semibold text-gray-900">Escopo (resumo)</h4>
-                                <button class="text-gray-700 hover:text-gray-900 text-sm" onclick="copyText('Escopo — ${escapeJs(norma.codigo)}\n\n${escapeJs(content.escopo || '')}')">
-                                    <i class="fas fa-copy"></i>
-                                </button>
+                        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                        <i class="fas fa-file-lines text-blue-600"></i> Escopo Sintético
+                                    </span>
+                                    <button class="text-slate-500 hover:text-slate-800 text-xs font-semibold px-2 py-1 rounded hover:bg-slate-100 transition cursor-pointer" onclick="copyText('Escopo — ' + escapeJs(norma.codigo) + '\n\n' + escapeJs(content.escopo || ''))" title="Copiar escopo">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-700 mt-3 leading-relaxed">${escapeHtml(content.escopo || '—')}</p>
                             </div>
-                            <p class="text-sm text-gray-700 mt-2">${escapeHtml(content.escopo || '—')}</p>
                         </div>
 
-                        <div class="bg-white border border-gray-200 rounded-xl p-4">
-                            <div class="flex items-center justify-between">
-                                <h4 class="font-semibold text-gray-900">Parâmetros rápidos (para consulta)</h4>
-                                <button class="text-gray-700 hover:text-gray-900 text-sm" onclick="copyText(currentParametrosRapidosText())">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                            <div class="mt-2">
-                                ${sectionItemList(ref.parametrosRapidos.slice(0, 10), 'fas fa-bolt text-amber-500')}
+                        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 uppercase tracking-wider">
+                                        <i class="fas fa-bolt text-amber-500"></i> Parâmetros Rápidos
+                                    </span>
+                                    <button class="text-slate-500 hover:text-slate-800 text-xs font-semibold px-2 py-1 rounded hover:bg-slate-100 transition cursor-pointer" onclick="copyText(currentParametrosRapidosText())" title="Copiar parâmetros">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-3">
+                                    ${sectionItemList(ref.parametrosRapidos.slice(0, 8), 'fas fa-bolt text-amber-500')}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -5155,6 +5182,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeModal();
+                closeNrToolsModal();
                 closeFavorites();
                 closeBiblioteca();
                 closePdfAssign();
