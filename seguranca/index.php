@@ -60,6 +60,61 @@ if (empty($_SESSION['api_token'])) {
         .generating-overlay {
             backdrop-filter: blur(5px);
         }
+
+        /* ==========================================================================
+           DESKTOP & MOBILE RESPONSIVE ENGINE (Sem dependência de runtime Tailwind)
+           ========================================================================== */
+        @media (min-width: 1024px) {
+            #sidebar {
+                position: fixed !important;
+                top: 52px !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                width: 260px !important;
+                height: calc(100vh - 52px) !important;
+                transform: none !important;
+                z-index: 40 !important;
+                border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+                background: rgba(15, 23, 42, 0.96) !important;
+                box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3) !important;
+            }
+            main {
+                margin-left: 260px !important;
+                width: calc(100% - 260px) !important;
+                max-width: calc(100% - 260px) !important;
+                min-height: calc(100vh - 52px) !important;
+                padding: 28px 36px !important;
+                box-sizing: border-box !important;
+            }
+            .mobile-header-bar {
+                display: none !important;
+            }
+        }
+        @media (max-width: 1023px) {
+            #sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                width: 280px !important;
+                max-width: 85vw !important;
+                height: 100vh !important;
+                z-index: 10001 !important;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+            #sidebar.-translate-x-full {
+                transform: translateX(-100%) !important;
+            }
+            #sidebar:not(.-translate-x-full) {
+                transform: translateX(0) !important;
+            }
+            main {
+                margin-left: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 16px !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-300 min-h-screen">
@@ -81,7 +136,7 @@ if (empty($_SESSION['api_token'])) {
     <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/75 backdrop-blur-xs z-[10000] hidden lg:hidden transition-opacity duration-300"></div>
 
     <!-- Mobile Top Bar (visível apenas em telas menores que lg) -->
-    <header class="lg:hidden sticky top-[46px] z-30 bg-slate-900/95 backdrop-blur-md border-b border-white/10 px-4 py-2.5 flex items-center justify-between shadow-lg">
+    <header class="mobile-header-bar lg:hidden sticky top-[46px] z-30 bg-slate-900/95 backdrop-blur-md border-b border-white/10 px-4 py-2.5 flex items-center justify-between shadow-lg">
         <div class="flex items-center gap-2.5">
             <button type="button" onclick="toggleSidebar(true)" class="p-2 rounded-xl bg-slate-800 text-slate-200 hover:text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-amber-400 active:scale-95 transition-all" aria-label="Abrir Menu">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,14 +221,15 @@ if (empty($_SESSION['api_token'])) {
         </div>
         
         <div class="p-4 border-t border-white/10" id="sidebar-footer-container">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
-                    <span class="text-sm">👷</span>
-                </div>
-                <div>
-                    <p class="font-medium text-sm">Técnico de Segurança</p>
-                    <p class="text-xs text-slate-500">Administrador</p>
-                </div>
+            <div class="flex flex-col gap-2 w-full">
+                <p class="text-[11px] text-slate-400 text-center font-medium">Entre para usar IA</p>
+                <button type="button" onclick="conectarGoogle()" class="w-full py-2.5 px-3 bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-800 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="18" height="18" class="shrink-0" style="display:inline-block;vertical-align:middle;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                    <span>Entrar com Google</span>
+                </button>
+                <button type="button" onclick="openModal('auth-modal')" class="text-[11px] text-purple-300 hover:text-white text-center transition-colors">
+                    ou usar e-mail
+                </button>
             </div>
         </div>
     </aside>
@@ -183,20 +239,39 @@ if (empty($_SESSION['api_token'])) {
         <div class="max-w-6xl mx-auto w-full">
         <!-- Dashboard Section -->
         <section id="dashboard-section" class="fade-in">
-            <div class="mb-6 sm:mb-8">
-                <h2 class="text-2xl sm:text-3xl font-bold text-white">Dashboard</h2>
-                <p class="text-xs sm:text-sm text-slate-400 mt-1">Visão geral do sistema de segurança com IA</p>
+            <div class="mb-6 sm:mb-8 flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Dashboard</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Visão geral do sistema de segurança com IA</p>
+                </div>
+                <div id="desktop-header-auth" class="hidden sm:flex items-center gap-2.5"></div>
             </div>
             
             <!-- AI Status -->
-            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 text-white" id="ai-status-banner">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-slate-900/40 border border-white/20 rounded-xl flex items-center justify-center shrink-0">
-                        <span class="text-2xl sm:text-4xl">🤖</span>
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 text-white shadow-lg" id="ai-status-banner">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 w-full">
+                    <div class="flex items-start sm:items-center gap-4">
+                        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-slate-900/50 border border-white/20 rounded-2xl flex items-center justify-center shrink-0 shadow-lg">
+                            <span class="text-3xl sm:text-4xl">🤖</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h3 class="text-lg sm:text-xl font-bold text-white">Inteligência Artificial Ativa</h3>
+                                <span class="bg-amber-400/20 text-amber-300 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-amber-400/30 uppercase tracking-wide">PGR • PCMAT • APR</span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-purple-100 mt-1 max-w-xl">
+                                Crie documentos técnicos completos de Engenharia e Segurança do Trabalho com IA. Conecte sua conta Google para começar.
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-lg sm:text-xl font-bold">Inteligência Artificial Ativa</h3>
-                        <p class="text-xs sm:text-sm text-purple-200 mt-0.5">Documentos gerados automaticamente com análise inteligente</p>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                        <button type="button" onclick="conectarGoogle()" class="px-5 py-3 bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-800 rounded-xl font-bold text-sm flex items-center justify-center gap-2.5 shadow-xl transition-all cursor-pointer border border-white/40">
+                            <svg viewBox="0 0 24 24" width="20" height="20" class="shrink-0" style="display:inline-block;vertical-align:middle;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                            <span>Entrar com Conta Google</span>
+                        </button>
+                        <button type="button" onclick="openModal('auth-modal')" class="px-4 py-3 bg-purple-900/40 hover:bg-purple-900/60 text-purple-200 hover:text-white rounded-xl text-xs sm:text-sm font-semibold border border-purple-400/30 transition-all text-center">
+                            ou usar e-mail
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1091,6 +1166,16 @@ if (empty($_SESSION['api_token'])) {
         let userToken = localStorage.getItem('keepai_token') || null;
         let userData = null;
         let userCredits = 0;
+
+        try {
+            const cachedProfile = localStorage.getItem('user_profile');
+            if (cachedProfile && userToken) {
+                userData = JSON.parse(cachedProfile);
+                userCredits = parseInt(localStorage.getItem('user_credits') || '0');
+            }
+        } catch (e) {}
+
+        const GOOGLE_ICON_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" class="shrink-0" style="display:inline-block;vertical-align:middle;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>';
         
         async function syncUser() {
             if (!userToken) {
@@ -1112,6 +1197,8 @@ if (empty($_SESSION['api_token'])) {
                 const result = await response.json();
                 userData = result.user;
                 userCredits = parseInt(result.user.credits || 0);
+                localStorage.setItem('user_profile', JSON.stringify(result.user));
+                localStorage.setItem('user_credits', String(userCredits));
                 updateCreditsUI();
                 updateAuthUI();
             } catch (err) {
@@ -1119,6 +1206,7 @@ if (empty($_SESSION['api_token'])) {
                 // Token inválido, limpa local
                 userToken = null;
                 localStorage.removeItem('keepai_token');
+                localStorage.removeItem('user_profile');
                 userData = null;
                 userCredits = 0;
                 updateAuthUI();
@@ -1148,37 +1236,55 @@ if (empty($_SESSION['api_token'])) {
             const aiStatusBanner = document.getElementById('ai-status-banner');
             if (aiStatusBanner) {
                 if (userToken) {
+                    const userName = (userData && (userData.display_name || userData.name || userData.email)) || 'Usuário';
                     aiStatusBanner.innerHTML = `
-                        <div class="flex items-center justify-between flex-wrap gap-4 w-full">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
                             <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 bg-slate-900/40 border border-white/20 rounded-xl flex items-center justify-center">
-                                    <span class="text-4xl">🤖</span>
+                                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-slate-900/50 border border-white/20 rounded-2xl flex items-center justify-center shrink-0 shadow-lg">
+                                    <span class="text-3xl sm:text-4xl">🤖</span>
                                 </div>
                                 <div>
-                                    <h3 class="text-xl font-bold">Inteligência Artificial Ativa</h3>
-                                    <p class="text-purple-200">Saldo unificado: <strong class="text-white">${userCredits} créditos</strong></p>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h3 class="text-lg sm:text-xl font-bold text-white">Inteligência Artificial Pronta</h3>
+                                        <span class="bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-emerald-500/30">ONLINE</span>
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-purple-100 mt-1">
+                                        Conectado como <strong class="text-white">${userName}</strong> • Saldo unificado: <strong class="text-amber-300 font-bold">${userCredits} créditos</strong>
+                                    </p>
                                 </div>
                             </div>
-                            <button onclick="openModal('pix-modal')" class="bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 rounded-xl text-sm font-semibold transition-all">
-                                ⚡ Recarregar Créditos
+                            <button type="button" onclick="openModal('pix-modal')" class="px-4 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold rounded-xl text-sm transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer shrink-0">
+                                <span>💎</span>
+                                <span>Recarregar Créditos</span>
                             </button>
                         </div>
                     `;
                 } else {
                     aiStatusBanner.innerHTML = `
-                        <div class="flex items-center justify-between flex-wrap gap-4 w-full">
-                            <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 bg-slate-900/40 border border-white/20 rounded-xl flex items-center justify-center">
-                                    <span class="text-4xl">🔒</span>
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 w-full">
+                            <div class="flex items-start sm:items-center gap-4">
+                                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-slate-900/50 border border-white/20 rounded-2xl flex items-center justify-center shrink-0 shadow-lg">
+                                    <span class="text-3xl sm:text-4xl">🤖</span>
                                 </div>
                                 <div>
-                                    <h3 class="text-xl font-bold">IA Protegida por Créditos</h3>
-                                    <p class="text-purple-200">Faça login para utilizar o PGR, PCMAT e APR com Inteligência Artificial.</p>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h3 class="text-lg sm:text-xl font-bold text-white">Inteligência Artificial Ativa</h3>
+                                        <span class="bg-amber-400/20 text-amber-300 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-amber-400/30 uppercase tracking-wide">PGR • PCMAT • APR</span>
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-purple-100 mt-1 max-w-xl">
+                                        Crie documentos técnicos completos de Engenharia e Segurança do Trabalho com IA. Conecte sua conta Google para começar.
+                                    </p>
                                 </div>
                             </div>
-                            <button onclick="openModal('auth-modal')" class="bg-yellow-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-sm hover:bg-yellow-350 transition-all shadow-[0_0_15px_rgba(250,204,21,0.4)]">
-                                🔑 Conectar Conta
-                            </button>
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                                <button type="button" onclick="conectarGoogle()" class="px-5 py-3 bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-800 rounded-xl font-bold text-sm flex items-center justify-center gap-2.5 shadow-xl transition-all cursor-pointer border border-white/40">
+                                    ${GOOGLE_ICON_SVG}
+                                    <span>Entrar com Conta Google</span>
+                                </button>
+                                <button type="button" onclick="openModal('auth-modal')" class="px-4 py-3 bg-purple-900/40 hover:bg-purple-900/60 text-purple-200 hover:text-white rounded-xl text-xs sm:text-sm font-semibold border border-purple-400/30 transition-all text-center">
+                                    ou usar e-mail
+                                </button>
+                            </div>
                         </div>
                     `;
                 }
@@ -1187,40 +1293,80 @@ if (empty($_SESSION['api_token'])) {
         
         function updateAuthUI() {
             const footerContainer = document.getElementById('sidebar-footer-container');
-            if (!footerContainer) return;
+            const desktopHeaderAuth = document.getElementById('desktop-header-auth');
             
             if (userToken && userData) {
-                const name = userData.display_name || userData.name || userData.email || 'SW';
+                const name = userData.display_name || userData.name || userData.email || 'Usuário';
                 const initials = name.substring(0, 2).toUpperCase();
                 const avatarHtml = userData.photo_url 
                     ? `<img src="${userData.photo_url}" class="w-10 h-10 rounded-full object-cover border border-purple-500/40 shrink-0 shadow-[0_0_10px_rgba(168,85,247,0.3)]" alt="${name}">`
                     : `<div class="w-10 h-10 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-full flex items-center justify-center font-bold text-white shadow-[0_0_10px_rgba(168,85,247,0.4)] shrink-0">${initials}</div>`;
                 
-                footerContainer.innerHTML = `
-                    <div class="flex items-center justify-between w-full">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            ${avatarHtml}
-                            <div class="min-w-0">
-                                <p class="font-medium text-sm text-white truncate" title="${name}">${name}</p>
-                                <p class="text-[10px] text-purple-400 font-semibold flex items-center gap-1 cursor-pointer hover:underline" onclick="openModal('pix-modal')">
-                                    <span>💎</span> <span>${userCredits} créditos</span>
-                                </p>
+                if (footerContainer) {
+                    footerContainer.innerHTML = `
+                        <div class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                ${avatarHtml}
+                                <div class="min-w-0">
+                                    <p class="font-medium text-sm text-white truncate" title="${name}">${name}</p>
+                                    <p class="text-[10px] text-purple-400 font-semibold flex items-center gap-1 cursor-pointer hover:underline" onclick="openModal('pix-modal')">
+                                        <span>💎</span> <span>${userCredits} créditos</span>
+                                    </p>
+                                </div>
                             </div>
+                            <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-white/5 cursor-pointer shrink-0" title="Sair da Conta">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                            </button>
                         </div>
-                        <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-white/5 cursor-pointer shrink-0" title="Sair da Conta">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                        </button>
-                    </div>
-                `;
+                    `;
+                }
+
+                if (desktopHeaderAuth) {
+                    desktopHeaderAuth.innerHTML = `
+                        <div class="flex items-center gap-2.5 bg-slate-900/80 border border-white/10 px-3 py-1.5 rounded-xl backdrop-blur-md">
+                            ${avatarHtml}
+                            <div class="text-left text-xs min-w-0">
+                                <p class="font-bold text-white truncate max-w-[130px]">${name}</p>
+                                <p class="text-purple-300 font-medium">${userCredits} créditos</p>
+                            </div>
+                            <button type="button" onclick="openModal('pix-modal')" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-lg font-semibold text-xs transition-colors cursor-pointer" title="Comprar Créditos">
+                                + Créditos
+                            </button>
+                            <button type="button" onclick="handleLogout()" class="text-slate-400 hover:text-red-400 p-1 transition-colors" title="Desconectar">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                            </button>
+                        </div>
+                    `;
+                }
             } else {
-                footerContainer.innerHTML = `
-                    <div class="flex flex-col gap-2 w-full">
-                        <p class="text-[10px] text-slate-400 text-center">Entre para gerar documentos com IA</p>
-                        <button onclick="openModal('auth-modal')" class="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-semibold text-sm transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.5)] cursor-pointer">
-                            🔑 Conectar Conta
-                        </button>
-                    </div>
-                `;
+                if (footerContainer) {
+                    footerContainer.innerHTML = `
+                        <div class="flex flex-col gap-2.5 w-full">
+                            <p class="text-[11px] text-slate-400 text-center font-medium">Acesse com sua conta</p>
+                            <button type="button" onclick="conectarGoogle()" class="w-full py-2.5 px-3 bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-800 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer">
+                                ${GOOGLE_ICON_SVG}
+                                <span>Entrar com Google</span>
+                            </button>
+                            <button type="button" onclick="openModal('auth-modal')" class="text-[11px] text-purple-300 hover:text-white text-center transition-colors">
+                                ou usar e-mail e senha
+                            </button>
+                        </div>
+                    `;
+                }
+
+                if (desktopHeaderAuth) {
+                    desktopHeaderAuth.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="conectarGoogle()" class="px-3.5 py-2 bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-800 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer border border-slate-200">
+                                ${GOOGLE_ICON_SVG}
+                                <span>Entrar com Google</span>
+                            </button>
+                            <button type="button" onclick="openModal('auth-modal')" class="px-3 py-2 bg-slate-900/80 hover:bg-slate-800 text-purple-300 hover:text-white rounded-xl font-medium text-xs border border-white/10 transition-colors">
+                                E-mail
+                            </button>
+                        </div>
+                    `;
+                }
             }
             updateCreditsUI();
         }
@@ -1280,14 +1426,22 @@ if (empty($_SESSION['api_token'])) {
         }
 
         function conectarGoogle() {
-            if (!googleTokenClient) {
-                initGoogleAuth();
-            }
             if (googleTokenClient) {
                 googleTokenClient.requestAccessToken({ prompt: 'select_account' });
-            } else {
-                alert('Os serviços do Google estão inicializando. Tente novamente em instantes.');
+                return;
             }
+            if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+                try {
+                    initGoogleAuth();
+                    if (googleTokenClient) {
+                        googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+                        return;
+                    }
+                } catch (e) {
+                    console.error('[GoogleAuth] Erro ao conectar:', e);
+                }
+            }
+            alert('Inicializando serviços do Google... Por favor, clique novamente em instantes.');
         }
 
         async function processarGoogleToken(accessToken) {
@@ -1608,8 +1762,11 @@ if (empty($_SESSION['api_token'])) {
 
         // Navigation
         function showSection(section) {
-            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`${section}-section`).classList.remove('hidden');
+            document.querySelectorAll('section[id$="-section"]').forEach(s => s.classList.add('hidden'));
+            const targetSection = document.getElementById(`${section}-section`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
             
             document.querySelectorAll('.sidebar-item').forEach(item => {
                 item.classList.remove('active');
@@ -1636,6 +1793,7 @@ if (empty($_SESSION['api_token'])) {
             toggleSidebar(false);
             
             updateStats();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Modal Functions
