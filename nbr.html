@@ -223,17 +223,17 @@
     </main>
 
     <!-- Modal de Detalhes -->
-    <div id="detailModal" class="fixed inset-0 bg-black/65 backdrop-blur-sm modal-overlay z-[70] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-start justify-center">
-        <div class="bg-white rounded-2xl max-w-5xl w-full my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-hidden shadow-2xl fade-in flex flex-col border border-gray-200/50">
-            <div id="modalHeader" class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 sm:p-5 shrink-0">
+    <div id="detailModal" class="fixed inset-0 bg-black/75 backdrop-blur-md modal-overlay z-[70] hidden overflow-y-auto px-2 sm:px-4 md:px-6 py-6 sm:py-10 md:py-12 flex items-start justify-center">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full my-auto max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5.5rem)] overflow-hidden shadow-2xl fade-in flex flex-col border border-slate-200/80 relative">
+            <div id="modalHeader" class="bg-gradient-to-r from-blue-600 to-blue-800 text-white pt-5 sm:pt-6 pb-4 sm:pb-5 px-4 sm:px-6 shrink-0 shadow-xs">
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0 pr-2">
-                        <div class="flex flex-wrap items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-2 mb-1.5">
                             <span id="modalBadge" class="bg-white/25 px-2.5 py-0.5 rounded-full text-xs font-bold tracking-wide shadow-2xs">NBR</span>
                             <span id="modalCategoria" class="bg-white/15 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">Categoria</span>
                             <span id="modalMeta" class="hidden sm:inline bg-white/10 px-2.5 py-0.5 rounded-full text-[11px]">Consulta rápida • resumo técnico</span>
                         </div>
-                        <h2 id="modalTitle" class="text-xl sm:text-2xl font-black mt-1.5 leading-tight tracking-tight">NBR 6118</h2>
+                        <h2 id="modalTitle" class="text-xl sm:text-2xl font-black leading-tight tracking-tight">NBR 6118</h2>
                         <p id="modalSubtitle" class="text-white/90 mt-1 text-xs sm:text-sm font-medium leading-snug line-clamp-2">Projeto de estruturas de concreto</p>
                     </div>
 
@@ -244,20 +244,24 @@
                                 <i class="fas fa-up-right-from-square text-xs"></i>
                                 <span class="hidden md:inline font-semibold">Abrir oficial</span>
                             </button>
-                            <button onclick="openPdfForCurrentNorma()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 tooltip whitespace-nowrap cursor-pointer shadow-2xs" data-tip="Abrir PDF anexado (se existir)">
+                            <button id="modalOpenPdfBtn" onclick="openPdfForCurrentNorma()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 tooltip whitespace-nowrap cursor-pointer shadow-2xs" data-tip="Abrir PDF anexado (se existir)">
                                 <i class="fas fa-file-pdf text-xs"></i>
                                 <span class="hidden md:inline font-semibold">Abrir PDF</span>
                             </button>
-                            <label class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 cursor-pointer tooltip whitespace-nowrap shadow-2xs" data-tip="Anexar PDF desta norma (salvo localmente)">
+                            <label class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 cursor-pointer tooltip whitespace-nowrap shadow-2xs" data-tip="Anexar ou substituir PDF desta norma">
                                 <i class="fas fa-paperclip text-xs"></i>
                                 <span class="hidden md:inline font-semibold">Anexar</span>
                                 <input id="modalPdfInput" type="file" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event, true)">
                             </label>
+                            <button id="modalDeletePdfBtn" onclick="deleteCurrentNormaPdf()" class="hidden bg-red-500/25 hover:bg-red-500/40 text-red-100 hover:text-white active:scale-95 h-9 px-2.5 rounded-xl transition text-xs inline-flex items-center gap-1.5 tooltip whitespace-nowrap cursor-pointer shadow-2xs border border-red-300/30" data-tip="Excluir PDF anexado desta norma">
+                                <i class="fas fa-trash-can text-xs text-red-200"></i>
+                                <span class="hidden lg:inline font-semibold">Excluir PDF</span>
+                            </button>
                             <button onclick="copyLink()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs" title="Copiar link direto">
                                 <i class="fas fa-link text-xs"></i>
                                 <span class="hidden md:inline font-semibold">Copiar link</span>
                             </button>
-                            <button onclick="printNorma()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs" title="Imprimir / Salvar PDF">
+                            <button onclick="printNorma()" class="bg-white/15 hover:bg-white/25 active:scale-95 h-9 px-3 rounded-xl transition text-xs sm:text-sm inline-flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs" title="Imprimir Ficha Técnica">
                                 <i class="fas fa-print text-xs"></i>
                                 <span class="hidden md:inline font-semibold">Imprimir</span>
                             </button>
@@ -311,8 +315,8 @@
     </div>
 
     <!-- Modal de Ferramentas e Dimensionadores das NRs -->
-    <div id="nrToolsModal" class="fixed inset-0 bg-black/65 backdrop-blur-sm modal-overlay z-[70] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-start justify-center">
-        <div class="bg-white rounded-2xl max-w-4xl w-full my-auto max-h-[calc(100vh-2.5rem)] overflow-hidden shadow-2xl fade-in flex flex-col border border-amber-200/40">
+    <div id="nrToolsModal" class="fixed inset-0 bg-black/75 backdrop-blur-md modal-overlay z-[70] hidden overflow-y-auto px-2 sm:px-4 md:px-6 py-6 sm:py-10 md:py-12 flex items-start justify-center">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-4xl w-full my-auto max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5.5rem)] overflow-hidden shadow-2xl fade-in flex flex-col border border-amber-200/40 relative">
             <!-- Modal Header -->
             <div class="bg-gradient-to-r from-amber-600 via-amber-700 to-amber-900 text-white p-4 md:p-5 shrink-0 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -4042,11 +4046,16 @@
                 let pdfActionHtml = '';
                 if (hasLocalPdf) {
                     pdfActionHtml = `
-                        <button onclick="event.stopPropagation(); openPdfById('${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 border border-emerald-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Abrir PDF completo salvo localmente">
-                            <i class="fas fa-file-pdf text-emerald-600"></i>
-                            <span>PDF Completo</span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        </button>
+                        <div class="flex items-center gap-1">
+                            <button onclick="event.stopPropagation(); openPdfById('${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 border border-emerald-300 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Abrir PDF completo salvo">
+                                <i class="fas fa-file-pdf text-emerald-600"></i>
+                                <span>PDF Completo</span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            </button>
+                            <button onclick="deleteCardPdf(event, '${norma.id}', '${norma.codigo}')" class="w-7 h-7 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 flex items-center justify-center transition text-xs border border-red-200 shadow-2xs hover:scale-105 active:scale-95 cursor-pointer" title="Excluir PDF anexado desta norma">
+                                <i class="fas fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
                     `;
                 } else if (norma.tipo === 'NR') {
                     pdfActionHtml = `
@@ -4056,23 +4065,19 @@
                                 <span>PDF Oficial</span>
                                 <i class="fas fa-arrow-up-right-from-square text-[9px] text-amber-700/80"></i>
                             </button>
-                            <button onclick="attachPdfDirectly(event, '${norma.id}')" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-800 flex items-center justify-center transition text-xs border border-slate-200 shadow-2xs cursor-pointer" title="Anexar arquivo PDF offline desta NR">
-                                <i class="fas fa-paperclip"></i>
+                            <button onclick="attachPdfDirectly(event, '${norma.id}')" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-900 flex items-center gap-1 transition text-xs border border-slate-200 shadow-2xs cursor-pointer" title="Anexar arquivo PDF offline desta NR">
+                                <i class="fas fa-paperclip text-[11px]"></i>
+                                <span class="hidden sm:inline font-semibold">Anexar</span>
                             </button>
                         </div>
                     `;
                 } else {
+                    // NBR sem PDF (Caderno PDF removido conforme solicitado!)
                     pdfActionHtml = `
-                        <div class="flex items-center gap-1">
-                            <button onclick="openCadernoPdf(event, '${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-bold transition flex items-center gap-1.5 border border-blue-200 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Gerar Caderno Técnico da norma completo para impressão ou salvar em PDF">
-                                <i class="fas fa-print text-blue-600"></i>
-                                <span>Caderno PDF</span>
-                            </button>
-                            <button onclick="attachPdfDirectly(event, '${norma.id}')" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-900 text-xs font-semibold transition flex items-center gap-1 border border-slate-200 shadow-2xs cursor-pointer" title="Anexar seu arquivo PDF desta NBR (armazenamento local privado seguro)">
-                                <i class="fas fa-paperclip text-[10px]"></i>
-                                <span class="hidden sm:inline">Anexar</span>
-                            </button>
-                        </div>
+                        <button onclick="attachPdfDirectly(event, '${norma.id}')" class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-800 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 hover:border-blue-200 shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer" title="Anexar arquivo PDF desta NBR (armazenamento local seguro no navegador)">
+                            <i class="fas fa-paperclip text-slate-500 hover:text-blue-600 text-xs"></i>
+                            <span>Anexar PDF</span>
+                        </button>
                     `;
                 }
 
@@ -4325,7 +4330,16 @@
                 nr: 'Normas Regulamentadoras (NR)'
             };
 
-            document.getElementById('modalHeader').className = `bg-gradient-to-r ${colors[norma.cor]} text-white p-4 md:p-5 shrink-0`;
+            document.getElementById('modalHeader').className = `bg-gradient-to-r ${colors[norma.cor] || 'from-slate-700 to-slate-900'} text-white pt-5 sm:pt-6 pb-4 sm:pb-5 px-4 sm:px-6 shrink-0 shadow-xs`;
+
+            const delModalBtn = document.getElementById('modalDeletePdfBtn');
+            if (delModalBtn) {
+                if (pdfMap[norma.id]) {
+                    delModalBtn.classList.remove('hidden');
+                } else {
+                    delModalBtn.classList.add('hidden');
+                }
+            }
             document.getElementById('modalBadge').textContent = norma.tipo;
             document.getElementById('modalTitle').textContent = norma.codigo;
             document.getElementById('modalSubtitle').textContent = norma.nome;
@@ -5100,6 +5114,23 @@
                 return;
             }
             window.open(lnk.url, '_blank', 'noopener,noreferrer');
+        }
+
+        
+        async function deleteCardPdf(event, normaId, normaCodigo) {
+            event.stopPropagation();
+            if (!confirm(`Deseja realmente excluir o PDF anexado da ${normaCodigo}?`)) return;
+            await removePdf(normaId);
+            if (currentNorma && currentNorma.id === normaId) {
+                openModal(normaId);
+            }
+        }
+
+        async function deleteCurrentNormaPdf() {
+            if (!currentNorma) return;
+            if (!confirm(`Deseja realmente excluir o PDF anexado de ${currentNorma.codigo}?`)) return;
+            await removePdf(currentNorma.id);
+            openModal(currentNorma.id);
         }
 
         async function removePdf(normaId) {
