@@ -3,20 +3,17 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>Combate a Incêndio (PPCI) | Ferramentas de Engenharia</title>
+  <title>Combate a Incêndio & PPCI | Suíte de Engenharia eCalc</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
             dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24', 600: '#22222e' },
-            neon: { cyan: '#00ffff', magenta: '#ff00ff', purple: '#8b1bf7', green: '#00ff88', red: '#ff3333', orange: '#ff8800' }
+            neon: { red: '#ff3333', orange: '#ff8800', yellow: '#ffea00', green: '#00ff88', cyan: '#00ffff', purple: '#9933ff' }
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
@@ -32,10 +29,10 @@
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #12121a; }
     ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ff3333, #ff8800); border-radius: 4px; }
-    
-    .glow-red { box-shadow: 0 0 20px rgba(255, 51, 51, 0.3), inset 0 0 20px rgba(255, 51, 51, 0.05); }
+
     .text-glow { text-shadow: 0 0 20px rgba(255, 51, 51, 0.5); }
-    
+    .text-glow-orange { text-shadow: 0 0 20px rgba(255, 136, 0, 0.5); }
+
     .gradient-border {
       position: relative;
       background: #12121a;
@@ -50,329 +47,1583 @@
       background-size: 300% 300%;
       animation: gradientMove 8s ease infinite;
       z-index: -1;
-      opacity: 0.6;
+      opacity: 0.5;
     }
     @keyframes gradientMove {
       0%, 100% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
     }
-    
-    @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(255, 51, 51, 0.3); }
-      50% { box-shadow: 0 0 40px rgba(255, 51, 51, 0.6); }
-    }
-    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-    
+
     .form-input {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.25s ease;
     }
     .form-input:focus {
       border-color: #ff3333;
-      box-shadow: 0 0 15px rgba(255, 51, 51, 0.2);
+      box-shadow: 0 0 15px rgba(255, 51, 51, 0.25);
       outline: none;
     }
-    .form-input:hover { border-color: rgba(255, 51, 51, 0.5); }
-    
-    .btn-primary {
+    .form-input:hover { border-color: rgba(255, 136, 0, 0.5); }
+
+    .btn-fire {
       background: linear-gradient(135deg, #ff3333 0%, #ff8800 100%);
       transition: all 0.3s ease;
     }
-    .btn-primary:hover {
+    .btn-fire:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(255, 51, 51, 0.4);
+      box-shadow: 0 10px 25px rgba(255, 51, 51, 0.4);
     }
-    .btn-primary:active { transform: translateY(0); }
-    
+    .btn-fire:active { transform: translateY(0); }
+
     .card-hover:hover {
-      transform: translateY(-4px);
-      border-color: #ff3333;
+      transform: translateY(-2px);
+      border-color: rgba(255, 51, 51, 0.5);
     }
-    
-    .progress-fill {
-      background: linear-gradient(90deg, #ff3333, #ff8800);
-      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .badge-mandatory {
+      background: rgba(255, 51, 51, 0.15);
+      border: 1px solid rgba(255, 51, 51, 0.5);
+      color: #ff5555;
     }
-    
+    .badge-exempt {
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #94a3b8;
+    }
+    .badge-recommended {
+      background: rgba(255, 234, 0, 0.15);
+      border: 1px solid rgba(255, 234, 0, 0.4);
+      color: #ffea00;
+    }
+
     @media print {
-      body { background: white !important; }
+      body { background: white !important; color: black !important; }
       .no-print { display: none !important; }
     }
   </style>
 </head>
-<body class="font-sans text-gray-100">
+<body class="font-sans text-gray-100 antialiased selection:bg-red-500/30">
+
+  <!-- Header de Integração da Suíte -->
   <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/5 no-print">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-red to-neon-orange flex items-center justify-center font-bold text-dark-900 text-xl">
-          🔥
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-red to-neon-orange flex items-center justify-center font-bold text-dark-900 text-xl shadow-lg shadow-red-500/30">
+          🚒
         </div>
         <div>
-          <h1 class="text-lg font-semibold text-white">Combate a Incêndio (PPCI)</h1>
-          <p class="text-xs text-gray-500">Estimativa de Extintores e RTI</p>
+          <div class="flex items-center gap-2">
+            <span class="text-xs uppercase tracking-wider text-neon-red font-bold">ECALC SUITE PRO</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 font-semibold border border-red-500/30">PPCI & BOMBEIROS</span>
+          </div>
+          <h1 class="text-base font-bold text-white leading-tight">Segurança Contra Incêndio & Pânico</h1>
+          <p class="text-[11px] text-gray-400">NBR 13714 • NBR 12693 • NBR 9077 • NBR 14432 • ITs CBPMESP</p>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <button id="btnReset" class="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Limpar">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="gerarMemorialIncendio()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold text-xs shadow-md shadow-red-600/30 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>📄 Gerar Memorial ABNT</span>
+        </button>
+        <button type="button" onclick="exportarOfficeClone()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>📊 Abrir no OfficeClone</span>
+        </button>
+        <button type="button" onclick="abrirNoCadCloneIncendio()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>📐 Abrir no CADClone</span>
+        </button>
+        <button type="button" onclick="baixarDxfIncendio()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-700 hover:bg-dark-600 text-gray-300 border border-white/10 font-bold text-xs shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>💾 Baixar .DXF</span>
+        </button>
+        <button type="button" id="btnReset" class="p-2 rounded-xl bg-dark-700 hover:bg-dark-600 text-gray-400 hover:text-white transition-colors border border-white/10" title="Restaurar Parâmetros">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <div class="grid lg:grid-cols-3 gap-8">
-      <!-- Painel de Dados -->
-      <div class="lg:col-span-1 space-y-6">
-        <div class="gradient-border p-6">
-          <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <span class="text-neon-red">●</span> Dados da Edificação
+  <!-- Conteúdo Principal -->
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <div class="grid lg:grid-cols-12 gap-6 items-start">
+
+      <!-- ========================================== -->
+      <!-- COLUNA DA ESQUERDA: PARÂMETROS E ENTRADAS -->
+      <!-- ========================================== -->
+      <div class="lg:col-span-5 space-y-6">
+
+        <!-- 1. Dados da Edificação & Ocupação -->
+        <div class="gradient-border p-5">
+          <h2 class="text-sm font-bold text-white mb-4 flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <span class="text-neon-red">●</span> 1. Dados da Edificação & Ocupação
+            </span>
+            <span class="text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">IT-01 / NBR 14432</span>
           </h2>
-          
-          <div class="space-y-5">
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Área Construída (m²)</label>
-              <input type="number" id="area" value="500" min="1" step="0.01" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
+
+          <div class="space-y-4 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-gray-400 mb-1 font-medium">Área Construída Total (m²)</label>
+                <input type="number" id="area" value="1200" min="10" step="10" class="form-input w-full px-3 py-2 rounded-xl text-white font-mono bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-gray-400 mb-1 font-medium">Nº de Pavimentos</label>
+                <input type="number" id="pavimentos" value="4" min="1" max="60" class="form-input w-full px-3 py-2 rounded-xl text-white font-mono bg-dark-700">
+              </div>
             </div>
-            
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Risco de Incêndio (Carga)</label>
-              <select id="risco" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
-                <option value="baixo">Baixo (< 300 MJ/m²)</option>
-                <option value="medio" selected>Médio (300 a 1200 MJ/m²)</option>
-                <option value="alto">Alto (> 1200 MJ/m²)</option>
-              </select>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-gray-400 mb-1 font-medium">Altura Edificação H (m)</label>
+                <input type="number" id="altura" value="12.0" min="1" step="0.5" class="form-input w-full px-3 py-2 rounded-xl text-white font-mono bg-dark-700">
+                <span class="text-[10px] text-gray-500">Piso térreo até último piso habitável</span>
+              </div>
+              <div>
+                <label class="block text-gray-400 mb-1 font-medium">Pé-direito Médio (m)</label>
+                <input type="number" id="peDireito" value="3.0" min="2" step="0.1" class="form-input w-full px-3 py-2 rounded-xl text-white font-mono bg-dark-700">
+                <span class="text-[10px] text-gray-500">Usado p/ estimar desnível</span>
+              </div>
             </div>
-            
+
             <div>
-              <label class="block text-sm text-gray-400 mb-2">Número de Pavimentos</label>
-              <input type="number" id="pavimentos" value="1" min="1" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
-            </div>
-            
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Classe de Ocupação Principal</label>
-              <select id="ocupacao" class="form-input w-full px-4 py-3 rounded-xl text-white bg-dark-700">
-                <option value="residencial">Residencial (A)</option>
-                <option value="comercial" selected>Comercial/Serviços (B/C)</option>
-                <option value="industrial">Industrial (I)</option>
-                <option value="deposito">Depósito (J)</option>
-                <option value="reuniao">Local de Reunião de Público (F)</option>
+              <label class="block text-gray-400 mb-1 font-medium">Grupo / Ocupação Principal (Divisão ABNT / IT)</label>
+              <select id="ocupacao" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 font-medium text-xs">
+                <optgroup label="Grupo A - Residencial">
+                  <option value="A-1">A-1: Habitação Unifamiliar (Casas Isoladas)</option>
+                  <option value="A-2" selected>A-2: Habitação Multifamiliar (Edifícios de Apartamentos)</option>
+                  <option value="A-3">A-3: Habitação Coletiva (Pensionatos, Alojamentos)</option>
+                </optgroup>
+                <optgroup label="Grupo B - Serviços de Hospedagem">
+                  <option value="B-1">B-1: Hotéis, Motéis e Pousadas sem Cozinha</option>
+                  <option value="B-2">B-2: Hotéis, Resorts e Flats com Cozinha</option>
+                </optgroup>
+                <optgroup label="Grupo C - Comercial">
+                  <option value="C-1">C-1: Comércio Varejista Baixa Carga (Papelarias, Farmácias)</option>
+                  <option value="C-2">C-2: Comércio Varejista Média/Alta Carga (Lojas Tecidos, Calçados)</option>
+                  <option value="C-3">C-3: Shopping Centers, Magazines e Grandes Centros</option>
+                </optgroup>
+                <optgroup label="Grupo D - Serviços Profissionais">
+                  <option value="D-1">D-1: Escritórios, Consultórios e Agências Bancárias</option>
+                  <option value="D-2">D-2: Repartições Públicas e Centros Empresariais</option>
+                </optgroup>
+                <optgroup label="Grupo E - Educacional e Cultura Física">
+                  <option value="E-1">E-1: Escolas de Ensino Fundamental / Médio</option>
+                  <option value="E-2">E-2: Faculdades, Universidades e Cursos Livres</option>
+                  <option value="E-3">E-3: Creches e Pré-escolas</option>
+                  <option value="E-4">E-4: Academias de Ginástica e Piscinas Cobertas</option>
+                </optgroup>
+                <optgroup label="Grupo F - Locais de Reunião de Público">
+                  <option value="F-1">F-1: Museus, Teatros, Cinemas e Auditórios</option>
+                  <option value="F-6">F-6: Casas Noturnas, Boates e Salões de Festas</option>
+                  <option value="F-8">F-8: Restaurantes, Bares, Lanchonetes e Refeitórios</option>
+                </optgroup>
+                <optgroup label="Grupo G - Garagens e Postos">
+                  <option value="G-1">G-1: Garagens Cobertas sem Abastecimento</option>
+                  <option value="G-2">G-2: Garagens Cobertas com Abastecimento / Oficinas</option>
+                </optgroup>
+                <optgroup label="Grupo H - Serviços de Saúde">
+                  <option value="H-2">H-2: Asilos, Clínicas e Casas de Repouso</option>
+                  <option value="H-3">H-3: Hospitais, Prontos-socorros com Internação</option>
+                </optgroup>
+                <optgroup label="Grupo I - Industrial">
+                  <option value="I-1">I-1: Indústria Carga Baixa (qfi <= 300 MJ/m²)</option>
+                  <option value="I-2">I-2: Indústria Carga Média (300 < qfi <= 1200 MJ/m²)</option>
+                  <option value="I-3">I-3: Indústria Carga Alta / Química (qfi > 1200 MJ/m²)</option>
+                </optgroup>
+                <optgroup label="Grupo J - Depósitos">
+                  <option value="J-1">J-1: Depósito de Material Incombustível</option>
+                  <option value="J-2">J-2: Depósito Carga Baixa (qfi <= 300 MJ/m²)</option>
+                  <option value="J-3">J-3: Depósito Carga Média (300 < qfi <= 1200 MJ/m²)</option>
+                  <option value="J-4">J-4: Depósito Carga Alta / Plásticos / Madeira (qfi > 1200 MJ/m²)</option>
+                </optgroup>
               </select>
             </div>
 
-            <button id="btnCalcular" class="btn-primary w-full py-3 rounded-xl font-semibold text-dark-900 mt-4 shadow-lg shadow-red-500/30">
-              Calcular Sistema PPCI
+            <div>
+              <label class="block text-gray-400 mb-1 font-medium">Localização do Reservatório de Incêndio</label>
+              <select id="posicaoReservatorio" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 font-medium">
+                <option value="inferior" selected>Reservatório Inferior / Enterrado (com Motobomba de Sucção)</option>
+                <option value="superior">Reservatório Superior de Cobertura (por Gravidade + Bomba de Reforço)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Cálculo da Carga de Incêndio Específica (qfi) -->
+        <div class="gradient-border p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="text-neon-orange">●</span> 2. Carga de Incêndio Específica (qfi)
+            </h2>
+            <span class="text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">NBR 14432 / IT-14</span>
+          </div>
+
+          <!-- Tabs de Método: Tabela vs Probabilístico Ponderado -->
+          <div class="flex rounded-xl bg-dark-800/80 p-1 border border-white/10 mb-4">
+            <button type="button" id="tabModoTabela" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-gradient-to-r from-red-600 to-orange-600 text-white transition-all">
+              Tabela Normativa
+            </button>
+            <button type="button" id="tabModoPonderado" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition-all">
+              Método Ponderado (kg)
             </button>
           </div>
-        </div>
 
-        <div class="gradient-border p-6 text-sm text-gray-400">
-          <h3 class="text-neon-orange font-semibold mb-2">⚠️ Atenção</h3>
-          <p>Esta é uma ferramenta de pré-dimensionamento baseada em parâmetros gerais de Instruções Técnicas (como as do Corpo de Bombeiros de SP - IT-16 e IT-22). <b>Não substitui o projeto executivo de PPCI assinado por um engenheiro responsável.</b></p>
-        </div>
-      </div>
+          <!-- Modo 1: Seleção por Atividade Real Normatizada -->
+          <div id="painelModoTabela" class="space-y-3 text-xs">
+            <div>
+              <label class="block text-gray-400 mb-1 font-medium">Atividade / Uso Específico</label>
+              <select id="atividadeTabelada" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+                <option value="300" data-risco="baixo" selected>Apartamentos / Habitação Residencial (300 MJ/m² - Baixo)</option>
+                <option value="700" data-risco="medio">Escritórios, Consultórios e Agências (700 MJ/m² - Médio)</option>
+                <option value="500" data-risco="medio">Restaurantes, Lanchonetes e Refeitórios (500 MJ/m² - Médio)</option>
+                <option value="600" data-risco="medio">Supermercados, Magazines e Mercados (600 MJ/m² - Médio)</option>
+                <option value="800" data-risco="medio">Lojas de Tecidos, Roupas e Calçados (800 MJ/m² - Médio)</option>
+                <option value="200" data-risco="baixo">Garagens e Estacionamentos Cobertos (200 MJ/m² - Baixo)</option>
+                <option value="300" data-risco="baixo">Escolas, Colégios e Faculdades (300 MJ/m² - Baixo)</option>
+                <option value="500" data-risco="medio">Hotéis, Pousadas e Hospedagens (500 MJ/m² - Médio)</option>
+                <option value="1500" data-risco="alto">Bibliotecas e Arquivos de Documentos (1.500 MJ/m² - Alto)</option>
+                <option value="1200" data-risco="alto">Depósito de Madeira e Embalagens de Papelão (1.200 MJ/m² - Alto)</option>
+                <option value="1800" data-risco="alto">Indústria / Depósito de Plásticos e Espumas (1.800 MJ/m² - Alto)</option>
+                <option value="2000" data-risco="alto">Indústria Química / Tintas, Vernizes e Solventes (2.000 MJ/m² - Alto)</option>
+              </select>
+            </div>
+          </div>
 
-      <!-- Resultados -->
-      <div class="lg:col-span-2 space-y-6">
-        <!-- Main Result -->
-        <div id="resultadoSection" class="gradient-border p-8 text-center opacity-50 transition-opacity duration-500">
-          <div class="text-gray-400 mb-2 text-sm uppercase tracking-wider">Reserva Técnica de Incêndio (RTI)</div>
-          <div id="valorRTI" class="text-5xl md:text-6xl font-bold text-neon-red text-glow mb-2">0 m³</div>
-          <div id="infoHidrante" class="text-xl text-gray-300 mb-4">Hidrantes: Não Exigido</div>
-          
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Total de Extintores</div>
-              <div id="qtdExtintores" class="text-xl font-semibold text-neon-orange">0</div>
+          <!-- Modo 2: Cálculo Probabilístico Ponderado por Materiais -->
+          <div id="painelModoPonderado" class="hidden space-y-3 text-xs">
+            <p class="text-[11px] text-gray-400 leading-relaxed">
+              Insira a massa total estimada dos combustíveis presentes na edificação (fórmula: <code class="text-orange-400 font-mono">qfi = Σ(Mi × Hi) / Área</code>):
+            </p>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-gray-400 text-[11px] mb-1 font-medium">Madeira / Papel (19 MJ/kg)</label>
+                <input type="number" id="matMadeira" value="5000" min="0" step="100" class="form-input w-full px-2.5 py-1.5 rounded-lg text-white font-mono bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-gray-400 text-[11px] mb-1 font-medium">Plásticos / Polímeros (40 MJ/kg)</label>
+                <input type="number" id="matPlastico" value="2000" min="0" step="100" class="form-input w-full px-2.5 py-1.5 rounded-lg text-white font-mono bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-gray-400 text-[11px] mb-1 font-medium">Borrachas / Pneus (32 MJ/kg)</label>
+                <input type="number" id="matBorracha" value="0" min="0" step="50" class="form-input w-full px-2.5 py-1.5 rounded-lg text-white font-mono bg-dark-700">
+              </div>
+              <div>
+                <label class="block text-gray-400 text-[11px] mb-1 font-medium">Líquidos Inflam. (42 MJ/kg)</label>
+                <input type="number" id="matLiquidos" value="0" min="0" step="50" class="form-input w-full px-2.5 py-1.5 rounded-lg text-white font-mono bg-dark-700">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-gray-400 text-[11px] mb-1 font-medium">Têxteis / Algodão / Espumas (17 MJ/kg)</label>
+                <input type="number" id="matTexteis" value="1000" min="0" step="50" class="form-input w-full px-2.5 py-1.5 rounded-lg text-white font-mono bg-dark-700">
+              </div>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Capacidade Extintora</div>
-              <div id="capExtintora" class="text-xl font-semibold text-neon-orange">-</div>
+          </div>
+
+          <!-- Resumo da Carga Calculada -->
+          <div class="mt-4 p-3 bg-dark-800/80 rounded-xl border border-white/5 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-gray-400 font-bold block">Carga de Incêndio Adotada</span>
+              <span id="valorQfiDisplay" class="text-xl font-bold text-neon-orange font-mono">300 MJ/m²</span>
             </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Dist. Máx. Caminhamento</div>
-              <div id="distMax" class="text-xl font-semibold text-neon-orange">0 m</div>
-            </div>
-            <div class="p-4 bg-dark-800/50 rounded-xl border border-white/5 card-hover">
-              <div class="text-xs text-gray-500 mb-1">Vazão do Hidrante</div>
-              <div id="vazaoHidrante" class="text-xl font-semibold text-neon-orange">0 L/min</div>
+            <div class="text-right">
+              <span class="text-[10px] uppercase tracking-wider text-gray-400 font-bold block">Classificação de Risco</span>
+              <span id="badgeRiscoDisplay" class="text-xs px-2.5 py-1 rounded-full font-bold bg-green-500/20 text-green-400 border border-green-500/30">
+                Risco Baixo (Leve)
+              </span>
             </div>
           </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="gradient-border p-6">
-            <h3 class="text-lg font-semibold mb-4 text-neon-orange">🧯 Distribuição de Extintores</h3>
-            <div id="listaExtintores" class="space-y-3">
+        <!-- 3. Parâmetros Hidráulicos de Hidrantes & Bombas (IT-22) -->
+        <div class="gradient-border p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="text-neon-red">●</span> 3. Parâmetros de Hidrantes & Bombas
+            </h2>
+            <span class="text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">NBR 13714 / IT-22</span>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="block text-gray-400 mb-1 font-medium">Classificação do Sistema de Hidrantes</label>
+              <select id="tipoSistemaHidrante" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 font-medium">
+                <option value="auto" selected>Auto: Determinar por Norma (IT-22 conforme Risco)</option>
+                <option value="tipo1">Tipo 1: Mangotinho Ø25mm (1") • Q=100 L/min • P=8 mca • Auton. 30min</option>
+                <option value="tipo2">Tipo 2: Hidrante Ø38mm (1.1/2") • Esguicho 13mm • Q=150 L/min • P=10 mca</option>
+                <option value="tipo3">Tipo 3: Hidrante Ø38/65mm • Esguicho 16mm • Q=200 L/min • P=15 mca</option>
+                <option value="tipo4">Tipo 4: Hidrante Industrial Ø65mm (2.1/2") • Esguicho 19mm • Q=300 L/min • P=20 mca</option>
+                <option value="tipo5">Tipo 5: Hidrante Alto Risco Ø65mm • Esguicho 25mm • Q=450 L/min • P=30 mca</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-gray-400 mb-1 font-medium">Autonomia da RTI</label>
+                <select id="autonomiaRti" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+                  <option value="30">30 minutos (Risco Baixo)</option>
+                  <option value="60" selected>60 minutos (Risco Médio / Padrão)</option>
+                  <option value="120">120 minutos (Risco Alto / Indústrias)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-400 mb-1 font-medium">Rendimento Bomba (η)</label>
+                <select id="rendimentoBomba" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700 font-mono">
+                  <option value="0.60">60% (Bomba compacta)</option>
+                  <option value="0.65" selected>65% (Padrão industrial)</option>
+                  <option value="0.70">70% (Alta eficiência)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-gray-400 mb-1 font-medium">Tubulação da Prumada de Hidrantes</label>
+              <select id="tuboPrumada" class="form-input w-full px-3 py-2 rounded-xl text-white bg-dark-700">
+                <option value="50">DN 50 mm (2") — Permitido apenas Tipo 1</option>
+                <option value="65" selected>DN 65 mm (2.1/2") — Padrão Geral NBR 13714</option>
+                <option value="75">DN 75 mm (3") — Redes Comerciais Médias</option>
+                <option value="100">DN 100 mm (4") — Redes Industriais / Alto Porte</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Riscos Especiais & Riscos Pontuais (IT-16) -->
+        <div class="gradient-border p-5">
+          <h2 class="text-sm font-bold text-white mb-3 flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <span class="text-neon-yellow">●</span> 4. Riscos Pontuais no Imóvel
+            </span>
+            <span class="text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">IT-16</span>
+          </h2>
+          <p class="text-[11px] text-gray-400 mb-3">Marque as instalações pontuais presentes que exigem extintores dedicados:</p>
+          <div class="space-y-2 text-xs">
+            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700 transition-colors">
+              <input type="checkbox" id="chkGlp" checked class="rounded border-gray-600 text-red-600 focus:ring-red-500">
+              <span>Central de GLP / Estação Medição de Gás (Exige PQS 4/6kg ABC a menos de 5m)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700 transition-colors">
+              <input type="checkbox" id="chkCasaBombas" checked class="rounded border-gray-600 text-red-600 focus:ring-red-500">
+              <span>Casa de Máquinas / Bombas de Incêndio / Elevadores (Exige CO2 6kg ou ABC)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700 transition-colors">
+              <input type="checkbox" id="chkQuadrosEletricos" checked class="rounded border-gray-600 text-red-600 focus:ring-red-500">
+              <span>Quadro Geral de Baixa Tensão (QGBT) / Cabine Primária (Exige CO2 6kg)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700 transition-colors">
+              <input type="checkbox" id="chkGerador" class="rounded border-gray-600 text-red-600 focus:ring-red-500">
+              <span>Grupo Gerador Diesel / Tanque Diário (Exige CO2 + Pó Químico ABC)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg bg-dark-800/50 hover:bg-dark-700 transition-colors">
+              <input type="checkbox" id="chkGaragem" checked class="rounded border-gray-600 text-red-600 focus:ring-red-500">
+              <span>Garagem / Estacionamento Coberto (Extintores ABC com proteção de veículos)</span>
+            </label>
+          </div>
+        </div>
+
+        <button id="btnCalcular" type="button" class="btn-fire w-full py-3.5 rounded-xl font-bold text-dark-900 text-sm tracking-wider uppercase shadow-xl shadow-red-500/25 flex items-center justify-center gap-2 cursor-pointer">
+          <span>🚀 Processar Dimensionamento Completo PPCI</span>
+        </button>
+
+      </div>
+
+      <!-- ========================================== -->
+      <!-- COLUNA DA DIREITA: RESULTADOS & DASHBOARDS -->
+      <!-- ========================================== -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- 1. Enquadramento e Diagnóstico Geral de Medidas (IT-01) -->
+        <div class="gradient-border p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <span class="text-xs uppercase tracking-wider text-neon-red font-bold">Diagnóstico Regulamentar</span>
+              <h2 class="text-base font-bold text-white flex items-center gap-2">
+                🛡️ Medidas de Segurança Contra Incêndio Obrigatórias
+              </h2>
+            </div>
+            <span id="badgeClassificacaoEdificacao" class="text-xs px-2.5 py-1 rounded-full font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+              Edificação Média (Porte II)
+            </span>
+          </div>
+          <p class="text-xs text-gray-400 mb-4">
+            Enquadramento automático com base na área (<span id="diagArea">1200</span> m²), altura (<span id="diagAltura">12.0</span> m), pavimentos (<span id="diagPav">4</span>) e ocupação (<span id="diagOcup">A-2</span>), conforme Decreto Estadual e Tabela de Exigências da IT-01.
+          </p>
+
+          <!-- Grid de Medidas com Badges -->
+          <div id="gridMedidasSeguranca" class="grid sm:grid-cols-2 gap-2.5 text-xs">
+            <!-- Inserido dinamicamente via JS -->
+          </div>
+        </div>
+
+        <!-- 2. KPIs e Resultados Principais do Sistema Hidráulico -->
+        <div class="gradient-border p-6 text-center">
+          <div class="flex flex-wrap items-center justify-between border-b border-white/10 pb-4 mb-4">
+            <div class="text-left">
+              <span class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold block">Reserva Técnica de Incêndio (RTI)</span>
+              <span id="kpiRti" class="text-4xl sm:text-5xl font-extrabold text-neon-red text-glow font-mono">18,0 m³</span>
+              <span id="kpiRtiLitros" class="text-xs text-gray-400 block font-mono">(18.000 Litros de água)</span>
+            </div>
+            <div class="text-right mt-2 sm:mt-0">
+              <span class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold block">Sistema de Hidrantes</span>
+              <span id="kpiHidranteStatus" class="text-sm font-bold text-green-400 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/30 inline-block">
+                OBRIGATÓRIO (Tipo 2)
+              </span>
+              <span id="kpiHidranteVazao" class="text-xs text-gray-400 block font-mono mt-1">Vazão Total: 300 L/min (2 jatos simultâneos)</span>
+            </div>
+          </div>
+
+          <!-- Grid 4 Cards Resumo -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 card-hover">
+              <div class="text-[10px] text-gray-400 uppercase font-semibold">Altura Manométrica</div>
+              <div id="kpiHmt" class="text-lg font-bold text-neon-orange font-mono mt-0.5">28,5 mca</div>
+              <div class="text-[10px] text-gray-500">Hgeom + Perdas + Pesg</div>
+            </div>
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 card-hover">
+              <div class="text-[10px] text-gray-400 uppercase font-semibold">Bomba Principal</div>
+              <div id="kpiPotBomba" class="text-lg font-bold text-neon-yellow font-mono mt-0.5">5,0 CV</div>
+              <div id="kpiPotKw" class="text-[10px] text-gray-500">3,68 kW (Trifásico)</div>
+            </div>
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 card-hover">
+              <div class="text-[10px] text-gray-400 uppercase font-semibold">Bomba Jockey</div>
+              <div id="kpiBombaJockey" class="text-lg font-bold text-neon-cyan font-mono mt-0.5">0,75 CV</div>
+              <div class="text-[10px] text-gray-500">Pressão: 33,5 mca</div>
+            </div>
+            <div class="p-3 bg-dark-800/60 rounded-xl border border-white/5 card-hover">
+              <div class="text-[10px] text-gray-400 uppercase font-semibold">Total Extintores</div>
+              <div id="kpiTotalExtintores" class="text-lg font-bold text-neon-red font-mono mt-0.5">10 unid.</div>
+              <div id="kpiDistMax" class="text-[10px] text-gray-500">Caminh. máx: 15 m</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Diagrama Isométrico Esquemático da Rede e Barrilete (SVG Interativo) -->
+        <div class="gradient-border p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <span class="text-xs uppercase tracking-wider text-neon-red font-bold">Visualização Técnica</span>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                📐 Esquema Isométrico da Prumada & Barrilete
+              </h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono border border-blue-500/30">SVG DINÂMICO</span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 mb-3">
+            Diagrama unifilar da instalação com indicação do reservatório (RTI), conjunto moto-bomba principal e jockey, barrilete, prumada vertical, hidrantes de pavimento e registro de recalque no passeio.
+          </p>
+
+          <!-- SVG Container -->
+          <div class="w-full bg-dark-900 rounded-xl border border-white/10 p-3 overflow-hidden">
+            <div id="svgContainer" class="w-full overflow-x-auto flex justify-center">
+              <!-- Renderizado via JS -->
+            </div>
+          </div>
+
+          <!-- Alerta de Válvula Redutora de Pressão (VRP) -->
+          <div id="alertaVrp" class="mt-3 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-xs text-yellow-300 hidden">
+            <!-- Preenchido dinamicamente se P > 45 mca -->
+          </div>
+        </div>
+
+        <!-- 4. Duas Colunas: Saídas de Emergência (IT-11) + Distribuição de Extintores (IT-16) -->
+        <div class="grid sm:grid-cols-2 gap-6">
+
+          <!-- Card Saídas de Emergência -->
+          <div class="gradient-border p-5">
+            <h3 class="text-sm font-bold text-white mb-3 flex items-center justify-between">
+              <span class="flex items-center gap-2">
+                <span class="text-neon-cyan">●</span> Saídas de Emergência (IT-11)
+              </span>
+              <span class="text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">NBR 9077</span>
+            </h3>
+
+            <div class="space-y-3 text-xs">
+              <div class="p-2.5 rounded-lg bg-dark-800/60 border border-white/5">
+                <span class="text-gray-400 block text-[11px]">População Total Estimada:</span>
+                <span id="resPopulacao" class="text-base font-bold text-white font-mono">80 pessoas</span>
+                <span id="resDensidade" class="text-[10px] text-gray-500 block">Densidade adotada: 1 pessoa a cada 15 m²</span>
+              </div>
+
+              <div class="p-2.5 rounded-lg bg-dark-800/60 border border-white/5">
+                <span class="text-gray-400 block text-[11px]">Unidades de Passagem (UPs):</span>
+                <div class="flex items-center justify-between mt-1">
+                  <div>
+                    <span class="text-[10px] text-gray-400">Portas/Corredores:</span>
+                    <span id="resUpPortas" class="font-bold text-neon-cyan font-mono block">2 UP (1,10 m)</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-gray-400">Escadas:</span>
+                    <span id="resUpEscadas" class="font-bold text-neon-cyan font-mono block">2 UP (1,10 m)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-lg bg-dark-800/60 border border-white/5">
+                <span class="text-gray-400 block text-[11px]">Tipo de Escada Exigido:</span>
+                <span id="resTipoEscada" class="text-xs font-bold text-neon-orange block mt-0.5">
+                  Escada Protegida (EP) — Portas P-60
+                </span>
+                <span id="resObsEscada" class="text-[10px] text-gray-500 block mt-0.5">
+                  Paredes com resistência ao fogo CF-120 e ventilação garantida.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Distribuição de Extintores -->
+          <div class="gradient-border p-5">
+            <h3 class="text-sm font-bold text-white mb-3 flex items-center justify-between">
+              <span class="flex items-center gap-2">
+                <span class="text-neon-orange">●</span> Locação de Extintores (IT-16)
+              </span>
+              <span class="text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">NBR 12693</span>
+            </h3>
+
+            <div id="listaDetalhadaExtintores" class="space-y-2.5 text-xs">
               <!-- Preenchido via JS -->
             </div>
           </div>
-          <div class="gradient-border p-6">
-            <h3 class="text-lg font-semibold mb-4 text-neon-red">🚰 Sistema de Hidrantes</h3>
-            <div id="listaHidrantes" class="space-y-3 text-sm text-gray-300">
-              <!-- Preenchido via JS -->
-            </div>
+
+        </div>
+
+        <!-- 5. Tabela de Pressões por Pavimento & Verificações -->
+        <div class="gradient-border p-5">
+          <h3 class="text-sm font-bold text-white mb-3 flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <span class="text-neon-green">●</span> Pressão Hidráulica por Pavimento (NBR 13714)
+            </span>
+            <span class="text-[10px] text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">Limite: 45 mca</span>
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-gray-300">
+              <thead class="bg-dark-800 text-gray-400 uppercase text-[10px]">
+                <tr>
+                  <th class="px-3 py-2 rounded-l-lg">Pavimento</th>
+                  <th class="px-3 py-2">Cota Nível</th>
+                  <th class="px-3 py-2">Pressão Estática</th>
+                  <th class="px-3 py-2">Pressão Dinâmica</th>
+                  <th class="px-3 py-2">Status Normativo</th>
+                  <th class="px-3 py-2 rounded-r-lg">Exigência VRP</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaPressaoPavimentos" class="divide-y divide-white/5 font-mono">
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <!-- Memorial -->
-        <div class="gradient-border p-6">
-          <h3 class="text-lg font-semibold mb-4 text-white">📝 Memorial Descritivo</h3>
-          <pre id="memorial" class="font-mono text-xs text-gray-400 bg-dark-800/50 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">Aguardando cálculo...</pre>
+        <!-- 6. Memorial Técnico Preliminar -->
+        <div class="gradient-border p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              📝 Memorial de Pré-Dimensionamento PPCI
+            </h3>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="copiarMemorialTexto()" class="text-xs px-3 py-1 rounded-lg bg-dark-700 hover:bg-dark-600 text-gray-300 border border-white/10 cursor-pointer">
+                Copiar Texto
+              </button>
+              <button type="button" onclick="gerarMemorialIncendio()" class="text-xs px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold cursor-pointer">
+                Visualizar ABNT Oficial
+              </button>
+            </div>
+          </div>
+          <pre id="memorial" class="font-mono text-[11px] leading-relaxed text-gray-400 bg-dark-800/80 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap max-h-60 border border-white/5">Aguardando processamento...</pre>
         </div>
+
       </div>
+
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="mt-12 py-6 text-center text-gray-500 text-sm border-t border-black/5">
-    <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-cyan-400 font-bold transition-colors">4u.ia.br</a>– Ferramentas de Engenharia</p>
+  <!-- Rodapé -->
+  <footer class="mt-12 py-6 text-center text-gray-500 text-xs border-t border-white/5 no-print">
+    <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-4">
+      <p>&copy; <span id="year"></span> <a href="https://4u.ia.br" target="_blank" class="hover:text-red-400 font-bold text-gray-400 transition-colors">4u.ia.br</a> — Suíte de Engenharia eCalc Pro</p>
+      <div class="flex items-center gap-4 text-gray-500">
+        <span>NBR 13714 (Hidrantes)</span>
+        <span>•</span>
+        <span>NBR 12693 (Extintores)</span>
+        <span>•</span>
+        <span>NBR 9077 (Saídas)</span>
+        <span>•</span>
+        <span>ITs Corpo de Bombeiros</span>
+      </div>
+    </div>
   </footer>
 
+  <!-- ========================================================= -->
+  <!-- SCRIPTS E LÓGICA TÉCNICA NORMATIVA PPCI (IT / NBR)       -->
+  <!-- ========================================================= -->
   <script>
     const $ = id => document.getElementById(id);
 
+    // Estado global da memória de cálculo
+    let ultimoCalculoPPCI = null;
+    let modoCargaAtual = 'tabela'; // 'tabela' ou 'ponderado'
+
+    // Alternar abas de modo de cálculo de carga de incêndio (Item 2)
+    $('tabModoTabela').addEventListener('click', () => {
+      modoCargaAtual = 'tabela';
+      $('tabModoTabela').className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg bg-gradient-to-r from-red-600 to-orange-600 text-white transition-all';
+      $('tabModoPonderado').className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition-all';
+      $('painelModoTabela').classList.remove('hidden');
+      $('painelModoPonderado').classList.add('hidden');
+      calcularPPCI();
+    });
+
+    $('tabModoPonderado').addEventListener('click', () => {
+      modoCargaAtual = 'ponderado';
+      $('tabModoPonderado').className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg bg-gradient-to-r from-red-600 to-orange-600 text-white transition-all';
+      $('tabModoTabela').className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition-all';
+      $('painelModoPonderado').classList.remove('hidden');
+      $('painelModoTabela').classList.add('hidden');
+      calcularPPCI();
+    });
+
+    // Atualização dinâmica em tempo de digitação
+    ['area', 'pavimentos', 'altura', 'peDireito', 'ocupacao', 'posicaoReservatorio',
+     'atividadeTabelada', 'matMadeira', 'matPlastico', 'matBorracha', 'matLiquidos', 'matTexteis',
+     'tipoSistemaHidrante', 'autonomiaRti', 'rendimentoBomba', 'tuboPrumada',
+     'chkGlp', 'chkCasaBombas', 'chkQuadrosEletricos', 'chkGerador', 'chkGaragem'
+    ].forEach(id => {
+      const el = $(id);
+      if (el) {
+        el.addEventListener('input', calcularPPCI);
+        el.addEventListener('change', calcularPPCI);
+      }
+    });
+
+    // Auto-ajustar altura quando alterar número de pavimentos ou pé-direito
+    $('pavimentos').addEventListener('change', () => {
+      const pav = parseInt($('pavimentos').value) || 1;
+      const pd = parseFloat($('peDireito').value) || 3.0;
+      $('altura').value = ((pav - 1) * pd).toFixed(1);
+      calcularPPCI();
+    });
+
+    $('btnCalcular').addEventListener('click', () => {
+      calcularPPCI();
+      const el = $('kpiRti');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
+    // =========================================================
+    // MOTOR DE CÁLCULO PRINCIPAL
+    // =========================================================
     function calcularPPCI() {
-      const area = parseFloat($('area').value) || 0;
-      const risco = $('risco').value;
-      const pavimentos = parseInt($('pavimentos').value) || 1;
+      const areaTotal = Math.max(10, parseFloat($('area').value) || 1200);
+      const pavimentos = Math.max(1, parseInt($('pavimentos').value) || 1);
+      const altura = Math.max(1, parseFloat($('altura').value) || 12.0);
+      const peDireito = Math.max(2.0, parseFloat($('peDireito').value) || 3.0);
       const ocupacao = $('ocupacao').value;
+      const posicaoRes = $('posicaoReservatorio').value;
+      const areaPorPav = areaTotal / pavimentos;
 
-      if (area <= 0) return alert("Área inválida");
+      // ---------------------------------------------------------
+      // 1. CARGA DE INCÊNDIO ESPECÍFICA (Item 2 - NBR 14432 / IT-14)
+      // ---------------------------------------------------------
+      let qfi = 300;
+      let metodoCargaTexto = '';
+      if (modoCargaAtual === 'tabela') {
+        const selAtiv = $('atividadeTabelada');
+        qfi = parseFloat(selAtiv.value) || 300;
+        metodoCargaTexto = `Tabela Normativa IT-14: ${selAtiv.options[selAtiv.selectedIndex].text}`;
+      } else {
+        // Cálculo ponderado: qfi = Σ(Mi * Hi) / Area
+        const mMad = parseFloat($('matMadeira').value) || 0;
+        const mPla = parseFloat($('matPlastico').value) || 0;
+        const mBor = parseFloat($('matBorracha').value) || 0;
+        const mLiq = parseFloat($('matLiquidos').value) || 0;
+        const mTex = parseFloat($('matTexteis').value) || 0;
 
-      // 1. Extintores (IT-16 / NBR 12693)
-      let areaPorExtintor = 500;
-      let distMax = 25;
-      let capMinima = "2-A";
-      
-      if (risco === 'medio') {
-        areaPorExtintor = 250;
-        distMax = 20;
-        capMinima = "3-A / 20-B";
-      } else if (risco === 'alto') {
-        areaPorExtintor = 150;
-        distMax = 15;
-        capMinima = "4-A / 40-B";
+        const energiaTotalMJ = (mMad * 19) + (mPla * 40) + (mBor * 32) + (mLiq * 42) + (mTex * 17);
+        qfi = Math.round(energiaTotalMJ / areaTotal);
+        if (qfi < 100) qfi = 100;
+        metodoCargaTexto = `Método Ponderado: Energia total de ${energiaTotalMJ.toLocaleString('pt-BR')} MJ em ${areaTotal} m²`;
       }
 
-      // No mínimo 2 extintores por pavimento (Água + Pó/CO2), exceto áreas minúsculas
-      let qtdBase = Math.ceil(area / areaPorExtintor);
-      const minPorPavimento = 2;
-      let totalExtintores = Math.max(qtdBase, minPorPavimento * pavimentos);
+      // Classificação do Risco pela Carga
+      let risco = 'baixo';
+      let riscoTexto = 'Risco Baixo (Leve)';
+      let badgeRiscoCls = 'bg-green-500/20 text-green-400 border-green-500/30';
+      if (qfi > 1200) {
+        risco = 'alto';
+        riscoTexto = 'Risco Alto (Extraordinário)';
+        badgeRiscoCls = 'bg-red-500/20 text-red-400 border-red-500/30';
+      } else if (qfi > 300) {
+        risco = 'medio';
+        riscoTexto = 'Risco Médio (Ordinário)';
+        badgeRiscoCls = 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      }
 
-      // 2. Hidrantes e RTI (IT-22)
-      // Regra simplificada: Hidrantes exigidos para > 750m² ou > 12m de altura.
-      let exigeHidrante = (area > 750 || pavimentos > 3);
-      let rti = 0;
-      let tipoSistema = "Não exigido";
-      let vazao = 0;
-      let pressao = 0;
+      $('valorQfiDisplay').textContent = `${qfi} MJ/m²`;
+      $('badgeRiscoDisplay').textContent = riscoTexto;
+      $('badgeRiscoDisplay').className = `text-xs px-2.5 py-1 rounded-full font-bold border ${badgeRiscoCls}`;
 
-      if (exigeHidrante) {
-        if (risco === 'baixo') {
-          tipoSistema = "Tipo 1 (Esguicho 13mm)";
-          rti = Math.max(8, area * 0.008); // 8m³ minimo simplificado
-          vazao = 130;
-          pressao = 10; // mca
+      // ---------------------------------------------------------
+      // 2. ENQUADRAMENTO E DIAGNÓSTICO DE MEDIDAS DE SEGURANÇA (Item 1 - IT-01)
+      // ---------------------------------------------------------
+      const exigeAcessoViaturas = (altura > 12 || areaTotal > 750);
+      const exigeSaidasEmergencia = true; // Sempre obrigatório
+      const exigeBrigada = (areaTotal > 750 || ['F-1', 'F-6', 'B-1', 'B-2', 'H-2', 'H-3', 'I-3', 'J-4'].includes(ocupacao));
+      const exigeIluminacao = (pavimentos > 1 || areaTotal > 200);
+      const exigeSinalizacao = true; // Sempre obrigatório
+      const exigeAlarme = (areaTotal > 750 || altura > 12 || ['F-1', 'F-6'].includes(ocupacao));
+      const exigeDeteccao = (altura > 30 || ['H-3', 'B-1', 'B-2', 'J-4'].includes(ocupacao) || (areaTotal > 2000 && risco === 'alto'));
+      const exigeExtintores = true; // Sempre obrigatório
+      const exigeHidrantes = (areaTotal > 750 || altura > 12 || (['I-2', 'I-3', 'J-3', 'J-4'].includes(ocupacao) && areaTotal > 500));
+      const exigeSprinklers = (altura > 30 || (areaTotal > 2500 && qfi > 1200) || ['C-3'].includes(ocupacao));
+      const exigeControleFumaca = (altura > 12 || ['F-6'].includes(ocupacao));
+      const exigeSpda = (altura > 12 || areaTotal > 1500 || ['F-1', 'F-6'].includes(ocupacao));
+
+      // Classificação do porte
+      let porteTexto = 'Pequeno Porte (PTS)';
+      if (altura > 30 || areaTotal > 5000) {
+        porteTexto = 'Edificação de Grande Porte / Alta Complexidade';
+      } else if (areaTotal > 750 || altura > 12) {
+        porteTexto = 'Edificação de Médio Porte (Processo Técnico PT)';
+      }
+      $('badgeClassificacaoEdificacao').textContent = porteTexto;
+      $('diagArea').textContent = areaTotal.toLocaleString('pt-BR');
+      $('diagAltura').textContent = altura.toFixed(1);
+      $('diagPav').textContent = pavimentos;
+      $('diagOcup').textContent = ocupacao;
+
+      // Renderizar Grade de Medidas
+      const medidas = [
+        { nome: 'Acesso de Viaturas', norma: 'IT-06', status: exigeAcessoViaturas ? 'OBRIGATÓRIO' : 'ISENTO', desc: 'Largura viária >= 6,00 m e altura >= 4,50 m' },
+        { nome: 'Saídas de Emergência', norma: 'IT-11 / NBR 9077', status: 'OBRIGATÓRIO', desc: 'Portas, corredores e caixas de escadas protegidas' },
+        { nome: 'Brigada de Incêndio', norma: 'IT-17', status: exigeBrigada ? 'OBRIGATÓRIO' : (areaTotal > 500 ? 'RECOMENDADO' : 'ISENTO'), desc: 'Treinamento periódico com certificação' },
+        { nome: 'Iluminação de Emergência', norma: 'IT-18', status: exigeIluminacao ? 'OBRIGATÓRIO' : 'ISENTO', desc: 'Blocos autônomos ou central nas rotas de fuga' },
+        { nome: 'Sinalização de Emergência', norma: 'IT-20 / NBR 13434', status: 'OBRIGATÓRIO', desc: 'Placas fotoluminescentes de rotas e equipamentos' },
+        { nome: 'Alarme e Detecção', norma: 'IT-19 / NBR 17240', status: (exigeDeteccao ? 'OBRIGATÓRIO (Detecção+Alarme)' : (exigeAlarme ? 'OBRIGATÓRIO (Alarme Manual)' : 'ISENTO')), desc: exigeDeteccao ? 'Detectores ópticos automáticos' : 'Botoeiras manuais e sirenes' },
+        { nome: 'Sistema de Extintores', norma: 'IT-16 / NBR 12693', status: 'OBRIGATÓRIO', desc: 'Mínimo 2 unidades por pavimento (Água + Pó/CO2)' },
+        { nome: 'Hidrantes / Mangotinhos', norma: 'IT-22 / NBR 13714', status: exigeHidrantes ? 'OBRIGATÓRIO' : 'ISENTO', desc: exigeHidrantes ? 'Rede pressurizada com RTI e mangueiras' : 'Dispensado por área <= 750m² e H <= 12m' },
+        { nome: 'Chuveiros (Sprinklers)', norma: 'IT-23 / NBR 10897', status: exigeSprinklers ? 'OBRIGATÓRIO' : 'ISENTO', desc: exigeSprinklers ? 'Proteção automática por bicos termossensíveis' : 'Exigido p/ H > 30m ou depósitos altos' },
+        { nome: 'Controle de Fumaça/Comp.', norma: 'IT-09 / IT-15', status: exigeControleFumaca ? 'OBRIGATÓRIO' : 'RECOMENDADO', desc: 'Compartimentação vertical e selagem de shafts' },
+        { nome: 'Proteção Descargas (SPDA)', norma: 'IT-41 / NBR 5419', status: exigeSpda ? 'OBRIGATÓRIO' : 'RECOMENDADO', desc: 'Para-raios externo e malha de aterramento' }
+      ];
+
+      const gridHtml = medidas.map(m => {
+        let badgeCls = 'badge-exempt';
+        if (m.status.includes('OBRIGATÓRIO')) badgeCls = 'badge-mandatory font-bold';
+        else if (m.status.includes('RECOMENDADO')) badgeCls = 'badge-recommended font-bold';
+
+        return `
+          <div class="p-2.5 rounded-xl bg-dark-800/60 border border-white/5 flex items-center justify-between gap-2">
+            <div>
+              <div class="font-bold text-white flex items-center gap-1.5">
+                <span>${m.nome}</span>
+                <span class="text-[10px] text-gray-500 font-mono">(${m.norma})</span>
+              </div>
+              <div class="text-[10px] text-gray-400 mt-0.5">${m.desc}</div>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap uppercase tracking-wider ${badgeCls}">
+              ${m.status.split(' ')[0]}
+            </span>
+          </div>
+        `;
+      }).join('');
+      $('gridMedidasSeguranca').innerHTML = gridHtml;
+
+      // ---------------------------------------------------------
+      // 3. DIMENSIONAMENTO DE HIDRANTES E RTI (Item 3 - NBR 13714 / IT-22)
+      // ---------------------------------------------------------
+      let tipoHidrante = $('tipoSistemaHidrante').value;
+      if (tipoHidrante === 'auto') {
+        if (!exigeHidrantes) {
+          tipoHidrante = 'isento';
+        } else if (risco === 'baixo') {
+          tipoHidrante = 'tipo1'; // Mangotinho
         } else if (risco === 'medio') {
-          tipoSistema = "Tipo 2/3 (Esguicho 16mm/19mm)";
-          rti = Math.max(12, area * 0.012); 
-          vazao = 200;
-          pressao = 25;
+          tipoHidrante = 'tipo2'; // Hidrante 38mm esguicho 13mm
         } else {
-          tipoSistema = "Tipo 4/5 (Alta demanda)";
-          rti = Math.max(18, area * 0.018);
-          vazao = 300;
-          pressao = 40;
+          tipoHidrante = 'tipo4'; // Industrial 65mm
         }
-        rti = Math.ceil(rti);
-        // Limites práticos para reservatório em edifícios comuns
-        if (rti > 120) rti = 120;
       }
 
-      // Atualizar UI
-      $('resultadoSection').classList.remove('opacity-50');
-      $('resultadoSection').classList.add('pulse-glow');
-      setTimeout(() => $('resultadoSection').classList.remove('pulse-glow'), 1000);
+      let qPontoLmin = 0; // L/min por hidrante
+      let pEsguichoMca = 0; // mca no esguicho mais desfavorável
+      let diamEsguichoMm = 0;
+      let diamMangueiraMm = 0;
+      let tipoHidranteLabel = '';
 
-      $('valorRTI').textContent = `${rti} m³`;
-      $('infoHidrante').textContent = `Sistema de Hidrantes: ${exigeHidrante ? 'Exigido' : 'Isento'}`;
-      
-      $('qtdExtintores').textContent = totalExtintores;
-      $('capExtintora').textContent = capMinima;
-      $('distMax').textContent = `${distMax} m`;
-      $('vazaoHidrante').textContent = exigeHidrante ? `${vazao} L/min` : '-';
+      if (tipoHidrante === 'tipo1') {
+        tipoHidranteLabel = 'Tipo 1 (Mangotinho Ø25mm)';
+        qPontoLmin = 100;
+        pEsguichoMca = 8;
+        diamEsguichoMm = 8;
+        diamMangueiraMm = 25;
+      } else if (tipoHidrante === 'tipo2') {
+        tipoHidranteLabel = 'Tipo 2 (Hidrante Ø38mm - Esguicho 13mm)';
+        qPontoLmin = 150;
+        pEsguichoMca = 10;
+        diamEsguichoMm = 13;
+        diamMangueiraMm = 38;
+      } else if (tipoHidrante === 'tipo3') {
+        tipoHidranteLabel = 'Tipo 3 (Hidrante Ø38/65mm - Esguicho 16mm)';
+        qPontoLmin = 200;
+        pEsguichoMca = 15;
+        diamEsguichoMm = 16;
+        diamMangueiraMm = 38;
+      } else if (tipoHidrante === 'tipo4') {
+        tipoHidranteLabel = 'Tipo 4 (Hidrante Industrial Ø65mm - Esguicho 19mm)';
+        qPontoLmin = 300;
+        pEsguichoMca = 20;
+        diamEsguichoMm = 19;
+        diamMangueiraMm = 65;
+      } else if (tipoHidrante === 'tipo5') {
+        tipoHidranteLabel = 'Tipo 5 (Alto Risco Ø65mm - Esguicho 25mm)';
+        qPontoLmin = 450;
+        pEsguichoMca = 30;
+        diamEsguichoMm = 25;
+        diamMangueiraMm = 65;
+      } else {
+        tipoHidranteLabel = 'Isento de Hidrantes';
+      }
 
-      // Lista Extintores
-      let qAgua = Math.ceil(totalExtintores * 0.4);
-      let qPo = totalExtintores - qAgua;
-      $('listaExtintores').innerHTML = `
-        <div class="flex justify-between border-b border-white/10 pb-2">
-          <span>💧 Água Pressurizada (10L)</span>
-          <span class="font-bold text-neon-orange">${qAgua} unid.</span>
+      // Cálculo de Vazão Simultânea (2 hidrantes mais desfavoráveis conforme NBR 13714)
+      const vazaoTotalLmin = tipoHidrante !== 'isento' ? (2 * qPontoLmin) : 0;
+      const vazaoTotalM3h = (vazaoTotalLmin * 60) / 1000;
+      const vazaoTotalM3s = vazaoTotalLmin / 60000;
+
+      // Autonomia e Volume da RTI
+      const autonomiaMin = parseInt($('autonomiaRti').value) || 60;
+      let rtiCalculadaM3 = 0;
+      let rtiAdotadaM3 = 0;
+
+      if (tipoHidrante !== 'isento') {
+        rtiCalculadaM3 = (vazaoTotalLmin * autonomiaMin) / 1000;
+        // Mínimos normativos tabelados IT-22 SP
+        let rtiMinNormativo = 8;
+        if (tipoHidrante === 'tipo1') rtiMinNormativo = 5;
+        else if (tipoHidrante === 'tipo2') rtiMinNormativo = 12;
+        else if (tipoHidrante === 'tipo3') rtiMinNormativo = 18;
+        else if (tipoHidrante === 'tipo4') rtiMinNormativo = 24;
+        else if (tipoHidrante === 'tipo5') rtiMinNormativo = 36;
+
+        rtiAdotadaM3 = Math.max(rtiCalculadaM3, rtiMinNormativo);
+        rtiAdotadaM3 = Math.ceil(rtiAdotadaM3 * 2) / 2; // Arredondar para múltiplos de 0.5 m³
+      }
+
+      // ---------------------------------------------------------
+      // 4. DIMENSIONAMENTO DA BOMBA DE INCÊNDIO & JOCKEY (Item 3)
+      // ---------------------------------------------------------
+      let hmt = 0;
+      let potBombaCv = 0;
+      let potBombaKw = 0;
+      let potComercialCv = 0;
+      let jockeyPotCv = 0.5;
+      let jockeyPressaoMca = 0;
+
+      if (tipoHidrante !== 'isento') {
+        const hGeom = altura; // desnível geométrico
+        // Perda de carga estimada no barrilete, conexões, prumada e mangueira (aprox. 15% do desnível + 5m de mangueira)
+        const perdaCargaMca = (0.12 * hGeom) + 5.0;
+        hmt = hGeom + perdaCargaMca + pEsguichoMca;
+
+        // Se reservatório for superior e estiver na cobertura, o hidrante mais desfavorável é o do último andar (hgeom pequeno)
+        if (posicaoRes === 'superior') {
+          // No topo da edificação, o desnível geométrico favorável é apenas cerca de 2m abaixo do reservatório:
+          hmt = pEsguichoMca + 4.0; // Bomba de reforço apenas para o andar superior
+        }
+
+        const rendimento = parseFloat($('rendimentoBomba').value) || 0.65;
+        // Fórmula de potência: P = (γ * Q * HMT) / (75 * η) [Q em m³/s, γ = 1000 kgf/m³]
+        potBombaCv = (1000 * vazaoTotalM3s * hmt) / (75 * rendimento);
+        potBombaKw = potBombaCv * 0.7355;
+
+        // Seleção de Motor Comercial Padrão (WEG / Dancor / Schneider)
+        const motoresComerciais = [1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10.0, 12.5, 15.0, 20.0, 25.0, 30.0, 40.0, 50.0];
+        potComercialCv = motoresComerciais.find(m => m >= potBombaCv) || Math.ceil(potBombaCv);
+
+        // Bomba Jockey (manutenção de pressão e pequenos vazamentos)
+        jockeyPressaoMca = Math.round(hmt + 5);
+        jockeyPotCv = potComercialCv > 15 ? 1.5 : (potComercialCv > 7.5 ? 1.0 : 0.75);
+      }
+
+      // ---------------------------------------------------------
+      // 5. SAÍDAS DE EMERGÊNCIA E LOTAÇÃO (Item 4 - NBR 9077 / IT-11)
+      // ---------------------------------------------------------
+      let densidadeM2PorPessoa = 15; // padrão residencial
+      let tipoEscadaRecomendada = 'Escada Não Enclausurada (Comum)';
+      let obsEscada = 'Permitida para edificações térreas ou até 12m sem exigência especial de isolamento.';
+
+      if (['A-1', 'A-2', 'A-3'].includes(ocupacao)) {
+        densidadeM2PorPessoa = 15; // 1 pessoa a cada 15m²
+      } else if (['D-1', 'D-2'].includes(ocupacao)) {
+        densidadeM2PorPessoa = 7; // escritórios
+      } else if (['C-1', 'C-2', 'C-3'].includes(ocupacao)) {
+        densidadeM2PorPessoa = 3; // comércio varejista
+      } else if (['F-1', 'F-6'].includes(ocupacao)) {
+        densidadeM2PorPessoa = 1.0; // reunião de público em pé
+      } else if (['F-8'].includes(ocupacao)) {
+        densidadeM2PorPessoa = 1.5; // restaurantes
+      } else if (['E-1', 'E-2', 'E-3', 'E-4'].includes(ocupacao)) {
+        densidadeM2PorPessoa = 2.0; // educacional
+      } else {
+        densidadeM2PorPessoa = 20; // indústrias e depósitos
+      }
+
+      const popPorPav = Math.max(2, Math.ceil(areaPorPav / densidadeM2PorPessoa));
+      const popTotal = popPorPav * pavimentos;
+
+      // Capacidade das Unidades de Passagem (NBR 9077)
+      const capPortas = 100;
+      const capEscadas = ['F-1', 'F-6', 'E-1'].includes(ocupacao) ? 60 : 75;
+
+      const upPortas = Math.max(2, Math.ceil(popPorPav / capPortas));
+      const upEscadas = Math.max(2, Math.ceil(popPorPav / capEscadas));
+      const largPortas = (upPortas * 0.55).toFixed(2);
+      const largEscadas = (upEscadas * 0.55).toFixed(2);
+
+      // Classificação da Escada
+      if (altura > 60) {
+        tipoEscadaRecomendada = 'Escada Pressurizada com Insuflamento Mecânico';
+        obsEscada = 'Obrigatória para H > 60m. Ventiladores com acionamento automático por detectores.';
+      } else if (altura > 30) {
+        tipoEscadaRecomendada = 'Escada Enclausurada à Prova de Fumaça (EAPF)';
+        obsEscada = 'Antecâmara obrigatória com duto de entrada de ar (DA) e duto de saída de fumaça (DF) ou balcão.';
+      } else if (altura > 12 || areaTotal > 750) {
+        tipoEscadaRecomendada = 'Escada Protegida (EP)';
+        obsEscada = 'Paredes resistentes ao fogo CF-120 e portas corta-fogo P-60/P-90 com fechamento automático.';
+      }
+
+      // ---------------------------------------------------------
+      // 6. DISTRIBUIÇÃO E LOCAÇÃO DE EXTINTORES (Item 5 - NBR 12693 / IT-16)
+      // ---------------------------------------------------------
+      let areaCobPorExtintor = 500;
+      let distCaminhamentoMax = 20;
+      let capMinimaExtintora = '2-A / 20-B:C';
+
+      if (risco === 'medio') {
+        areaCobPorExtintor = 250;
+        distCaminhamentoMax = 15;
+        capMinimaExtintora = '3-A / 40-B:C';
+      } else if (risco === 'alto') {
+        areaCobPorExtintor = 150;
+        distCaminhamentoMax = 10;
+        capMinimaExtintora = '4-A / 80-B:C';
+      }
+
+      // Mínimo 2 extintores por pavimento
+      const qtdBaseExtintores = Math.max(Math.ceil(areaTotal / areaCobPorExtintor), pavimentos * 2);
+
+      // Riscos pontuais marcados
+      let extintoresEspeciais = [];
+      if ($('chkGlp').checked) {
+        extintoresEspeciais.push({ tipo: 'Pó Químico ABC (6kg)', local: 'Central de GLP / Medição de Gás', motivo: 'Proteção pontual de gases inflamáveis a menos de 5m' });
+      }
+      if ($('chkCasaBombas').checked) {
+        extintoresEspeciais.push({ tipo: 'Gás Carbônico CO2 (6kg)', local: 'Casa de Bombas / Máquinas', motivo: 'Proteção contra curto-circuito em motores e painel elétrico' });
+      }
+      if ($('chkQuadrosEletricos').checked) {
+        extintoresEspeciais.push({ tipo: 'Gás Carbônico CO2 (6kg)', local: 'Quadro Geral QGBT / Cabine', motivo: 'Gás limpo não condutor, sem resíduos sólidos' });
+      }
+      if ($('chkGerador').checked) {
+        extintoresEspeciais.push({ tipo: 'Pó Químico ABC (6kg) + CO2', local: 'Grupo Moto-Gerador', motivo: 'Proteção combinada contra óleo diesel (B) e parte elétrica (C)' });
+      }
+      if ($('chkGaragem').checked) {
+        extintoresEspeciais.push({ tipo: 'Pó Químico ABC (6kg)', local: 'Garagens / Estacionamento', motivo: 'Proteção de veículos motorizados e combustíveis' });
+      }
+
+      const totalExtintores = qtdBaseExtintores + extintoresEspeciais.length;
+      const qtdAgua = Math.ceil(qtdBaseExtintores * 0.5);
+      const qtdPoAbc = qtdBaseExtintores - qtdAgua;
+
+      // ---------------------------------------------------------
+      // 7. PRESSÃO POR PAVIMENTO & VERIFICAÇÃO DE VRP (Item 6)
+      // ---------------------------------------------------------
+      const pressoesPorPav = [];
+      let existeVrpObrigatoria = false;
+
+      for (let i = pavimentos; i >= 1; i--) {
+        const cotaZ = (i - 1) * peDireito;
+        // Pressão dinâmica aproximada no hidrante:
+        // No topo: pesguicho. Nos inferiores: ganha desnível (hgeom) menos atrito
+        const ganhoDesnivel = (altura - cotaZ);
+        const perdaAtritoTrecho = 0.08 * ganhoDesnivel;
+        let pressaoDinamica = pEsguichoMca + (ganhoDesnivel - perdaAtritoTrecho);
+        let pressaoEstatica = hmt - (cotaZ - 0.5);
+
+        if (posicaoRes === 'superior') {
+          // No sistema superior por gravidade
+          pressaoEstatica = (altura + 3.0) - cotaZ;
+          pressaoDinamica = pressaoEstatica - perdaAtritoTrecho;
+        }
+
+        if (pressaoDinamica < pEsguichoMca) pressaoDinamica = pEsguichoMca;
+        if (pressaoEstatica < pressaoDinamica) pressaoEstatica = pressaoDinamica + 2;
+
+        const exigeVrp = pressaoDinamica > 45.0 || pressaoEstatica > 50.0;
+        if (exigeVrp) existeVrpObrigatoria = true;
+
+        pressoesPorPav.push({
+          pav: i,
+          nome: i === 1 ? '1º Pavimento (Térreo)' : `${i}º Pavimento`,
+          cota: cotaZ.toFixed(1),
+          pEst: pressaoEstatica.toFixed(1),
+          pDin: pressaoDinamica.toFixed(1),
+          exigeVrp
+        });
+      }
+
+      // Salvar objeto no estado para integrações
+      ultimoCalculoPPCI = {
+        areaTotal,
+        pavimentos,
+        altura,
+        peDireito,
+        ocupacao,
+        posicaoRes,
+        qfi,
+        risco,
+        riscoTexto,
+        metodoCargaTexto,
+        tipoHidrante,
+        tipoHidranteLabel,
+        exigeHidrantes,
+        qPontoLmin,
+        vazaoTotalLmin,
+        vazaoTotalM3h,
+        autonomiaMin,
+        rtiAdotadaM3,
+        pEsguichoMca,
+        diamEsguichoMm,
+        diamMangueiraMm,
+        hmt,
+        potBombaCv,
+        potComercialCv,
+        potBombaKw,
+        jockeyPotCv,
+        jockeyPressaoMca,
+        popTotal,
+        popPorPav,
+        densidadeM2PorPessoa,
+        upPortas,
+        upEscadas,
+        largPortas,
+        largEscadas,
+        tipoEscadaRecomendada,
+        obsEscada,
+        totalExtintores,
+        qtdAgua,
+        qtdPoAbc,
+        distCaminhamentoMax,
+        capMinimaExtintora,
+        extintoresEspeciais,
+        pressoesPorPav,
+        existeVrpObrigatoria,
+        medidas
+      };
+
+      // Atualizar KPIs e DOM
+      renderizarResultadosDOM();
+      renderizarSvgEsquematico();
+      renderizarMemorialTexto();
+    }
+
+    // Renderizar Indicadores na Interface
+    function renderizarResultadosDOM() {
+      const d = ultimoCalculoPPCI;
+      if (!d) return;
+
+      $('kpiRti').textContent = d.exigeHidrantes ? `${d.rtiAdotadaM3.toFixed(1)} m³` : '0,0 m³';
+      $('kpiRtiLitros').textContent = d.exigeHidrantes ? `(${(d.rtiAdotadaM3 * 1000).toLocaleString('pt-BR')} Litros de água)` : '(Edificação Isenta de RTI)';
+
+      if (d.exigeHidrantes) {
+        $('kpiHidranteStatus').textContent = `OBRIGATÓRIO (${d.tipoHidranteLabel.split(' ')[0]} ${d.tipoHidranteLabel.split(' ')[1] || ''})`;
+        $('kpiHidranteStatus').className = 'text-xs font-bold text-red-400 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 inline-block';
+        $('kpiHidranteVazao').textContent = `Vazão: ${d.vazaoTotalLmin} L/min (${d.vazaoTotalM3h.toFixed(1)} m³/h)`;
+      } else {
+        $('kpiHidranteStatus').textContent = 'ISENTO DE HIDRANTES';
+        $('kpiHidranteStatus').className = 'text-xs font-bold text-gray-400 px-3 py-1 rounded-full bg-gray-500/10 border border-gray-500/30 inline-block';
+        $('kpiHidranteVazao').textContent = 'Área < 750m² e H <= 12m';
+      }
+
+      $('kpiHmt').textContent = d.exigeHidrantes ? `${d.hmt.toFixed(1)} mca` : '-';
+      $('kpiPotBomba').textContent = d.exigeHidrantes ? `${d.potComercialCv.toFixed(1)} CV` : '-';
+      $('kpiPotKw').textContent = d.exigeHidrantes ? `${d.potBombaKw.toFixed(2)} kW (Trifásico)` : 'Isento';
+      $('kpiBombaJockey').textContent = d.exigeHidrantes ? `${d.jockeyPotCv.toFixed(2)} CV` : '-';
+
+      $('kpiTotalExtintores').textContent = `${d.totalExtintores} unid.`;
+      $('kpiDistMax').textContent = `Caminh. máx: ${d.distCaminhamentoMax} m`;
+
+      // Saídas de emergência
+      $('resPopulacao').textContent = `${d.popTotal} pessoas (${d.popPorPav} / pav)`;
+      $('resDensidade').textContent = `Densidade adotada: 1 pessoa a cada ${d.densidadeM2PorPessoa} m²`;
+      $('resUpPortas').textContent = `${d.upPortas} UP (${d.largPortas} m)`;
+      $('resUpEscadas').textContent = `${d.upEscadas} UP (${d.largEscadas} m)`;
+      $('resTipoEscada').textContent = d.tipoEscadaRecomendada;
+      $('resObsEscada').textContent = d.obsEscada;
+
+      // Lista de Extintores
+      let htmlExt = `
+        <div class="flex justify-between items-center p-2 rounded-lg bg-dark-800/60 border border-white/5">
+          <span>💧 Água Pressurizada (AP 10L - 2A)</span>
+          <span class="font-bold text-neon-orange font-mono">${d.qtdAgua} unid.</span>
         </div>
-        <div class="flex justify-between border-b border-white/10 pb-2">
-          <span>⚪ Pó Químico Seco (PQS)</span>
-          <span class="font-bold text-neon-orange">${qPo} unid.</span>
-        </div>
-        <div class="flex justify-between pt-2">
-          <span>⚠️ Gás Carbônico (CO2)</span>
-          <span class="text-gray-400 text-xs text-right w-40">Substituir parte do PQS em áreas elétricas (quadros, servidores)</span>
+        <div class="flex justify-between items-center p-2 rounded-lg bg-dark-800/60 border border-white/5">
+          <span>⚪ Pó Químico ABC (6kg - 3A:40B:C)</span>
+          <span class="font-bold text-neon-orange font-mono">${d.qtdPoAbc} unid.</span>
         </div>
       `;
 
-      // Lista Hidrantes
-      if (exigeHidrante) {
-        $('listaHidrantes').innerHTML = `
-          <div class="flex justify-between mb-2"><span>Classificação:</span> <strong class="text-neon-red">${tipoSistema}</strong></div>
-          <div class="flex justify-between mb-2"><span>Volume da RTI:</span> <strong>${rti} m³ (${rti * 1000} Litros)</strong></div>
-          <div class="flex justify-between mb-2"><span>Vazão mínima (2 jatos):</span> <strong>${vazao} L/min</strong></div>
-          <div class="flex justify-between mb-2"><span>Pressão mínima (jato mais desfav.):</span> <strong>${pressao} mca</strong></div>
-          <div class="flex justify-between mb-2"><span>Mangueira:</span> <strong>Tipo 2 - 30m</strong></div>
+      if (d.extintoresEspeciais.length > 0) {
+        htmlExt += `<div class="text-[11px] font-bold text-neon-red uppercase tracking-wider mt-2 pt-1 border-t border-white/10">Riscos Especiais Dedicados:</div>`;
+        d.extintoresEspeciais.forEach(esp => {
+          htmlExt += `
+            <div class="p-2 rounded-lg bg-dark-800/40 border border-red-500/20 text-[11px]">
+              <div class="flex justify-between font-semibold text-white">
+                <span>🔴 ${esp.tipo}</span>
+                <span class="text-neon-yellow">1 unid.</span>
+              </div>
+              <div class="text-gray-400 text-[10px] mt-0.5">Local: ${esp.local} — ${esp.motivo}</div>
+            </div>
+          `;
+        });
+      }
+      $('listaDetalhadaExtintores').innerHTML = htmlExt;
+
+      // Tabela de Pressões
+      let htmlTab = '';
+      d.pressoesPorPav.forEach(p => {
+        const badgeVrp = p.exigeVrp
+          ? '<span class="text-red-400 font-bold bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30">SIM (P > 45 mca)</span>'
+          : '<span class="text-gray-400">Não (Dispensada)</span>';
+        
+        const statusPressao = parseFloat(p.pDin) >= d.pEsguichoMca
+          ? '<span class="text-green-400">Conforme NBR</span>'
+          : '<span class="text-yellow-400">Pressão Baixa</span>';
+
+        htmlTab += `
+          <tr class="hover:bg-white/5 transition-colors">
+            <td class="px-3 py-2 text-white font-semibold">${p.nome}</td>
+            <td class="px-3 py-2">${p.cota} m</td>
+            <td class="px-3 py-2">${p.pEst} mca</td>
+            <td class="px-3 py-2 ${p.exigeVrp ? 'text-red-400 font-bold' : 'text-gray-300'}">${p.pDin} mca</td>
+            <td class="px-3 py-2">${statusPressao}</td>
+            <td class="px-3 py-2">${badgeVrp}</td>
+          </tr>
+        `;
+      });
+      $('tabelaPressaoPavimentos').innerHTML = htmlTab;
+
+      // Alerta VRP
+      if (d.existeVrpObrigatoria) {
+        $('alertaVrp').classList.remove('hidden');
+        $('alertaVrp').innerHTML = `
+          <strong>⚠️ ATENÇÃO NORMATIVA (NBR 13714):</strong> A pressão residual em pavimentos inferiores ultrapassa o limite de <strong>45 mca</strong>. É obrigatória a instalação de <strong>Válvula Redutora de Pressão (VRP)</strong> ou estrangulador calibrado nos hidrantes desses pavimentos para resguardar a integridade física do brigadista e evitar rompimento de mangueiras.
         `;
       } else {
-        $('listaHidrantes').innerHTML = `<p class="text-gray-500 italic">Edificação isenta de sistema de hidrantes pelas dimensões/risco informados.</p>`;
+        $('alertaVrp').classList.add('hidden');
       }
-
-      // Memorial
-      $('memorial').textContent = `MEMORIAL DE PRÉ-DIMENSIONAMENTO - PPCI
-Data: ${new Date().toLocaleDateString('pt-BR')}
-
-1. PARÂMETROS DA EDIFICAÇÃO
-Área: ${area} m² | Pavimentos: ${pavimentos}
-Risco: ${risco.toUpperCase()} | Ocupação: ${ocupacao.toUpperCase()}
-
-2. PROTEÇÃO POR EXTINTORES (Referência IT-16 / NBR 12693)
-Total Estimado: ${totalExtintores} extintores
-Capacidade Extintora Mínima: ${capMinima}
-Distância Máxima de Caminhamento: ${distMax} metros
-Área de Cobertura por Unidade: ${areaPorExtintor} m²
-
-3. REDE DE HIDRANTES E RTI (Referência IT-22)
-Exigência: ${exigeHidrante ? 'SIM' : 'NÃO'}
-${exigeHidrante ? `Tipo de Sistema: ${tipoSistema}
-Reserva Técnica de Incêndio (RTI): ${rti} m³
-Vazão Mínima Requerida: ${vazao} L/min
-Pressão Residual Mínima: ${pressao} mca` : ''}
-
-Nota: Valores estimativos para estudo de viabilidade.`;
     }
 
-    $('btnCalcular').addEventListener('click', calcularPPCI);
-    $('btnReset').addEventListener('click', () => {
-      $('area').value = 500;
-      $('risco').value = 'medio';
-      $('pavimentos').value = 1;
-      $('resultadoSection').classList.add('opacity-50');
-      $('memorial').textContent = 'Aguardando cálculo...';
-    });
+    // =========================================================
+    // DIAGRAMA ISOMÉTRICO ESQUEMÁTICO (Item 6 - SVG Interativo)
+    // =========================================================
+    function renderizarSvgEsquematico() {
+      const d = ultimoCalculoPPCI;
+      if (!d) return;
 
+      const numAndares = Math.min(d.pavimentos, 5); // até 5 pavimentos desenhados
+      const svgW = 680;
+      const svgH = 380;
+
+      let svg = `
+        <svg viewBox="0 0 ${svgW} ${svgH}" class="w-full max-w-[650px] h-auto font-mono select-none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="fireGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff3333"/>
+              <stop offset="100%" stop-color="#ff8800"/>
+            </linearGradient>
+            <linearGradient id="tankWater" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stop-color="#0066cc"/>
+              <stop offset="70%" stop-color="#00ccff"/>
+              <stop offset="100%" stop-color="#00ffff"/>
+            </linearGradient>
+            <filter id="glowFilt" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            </filter>
+          </defs>
+
+          <!-- Fundo de Grade Técnica -->
+          <rect x="0" y="0" width="${svgW}" height="${svgH}" fill="#0d0d14" rx="12"/>
+          <path d="M 0,60 L ${svgW},60 M 0,120 L ${svgW},120 M 0,180 L ${svgW},180 M 0,240 L ${svgW},240 M 0,300 L ${svgW},300" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4,4"/>
+          <path d="M 120,0 L 120,${svgH} M 240,0 L 240,${svgH} M 360,0 L 360,${svgH} M 480,0 L 480,${svgH} M 600,0 L 600,${svgH}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4,4"/>
+
+          <!-- Título Interno -->
+          <text x="20" y="30" fill="#94a3b8" font-size="11" font-weight="bold">ISOMÉTRICO UNIFILAR — REDE DE HIDRANTES E BARRILETE</text>
+          <text x="20" y="46" fill="#ff5555" font-size="10">RTI: ${d.rtiAdotadaM3} m³ | Vazão: ${d.vazaoTotalLmin} L/min | HMT: ${d.hmt.toFixed(1)} mca</text>
+      `;
+
+      if (d.posicaoRes === 'inferior') {
+        // Reservatório Inferior
+        svg += `
+          <!-- Reservatório Inferior / Enterrado -->
+          <rect x="30" y="240" width="130" height="90" rx="8" fill="#141923" stroke="#00ffff" stroke-width="2"/>
+          <rect x="34" y="270" width="122" height="56" rx="4" fill="url(#tankWater)" opacity="0.6"/>
+          <text x="95" y="260" fill="#00ffff" font-size="10" font-weight="bold" text-anchor="middle">RESERVATÓRIO (RTI)</text>
+          <text x="95" y="295" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">${d.rtiAdotadaM3} m³</text>
+          <text x="95" y="312" fill="#e2e8f0" font-size="9" text-anchor="middle">${d.autonomiaMin} min reserva</text>
+
+          <!-- Tubulação de Sucção -->
+          <path d="M 160,290 L 195,290" fill="none" stroke="#ff3333" stroke-width="4"/>
+          <!-- Válvula de Sucção -->
+          <polygon points="175,283 175,297 185,290" fill="#ffea00"/>
+          <polygon points="185,283 185,297 175,290" fill="#ffea00"/>
+
+          <!-- Conjunto de Moto-bomba Principal + Jockey -->
+          <rect x="195" y="270" width="48" height="40" rx="6" fill="#221111" stroke="#ff3333" stroke-width="2"/>
+          <circle cx="219" cy="290" r="12" fill="url(#fireGrad)"/>
+          <text x="219" y="294" fill="#0a0a0f" font-size="9" font-weight="bold" text-anchor="middle">B1</text>
+          <text x="219" y="322" fill="#ff8800" font-size="9" font-weight="bold" text-anchor="middle">${d.potComercialCv} CV</text>
+
+          <!-- Bomba Jockey Auxiliar -->
+          <rect x="200" y="235" width="38" height="25" rx="4" fill="#102030" stroke="#00ffff" stroke-width="1.5"/>
+          <text x="219" y="251" fill="#00ffff" font-size="8" font-weight="bold" text-anchor="middle">JOCKEY</text>
+
+          <!-- Barrilete e Linha de Recalque -->
+          <path d="M 243,290 L 290,290 L 290,100" fill="none" stroke="#ff3333" stroke-width="4"/>
+          <!-- Válvula de Retenção (VR) -->
+          <polygon points="265,284 275,290 265,296" fill="#00ff88"/>
+          <line x1="275" y1="284" x2="275" y2="296" stroke="#00ff88" stroke-width="2"/>
+          <text x="270" y="306" fill="#00ff88" font-size="8" text-anchor="middle">VR</text>
+        `;
+      } else {
+        // Reservatório Superior
+        svg += `
+          <!-- Reservatório Superior na Cobertura -->
+          <rect x="180" y="50" width="130" height="70" rx="8" fill="#141923" stroke="#00ffff" stroke-width="2"/>
+          <rect x="184" y="70" width="122" height="46" rx="4" fill="url(#tankWater)" opacity="0.6"/>
+          <text x="245" y="65" fill="#00ffff" font-size="10" font-weight="bold" text-anchor="middle">RTI COBERTURA</text>
+          <text x="245" y="95" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">${d.rtiAdotadaM3} m³</text>
+
+          <!-- Descida da Prumada -->
+          <path d="M 290,120 L 290,320" fill="none" stroke="#ff3333" stroke-width="4"/>
+          <!-- Bomba Booster de Topo -->
+          <circle cx="290" cy="140" r="10" fill="url(#fireGrad)"/>
+          <text x="290" y="144" fill="#0a0a0f" font-size="8" font-weight="bold" text-anchor="middle">B</text>
+        `;
+      }
+
+      // Registro de Recalque no Passeio (Calçada dos Bombeiros)
+      svg += `
+        <!-- Registro de Recalque no Passeio Público -->
+        <path d="M 290,320 L 370,320 L 370,345" fill="none" stroke="#ff3333" stroke-width="3" stroke-dasharray="3,2"/>
+        <rect x="355" y="342" width="30" height="20" rx="3" fill="#2d1515" stroke="#ff3333" stroke-width="1.5"/>
+        <text x="370" y="356" fill="#ff5555" font-size="8" font-weight="bold" text-anchor="middle">RECALQUE</text>
+        <text x="370" y="372" fill="#94a3b8" font-size="8" text-anchor="middle">Passeio Público (Ø65mm)</text>
+      `;
+
+      // Prumada Geral e Pavimentos
+      const prumadaX = 430;
+      svg += `
+        <!-- Prumada Vertical -->
+        <line x1="${prumadaX}" y1="80" x2="${prumadaX}" y2="330" stroke="#ff3333" stroke-width="5"/>
+        <text x="${prumadaX - 10}" y="200" fill="#ff8800" font-size="9" font-weight="bold" transform="rotate(-90 ${prumadaX - 10} 200)">
+          PRUMADA Ø${$('tuboPrumada').value}mm
+        </text>
+        <path d="M 290,100 L ${prumadaX},100" fill="none" stroke="#ff3333" stroke-width="4"/>
+      `;
+
+      // Pavimentos e Caixas de Hidrante
+      const niveisY = [100, 155, 210, 265, 320];
+      const alturaSlice = Math.floor(niveisY.length / numAndares);
+
+      for (let i = 0; i < numAndares; i++) {
+        const y = niveisY[i];
+        const andarNum = numAndares - i;
+        const dadosPav = d.pressoesPorPav[i] || { pDin: '15.0', exigeVrp: false };
+
+        svg += `
+          <!-- Andar ${andarNum} -->
+          <line x1="${prumadaX}" y1="${y}" x2="${prumadaX + 70}" y2="${y}" stroke="#ff3333" stroke-width="3"/>
+          <!-- Caixa de Hidrante (Caixa Vermelha) -->
+          <rect x="${prumadaX + 70}" y="${y - 14}" width="28" height="28" rx="4" fill="#b91c1c" stroke="#f87171" stroke-width="1.5"/>
+          <text x="${prumadaX + 84}" y="${y + 4}" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">H</text>
+
+          <!-- Mangueira e Esguicho Ilustrativo -->
+          <circle cx="${prumadaX + 115}" cy="${y}" r="8" fill="none" stroke="#ff8800" stroke-width="2"/>
+          <line x1="${prumadaX + 98}" y1="${y}" x2="${prumadaX + 107}" y2="${y}" stroke="#ff8800" stroke-width="2"/>
+
+          <!-- Label do Andar e Pressão -->
+          <text x="${prumadaX + 130}" y="${y - 3}" fill="#ffffff" font-size="10" font-weight="bold">${andarNum}º Pavimento</text>
+          <text x="${prumadaX + 130}" y="${y + 11}" fill="${dadosPav.exigeVrp ? '#ff4444' : '#00ff88'}" font-size="9" font-family="monospace">
+            P = ${dadosPav.pDin} mca ${dadosPav.exigeVrp ? '⚠️ (VRP)' : '✓'}
+          </text>
+        `;
+      }
+
+      svg += `</svg>`;
+      $('svgContainer').innerHTML = svg;
+    }
+
+    // =========================================================
+    // MEMORIAL DESCRITIVO PRELIMINAR EM TEXTO
+    // =========================================================
+    function renderizarMemorialTexto() {
+      const d = ultimoCalculoPPCI;
+      if (!d) return;
+
+      const txt = `================================================================================
+MEMORIAL DE PRÉ-DIMENSIONAMENTO TÉCNICO DE COMBATE A INCÊNDIO (PPCI)
+Normas de Referência: ABNT NBR 13714, NBR 12693, NBR 9077, NBR 14432 e ITs CBPMESP
+Data: ${new Date().toLocaleDateString('pt-BR')} | Hora: ${new Date().toLocaleTimeString('pt-BR')}
+================================================================================
+
+1. IDENTIFICAÇÃO DA EDIFICAÇÃO
+--------------------------------------------------------------------------------
+- Área Construída Total: ${d.areaTotal.toLocaleString('pt-BR')} m²
+- Número de Pavimentos: ${d.pavimentos}
+- Altura da Edificação (H): ${d.altura.toFixed(1)} metros
+- Ocupação Principal: Grupo ${d.ocupacao}
+- Localização do Reservatório: ${d.posicaoRes === 'inferior' ? 'Inferior / Enterrado (Sucção)' : 'Superior / Cobertura'}
+
+2. CARGA DE INCÊNDIO E ENQUADRAMENTO DE RISCO (NBR 14432 / IT-14)
+--------------------------------------------------------------------------------
+- Método Adotado: ${d.metodoCargaTexto}
+- Carga de Incêndio Específica (qfi): ${d.qfi} MJ/m²
+- Grau de Risco Normativo: ${d.riscoTexto.toUpperCase()}
+
+3. SISTEMA DE HIDRANTES E MANGOTINHOS (NBR 13714 / IT-22)
+--------------------------------------------------------------------------------
+- Exigência Normativa: ${d.exigeHidrantes ? 'OBRIGATÓRIO' : 'ISENTO'}
+${d.exigeHidrantes ? `- Classificação Adotada: ${d.tipoHidranteLabel}
+- Número de Pontos Simultâneos: 2 hidrantes mais desfavoráveis
+- Vazão Unificada de Projeto: ${d.vazaoTotalLmin} L/min (${d.vazaoTotalM3h.toFixed(1)} m³/h)
+- Pressão Mínima no Esguicho: ${d.pEsguichoMca} mca
+- Autonomia da Reserva: ${d.autonomiaMin} minutos
+- Reserva Técnica de Incêndio (RTI): ${d.rtiAdotadaM3.toFixed(1)} m³ (${(d.rtiAdotadaM3 * 1000).toLocaleString('pt-BR')} Litros)
+- Altura Manométrica Total (HMT): ${d.hmt.toFixed(1)} mca
+- Potência da Motobomba Principal: ${d.potComercialCv.toFixed(1)} CV (${d.potBombaKw.toFixed(2)} kW)
+- Bomba Jockey de Pressurização: ${d.jockeyPotCv.toFixed(2)} CV (Pressão de parada: ${d.jockeyPressaoMca} mca)
+- Diâmetro da Prumada Vertical: DN ${$('tuboPrumada').value} mm
+- Válvula Redutora de Pressão (VRP): ${d.existeVrpObrigatoria ? 'OBRIGATÓRIA nos andares inferiores (P > 45 mca)' : 'DISPENSADA'}` : '- Edificação dispensada de sistema hidráulico de hidrantes.'}
+
+4. SISTEMA DE PROTEÇÃO POR EXTINTORES (NBR 12693 / IT-16)
+--------------------------------------------------------------------------------
+- Quantitativo Total: ${d.totalExtintores} extintores distribuídos
+- Capacidade Mínima de Projeto: ${d.capMinimaExtintora}
+- Distância Máxima de Caminhamento: ${d.distCaminhamentoMax} metros
+- Distribuição Geral:
+  * Água Pressurizada (AP 10L): ${d.qtdAgua} unidades
+  * Pó Químico Seco ABC (6kg): ${d.qtdPoAbc} unidades
+${d.extintoresEspeciais.map(e => `  * [Risco Pontual] ${e.tipo} -> ${e.local} (${e.motivo})`).join('\n')}
+
+5. SAÍDAS DE EMERGÊNCIA E EVACUAÇÃO (NBR 9077 / IT-11)
+--------------------------------------------------------------------------------
+- População Total Estimada: ${d.popTotal} pessoas (Densidade: 1 pess / ${d.densidadeM2PorPessoa} m²)
+- Unidades de Passagem (UP) Portas: ${d.upPortas} UP (Largura livre: ${d.largPortas} m)
+- Unidades de Passagem (UP) Escadas: ${d.upEscadas} UP (Largura livre: ${d.largEscadas} m)
+- Classificação da Escada: ${d.tipoEscadaRecomendada}
+- Requisitos Construtivos: ${d.obsEscada}
+
+================================================================================
+Nota Técnica: Estudo preliminar de pré-dimensionamento para composição de PPCI.
+================================================================================`;
+
+      $('memorial').textContent = txt;
+    }
+
+    function copiarMemorialTexto() {
+      const txt = $('memorial').textContent;
+      navigator.clipboard.writeText(txt).then(() => {
+        alert("Memorial de cálculo copiado com sucesso!");
+      });
+    }
+
+    // =========================================================
+    // INTEGRAÇÃO COM A SUÍTE ECALC (Item 7)
+    // =========================================================
+
+    // 1. Memorial ABNT Completo com suite-memorial.js
+    function gerarMemorialIncendio() {
+      if (!ultimoCalculoPPCI) calcularPPCI();
+      if (typeof window.ECALC_MEMORIAL === 'undefined') {
+        alert('Módulo de Memorial não disponível');
+        return;
+      }
+
+      const d = ultimoCalculoPPCI;
+
+      const inputsTab = [
+        { label: 'Área Construída Total', val: `${d.areaTotal.toLocaleString('pt-BR')} m²` },
+        { label: 'Número de Pavimentos', val: `${d.pavimentos} pavimentos` },
+        { label: 'Altura da Edificação (H)', val: `${d.altura.toFixed(1)} m` },
+        { label: 'Ocupação / Uso Principal', val: `Grupo ${d.ocupacao}` },
+        { label: 'Carga de Incêndio Específica (qfi)', val: `${d.qfi} MJ/m² (${d.riscoTexto})` },
+        { label: 'Localização do Reservatório', val: d.posicaoRes === 'inferior' ? 'Inferior / Enterrado (Sucção)' : 'Superior / Cobertura' },
+        { label: 'Sistema de Hidrantes / Mangotinhos', val: d.tipoHidranteLabel },
+        { label: 'Autonomia Regulamentar Adotada', val: `${d.autonomiaMin} minutos` }
+      ];
+
+      const resultadosTab = [
+        { label: 'Reserva Técnica de Incêndio (RTI)', val: `${d.rtiAdotadaM3.toFixed(1)} m³ (${(d.rtiAdotadaM3 * 1000).toLocaleString('pt-BR')} L)`, status: 'ok' },
+        { label: 'Vazão Simultânea Requerida', val: `${d.vazaoTotalLmin} L/min (${d.vazaoTotalM3h.toFixed(1)} m³/h)`, status: 'ok' },
+        { label: 'Altura Manométrica Total (HMT)', val: `${d.hmt.toFixed(1)} mca`, status: 'ok' },
+        { label: 'Potência da Motobomba Principal', val: `${d.potComercialCv.toFixed(1)} CV (${d.potBombaKw.toFixed(2)} kW)`, status: 'ok' },
+        { label: 'Bomba Jockey de Pressurização', val: `${d.jockeyPotCv.toFixed(2)} CV (Pressão: ${d.jockeyPressaoMca} mca)`, status: 'ok' },
+        { label: 'Total de Extintores Distribuídos', val: `${d.totalExtintores} extintores (${d.qtdAgua} AP + ${d.qtdPoAbc} PQS)`, status: 'ok' },
+        { label: 'Caminhamento Máximo Extintores', val: `${d.distCaminhamentoMax} metros`, status: 'ok' },
+        { label: 'População Máxima da Edificação', val: `${d.popTotal} pessoas`, status: 'ok' },
+        { label: 'Unidades de Passagem (Portas / Escadas)', val: `${d.upPortas} UP (${d.largPortas} m) / ${d.upEscadas} UP (${d.largEscadas} m)`, status: 'ok' },
+        { label: 'Classificação da Escada de Emergência', val: d.tipoEscadaRecomendada, status: 'ok' }
+      ];
+
+      const verificacoesTab = [
+        { item: 'Pressão Residual Mínima no Esguicho', exigido: `>= ${d.pEsguichoMca} mca (NBR 13714)`, obtido: `${d.pEsguichoMca} mca`, status: 'ok' },
+        { item: 'Pressão Dinâmica Máxima nos Pavimentos', exigido: '<= 45,0 mca (Limite de segurança)', obtido: d.existeVrpObrigatoria ? 'Excedeu 45 mca (Exige VRP)' : '<= 45 mca (Atendido)', status: d.existeVrpObrigatoria ? 'aviso' : 'ok' },
+        { item: 'Autonomia Mínima da Reserva de Água', exigido: `>= ${d.autonomiaMin} min`, obtido: `${d.autonomiaMin} min`, status: 'ok' },
+        { item: 'Caminhamento Máximo até Extintores', exigido: `<= ${d.distCaminhamentoMax} m (IT-16)`, obtido: `${d.distCaminhamentoMax} m`, status: 'ok' },
+        { item: 'Largura Livre de Saídas de Emergência', exigido: `>= ${d.largPortas} m (NBR 9077)`, obtido: `${d.largPortas} m`, status: 'ok' }
+      ];
+
+      window.ECALC_MEMORIAL.gerar({
+        titulo: 'Memorial Descritivo e Justificativo de Proteção Contra Incêndio (PPCI)',
+        norma: 'ABNT NBR 13714, NBR 12693, NBR 9077, NBR 14432 e Instruções Técnicas do Corpo de Bombeiros',
+        elemento: `Edificação Grupo ${d.ocupacao} — ${d.areaTotal} m² (${d.pavimentos} Pavimentos)`,
+        inputs: inputsTab,
+        resultados: resultadosTab,
+        verificacoes: verificacoesTab,
+        observacoes: [
+          'Este memorial técnico consolida os parâmetros de segurança contra incêndio e pânico para protocolo perante o Corpo de Bombeiros Militar.',
+          `A carga de incêndio específica adotada é de ${d.qfi} MJ/m², classificando o risco da edificação como ${d.riscoTexto}.`,
+          d.exigeHidrantes
+            ? `O sistema hidráulico de combate opera com ${d.tipoHidranteLabel}, alimentado por reserva técnica de ${d.rtiAdotadaM3} m³ e conjunto moto-bomba principal de ${d.potComercialCv} CV e jockey de ${d.jockeyPotCv} CV.`
+            : 'A edificação encontra-se isenta da instalação de sistema hidráulico sob comando de hidrantes pelas suas dimensões regulamentares.',
+          d.existeVrpObrigatoria
+            ? 'ATENÇÃO: É obrigatório o emprego de Válvulas Redutoras de Pressão (VRP) nos hidrantes dos pavimentos inferiores cuja pressão dinâmica ultrapasse 45 mca.'
+            : 'As pressões dinâmicas em todos os pavimentos encontram-se dentro dos limites confortáveis e seguros de operação sem necessidade de VRP.',
+          `Para a evacuação rápida e segura da população (${d.popTotal} pessoas), especificou-se ${d.tipoEscadaRecomendada} com portas corta-fogo e largura mínima livre de ${d.largPortas} m.`
+        ]
+      });
+    }
+
+    // 2. Exportação OfficeClone (Planilha Excel .xlsx/.csv)
+    function exportarOfficeClone() {
+      if (!ultimoCalculoPPCI) calcularPPCI();
+      const d = ultimoCalculoPPCI;
+
+      const csvData = [
+        ['ITEM', 'PARAMETRO / COMPONENTE', 'VALOR', 'UNIDADE', 'NORMA / REFERENCIA'],
+        [1, 'Area Construida Total', d.areaTotal, 'm²', 'IT-01 CBPMESP'],
+        [2, 'Numero de Pavimentos', d.pavimentos, 'pavimentos', 'Decreto Estadual'],
+        [3, 'Altura da Edificacao H', d.altura, 'metros', 'IT-01'],
+        [4, 'Grupo / Ocupacao', d.ocupacao, '-', 'NBR 14432'],
+        [5, 'Carga de Incendio Especifica', d.qfi, 'MJ/m²', 'NBR 14432 / IT-14'],
+        [6, 'Grau de Risco', d.riscoTexto, '-', 'IT-14'],
+        [7, 'Exigencia de Hidrantes', d.exigeHidrantes ? 'SIM' : 'ISENTO', '-', 'IT-22'],
+        [8, 'Tipo de Sistema de Hidrantes', d.tipoHidranteLabel, '-', 'NBR 13714'],
+        [9, 'Volume da RTI', d.rtiAdotadaM3, 'm³', 'NBR 13714 / IT-22'],
+        [10, 'Vazao Simultanea (2 jatos)', d.vazaoTotalLmin, 'L/min', 'NBR 13714'],
+        [11, 'Altura Manometrica Total HMT', d.hmt.toFixed(1), 'mca', 'Hazen-Williams'],
+        [12, 'Potencia Bomba Principal', d.potComercialCv, 'CV', 'WEG / Schneider'],
+        [13, 'Potencia Bomba Jockey', d.jockeyPotCv, 'CV', 'NBR 13714'],
+        [14, 'Total de Extintores', d.totalExtintores, 'unidades', 'NBR 12693 / IT-16'],
+        [15, 'Extintores Agua Pressurizada AP 10L', d.qtdAgua, 'unidades', 'NBR 12693'],
+        [16, 'Extintores Po ABC 6kg', d.qtdPoAbc, 'unidades', 'NBR 12693'],
+        [17, 'Caminhamento Maximo Extintor', d.distCaminhamentoMax, 'metros', 'IT-16'],
+        [18, 'Populacao Maxima Estimada', d.popTotal, 'pessoas', 'NBR 9077 / IT-11'],
+        [19, 'Unidades de Passagem UP', d.upPortas, 'UP', 'NBR 9077'],
+        [20, 'Largura Livre de Saida', d.largPortas, 'metros', 'NBR 9077'],
+        [21, 'Tipo de Escada Exigido', d.tipoEscadaRecomendada, '-', 'NBR 9077']
+      ];
+
+      localStorage.setItem('officeclone_import_data', JSON.stringify({
+        filename: `Quantitativos_PPCI_${d.ocupacao}_${d.areaTotal}m2.csv`,
+        rows: csvData
+      }));
+      window.open('../office/excel/', '_blank');
+    }
+
+    // 3. Exportação CADClone e DXF
+    function gerarDxfConteudoIncendio() {
+      if (typeof window.ECALC_CAD === 'undefined') return null;
+      const builder = window.ECALC_CAD.createBuilder();
+      const d = ultimoCalculoPPCI || {};
+
+      // Textos e Títulos
+      builder.addText(100, 4200, 150, `ESQUEMA UNIFILAR DE COMBATE A INCENDIO (PPCI)`, 'PCI_TEXTO', 1);
+      builder.addText(100, 3950, 100, `Area: ${d.areaTotal} m2 | RTI: ${d.rtiAdotadaM3} m3 | Hidrantes: ${d.tipoHidranteLabel}`, 'PCI_TEXTO', 7);
+      builder.addText(100, 3750, 80, `Normas: ABNT NBR 13714:2000, NBR 12693:2021 e NBR 9077:2001`, 'PCI_TEXTO', 7);
+
+      // Reservatório de Incêndio (RTI)
+      builder.addRect(200, 400, 1200, 800, 'PCI_RESERVATORIO', 4);
+      builder.addText(400, 950, 100, `RTI ${d.rtiAdotadaM3} m3`, 'PCI_TEXTO', 2);
+      builder.addText(350, 750, 70, `Reserva Incendio`, 'PCI_TEXTO', 7);
+
+      // Linha de Sucção e Bomba
+      builder.addLine(1400, 800, 1900, 800, 'PCI_TUBULACAO', 1);
+      builder.addCircle(2100, 800, 180, 'PCI_BOMBAS', 1);
+      builder.addText(2000, 770, 80, `B1 ${d.potComercialCv}CV`, 'PCI_TEXTO', 3);
+
+      // Linha até a Prumada Vertical
+      builder.addLine(2280, 800, 2700, 800, 'PCI_TUBULACAO', 1);
+      builder.addLine(2700, 800, 2700, 3400, 'PCI_TUBULACAO', 1);
+      builder.addText(2750, 2000, 80, `PRUMADA DN ${$('tuboPrumada').value}mm`, 'PCI_TEXTO', 3);
+
+      // Registro de Recalque no Passeio
+      builder.addLine(2700, 500, 3400, 500, 'PCI_TUBULACAO', 1);
+      builder.addRect(3400, 420, 250, 160, 'PCI_RECALQUE', 1);
+      builder.addText(3420, 480, 60, `RECALQUE`, 'PCI_TEXTO', 7);
+
+      // Hidrantes de Pavimento (Simulação esquemática dos níveis)
+      const andaresY = [1200, 1800, 2400, 3000];
+      andaresY.forEach((y, idx) => {
+        builder.addLine(2700, y, 3200, y, 'PCI_TUBULACAO', 1);
+        builder.addRect(3200, y - 100, 200, 200, 'PCI_HIDRANTES', 1);
+        builder.addText(3250, y - 20, 70, `H`, 'PCI_TEXTO', 7);
+        builder.addText(3500, y - 20, 60, `Pav ${idx + 1} (H=${d.pEsguichoMca}mca)`, 'PCI_TEXTO', 2);
+      });
+
+      builder.addDimension(2700, 400, 2700, 3400, 300, `H=${d.altura}m`, 'PCI_COTAS');
+
+      return builder.build();
+    }
+
+    function abrirNoCadCloneIncendio() {
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoIncendio();
+      if (dxf) {
+        window.ECALC_CAD.abrirNoCadClone(dxf, `PPCI_Hidrantes_${$('ocupacao').value}.dxf`);
+      }
+    }
+
+    function baixarDxfIncendio() {
+      if (typeof window.ECALC_CAD === 'undefined') {
+        alert('Módulo CADClone não carregado');
+        return;
+      }
+      const dxf = gerarDxfConteudoIncendio();
+      if (dxf) {
+        window.ECALC_CAD.baixarDXF(dxf, `PPCI_Hidrantes_${$('ocupacao').value}.dxf`);
+      }
+    }
+
+    // Inicialização ao carregar
     document.addEventListener('DOMContentLoaded', () => {
       if ($('year')) $('year').textContent = new Date().getFullYear();
+      calcularPPCI();
+    });
+
+    $('btnReset').addEventListener('click', () => {
+      if (confirm("Deseja restaurar os parâmetros padrões do aplicativo?")) {
+        location.reload();
+      }
     });
   </script>
-    <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js"></script>
+
+  <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
+  <script src="assets/suite/suite-nav.js"></script>
+  <script src="assets/suite/suite-memorial.js"></script>
+  <script src="assets/suite/suite-cad.js"></script>
 </body>
 </html>
