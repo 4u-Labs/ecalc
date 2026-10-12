@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Desempenho Térmico NBR 15575 | Ferramentas de Engenharia</title>
@@ -1040,10 +1041,7 @@
       .header p { font-size: 0.8rem !important; }
     }
 </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body>
-  <div class="container">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"container">
     <!-- Header -->
     <header class="header">
       <h1>🌡️ Desempenho Térmico NBR 15575</h1>
@@ -1368,7 +1366,7 @@
       tipoVedacao: 'parede',
       absortancia: 0.30,
       camadas: [],
-      precos: JSON.parse(localStorage.getItem('precosTermico')) || {}
+      precos: ECalc.readJSON('precosTermico',null) || {}
     };
     
     // ================== INICIALIZAÇÃO ==================
@@ -1923,7 +1921,7 @@
         }
       });
       
-      localStorage.setItem('precosTermico', JSON.stringify(estado.precos));
+      ECalc.setItem('precosTermico', JSON.stringify(estado.precos));
       fecharModalPrecos();
       
       // Feedback visual
@@ -1984,6 +1982,7 @@
 
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

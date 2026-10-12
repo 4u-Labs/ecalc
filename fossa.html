@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Fossa Séptica e Sumidouro | Ferramentas de Engenharia</title>
@@ -355,9 +356,7 @@
       .seta-fluxo { transform: rotate(90deg); }
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="text-gray-200">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"text-gray-200">
   <!-- Header -->
   <header class="glass border-b border-cyan-500/20 no-print relative z-20">
     <div class="max-w-7xl mx-auto px-4 py-4">
@@ -1054,20 +1053,21 @@
     // CÁLCULOS
     // =============================================
     
-    function calcular() {
+    function calcular() { ultimoCalculo=null;
       const numPessoas = parseInt(document.getElementById('num-pessoas').value);
       const contribuicao = parseFloat(document.getElementById('contribuicao').value);
       const tempoDetencao = parseFloat(document.getElementById('tempo-detencao').value);
       const formatoFossa = document.getElementById('formato-fossa').value;
       const materialFossa = document.getElementById('material-fossa').value;
       const tipoSumidouro = document.getElementById('tipo-sumidouro').value;
-      const nivelLencol = parseFloat(document.getElementById('nivel-lencol').value) || 5;
+      const nivelLencol = ECalc.number(document.getElementById('nivel-lencol').value);
       
       if (!numPessoas || numPessoas < 1) {
         mostrarNotificacao('Informe o número de pessoas!', 'error');
         return;
       }
       
+      ECalc.positive(contribuicao,'Contribuição diária');ECalc.positive(tempoDetencao,'Tempo de detenção');if(!Number.isInteger(numPessoas))throw Error('O número de pessoas deve ser inteiro');
       // Contribuição diária
       const contribuicaoDiaria = numPessoas * contribuicao;
       
@@ -1190,11 +1190,12 @@
     }
     
     function calcularSumidouro(contribuicaoDiaria, coefInfiltracao, tipo, nivelLencol) {
+      ECalc.positive(contribuicaoDiaria,'Contribuição diária');ECalc.positive(coefInfiltracao,'Coeficiente de infiltração');
+      if(!['circular','retangular','valas'].includes(tipo))throw Error('Tipo de sumidouro inválido');
       const areaInfiltracao = contribuicaoDiaria / coefInfiltracao;
       
       // Profundidade máxima considerando lençol freático
-      let profundidadeMax = Math.max(1.0, nivelLencol - 1.5);
-      profundidadeMax = Math.min(profundidadeMax, 3.0);
+      const profundidadeMax = ECalc.infiltrationDepth(nivelLencol,tipo);
       
       let dimensoes = {};
       let quantidade = 1;
@@ -1230,7 +1231,7 @@
       } else if (tipo === 'retangular') {
         const h = profundidadeMax;
         // Área = L*W + 2*(L+W)*h, com L = 2W
-        const w = Math.sqrt(areaInfiltracao / (6*h + 2));
+        const w = ECalc.rectangleWidth(areaInfiltracao,h);
         const l = w * 2;
         
         dimensoes = {
@@ -1856,7 +1857,7 @@
       precosConfig.escavacao = parseFloat(document.getElementById('preco_escavacao').value) || 80;
       precosConfig.instalacao_perc = parseFloat(document.getElementById('preco_instalacao_perc').value) || 25;
       
-      localStorage.setItem('fossa_precos_config', JSON.stringify(precosConfig));
+      ECalc.setItem('fossa_precos_config', JSON.stringify(precosConfig));
       fecharModal();
       mostrarNotificacao('Preços salvos!', 'success');
     }
@@ -2273,7 +2274,7 @@
         ['Investimento Total Estimado', custoTotal.toFixed(2), 'R$']
       ];
 
-      localStorage.setItem('officeclone_import_data', JSON.stringify({
+      ECalc.setItem('officeclone_import_data', JSON.stringify({
         filename: `Saneamento_Fossa_Filtro_Sumidouro_${d.numPessoas}pessoas.csv`,
         rows: csvData
       }));
@@ -2402,8 +2403,9 @@
 
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

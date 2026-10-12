@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Instalações de Gás (GLP / GN) | Suíte de Engenharia eCalc</title>
@@ -84,9 +85,7 @@
       border-color: #ffea00;
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="font-sans text-gray-100 pb-16">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"font-sans text-gray-100 pb-16">
   <!-- Top Navigation Header -->
   <header class="bg-dark-900/90 backdrop-blur-xl border-b border-white/5 no-print relative z-20">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -1110,7 +1109,7 @@ ${tipoGas === 'GLP' ? `- Sugestão Bateria Transportável: ${centralSugeridaCurt
         [15, 'Area de Ventilacao Inferior', d.ventInfCm2, 'cm2', 'NBR 13103']
       ];
 
-      localStorage.setItem('officeclone_import_data', JSON.stringify({
+      ECalc.setItem('officeclone_import_data', JSON.stringify({
         filename: `Dimensionamento_Gas_${d.tipoGas}_${$('unidades').value}Aptos.csv`,
         rows: csvData
       }));
@@ -1200,8 +1199,9 @@ ${tipoGas === 'GLP' ? `- Sugestão Bateria Transportável: ${centralSugeridaCurt
   </script>
 
   <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-  <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+  <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

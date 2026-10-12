@@ -1,0 +1,3 @@
+<FilesMatch "^(\.env|config\.php|credits\.php|fix\.ps1)$">
+Require all denied
+</FilesMatch>

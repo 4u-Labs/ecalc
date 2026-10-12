@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Muros de Arrimo e Contenções | Ferramentas de Engenharia</title>
@@ -85,9 +86,7 @@
     }
     .hidden { display: none !important; }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="font-sans text-gray-100">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"font-sans text-gray-100">
   <header class="bg-dark-900/90 backdrop-blur-xl border-b border-white/5 no-print relative z-20">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-4">
@@ -347,13 +346,13 @@
       calcularEstabilidade();
     }
 
-    function calcularEstabilidade() {
+    function calcularEstabilidade() { ultimoResultadoArrimo=null;
       const tipo = $('tipoMuro').value;
-      const h = parseFloat($('altura').value) || 3.5;
-      const b = parseFloat($('base').value) || 2.0;
-      const q = parseFloat($('sobrecarga').value) || 0;
-      const mu = parseFloat($('atrito').value) || 0.5;
-      const tensaoAdm = parseFloat($('tensaoAdm').value) || 200;
+      const h = ECalc.positive($('altura').value,'altura',false);
+      const b = ECalc.positive($('base').value,'base',false);
+      const q = ECalc.positive($('sobrecarga').value,'sobrecarga',true);
+      const mu = ECalc.positive($('atrito').value,'atrito',true);
+      const tensaoAdm = ECalc.positive($('tensaoAdm').value,'tensaoAdm',false);
 
       const soloParams = $('tipoSolo').value.split(',');
       const phiDeg = parseFloat(soloParams[0]);
@@ -374,16 +373,17 @@
       let fck = 25, fyd = 435;
 
       if (tipo === 'cantilever') {
-        eTopo = parseFloat($('eTopo').value) || 0.25;
-        eBase = parseFloat($('eBase').value) || 0.40;
-        hSap = parseFloat($('hSap').value) || 0.45;
-        bPonta = parseFloat($('bPonta').value) || 0.40;
-        fck = parseFloat($('fck').value) || 25;
-        fyd = parseFloat($('acoFyd').value) || 435;
+        eTopo = ECalc.positive($('eTopo').value,'eTopo',false);
+        eBase = ECalc.positive($('eBase').value,'eBase',false);
+        hSap = ECalc.positive($('hSap').value,'hSap',false);
+        bPonta = ECalc.positive($('bPonta').value,'bPonta',true);
+        fck = ECalc.positive($('fck').value,'fck',false);
+        fyd = ECalc.positive($('acoFyd').value,'acoFyd',false);
 
         const gamaConc = 25.0; // kN/m³
-        const hFuste = Math.max(0.5, h - hSap);
-        bCalc = Math.max(0.1, b - bPonta - eBase);
+        if(h<=hSap||eBase<eTopo||b<=bPonta+eBase)throw Error('Geometria incompatível: revise altura, espessuras e base');
+        const hFuste = h - hSap;
+        bCalc = b - bPonta - eBase;
 
         // Pesos e momentos estabilizadores em relação ao ponto O (borda frontal da ponta)
         const wSap = b * hSap * gamaConc;
@@ -410,7 +410,8 @@
         const mtFuste = (eaSoloF * hFuste / 3) + (eaQF * hFuste / 2);
         mdFuste = 1.4 * mtFuste; // kNm/m
 
-        const dFuste = Math.max(0.15, eBase - 0.04); // 4cm cobrimento
+        if(eBase<=.04)throw Error('Espessura insuficiente para o cobrimento adotado');
+        const dFuste = eBase - 0.04; // 4cm cobrimento
         const asCalc = (mdFuste / (0.85 * dFuste * fyd * 1000)) * 10000; // cm²/m
         asMin = 0.0015 * 100 * (eBase * 100); // 0.15% da seção
         asFuste = Math.max(asCalc, asMin);
@@ -431,11 +432,12 @@
           }
         }
         const sFinal = Math.min(25, Math.max(10, Math.floor((melhor.area / asFuste) * 100)));
+        if(melhor.area*100/sFinal+1e-9<asFuste)throw Error('Armadura necessária excede as combinações disponíveis');
         bitolaStr = `φ ${melhor.phi} mm c/ ${sFinal} cm (${(melhor.area * (100 / sFinal)).toFixed(2)} cm²/m)`;
 
       } else {
         // Muro de Gravidade
-        const gamaMuro = parseFloat($('matMuro').value) || 24;
+        const gamaMuro = ECalc.positive($('matMuro').value,'matMuro',false);
         wTot = b * h * gamaMuro;
         mr = wTot * (b / 2);
       }
@@ -449,6 +451,7 @@
       const dRes = (mr - mt) / Math.max(0.01, wTot);
       const e = (b / 2) - dRes;
       const eMax = b / 6;
+      if(Math.abs(e)>=b/2)throw Error('Resultante fora da base: configuração sem apoio estável no modelo');
 
       let sigmaMax = 0, sigmaMin = 0;
       if (Math.abs(e) <= eMax) {
@@ -696,7 +699,7 @@ Sistema de Drenagem Obrigatório: Camada drenante de brita com e = 30 cm no tard
         csvData.push(['Área de Aço Requerida (As)', d.asFuste.toFixed(2), 'cm²/m']);
         csvData.push(['Armadura Recomendada', d.bitolaStr, '-']);
       }
-      localStorage.setItem('officeclone_import_data', JSON.stringify({
+      ECalc.setItem('officeclone_import_data', JSON.stringify({
         filename: `Estabilidade_Muro_H${d.h.toFixed(1)}m.csv`,
         rows: csvData
       }));
@@ -797,8 +800,9 @@ Sistema de Drenagem Obrigatório: Camada drenante de brita com e = 30 cm no tard
     });
   </script>
   <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-  <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+  <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

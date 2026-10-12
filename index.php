@@ -8,6 +8,7 @@ $v = time();
 <!DOCTYPE html>
 <html lang="pt-br" class="scroll-smooth">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
@@ -1316,8 +1317,8 @@ $v = time();
                     clicks = 1;
                 }
 
-                localStorage.setItem('logo_clicks', clicks);
-                localStorage.setItem('logo_last_click', now);
+                ECalc.setItem('logo_clicks', clicks);
+                ECalc.setItem('logo_last_click', now);
 
                 if (clicks >= 5) {
                     e.preventDefault();
@@ -1339,5 +1340,6 @@ $v = time();
             });
         }
     </script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Calculador de Consumo por m² | Ferramentas de Engenharia</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -820,11 +821,7 @@
       color: var(--primary);
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body>
-  <!-- Header -->
-  <header class="header">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"header">
     <div class="header-content">
       <a href="#" class="logo">
         <div class="logo-icon">
@@ -1375,12 +1372,12 @@
     const fmtNum = v => (isNaN(v) ? "-" : Number(v).toFixed(2));
 
     const state = {
-      itens: JSON.parse(localStorage.getItem("consumo_itens_v2") || "[]"),
+      itens: ECalc.readJSON('consumo_itens_v2',[]),
       selectedPreset: 'tinta'
     };
 
     function save() {
-      localStorage.setItem("consumo_itens_v2", JSON.stringify(state.itens));
+      ECalc.setItem("consumo_itens_v2", JSON.stringify(state.itens));
     }
 
     // ==================== RENDERIZAR PRESETS ====================
@@ -1982,6 +1979,7 @@
 
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

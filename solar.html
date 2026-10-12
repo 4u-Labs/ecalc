@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <title>☀️ Dimensionamento Fotovoltaico Residencial | Energia Solar</title>
@@ -666,10 +667,7 @@
             }
         }
     </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body>
-    <div class="sun-bg"></div>
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"sun-bg"></div>
 
     <main class="max-w-4xl mx-auto">
         <!-- Header -->
@@ -1355,10 +1353,10 @@
             const tipoInversor = document.getElementById('tipo-inversor').value;
             const performanceRatio = parseFloat(document.getElementById('performance-ratio').value) / 100 || 0.80;
             
-            const tarifaEnergia = parseFloat(document.getElementById('tarifa-energia')?.value) || 0.95;
-            const reajusteTarifa = parseFloat(document.getElementById('reajuste-tarifa').value) / 100 || 0.08;
+            const tarifaEnergia = ECalc.positive(document.getElementById('tarifa-energia')?.value,'Tarifa',true);
+            const reajusteTarifa = ECalc.positive(document.getElementById('reajuste-tarifa').value,'reajuste-tarifa',true)/100;
             const custoKwp = parseFloat(document.getElementById('custo-kwp').value) || 3800;
-            const degradacao = parseFloat(document.getElementById('degradacao').value) / 100 || 0.005;
+            const degradacao = ECalc.positive(document.getElementById('degradacao').value,'degradacao',true)/100;
 
             // Custo de disponibilidade (mínimo a pagar)
             const consumoMinimo = custoDisponibilidade[tipoLigacao];
@@ -1668,7 +1666,7 @@
                 if (el) data[campo] = el.value;
             });
             
-            localStorage.setItem('solar_calc_data', JSON.stringify(data));
+            ECalc.setItem('solar_calc_data', JSON.stringify(data));
         }
 
         // ==================== INICIAR ====================
@@ -1682,6 +1680,7 @@
     </script>
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

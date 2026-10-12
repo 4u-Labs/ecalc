@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Comparador de Sistemas Construtivos | Ferramentas de Engenharia</title>
@@ -341,9 +342,7 @@
       border-bottom-color: #00ffff;
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="text-gray-200">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"text-gray-200">
   <div class="bg-pattern"></div>
   
   <!-- Header -->
@@ -1114,7 +1113,7 @@
         }
       });
       
-      localStorage.setItem('precosConstrutivos', JSON.stringify(precosPersonalizados));
+      ECalc.setItem('precosConstrutivos', JSON.stringify(precosPersonalizados));
       fecharModalPrecos();
       
       if (sistemasSelecionados.length >= 2) {
@@ -1211,6 +1210,7 @@
 
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

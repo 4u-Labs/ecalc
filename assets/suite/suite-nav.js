@@ -14,7 +14,7 @@
         { id: 'lajes', title: 'Lajes Maciças e Treliçadas', cat: 'estrutural', icon: '📐', url: 'lajes.html', desc: 'Momentos, flechas e vigotas treliçadas' },
         { id: 'fundacoes', title: 'Fundações & Sapatas', cat: 'estrutural', icon: '⚓', url: 'fundacoes.html', desc: 'Sapatas isoladas, estacas e NSPT' },
         { id: 'arrimo', title: 'Muros de Arrimo', cat: 'estrutural', icon: '🧱', url: 'arrimo.html', desc: 'Empuxo, tombamento e deslizamento' },
-        { id: 'aco', title: 'Estruturas de Aço', cat: 'estrutural', icon: '🔩', url: 'aco.html', desc: 'Perfis laminados e soldados NBR 8800' },
+        { id: 'aco', title: 'Aço e Armaduras', cat: 'estrutural', icon: '🔩', url: 'aco.html', desc: 'Peso, bitolas e quantitativos de armaduras' },
         { id: 'escadas', title: 'Escadas em Concreto', cat: 'estrutural', icon: '🪜', url: 'escadas.html', desc: 'Blondel, dimensionamento e armaduras' },
         { id: 'telhados', title: 'Estruturas de Telhados', cat: 'estrutural', icon: '🏠', url: 'telhados.html', desc: 'Tesouras, terças e cargas de vento' },
         { id: 'terraplenagem', title: 'Terraplenagem & Taludes', cat: 'estrutural', icon: '🚜', url: 'terraplenagem.html', desc: 'Corte, aterro e empolamento' },
@@ -38,7 +38,7 @@
         { id: 'arcondicionado', title: 'Climatização & HVAC', cat: 'mep', icon: '❄️', url: 'arcondicionado.html', desc: 'Carga térmica em BTUs e renovação' },
 
         // Gestão, Custos & Campo
-        { id: 'orcamento', title: 'Planilha Orçamentária SINAPI', cat: 'gestao', icon: '💰', url: 'orcamento.html', desc: 'Composições analíticas e BDI 2025' },
+        { id: 'orcamento', title: 'Orçamento Estimativo CUB', cat: 'gestao', icon: '💰', url: 'orcamento.html', desc: 'Composições analíticas e BDI 2025' },
         { id: 'sistemas', title: 'Sistemas Construtivos', cat: 'gestao', icon: '📊', url: 'sistemas.html', desc: 'Comparativo de custos: Alvenaria vs Drywall vs Steel' },
         { id: 'diario', title: 'Diário de Obra Digital', cat: 'gestao', icon: '📋', url: 'diario.html', desc: 'Relatórios diários, clima, mão de obra e fotos' },
         { id: 'checklist', title: 'Fiscalização Técnica & Checklists', cat: 'gestao', icon: '✅', url: 'checklist.html', desc: 'Conformidade por etapa da obra' },
@@ -63,29 +63,29 @@
     function getProject() {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) return JSON.parse(raw);
+            if (raw) {const project=ECalc.readJSON(STORAGE_KEY,null);if(project&&typeof project==='object'&&!Array.isArray(project))return project;}
         } catch (e) {
             console.error('Erro ao ler projeto do localStorage:', e);
         }
         return {
-            nomeObra: 'Edifício Residencial Padrão',
-            cliente: 'Cliente Padrão',
-            responsavelTecnico: 'Engenheiro Civil Responsável',
-            creaCau: 'CREA 123456/D',
-            artRrt: 'ART 2026/001452',
-            cidadeUf: 'São Paulo - SP',
+            nomeObra: '',
+            cliente: '',
+            responsavelTecnico: '',
+            creaCau: '',
+            artRrt: '',
+            cidadeUf: '',
             data: new Date().toISOString().split('T')[0]
         };
     }
 
     function saveProject(data) {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            ECalc.setItem(STORAGE_KEY, JSON.stringify(data));
             updateProjectBadge(data);
             window.dispatchEvent(new CustomEvent('ecalc:project-updated', { detail: data }));
-            showToast('Projeto atualizado com sucesso!');
+            showToast('Projeto atualizado com sucesso!');return true;
         } catch (e) {
-            console.error('Erro ao salvar projeto:', e);
+            console.error('Erro ao salvar projeto:', e);showToast(e.message);return false;
         }
     }
 
@@ -186,7 +186,7 @@
 
                 <div class="ecalc-project-pill" id="ecalc-btn-project" data-ecalc-hide-mobile="true" title="Editar dados da obra ativa">
                     <span class="dot"></span>
-                    <span class="ecalc-project-name" id="ecalc-bar-project-name">${project.nomeObra || 'Definir Obra'}</span>
+                    <span class="ecalc-project-name" id="ecalc-bar-project-name">${ECalc.escapeHtml(project.nomeObra || 'Definir Obra')}</span>
                     <svg style="width: 12px; height: 12px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
             </div>
@@ -431,8 +431,7 @@
                 cidadeUf: document.getElementById('ecalc-field-cidade').value.trim(),
                 data: document.getElementById('ecalc-field-data').value
             };
-            saveProject(updated);
-            closeProjectDrawer();
+            if(saveProject(updated))closeProjectDrawer();
         });
 
         clearBtn?.addEventListener('click', () => {

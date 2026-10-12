@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Orçamento Rápido CUB | Ferramentas de Engenharia</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script>
@@ -158,9 +159,7 @@
       .print-break { page-break-before: always; }
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="font-sans text-gray-100">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"font-sans text-gray-100">
   <!-- Header -->
   <header class="bg-dark-900/90 backdrop-blur-xl border-b border-white/5 no-print relative z-20">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -1437,7 +1436,7 @@
         darkMode: false
       };
 
-      localStorage.setItem('excelCloneData', JSON.stringify(payload));
+      ECalc.setItem('excelCloneData', JSON.stringify(payload));
       window.open('../office/excel/', '_blank');
     }
 
@@ -1481,16 +1480,16 @@
       
       if (!projeto.nome) return;
       
-      const projetos = JSON.parse(localStorage.getItem('orcamentoCUB_projetos') || '[]');
+      const projetos = ECalc.readJSON('orcamentoCUB_projetos',[]);
       projetos.push(projeto);
-      localStorage.setItem('orcamentoCUB_projetos', JSON.stringify(projetos));
+      ECalc.setItem('orcamentoCUB_projetos', JSON.stringify(projetos));
       
       atualizarListaProjetos();
       showToast('Projeto salvo com sucesso!', 'success');
     }
 
     function carregarProjeto() {
-      const projetos = JSON.parse(localStorage.getItem('orcamentoCUB_projetos') || '[]');
+      const projetos = ECalc.readJSON('orcamentoCUB_projetos',[]);
       if (projetos.length === 0) {
         showToast('Nenhum projeto salvo', 'info');
         return;
@@ -1513,7 +1512,7 @@
     }
 
     function atualizarListaProjetos() {
-      const projetos = JSON.parse(localStorage.getItem('orcamentoCUB_projetos') || '[]');
+      const projetos = ECalc.readJSON('orcamentoCUB_projetos',[]);
       const container = $('projetosSalvos');
       
       if (projetos.length === 0) {
@@ -1523,7 +1522,7 @@
       
       container.innerHTML = projetos.slice(-5).reverse().map(p => `
         <div class="flex justify-between items-center py-1 border-b border-white/5">
-          <span>${p.nome}</span>
+          <span>${ECalc.escapeHtml(p.nome)}</span>
           <span class="text-xs text-gray-500">${new Date(p.data).toLocaleDateString('pt-BR')}</span>
         </div>
       `).join('');
@@ -1662,7 +1661,8 @@
 
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

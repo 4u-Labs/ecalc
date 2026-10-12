@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Calculadora de Aço | Ferramentas de Engenharia</title>
@@ -203,9 +204,7 @@
       background: rgba(6, 182, 212, 0.1);
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="text-gray-100">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"text-gray-100">
   <!-- Header -->
   <header class="no-print glass border-b border-white/10 relative z-20">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -598,7 +597,7 @@
     };
 
     const precoPadrao = { custoKg: 9.80 };
-    let precos = JSON.parse(localStorage.getItem('precosAco')) || { ...precoPadrao };
+    let precos = ECalc.readJSON('precosAco',null) || { ...precoPadrao };
     let tipoCalculoAtual = 'peso-comprimento';
     let ultimoResultado = null;
 
@@ -671,11 +670,11 @@
         pesoComprimento: document.getElementById('peso-comprimento').value,
         tamanhoBarra: document.getElementById('tamanho-barra').value
       };
-      localStorage.setItem('aco-calc', JSON.stringify(dados));
+      ECalc.setItem('aco-calc', JSON.stringify(dados));
     }
 
     function carregarDados() {
-      const dados = JSON.parse(localStorage.getItem('aco-calc'));
+      const dados = ECalc.readJSON('aco-calc',null);
       if (!dados) return;
 
       if (dados.tipoCalculoAtual) selecionarTipo(dados.tipoCalculoAtual, false);
@@ -1197,7 +1196,7 @@ Sobra = ${sobra.toFixed(2)} kg (${sobraPercentual.toFixed(1)}%)</pre>
       }
 
       precos.custoKg = custoKg;
-      localStorage.setItem('precosAco', JSON.stringify(precos));
+      ECalc.setItem('precosAco', JSON.stringify(precos));
       document.getElementById('precoBase').textContent = custoKg.toFixed(2);
       
       calcular();
@@ -1217,7 +1216,7 @@ Sobra = ${sobra.toFixed(2)} kg (${sobraPercentual.toFixed(1)}%)</pre>
     function restaurarPrecos() {
       if (confirm('Restaurar preços padrão?')) {
         precos = { ...precoPadrao };
-        localStorage.setItem('precosAco', JSON.stringify(precos));
+        ECalc.setItem('precosAco', JSON.stringify(precos));
         document.getElementById('preco-aco-kg').value = precos.custoKg.toFixed(2);
         document.getElementById('precoBase').textContent = precos.custoKg.toFixed(2);
         calcular();
@@ -1255,6 +1254,7 @@ Sobra = ${sobra.toFixed(2)} kg (${sobraPercentual.toFixed(1)}%)</pre>
     }
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

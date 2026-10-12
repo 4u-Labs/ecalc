@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Cálculo de Lajes - NBR 6118:2014</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" id="ecalc-suite-css" href="assets/suite/suite-nav.css?v=20260929_4">
+    <link rel="stylesheet" id="ecalc-suite-css" href="assets/suite/suite-nav.css?v=20261011_1">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -550,7 +551,7 @@
         // Dark Mode
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+            ECalc.setItem('darkMode', document.documentElement.classList.contains('dark'));
         }
 
         function checkDarkMode() {
@@ -766,6 +767,8 @@
         }
 
         function calcular() {
+            window.ultimoResultadoLaje=null; calculoRealizado=false;
+            document.getElementById('resultados').textContent='';
             const tipoLaje = document.getElementById('tipoLaje').value;
             const condicaoApoio = parseInt(document.getElementById('condicaoApoio').value);
             const lx = parseFloat(document.getElementById('lx').value);
@@ -778,6 +781,8 @@
             const cobrimento = parseFloat(document.getElementById('cobrimento').value) / 100;
 
             // Validações
+            [lx,ly,h,fck,fyk].forEach(v=>ECalc.positive(v,'Dimensão/material'));[gPermanente,qAcidental,cobrimento].forEach(v=>ECalc.positive(v,'Carga/cobrimento',true));
+            if(h-cobrimento-.004<=0)throw Error('Altura útil insuficiente: revise espessura e cobrimento');
             if (lx > ly) {
                 showToast('Lx deve ser menor ou igual a Ly!', 'error');
                 return;
@@ -830,6 +835,7 @@
             const armXn = calcularArmadura(mxn, d, fcd, fyd);
             const armYn = calcularArmadura(myn, d, fcd, fyd);
 
+            if([armX,armY, ...(mxn>0?[armXn]:[]), ...(myn>0?[armYn]:[])].some(a=>!Number.isFinite(a.As)||a.As<0))throw Error('Seção insuficiente para os momentos positivos ou negativos. Revise a geometria.');
             const AsX = Math.max(armX.As, AsMin);
             const AsY = Math.max(armY.As, AsMin);
             const AsXn = mxn > 0 ? Math.max(armXn.As, AsMin) : 0;
@@ -845,33 +851,22 @@
             const hMin = tipoLaje === 'macica' ? 7 : (tipoLaje === 'nervurada' ? 10 : 8);
 
             // Bitolas
-            function sugerirBitolas(As) {
-                const bitolas = [
-                    { phi: 5.0, area: 0.196 }, { phi: 6.3, area: 0.312 },
-                    { phi: 8.0, area: 0.503 }, { phi: 10.0, area: 0.785 },
-                    { phi: 12.5, area: 1.227 }
-                ];
-                for (const b of bitolas) {
-                    const n = Math.ceil(As / b.area);
-                    const esp = Math.floor(100 / n);
-                    if (esp >= 10 && esp <= 30) {
-                        return { phi: b.phi, espacamento: esp, nBarras: n, areaReal: n * b.area };
-                    }
-                }
-                return { phi: 8, espacamento: 15, nBarras: 7, areaReal: 3.52 };
-            }
+            function sugerirBitolas(As) { return ECalc.reinforcement(As); }
 
             const sugX = sugerirBitolas(AsX);
             const sugY = sugerirBitolas(AsY);
             const sugXn = AsXn > 0 ? sugerirBitolas(AsXn) : null;
             const sugYn = AsYn > 0 ? sugerirBitolas(AsYn) : null;
 
+            if(!sugX||!sugY||(AsXn>0&&!sugXn)||(AsYn>0&&!sugYn))throw Error('Nenhuma combinação disponível de bitola/espaçamento atende à armadura necessária');
+
             // Quantitativos
             const areaLaje = lx * ly;
             const volumeConcreto = areaLaje * h;
-            const pesoAcoX = (AsX / 10000) * lx * 7850 * (ly / (sugX.espacamento / 100));
-            const pesoAcoY = (AsY / 10000) * ly * 7850 * (lx / (sugY.espacamento / 100));
-            const pesoAcoTotal = pesoAcoX + pesoAcoY;
+            const pesoAcoX = (sugX.areaReal / 10000) * areaLaje * 7850;
+            const pesoAcoY = (sugY.areaReal / 10000) * areaLaje * 7850;
+            const pesoAcoNegativo = ((sugXn?.areaReal||0)+(sugYn?.areaReal||0))/10000*areaLaje*7850;
+            const pesoAcoTotal = pesoAcoX + pesoAcoY + pesoAcoNegativo; // kg; malhas completas, estimativa sem ancoragens/emendas
 
             // Orçamento 2025
             const precoConcreto = 480; // R$/m³
@@ -883,11 +878,11 @@
             let custoMaoObraExec = areaLaje * precoMaoObraSlab;
             
             if (tipoLaje === 'macica') {
-                custoMaterial = (volumeConcreto * precoConcreto) + (pesoAcoTotal/1000 * precoAco) + (areaLaje * precoFormaSlab);
+                custoMaterial = (volumeConcreto * precoConcreto) + (pesoAcoTotal * precoAco) + (areaLaje * precoFormaSlab);
             } else if (tipoLaje === 'nervurada') {
-                custoMaterial = (volumeConcreto * precoConcreto) + (pesoAcoTotal/1000 * precoAco) + (areaLaje * 45) + (areaLaje * 35); // Estimativa EPS + Formas leves
+                custoMaterial = (volumeConcreto * precoConcreto) + (pesoAcoTotal * precoAco) + (areaLaje * 45) + (areaLaje * 35); // Estimativa EPS + Formas leves
             } else {
-                custoMaterial = (areaLaje * 65) + (volumeConcreto * precoConcreto) + (pesoAcoTotal/1000 * precoAco); // Estimativa Vigotas + Capa
+                custoMaterial = (areaLaje * 65) + (volumeConcreto * precoConcreto) + (pesoAcoTotal * precoAco); // Estimativa Vigotas + Capa
             }
             
             const custoTotalEstimado = custoMaterial + custoMaoObraExec;
@@ -897,13 +892,14 @@
                 espessura: h * 100 >= hMin,
                 flecha: flechaTotal <= flechaLimite,
                 armaduraX: armX.As > 0,
-                armaduraY: armY.As > 0
+                armaduraY: armY.As > 0,
+                armaduraNegativa: (mxn<=0||armXn.As>=0)&&(myn<=0||armYn.As>=0)
             };
             const todasOk = Object.values(verif).every(v => v);
 
             // Armazenar para Suíte Integrada
             window.ultimoResultadoLaje = {
-                tipoLaje, condicaoApoio, lx, ly, h, d, fck, fcd, fyk, fyd,
+                aprovado: todasOk, tipoLaje, condicaoApoio, lx, ly, h, d, fck, fcd, fyk, fyd,
                 g0, gPermanente, gTotal, qAcidental, pd, mx, my, mxn, myn,
                 armX, armY, armXn, armYn, AsMin, AsX, AsY, AsXn, AsYn,
                 sugX, sugY, sugXn, sugYn, flechaImediata, flechaTotal, flechaLimite,
@@ -919,6 +915,7 @@
 
             // Render results
             document.getElementById('resultados').innerHTML = `
+                <p class="p-3 mb-4 text-sm border rounded-xl">Quantitativo estimativo: malhas uniformes em toda a área, inclusive negativas quando existentes, sem ancoragens e emendas. Preços de referência do modelo; confira os valores locais antes de orçar.</p>
                 <!-- Suite Action Bar -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 bg-white dark:bg-slate-800 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-md no-print">
                     <div class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
@@ -1270,7 +1267,7 @@ Aço: CA-${fyk === 500 ? '50' : '60'}
 
 2. CARREGAMENTOS (kN/m²)
 Peso Próprio: ${g0.toFixed(2)}
-Revestimento: ${(gPermanente - g0).toFixed(2)}
+Revestimento: ${gPermanente.toFixed(2)}
 Carga Acidental: ${qAcidental.toFixed(2)}
 Carga Total Cálculo (pd): ${pd.toFixed(2)}
 
@@ -1297,8 +1294,8 @@ Armadura Negativa Y: ${AsYn.toFixed(2)}</pre>
 
         // ==================== ECALC SUITE INTEGRATION ====================
         function abrirNoCadCloneLaje() {
-            if (!window.ultimoResultadoLaje) {
-                showToast('Calcule uma laje primeiro', 'warning');
+            if (!window.ultimoResultadoLaje?.aprovado) {
+                showToast('Calcule e resolva as verificações da laje antes de exportar', 'warning');
                 return;
             }
             if (typeof window.ECALC_CAD === 'undefined') {
@@ -1317,8 +1314,8 @@ Armadura Negativa Y: ${AsYn.toFixed(2)}</pre>
         }
 
         function baixarDxfLaje() {
-            if (!window.ultimoResultadoLaje) {
-                showToast('Calcule uma laje primeiro', 'warning');
+            if (!window.ultimoResultadoLaje?.aprovado) {
+                showToast('Calcule e resolva as verificações da laje antes de exportar', 'warning');
                 return;
             }
             const d = window.ultimoResultadoLaje;
@@ -1338,8 +1335,8 @@ Armadura Negativa Y: ${AsYn.toFixed(2)}</pre>
         }
 
         function gerarMemorialLaje() {
-            if (!window.ultimoResultadoLaje) {
-                showToast('Calcule uma laje primeiro', 'warning');
+            if (!window.ultimoResultadoLaje?.aprovado) {
+                showToast('Calcule e resolva as verificações da laje antes de exportar', 'warning');
                 return;
             }
             if (typeof window.ECALC_MEMORIAL === 'undefined') {
@@ -1367,7 +1364,7 @@ Armadura Negativa Y: ${AsYn.toFixed(2)}</pre>
 
             window.ECALC_MEMORIAL.gerar({
                 titulo: 'Memorial de Cálculo de Laje Maciça em Concreto Armado',
-                norma: 'ABNT NBR 6118:2023 - Projeto de Estruturas de Concreto',
+                norma: 'ABNT NBR 6118:2014 (referência do modelo; edição vigente a conferir) - Projeto de Estruturas de Concreto',
                 elemento: `Laje L-101 (${d.lx.toFixed(2)} × ${d.ly.toFixed(2)} m) - Espessura h = ${(d.h*100).toFixed(1)} cm`,
                 inputs: [
                     { label: 'Menor Vão Livre (Lx)', val: `${d.lx.toFixed(2)} m` },
@@ -1417,7 +1414,7 @@ Armadura Negativa Y: ${AsYn.toFixed(2)}</pre>
                     }
                 ],
                 svgSection: svgSection,
-                notas: 'Memorial de cálculo analítico gerado pela Suíte Integrada ECALC PRO em conformidade com a ABNT NBR 6118:2023. O projeto executivo e detalhamento devem ser acompanhados de ART/RRT de Responsabilidade Técnica.'
+                notas: 'Memorial de cálculo analítico gerado pela Suíte Integrada ECALC PRO com as hipóteses simplificadas do modelo apresentado. O projeto executivo e detalhamento devem ser acompanhados de ART/RRT de Responsabilidade Técnica.'
             });
         }
     </script>
@@ -1434,8 +1431,9 @@ Armadura Negativa Y: ${AsYn.toFixed(2)}</pre>
     </script>
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

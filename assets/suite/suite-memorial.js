@@ -511,7 +511,7 @@
             ? project.data.split('-').reverse().join('/')
             : new Date().toLocaleDateString('pt-BR');
 
-        const qrText = encodeURIComponent(`ECALC-VERIFY:${project.artRrt || 'ART-VALID'}:${project.creaCau || 'CREA'}`);
+        const qrText = encodeURIComponent(`ECALC-VERIFY:${ECalc.escapeHtml(project.artRrt || 'Não informada')}:${ECalc.escapeHtml(project.creaCau || 'CREA')}`);
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrText}`;
 
         modal.innerHTML = `
@@ -526,7 +526,8 @@
             </div>
 
             <div class="ecalc-a4-sheet">
-                <!-- Cabeçalho Oficial -->
+                <p style="font-size:10pt;border:1px solid #94a3b8;padding:8px">Memorial do modelo de cálculo. A edição normativa, as hipóteses e as verificações devem ser conferidas pelo responsável técnico. Documento gerado pelo aplicativo; não comprova aprovação ou assinatura.</p>
+                <!-- Cabeçalho do cálculo -->
                 <div class="ecalc-sheet-header">
                     <div class="ecalc-sheet-logo">
                         <div style="display: flex; align-items: center; gap: 8px;">
@@ -551,16 +552,16 @@
                 <!-- Tabela de Identificação da Obra / RT -->
                 <table class="ecalc-table-project">
                     <tr>
-                        <td style="width: 50%;"><strong>Edifício / Obra:</strong> ${project.nomeObra || '-'}</td>
-                        <td style="width: 50%;"><strong>Cliente / Contratante:</strong> ${project.cliente || '-'}</td>
+                        <td style="width: 50%;"><strong>Edifício / Obra:</strong> ${ECalc.escapeHtml(project.nomeObra || '-')}</td>
+                        <td style="width: 50%;"><strong>Cliente / Contratante:</strong> ${ECalc.escapeHtml(project.cliente || '-')}</td>
                     </tr>
                     <tr>
-                        <td><strong>Responsável Técnico:</strong> ${project.responsavelTecnico || '-'}</td>
-                        <td><strong>Registro Profissional:</strong> ${project.creaCau || '-'}</td>
+                        <td><strong>Responsável Técnico:</strong> ${ECalc.escapeHtml(project.responsavelTecnico || '-')}</td>
+                        <td><strong>Registro Profissional:</strong> ${ECalc.escapeHtml(project.creaCau || '-')}</td>
                     </tr>
                     <tr>
-                        <td><strong>Número ART / RRT:</strong> ${project.artRrt || '-'}</td>
-                        <td><strong>Localização:</strong> ${project.cidadeUf || '-'}</td>
+                        <td><strong>Número ART / RRT:</strong> ${ECalc.escapeHtml(project.artRrt || '-')}</td>
+                        <td><strong>Localização:</strong> ${ECalc.escapeHtml(project.cidadeUf || '-')}</td>
                     </tr>
                 </table>
 
@@ -569,8 +570,8 @@
                 <div class="ecalc-data-grid">
                     ${(options.inputs || []).map(inp => `
                         <div class="ecalc-data-row">
-                            <span class="ecalc-data-label">${inp.label}</span>
-                            <span class="ecalc-data-val">${inp.val}</span>
+                            <span class="ecalc-data-label">${ECalc.escapeHtml(inp.label)}</span>
+                            <span class="ecalc-data-val">${ECalc.escapeHtml(inp.val)}</span>
                         </div>
                     `).join('')}
                 </div>
@@ -586,8 +587,8 @@
                 <div class="ecalc-data-grid">
                     ${(options.resultados || []).map(res => `
                         <div class="ecalc-data-row">
-                            <span class="ecalc-data-label">${res.label}</span>
-                            <span class="ecalc-data-val" style="color: #0369a1;">${res.val}</span>
+                            <span class="ecalc-data-label">${ECalc.escapeHtml(res.label)}</span>
+                            <span class="ecalc-data-val" style="color: #0369a1;">${ECalc.escapeHtml(res.val)}</span>
                         </div>
                     `).join('')}
                 </div>
@@ -609,8 +610,8 @@
                                 const badgeText = v.status === 'pass' ? '✓ CONFORME' : (v.status === 'warn' ? '⚠ ATENÇÃO' : '✕ NÃO CONFORME');
                                 return `
                                     <tr>
-                                        <td><strong>${v.item}</strong></td>
-                                        <td>${v.calc}</td>
+                                        <td><strong>${ECalc.escapeHtml(v.item)}</strong></td>
+                                        <td>${ECalc.escapeHtml(v.calc)}</td>
                                         <td style="text-align: center;">
                                             <span class="ecalc-status-badge ${badgeClass}">${badgeText}</span>
                                         </td>
@@ -642,14 +643,14 @@
                         <div>
                             <strong>Autenticidade Técnica</strong><br>
                             <span style="color: #64748b;">Validação ART/CREA</span><br>
-                            <span style="color: #0284c7; font-family: monospace;">${project.artRrt || 'ART-DIGITAL'}</span>
+                            <span style="color: #0284c7; font-family: monospace;">${ECalc.escapeHtml(project.artRrt || 'Não informada')}</span>
                         </div>
                     </div>
 
                     <div class="ecalc-signature-line">
                         <div class="line"></div>
-                        <strong>${project.responsavelTecnico || 'Responsável Técnico'}</strong><br>
-                        <span>${project.creaCau || 'Registro CREA/CAU'}</span>
+                        <strong>${ECalc.escapeHtml(project.responsavelTecnico || 'Responsável Técnico')}</strong><br>
+                        <span>${ECalc.escapeHtml(project.creaCau || 'Registro CREA/CAU')}</span>
                     </div>
                 </div>
             </div>

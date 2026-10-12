@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NBR Guide - Engenharia Civil & Acessibilidade</title>
@@ -39,9 +40,7 @@
             #modalContent { max-height: none !important; overflow: visible !important; }
         }
     </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="bg-gray-50 min-h-screen">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"bg-gray-50 min-h-screen">
     <!-- Header -->
     <header class="gradient-bg text-white shadow-xl no-print relative z-20">
         <div class="max-w-7xl mx-auto px-4 py-4">
@@ -8056,14 +8055,14 @@
         // =====================
         let currentCategory = 'all';
         let currentSearch = '';
-        let favorites = JSON.parse(localStorage.getItem('nbrFavorites')) || [];
+        let favorites = ECalc.readJSON('nbrFavorites',null) || [];
         let currentNorma = null;
         let currentDicaIndex = 0;
 
         // Biblioteca local (PDFs)
         // - armazenamos em IndexedDB por ser mais robusto que localStorage
         // - mapeamento (normaId -> pdfRecordId) fica em localStorage
-        let pdfMap = JSON.parse(localStorage.getItem('nbrPdfMap')) || {}; // { [normaId]: dbId }
+        let pdfMap = ECalc.readJSON('nbrPdfMap',null) || {}; // { [normaId]: dbId }
         let pendingPdfFile = null;
 
         // =====================
@@ -8814,7 +8813,7 @@
                 favorites.push(id);
                 showToast('Adicionado aos favoritos!', 'success');
             }
-            localStorage.setItem('nbrFavorites', JSON.stringify(favorites));
+            ECalc.setItem('nbrFavorites', JSON.stringify(favorites));
             updateFavCount();
             renderResults();
         }
@@ -9049,7 +9048,7 @@
         }
 
         function savePdfMap() {
-            localStorage.setItem('nbrPdfMap', JSON.stringify(pdfMap));
+            ECalc.setItem('nbrPdfMap', JSON.stringify(pdfMap));
         }
 
         function buildPdfAssignSelect() {
@@ -9632,7 +9631,7 @@
     </script>
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4">
+    <script src="assets/suite/suite-nav.js?v=20261011_1">
         // ==========================================
         // CENTRAL DE FERRAMENTAS E DIMENSIONADORES DAS NRs
         // ==========================================
@@ -10008,5 +10007,6 @@ Emitido via NBR Guide • ECALC SUITE PRO (4u.ia.br)`;
         }
 
     </script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

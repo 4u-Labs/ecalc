@@ -20,6 +20,7 @@ require_once __DIR__ . '/../../keepai/api/database.php';
 
 // 2. Carrega as variáveis de ambiente locais do SafeWork Pro (.env)
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/credits.php';
 
 // 3. Validação de Segurança e Créditos (Executada apenas se a ação não for "test")
 $action = $_GET['action'] ?? '';
@@ -30,16 +31,7 @@ if ($action !== 'test') {
     $user = verifyAuthToken();
     $uid = (int) $user['id'];
     
-    // Verifica se possui créditos suficientes para uma geração de IA (1 crédito)
-    $credits = (int) $user['credits'];
-    if ($credits < 1) {
-        http_response_code(402); // Payment Required
-        echo json_encode([
-            'success' => false,
-            'error' => 'Saldo de IA insuficiente. Recarregue clicando no saldo de créditos no topo da tela.'
-        ], JSON_UNESCAPED_UNICODE);
-        exit;
-    }
+
 }
 
 class AIDocumentGenerator {
@@ -398,6 +390,7 @@ class AIDocumentGenerator {
 }
 
 // Roteamento da API
+$reserved=false;$requestId='';$pdo=null;
 try {
     $method = $_SERVER['REQUEST_METHOD'];
     
@@ -410,6 +403,22 @@ try {
         throw new Exception("Dados de entrada inválidos.");
     }
     
+    if ($action !== 'test') {
+        $allowed=['generate-pgr','generate-pcmat','generate-apr','generate-termo-epi','generate-certificado'];
+        if(!in_array($action,$allowed,true)||!is_array($input)||array_is_list($input))throw new RuntimeException('Ação ou dados inválidos');
+        $fields=['generate-pgr'=>["riscos","empresa","cnpj","endereco","ramo","funcionarios","responsavel","crea","plano_acao"],'generate-pcmat'=>["funcoes","obra","contratante","endereco","tipo_obra","trabalhadores","data_inicio","data_fim","engenheiro","crea","medidas"],'generate-apr'=>["epis","data","atividade","local","responsavel","tipo_servico","nivel_risco","riscos","medidas"],'generate-termo-epi'=>["funcionario","cpf","tipo_epi","ca","data_entrega","validade","observacoes"],'generate-certificado'=>["treinamento","funcionario","cpf","carga_horaria","data_realizacao","validade","instrutor"]];
+        $listFields=['generate-pgr'=>['riscos'],'generate-pcmat'=>['funcoes'],'generate-apr'=>['epis']];
+        foreach($fields[$action] as $field){$isList=in_array($field,$listFields[$action]??[],true);if(!isset($input[$field]))$input[$field]=$isList?[]:'';if($isList&&!is_array($input[$field]))throw new RuntimeException('Lista inválida: '.$field);if(!$isList&&!is_scalar($input[$field]))throw new RuntimeException('Texto inválido: '.$field);}
+        $required=['generate-pgr'=>['empresa','cnpj','responsavel'],'generate-pcmat'=>['obra','contratante','engenheiro'],'generate-apr'=>['atividade','local','responsavel','data'],'generate-termo-epi'=>['funcionario','cpf','tipo_epi','ca','data_entrega'],'generate-certificado'=>['funcionario','cpf','treinamento','carga_horaria','data_realizacao','instrutor']];
+        foreach($required[$action] as $field)if(!isset($input[$field])||!is_scalar($input[$field])||trim((string)$input[$field])==='')throw new RuntimeException('Campo obrigatório: '.$field);
+        foreach($input as $field=>$value){if(is_array($value)){foreach($value as $item)if(!is_string($item))throw new RuntimeException('Lista inválida: '.$field);}elseif(!is_scalar($value)&&$value!==null)throw new RuntimeException('Campo inválido: '.$field);}
+        if(strlen(json_encode($input))>100000)throw new RuntimeException('Dados excedem o limite permitido');
+        $requestId=$_SERVER['HTTP_X_IDEMPOTENCY_KEY']??bin2hex(random_bytes(16));
+        if(!preg_match('/^[a-zA-Z0-9_-]{16,128}$/',$requestId))throw new RuntimeException('Identificador inválido');
+        $pdo=Database::get();$cached=SafeWorkCredits::reserve($pdo,$uid,$requestId,hash('sha256',$action.json_encode($input,JSON_THROW_ON_ERROR)));
+        if($cached!==null){echo json_encode($cached,JSON_UNESCAPED_UNICODE);exit;}
+        $reserved=true;
+    }
     $generator = new AIDocumentGenerator();
     $result = null;
     
@@ -446,26 +455,16 @@ try {
             throw new Exception("Ação não reconhecida: $action");
     }
     
-    // Se a chamada gerou documento com sucesso, deduzir créditos do usuário
     if ($action !== 'test' && $user !== null) {
-        $uid = (int) $user['id'];
-        $pdo = Database::get();
-        
-        // Deduz 1 crédito
-        $pdo->prepare('UPDATE users SET credits = credits - 1, updated_at = datetime("now") WHERE id = ?')->execute([$uid]);
-        
-        // Registra transação
-        $pdo->prepare('
-            INSERT INTO transactions (user_id, mp_payment_id, package_label, amount_brl, credits_added, status)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ')->execute([$uid, 'SWP-' . time(), 'Consumo SafeWork Pro', 0.0, -1, 'approved']);
-        
-        // Retorna o resultado com sucesso e o saldo atualizado
-        echo json_encode([
-            'success' => true,
-            'data' => $result,
-            'credits_remaining' => $credits - 1
-        ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        if(!is_array($result)||!isset($result['titulo'])||!is_string($result['titulo'])||trim($result['titulo'])==='')throw new RuntimeException('A IA retornou um documento inválido');
+        if(in_array($action,['generate-pgr','generate-pcmat','generate-apr'],true)){
+          if(empty($result['secoes'])||!is_array($result['secoes']))throw new RuntimeException('Documento sem seções');
+          foreach($result['secoes'] as $section)if(!is_array($section)||empty($section['titulo'])||!isset($section['conteudo']))throw new RuntimeException('Seção de documento inválida');
+        }
+        if($action==='generate-termo-epi'&&empty($result['termo_declaracao']))throw new RuntimeException('Termo sem declaração');
+        if($action==='generate-certificado'&&empty($result['texto_certificacao']))throw new RuntimeException('Certificado sem conteúdo');
+        $response=SafeWorkCredits::finish($pdo,$uid,$requestId,$result);$reserved=false;
+        echo json_encode($response,JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT);
     } else {
         // Apenas para o endpoint de teste
         echo json_encode([
@@ -474,8 +473,10 @@ try {
         ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
     
-} catch (Exception $e) {
-    http_response_code(400);
+ } catch (Throwable $e) {
+    if($reserved&&$pdo!==null){try{SafeWorkCredits::fail($pdo,$uid,$requestId);}catch(Throwable $refundError){error_log('SafeWork reservation requires reconciliation: '.$uid.':'.$requestId);}}
+    $status=in_array($e->getCode(),[402,409],true)?$e->getCode():400;
+    http_response_code($status);
     echo json_encode([
         'success' => false,
         'error' => $e->getMessage()

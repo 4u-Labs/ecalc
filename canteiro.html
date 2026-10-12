@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Dimensionamento de Canteiro (NR 18) | Ferramentas de Engenharia</title>
@@ -825,11 +826,7 @@
       display: none !important;
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body>
-  <!-- Header -->
-  <header class="header">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"header">
     <div class="header-content">
       <a href="#" class="logo">
         <div class="logo-icon">
@@ -1235,7 +1232,7 @@
       precoM2Ambulatorio: 400
     };
 
-    let precosCanteiro = JSON.parse(localStorage.getItem('precosCanteiro')) || { ...precosCanteiroPadrao };
+    let precosCanteiro = ECalc.readJSON('precosCanteiro',null) || { ...precosCanteiroPadrao };
 
     // Parâmetros NR 18
     const NORMA = {
@@ -1931,7 +1928,7 @@
         precoM2Alojamento: parseFloat(document.getElementById('preco-m2-alojamento').value) || 0,
         precoM2Ambulatorio: parseFloat(document.getElementById('preco-m2-ambulatorio').value) || 0
       };
-      localStorage.setItem('precosCanteiro', JSON.stringify(precosCanteiro));
+      ECalc.setItem('precosCanteiro', JSON.stringify(precosCanteiro));
       calcular();
       fecharModalPrecos();
 
@@ -1952,7 +1949,7 @@
     function restaurarPrecosCanteiro() {
       if (confirm('Restaurar todos os preços para o padrão?')) {
         precosCanteiro = { ...precosCanteiroPadrao };
-        localStorage.setItem('precosCanteiro', JSON.stringify(precosCanteiro));
+        ECalc.setItem('precosCanteiro', JSON.stringify(precosCanteiro));
         abrirModalPrecos();
         calcular();
       }
@@ -2225,7 +2222,7 @@
         ['Investimento Total Estimado', d.custoTotalGeral.toFixed(2), 'R$']
       ];
 
-      localStorage.setItem('officeclone_import_data', JSON.stringify({
+      ECalc.setItem('officeclone_import_data', JSON.stringify({
         filename: `Canteiro_NR18_${d.numFuncionarios}trabalhadores.csv`,
         rows: csvData
       }));
@@ -2395,8 +2392,9 @@
 
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Calculadora de Escadas Pro | Ferramentas de Engenharia</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
@@ -223,9 +224,7 @@
       .specs-grid { grid-template-columns: 1fr !important; }
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="font-sans text-gray-200">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"font-sans text-gray-200">
   <!-- Header -->
   <header class="glass-card border-b border-cyan-500/20 no-print relative z-20">
     <div class="max-w-7xl mx-auto px-4 py-4">
@@ -827,8 +826,8 @@ Clique em "Calcular" para ver a análise de conformidade com as normas.
       corrimao: 210.00, guarda: 380.00
     };
     
-    let precosEscadas = JSON.parse(localStorage.getItem('precosEscadas')) || { ...precosEscadasPadrao };
-    let historicoCalclos = JSON.parse(localStorage.getItem('historicoEscadas')) || [];
+    let precosEscadas = ECalc.readJSON('precosEscadas',null) || { ...precosEscadasPadrao };
+    let historicoCalclos = ECalc.readJSON('historicoEscadas',null) || [];
     let tipoEscadaSelecionado = 'reta';
     let rotacao3D = 30;
     let ultimoCalculo = null;
@@ -2463,7 +2462,7 @@ Clique em "Calcular" para ver a análise de conformidade com as normas.
     function salvarNoHistorico(calc) {
       historicoCalclos.unshift(calc);
       if (historicoCalclos.length > 20) historicoCalclos.pop();
-      localStorage.setItem('historicoEscadas', JSON.stringify(historicoCalclos));
+      ECalc.setItem('historicoEscadas', JSON.stringify(historicoCalclos));
     }
 
     function abrirModalHistorico() {
@@ -2539,7 +2538,7 @@ Clique em "Calcular" para ver a análise de conformidade com as normas.
         guarda: parseFloat(document.getElementById('preco-guarda').value) || 0
       };
       
-      localStorage.setItem('precosEscadas', JSON.stringify(precosEscadas));
+      ECalc.setItem('precosEscadas', JSON.stringify(precosEscadas));
       
       if (ultimoCalculo) calcular();
       
@@ -2550,7 +2549,7 @@ Clique em "Calcular" para ver a análise de conformidade com as normas.
     function restaurarPrecosEscadas() {
       if (confirm('Restaurar preços padrão?')) {
         precosEscadas = { ...precosEscadasPadrao };
-        localStorage.setItem('precosEscadas', JSON.stringify(precosEscadas));
+        ECalc.setItem('precosEscadas', JSON.stringify(precosEscadas));
         abrirModalPrecos();
         showToast('Preços restaurados!', 'success');
       }
@@ -2922,7 +2921,7 @@ Clique em "Calcular" para ver a análise de conformidade com as normas.
       };
 
       try {
-        localStorage.setItem('officeclone_import_payload', JSON.stringify({
+        ECalc.setItem('officeclone_import_payload', JSON.stringify({
           title: `Escada_${d.numDegraus}Degraus_${d.espelho}x${d.piso}`,
           cells: dataCells,
           author: 'ECALC PRO - Suíte de Engenharia',
@@ -3022,8 +3021,9 @@ Clique em "Calcular" para ver a análise de conformidade com as normas.
     }
   </script>
   <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-  <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+  <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

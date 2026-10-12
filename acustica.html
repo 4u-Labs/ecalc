@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Conforto Acústico & TR60 | Suíte de Engenharia eCalc</title>
@@ -87,9 +88,7 @@
       .no-print { display: none !important; }
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="font-sans text-gray-100 antialiased selection:bg-blue-500/30">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"font-sans text-gray-100 antialiased selection:bg-blue-500/30">
 
   <!-- Header da Suíte -->
   <header class="bg-dark-900/90 backdrop-blur-xl border-b border-white/5 no-print relative z-20">
@@ -1139,7 +1138,7 @@ Relatório técnico para subsidiar projeto executivo de arquitetura e revestimen
         [15, 'TR60 Projetado Apos Tratamento', d.trTratadoMedio.toFixed(2), 'segundos', 'NBR 12179']
       ];
 
-      localStorage.setItem('officeclone_import_data', JSON.stringify({
+      ECalc.setItem('officeclone_import_data', JSON.stringify({
         filename: `Tratamento_Acustico_${d.nomePreset}_${d.volume.toFixed(0)}m3.csv`,
         rows: csvData
       }));
@@ -1219,8 +1218,9 @@ Relatório técnico para subsidiar projeto executivo de arquitetura e revestimen
   </script>
 
   <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-  <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+  <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

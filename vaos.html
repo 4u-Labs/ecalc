@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Calculadora de Vãos | Hub Engenharia Civil</title>
@@ -292,9 +293,7 @@
             transform: rotate(-180deg) scale(0);
         }
     </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="bg-gray-50 dark:bg-slate-900 min-h-screen transition-colors duration-300">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"bg-gray-50 dark:bg-slate-900 min-h-screen transition-colors duration-300">
     <!-- Header -->
     <header class="gradient-bg text-white py-2.5 sm:py-3.5 shadow-xl no-print relative z-20">
         <div class="container mx-auto px-4">
@@ -760,7 +759,7 @@
     <script>
         // ==================== INICIALIZAÇÃO ====================
         document.getElementById('ano').textContent = new Date().getFullYear();
-        let historico = JSON.parse(localStorage.getItem('calculoHistorico') || '[]');
+        let historico = ECalc.readJSON('calculoHistorico',[]);
         
         // Detectar preferência do sistema e localStorage
         function getPreferredTheme() {
@@ -1244,7 +1243,7 @@
                             <div class="mt-3">
                                 <div class="flex justify-between text-xs mb-1">
                                     <span class="dark:text-gray-300">Utilização ELS</span>
-                                    <span class="${utilizacao <= 100 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">${Math.min(utilizacao, 100).toFixed(1)}%</span>
+                                    <span class="${utilizacao <= 100 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">${utilizacao.toFixed(1)}%</span>
                                 </div>
                                 <div class="h-3 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
                                     <div class="h-full progress-bar rounded-full ${utilizacao <= 70 ? 'bg-green-500' : utilizacao <= 100 ? 'bg-yellow-500' : 'bg-red-500'}" 
@@ -1558,7 +1557,7 @@
 
             window.ECALC_MEMORIAL.gerar({
                 titulo: 'Memorial de Cálculo de Viga em Concreto Armado',
-                norma: 'ABNT NBR 6118:2023 - Projeto de Estruturas de Concreto',
+                norma: 'ABNT NBR 6118:2014 (referência do modelo; edição vigente a conferir) - Projeto de Estruturas de Concreto',
                 elemento: `Viga V-101 (${d.b} × ${d.h} cm) - Vão L = ${d.vao.toFixed(2)} m`,
                 inputs: [
                     { label: 'Vão Teórico (L)', val: `${d.vao.toFixed(2)} m` },
@@ -1609,7 +1608,7 @@
                     }
                 ],
                 svgSection: svgSection,
-                notas: 'Memorial analítico estrutural gerado pela Suíte Integrada ECALC PRO em conformidade rigorosa com a ABNT NBR 6118:2023. O detalhamento executivo e a ART/RRT devem ser assinados pelo Responsável Técnico.'
+                notas: 'Memorial analítico estrutural gerado pela Suíte Integrada ECALC PRO com as hipóteses do modelo apresentado. O detalhamento executivo e a ART/RRT devem ser assinados pelo Responsável Técnico.'
             });
         }
 
@@ -2172,7 +2171,7 @@
         function salvarHistorico(item) {
             historico.unshift(item);
             if (historico.length > 15) historico.pop();
-            localStorage.setItem('calculoHistorico', JSON.stringify(historico));
+            ECalc.setItem('calculoHistorico', JSON.stringify(historico));
             atualizarHistorico();
         }
 
@@ -2232,7 +2231,7 @@
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             applyTheme(isDarkMode);
-            localStorage.setItem('darkMode', isDarkMode);
+            ECalc.setItem('darkMode', isDarkMode);
             showToast(isDarkMode ? 'Modo escuro ativado' : 'Modo claro ativado', 'info');
         }
 
@@ -2309,8 +2308,9 @@
         }
     </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

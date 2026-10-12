@@ -2677,13 +2677,16 @@ if (empty($_SESSION['api_token'])) {
         }
 
         // API Functions
+        const aiRequestIds=new Map();
         async function callAPI(action, data) {
+            const fingerprint=action+JSON.stringify(data);const requestId=aiRequestIds.get(fingerprint)||crypto.randomUUID();aiRequestIds.set(fingerprint,requestId);
             const token = localStorage.getItem('keepai_token') || '';
             const response = await fetch(`${API_URL}?action=${action}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-API-TOKEN': API_TOKEN,
+                    'X-Idempotency-Key': requestId,
                     'Authorization': token ? `Bearer ${token}` : ''
                 },
                 body: JSON.stringify(data)
@@ -2706,7 +2709,7 @@ if (empty($_SESSION['api_token'])) {
             }
             
             const result = await response.json();
-            
+            if(response.status!==409)aiRequestIds.delete(fingerprint);
             if (!result.success) {
                 throw new Error(result.error || 'Erro desconhecido');
             }

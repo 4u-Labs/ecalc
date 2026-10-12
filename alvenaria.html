@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Calculadora de Alvenaria | Ferramentas de Engenharia</title>
@@ -183,9 +184,7 @@
       border-radius: 4px;
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="text-gray-100">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"text-gray-100">
   <!-- Header -->
   <header class="no-print glass border-b border-white/10 relative z-20">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -565,11 +564,11 @@
         precoBloco: document.getElementById('preco-bloco').value,
         precoArgamassa: document.getElementById('preco-argamassa').value
       };
-      localStorage.setItem('alvenaria-calc', JSON.stringify(dados));
+      ECalc.setItem('alvenaria-calc', JSON.stringify(dados));
     }
 
     function carregarDados() {
-      const dados = JSON.parse(localStorage.getItem('alvenaria-calc'));
+      const dados = ECalc.readJSON('alvenaria-calc',null);
       if (!dados) return;
 
       if (dados.tipoAtual) selecionarTipo(dados.tipoAtual, false);
@@ -1071,6 +1070,7 @@ Prazo Estimado (1 pedreiro + 1 servente): ${diasObra} dias úteis (considerando 
     }
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

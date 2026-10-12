@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Conversor de Unidades | Ferramentas de Engenharia</title>
@@ -175,9 +176,7 @@
       }
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="text-gray-100 scrollbar-thin">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"text-gray-100 scrollbar-thin">
   <!-- Toast Container -->
   <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
   
@@ -920,8 +919,8 @@
     // ==================== STATE ====================
     let categoriaAtual = "comprimento";
     let precision = 6;
-    let historico = JSON.parse(localStorage.getItem("conversor_historico") || "[]");
-    let favoritos = JSON.parse(localStorage.getItem("conversor_favoritos") || "[]");
+    let historico = ECalc.readJSON('conversor_historico',[]);
+    let favoritos = ECalc.readJSON('conversor_favoritos',[]);
 
     // ==================== UTILITY FUNCTIONS ====================
     function showToast(message, type = "success") {
@@ -1030,7 +1029,7 @@
     }
 
     function realizarConversao() {
-      const valor = parseFloat(document.getElementById("valorOrigem").value) || 0;
+      const valor = ECalc.number(document.getElementById("valorOrigem").value);
       const origem = document.getElementById("unidadeOrigem").value;
       const destino = document.getElementById("unidadeDestino").value;
       
@@ -1060,7 +1059,7 @@
       destino.selectedIndex = tempIdx;
       
       // Use the result as new input
-      const resultValue = parseFloat(valorDestino.value.replace(/\./g, '').replace(',', '.')) || 0;
+      const resultValue = ECalc.number(valorDestino.value);
       valorOrigem.value = resultValue;
       
       realizarConversao();
@@ -1151,7 +1150,7 @@
       if (!isDuplicate) {
         historico.unshift(item);
         historico = historico.slice(0, 20);
-        localStorage.setItem("conversor_historico", JSON.stringify(historico));
+        ECalc.setItem("conversor_historico", JSON.stringify(historico));
         renderHistorico();
       }
     }
@@ -1220,7 +1219,7 @@
     function mostrarComparacao() {
       const section = document.getElementById("comparisonSection");
       const tbody = document.getElementById("comparisonBody");
-      const valor = parseFloat(document.getElementById("valorOrigem").value) || 1;
+      const valor = ECalc.number(document.getElementById("valorOrigem").value);
       const origem = document.getElementById("unidadeOrigem").value;
       const cat = unidades[categoriaAtual];
       
@@ -1275,7 +1274,7 @@
         showToast("⭐ Adicionado aos favoritos!", "success");
       }
       
-      localStorage.setItem("conversor_favoritos", JSON.stringify(favoritos));
+      ECalc.setItem("conversor_favoritos", JSON.stringify(favoritos));
       atualizarBotaoFavorito();
       renderFavoritos();
     }
@@ -1538,6 +1537,7 @@
     });
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

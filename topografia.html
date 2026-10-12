@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Topografia e Agrimensura PRO | ECALC SUITE</title>
@@ -149,9 +150,7 @@
       color: #00e5ff;
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="font-sans antialiased">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"font-sans antialiased">
 
   <!-- Header da Aplicação -->
   <header class="bg-dark-950/90 backdrop-blur-xl border-b border-white/10 no-print relative z-20">
@@ -585,9 +584,9 @@
         parts = parts.map(p => p.trim().replace(',', '.')).filter(p => p !== '');
         if (parts.length >= 2) {
           novos.push({
-            x: parseFloat(parts[0]) || 0,
-            y: parseFloat(parts[1]) || 0,
-            z: parseFloat(parts[2]) || 0
+            x: ECalc.number(parts[0]),
+            y: ECalc.number(parts[1]),
+            z: parts[2]===undefined?0:ECalc.number(parts[2])
           });
         }
       }
@@ -597,6 +596,7 @@
         return;
       }
 
+      ECalc.validateVertices(novos);
       vertices = novos;
       renderizarLinhasVertices();
       setEntryMode('coord');
@@ -627,7 +627,7 @@
         inp.addEventListener('input', e => {
           const idx = parseInt(e.target.getAttribute('data-idx'));
           const axis = e.target.getAttribute('data-axis');
-          vertices[idx][axis] = parseFloat(e.target.value) || 0;
+          vertices[idx][axis] = ECalc.number(e.target.value);
           calcularTopografia();
         });
       });
@@ -696,6 +696,7 @@
 
     // Motor Principal de Cálculo
     function calcularTopografia() {
+      ECalc.validateVertices(vertices);
       const n = vertices.length;
       if (n < 3) return;
 
@@ -1151,8 +1152,8 @@ Data da Emissão: ${new Date().toLocaleDateString('pt-BR')}`;
         window.ECALC_CAD.abrirNoCadClone(dxf, 'planta_topografica_poligonal.dxf');
       } else {
         try {
-          localStorage.setItem('cadclone_external_dxf', dxf);
-          localStorage.setItem('cadclone_external_filename', 'planta_topografica_poligonal.dxf');
+          ECalc.setItem('cadclone_external_dxf', dxf);
+          ECalc.setItem('cadclone_external_filename', 'planta_topografica_poligonal.dxf');
           window.open('../cadclone/', '_blank');
         } catch (e) {
           baixarDxfTopografia();
@@ -1362,7 +1363,7 @@ Data da Emissão: ${new Date().toLocaleDateString('pt-BR')}`;
       };
 
       try {
-        localStorage.setItem('officeclone_import_payload', JSON.stringify(payload));
+        ECalc.setItem('officeclone_import_payload', JSON.stringify(payload));
         window.open('../office/excel/', '_blank');
       } catch (e) {
         console.error('Erro ao transferir para OfficeClone:', e);
@@ -1386,7 +1387,7 @@ Data da Emissão: ${new Date().toLocaleDateString('pt-BR')}`;
 
     function toggleTheme() {
       const isLight = !document.body.classList.contains('light-theme');
-      localStorage.setItem('ecalc_theme', isLight ? 'light' : 'dark');
+      ECalc.setItem('ecalc_theme', isLight ? 'light' : 'dark');
       applyTheme(isLight);
     }
 
@@ -1417,8 +1418,9 @@ Data da Emissão: ${new Date().toLocaleDateString('pt-BR')}`;
   </script>
 
   <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-  <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+  <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

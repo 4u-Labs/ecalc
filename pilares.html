@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1, maximum-scale=5.0" name="viewport"/>
   <title>Dimensionamento de Pilares | Ferramentas de Engenharia</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="stylesheet" id="ecalc-suite-css" href="assets/suite/suite-nav.css?v=20260929_4">
+  <link rel="stylesheet" id="ecalc-suite-css" href="assets/suite/suite-nav.css?v=20261011_1">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -658,8 +659,8 @@
       forma: 95
     };
     
-    let precosPilares = JSON.parse(localStorage.getItem('precosPilares')) || { ...precosPilaresPadrao };
-    let historicoCalculos = JSON.parse(localStorage.getItem('historicoCalculos')) || [];
+    let precosPilares = ECalc.readJSON('precosPilares',null) || { ...precosPilaresPadrao };
+    let historicoCalculos = ECalc.readJSON('historicoCalculos',null) || [];
     
     const bitolasComerciais = [6.3, 8, 10, 12.5, 16, 20, 25, 32, 40];
     const areasBitolas = {
@@ -1827,7 +1828,7 @@ Classificação: ${classificacao}</pre>
       precosPilares.adicionalFck = parseFloat(document.getElementById('preco-adicional-fck').value) || precosPilaresPadrao.adicionalFck;
       precosPilares.forma = parseFloat(document.getElementById('preco-forma').value) || precosPilaresPadrao.forma;
       
-      localStorage.setItem('precosPilares', JSON.stringify(precosPilares));
+      ECalc.setItem('precosPilares', JSON.stringify(precosPilares));
       fecharModalPrecos();
       calcular();
       mostrarToast('✅', 'Preços salvos com sucesso!');
@@ -1835,7 +1836,7 @@ Classificação: ${classificacao}</pre>
     
     function restaurarPrecosPilares() {
       precosPilares = { ...precosPilaresPadrao };
-      localStorage.setItem('precosPilares', JSON.stringify(precosPilares));
+      ECalc.setItem('precosPilares', JSON.stringify(precosPilares));
       document.getElementById('preco-aco').value = precosPilares.acoKg.toFixed(2);
       document.getElementById('preco-concreto-base').value = precosPilares.concretoBase.toFixed(0);
       document.getElementById('preco-adicional-fck').value = precosPilares.adicionalFck.toFixed(0);
@@ -1874,7 +1875,7 @@ Classificação: ${classificacao}</pre>
       historicoCalculos.unshift(item);
       if (historicoCalculos.length > 20) historicoCalculos.pop();
       
-      localStorage.setItem('historicoCalculos', JSON.stringify(historicoCalculos));
+      ECalc.setItem('historicoCalculos', JSON.stringify(historicoCalculos));
       mostrarToast('💾', 'Cálculo salvo no histórico!');
     }
     
@@ -1899,7 +1900,7 @@ Classificação: ${classificacao}</pre>
     
     function removerHistorico(id) {
       historicoCalculos = historicoCalculos.filter(item => item.id !== id);
-      localStorage.setItem('historicoCalculos', JSON.stringify(historicoCalculos));
+      ECalc.setItem('historicoCalculos', JSON.stringify(historicoCalculos));
       renderizarHistorico();
     }
     
@@ -2129,8 +2130,9 @@ CUSTO ESTIMADO: R$ ${ultimoResultado.custo.total.toFixed(2)}
     </script>
 
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

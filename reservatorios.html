@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Dimensionamento de Reservatórios | Ferramentas de Engenharia</title>
@@ -460,9 +461,7 @@
       .spec-value { color: #00838f !important; -webkit-text-fill-color: #00838f !important; }
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="text-gray-100 pb-10">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"text-gray-100 pb-10">
   
   <!-- Header -->
   <header class="no-print relative z-20 py-2.5 sm:py-3.5 px-3 sm:px-4 border-b border-cyan-900/30">
@@ -796,7 +795,7 @@
       instalacaoPerc: 20
     };
 
-    let precosReservatorios = JSON.parse(localStorage.getItem('precosReservatorios')) || { ...precosReservatoriosPadrao };
+    let precosReservatorios = ECalc.readJSON('precosReservatorios',null) || { ...precosReservatoriosPadrao };
 
     const consumosPadrao = {
       'residencial': { consumo: 150, populacao: 4, descricao: 'Residência unifamiliar' },
@@ -1567,7 +1566,7 @@
         instalacaoPerc: parseFloat(document.getElementById('preco-instalacao-perc').value) || 0
       };
 
-      localStorage.setItem('precosReservatorios', JSON.stringify(precosReservatorios));
+      ECalc.setItem('precosReservatorios', JSON.stringify(precosReservatorios));
       calcular();
       fecharModalPrecos();
 
@@ -1585,7 +1584,7 @@
     function restaurarPrecosReservatorios() {
       if (confirm('Restaurar todos os preços para os valores padrão?')) {
         precosReservatorios = { ...precosReservatoriosPadrao };
-        localStorage.setItem('precosReservatorios', JSON.stringify(precosReservatorios));
+        ECalc.setItem('precosReservatorios', JSON.stringify(precosReservatorios));
         abrirModalPrecos(); // Recarrega os valores no modal
         calcular();
       }
@@ -1892,7 +1891,7 @@
         ['Investimento Total Estimado', custoTotal.toFixed(2), 'R$']
       ];
 
-      localStorage.setItem('officeclone_import_data', JSON.stringify({
+      ECalc.setItem('officeclone_import_data', JSON.stringify({
         filename: `Reservatorios_RTI_${d.populacao}pessoas.csv`,
         rows: csvData
       }));
@@ -2059,8 +2058,9 @@
     window.addEventListener('load', calcular);
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

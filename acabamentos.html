@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Acabamentos e Revestimentos | Suíte de Engenharia eCalc</title>
@@ -113,9 +114,7 @@
       box-shadow: 0 4px 15px rgba(255, 0, 170, 0.35);
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="font-sans text-gray-100 pb-16">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"font-sans text-gray-100 pb-16">
   <!-- Top Navigation Header -->
   <header class="bg-dark-900/90 backdrop-blur-xl border-b border-white/5 no-print relative z-20">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -2261,7 +2260,7 @@ ${isF530 ? `- Chapas de Gesso ST 12.5mm: ${Math.ceil(area / 2.88 * 1.05)} unidad
         ]);
       });
 
-      localStorage.setItem('officeclone_import_data', JSON.stringify({
+      ECalc.setItem('officeclone_import_data', JSON.stringify({
         filename: `Orcamento_Acabamentos_${res.modulo}_${$('nomeAmbiente').value}.csv`,
         rows: csvData
       }));
@@ -2336,8 +2335,9 @@ ${isF530 ? `- Chapas de Gesso ST 12.5mm: ${Math.ceil(area / 2.88 * 1.05)} unidad
   </script>
 
   <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-  <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
-  <script src="assets/suite/suite-cad.js?v=20260929_4"></script>
+  <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+  <script src="assets/suite/suite-cad.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

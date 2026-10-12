@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#050512" />
@@ -263,11 +264,7 @@
       .circular-progress .progress-value{ font-size:1rem; }
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-
-<body>
-  <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-xl focus:bg-black focus:text-white">Pular para o conteúdo</a>
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-xl focus:bg-black focus:text-white">Pular para o conteúdo</a>
 
   <div class="bg-animation"></div>
   <div class="noise"></div>
@@ -1163,7 +1160,7 @@
           data: document.getElementById('input-data').value
         }
       };
-      localStorage.setItem('checklist-fiscalizacao', JSON.stringify(dados));
+      ECalc.setItem('checklist-fiscalizacao', JSON.stringify(dados));
     }
 
     function carregarDados() {
@@ -1345,6 +1342,7 @@
     }
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

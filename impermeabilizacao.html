@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Impermeabilização | Ferramentas de Engenharia</title>
@@ -706,10 +707,7 @@
       .header p { font-size: 0.8rem !important; }
     }
 </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body>
-    <a href="#" class="btn-voltar" onclick="history.back()">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"#" class="btn-voltar" onclick="history.back()">
         <i class="fas fa-arrow-left"></i> Voltar
     </a>
 
@@ -893,7 +891,7 @@
         };
 
         // Carregar preços do localStorage
-        let precos = JSON.parse(localStorage.getItem('precosImpermeabilizacao')) || { ...precosPadrao };
+        let precos = ECalc.readJSON('precosImpermeabilizacao',null) || { ...precosPadrao };
 
         // Sistemas de impermeabilização
         const sistemas = {
@@ -1510,7 +1508,7 @@
                 }
             });
 
-            localStorage.setItem('precosImpermeabilizacao', JSON.stringify(precos));
+            ECalc.setItem('precosImpermeabilizacao', JSON.stringify(precos));
             
             if (calculoRealizado) {
                 calcular();
@@ -1523,7 +1521,7 @@
         function restaurarPrecos() {
             if (confirm('Deseja restaurar os preços padrão?')) {
                 precos = { ...precosPadrao };
-                localStorage.setItem('precosImpermeabilizacao', JSON.stringify(precos));
+                ECalc.setItem('precosImpermeabilizacao', JSON.stringify(precos));
                 renderizarPrecosModal();
                 
                 if (calculoRealizado) {
@@ -1552,6 +1550,7 @@
         }
     </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>

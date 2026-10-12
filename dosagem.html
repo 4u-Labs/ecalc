@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+<script src="assets/suite/suite-core.js?v=20261011_1"></script>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Dosagem de Concreto | Ferramentas de Engenharia</title>
@@ -347,9 +348,7 @@
       color: #64748b !important;
     }
   </style>
-  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20260929_4>
-</head>
-<body class="text-gray-100">
+  <link rel=stylesheet id=ecalc-suite-css href=assets/suite/suite-nav.css?v=20261011_1"text-gray-100">
   <!-- Toast Container -->
   <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
   
@@ -792,7 +791,7 @@
 
     let autoCalc = false;
     let calculoAtual = null;
-    let historico = JSON.parse(localStorage.getItem('dosagem_historico') || '[]');
+    let historico = ECalc.readJSON('dosagem_historico',[]);
 
     // ===== UTILITÁRIOS =====
     const fmtBRL = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
@@ -847,13 +846,13 @@
         if (themeIcon) {
           themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
         }
-        localStorage.setItem('ecalc_theme', 'light');
+        ECalc.setItem('ecalc_theme', 'light');
       } else {
         document.body.classList.remove('light-theme');
         if (themeIcon) {
           themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>';
         }
-        localStorage.setItem('ecalc_theme', 'dark');
+        ECalc.setItem('ecalc_theme', 'dark');
       }
       if (typeof calculoAtual !== 'undefined' && calculoAtual) {
         desenharGraficos(calculoAtual);
@@ -1348,7 +1347,7 @@
       historico.unshift({...calculoAtual});
       if (historico.length > 20) historico.pop();
       
-      localStorage.setItem('dosagem_historico', JSON.stringify(historico));
+      ECalc.setItem('dosagem_historico', JSON.stringify(historico));
       showToast('Cálculo salvo!', 'success');
       renderHistorico();
     }
@@ -1395,7 +1394,7 @@
     function excluirCalculo(index) {
       if (!confirm('Excluir este cálculo?')) return;
       historico.splice(index, 1);
-      localStorage.setItem('dosagem_historico', JSON.stringify(historico));
+      ECalc.setItem('dosagem_historico', JSON.stringify(historico));
       renderHistorico();
       showToast('Cálculo excluído', 'info');
     }
@@ -1881,7 +1880,7 @@ Traço Unitário: ${d.traco}`;
         darkMode: false
       };
 
-      localStorage.setItem('excelCloneData', JSON.stringify(payload));
+      ECalc.setItem('excelCloneData', JSON.stringify(payload));
       window.open('../office/excel/', '_blank');
     }
 
@@ -1894,7 +1893,8 @@ Traço Unitário: ${d.traco}`;
     }
   </script>
     <!-- ECALC SUITE UNIFIED ARCHITECTURE -->
-    <script src="assets/suite/suite-nav.js?v=20260929_4"></script>
-    <script src="assets/suite/suite-memorial.js?v=20260929_4"></script>
+    <script src="assets/suite/suite-nav.js?v=20261011_1"></script>
+    <script src="assets/suite/suite-memorial.js?v=20261011_1"></script>
+<script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
 </body>
 </html>
