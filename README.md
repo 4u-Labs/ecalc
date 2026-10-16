@@ -72,7 +72,13 @@ O **ΞCALC** é uma suíte técnica de alta precisão desenvolvida para engenhei
 
 ---
 
-## 📄 Licença & Direitos
+## 📄 Licença & Termos de Uso / License
 
-© 2026 **4U.IA.BR**. Todos os direitos reservados.  
-Autor: **Fabiano Braga** ([ORCID: 0009-0004-5936-5060](https://orcid.org/0009-0004-5936-5060)).
+Este projeto é distribuído sob o modelo **Source-Available** (código disponível publicamente para consulta, aprendizado e auditoria técnica).
+
+* ✅ **Permitido:** Estudo pessoal, aprendizado, testes locais e auditoria de código.
+* ❌ **Proibido:** Uso comercial (direto ou indireto), redistribuição, revenda ou criação de produtos derivados sem autorização prévia por escrito.
+
+Todos os direitos autorais e patrimoniais pertencem à **4U** (4u.ia.br). Para detalhes completos e condições legais, consulte o arquivo [LICENSE](LICENSE).
+
+Para parcerias ou licenciamento de uso comercial do motor do ΞCALC (Engenharia Civil), entre em contato através de [4u.ia.br](https://4u.ia.br).
