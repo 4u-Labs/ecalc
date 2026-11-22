@@ -16,11 +16,9 @@ $v = time();
     <meta name="description" content="ECALC - Plataforma com 40 ferramentas técnicas, calculadoras especializadas, normas ABNT NBR e relatórios para engenharia civil.">
 
     <!-- Favicon & App Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-ecalc-32.png">
-    <link rel="icon" type="image/png" sizes="64x64" href="assets/icon-ecalc-64.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-ecalc-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=20261120-2">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=20261120-2">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-ecalc-192.png">
-    <link rel="shortcut icon" href="assets/favicon.ico">
     <link rel="manifest" href="manifest.json">
 
     <!-- Google Fonts -->
@@ -440,6 +438,15 @@ $v = time();
             border-color: rgba(139, 92, 246, 0.55) !important;
         }
     </style>
+    <!-- 4U SEO & AEO Schema -->
+    <link rel="canonical" href="https://4u.ia.br/app/engenharia/">
+    <meta property="og:site_name" content="4U.IA.BR — 4u-Labs">
+    <meta property="og:url" content="https://4u.ia.br/app/engenharia/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ECALC — Suíte com 30+ Calculadoras de Engenharia Civil e NBR Online | 4U.IA.BR">
+    <meta name="twitter:description" content="Plataforma gratuita com mais de 30 calculadoras técnicas de engenharia civil: dosagem de concreto, vigas, pilares, lajes, elétrica NBR 5410, solar, hidráulica e orçamento.">
+    <meta name="twitter:image" content="https://4u.ia.br/loja/uploads/img-1790552443-5e1701ce.webp">
+    <script type="application/ld+json" data-4u-seo="1">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"ECALC Engenharia","url":"https://4u.ia.br/app/engenharia/","image":"https://4u.ia.br/loja/uploads/img-1790552443-5e1701ce.webp","description":"Plataforma gratuita com mais de 30 calculadoras técnicas de engenharia civil: dosagem de concreto, vigas, pilares, lajes, elétrica NBR 5410, solar, hidráulica e orçamento.","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript. HTML5.","inLanguage":["pt-BR","en"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"BRL"},"featureList":["30+ calculadoras estruturais, materiais e MEP","Cálculos baseados em normas técnicas (NBR 6118, NBR 5410)","Orçamento estimativo CUB, diário de obra e NR-18","Integrado ao FotoLaudo, CADClone e 4USign"],"publisher":{"@type":"Organization","name":"4u-Labs","url":"https://4u.ia.br/"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quais áreas da engenharia civil o ECALC cobre?","acceptedAnswer":{"@type":"Answer","text":"Estrutural (vigas, pilares, lajes, fundações, aço), Materiais (dosagem de concreto, consumo, alvenaria), Instalações (elétrica, hidráulica, solar, gás, incêndio) e Gestão de Obra."}},{"@type":"Question","name":"Os cálculos substituem um engenheiro responsável?","acceptedAnswer":{"@type":"Answer","text":"Não. A suíte auxilia pré-dimensionamento, conferência rápida em obra e estudos preliminares com transparência nas fórmulas."}},{"@type":"Question","name":"É gratuito para estudantes e profissionais?","acceptedAnswer":{"@type":"Answer","text":"Sim, acesso gratuito direto no navegador, sem cadastro obrigatório."}}]}]}</script>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-white">
 
@@ -1341,5 +1348,7 @@ $v = time();
         }
     </script>
 <script src="assets/suite/suite-reliability.js?v=20261011_1"></script>
+
+    <script defer src="/assets/4ulabs-ecosystem.js?v=20261122" data-fouru-i18n="1"></script>
 </body>
 </html>
